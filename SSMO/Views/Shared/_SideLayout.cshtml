@@ -1,0 +1,93 @@
+﻿
+@if (this.User.Identity.IsAuthenticated)
+{
+    <div class="container">
+        <main role="main" class="pb-3">
+            <div id="wrapper">
+                <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+
+                    <li>
+
+                        <div class="dropdown ">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                MySales
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateInvoice">Invoice</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateProforma">Proforma Invoice</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateOrder">Order</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateCreditNote">Credit Note</a>
+                            </div>
+                        </div>
+                    </li>
+
+
+                    <li class="nav-item active">
+                        <a href="~/Descriptions/Add" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>New Product Description</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item active">
+                        <a href="~/Purchases/AddPurchase" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Purchase</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item active">
+                        <a href="~/Customers/Add" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Customer</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item active">
+                        <a href="~/Products/AddProduct" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Products</span>
+                        </a>
+                    </li>
+
+                    <!-- Heading -->
+                    <div class="sidebar-heading text-capitalize">
+                        <br />
+                        Records
+                        <br />
+                    </div>
+
+                    <li class="nav-item active">
+                        <a href="~/Customers/CustomersReport" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Customer Invoice Records</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item active">
+                        <a href="~/Customers/Add" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Supplier Purchases Records</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item active">
+                        <a href="~/Reports/ReportProducts" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Products Avaialbility</span>
+                        </a>
+                    </li>
+
+                </ul>
+
+            </div>
+        </main>
+
+    </div>
+
+}
+
+
+
+
+

@@ -1,0 +1,51 @@
+﻿@model MyCompanyFormModel
+
+<div class="text-center" >
+    <h2 class="text-dark"> Please Register</h2>
+</div>
+
+<div class="row align-items-center">
+    <div class="col-sm-12 offset-xl-3 col-md-10 col-lg-8 col-xl-6 offset-lg-2">
+        <form method="post">
+            <div class="form-group">
+                <label asp-for="Name">Company name</label>
+                <input class="form-control" asp-for="Name" placeholder="Enter company name">
+                <span asp-validation-for="Name" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="EIK">Company EIK</label>
+                <input class="form-control" asp-for="EIK" placeholder="write company EIK">
+                <span asp-validation-for="EIK" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="VAT">Company VAT</label>
+                <input type="text" class="form-control" asp-for="VAT" placeholder="write company VAT">
+                <span asp-validation-for="VAT" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Country">Country</label>
+                <input type="text" class="form-control" asp-for="Country" placeholder="Country">
+                <span asp-validation-for="Country" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="City">City</label>
+                <input type="text" class="form-control" asp-for="City" placeholder="City">
+                <span asp-validation-for="City" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Street">Street</label>
+                <input type="text" class="form-control" asp-for="Street" placeholder="Street">
+                <span asp-validation-for="Street" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="RepresentativePerson">Representative</label>
+                <input type="text" class="form-control" asp-for="RepresentativePerson" placeholder="RepresentativePerson">
+                <span asp-validation-for="RepresentativePerson" class="small text-danger"></span>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Submit</button>
+          
+        </form>
+    </div>
+
+</div>

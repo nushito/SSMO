@@ -1,0 +1,53 @@
+﻿@model AddBankDetailsFormModel
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="CompanyName">Company</label>
+        <select asp-for="CompanyName" asp-items="@(new SelectList(Model.CompanyNames))">
+            @foreach (var name in Model.CompanyNames)
+            {
+                <option  value="@name">@name</option>
+            }
+        </select>
+    </div>
+    
+@*</form>
+   
+<form method="post">*@
+    @*<div class="form-group">
+        <label asp-for="CompanyName"></label>
+        <input type="hidden" asp-for="CompanyName" value="@Model.CompanyName" />
+    </div>*@
+
+
+    <div class="form-group">
+        <label asp-for="CurrencyName">Currency</label>
+        <select asp-for="CurrencyName" asp-items="@(new SelectList(Model.Currency).Distinct())">
+
+            @foreach (var currency in Model.Currency)
+            {
+                <option value="@currency.ToString()">@currency.ToString()</option>
+            }
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="BankName">Bank Name</label>
+        <input asp-for="BankName" type="text" class="form-control" aria-describedby="name" placeholder="Enter bank name">
+        <span asp-validation-for="BankName" class="small text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Iban">Iban</label>
+        <input asp-for="Iban" type="text" class="form-control" placeholder="enter your IBAN">
+    </div>
+    <div class="form-group">
+        <label asp-for="Swift">SWIFT</label>
+        <input asp-for="Swift" type="text" class="form-control" placeholder="enter swift">
+    </div>
+    <div class="form-group">
+        <label asp-for="Address">Street</label>
+        <input asp-for="Address" type="text" class="form-control" placeholder="address">
+    </div>
+
+    <button type="submit" class="btn btn-primary" value="Save" asp-route-companyname="@Model.CompanyName">Add</button>
+</form>

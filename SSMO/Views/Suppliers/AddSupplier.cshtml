@@ -1,0 +1,59 @@
+﻿@model AddSupplierModel
+
+<h3 class="text-center">Add New Supplier</h3>
+
+<form method="post">
+    <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="Name">Name</label>
+        <input asp-for="Name" type="text" class="form-control" placeholder="Name">
+        <span asp-validation-for="Name" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="Eik">EIK</label>
+        <input asp-for="Eik" type="text" class="form-control" placeholder="Eik">
+        <span asp-validation-for="Eik" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="VAT">VAT</label>
+        <input asp-for="VAT" type="text" class="form-control" placeholder="VAT">
+        <span asp-validation-for="VAT" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="Country">Country</label>
+        <input asp-for="Country" type="text" class="form-control" placeholder="Country">
+    </div>
+    <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="City">City</label>
+        <input asp-for="City" type="text" class="form-control" placeholder="City">
+        <span asp-validation-for="City" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="SupplierAddress">Address</label>
+        <input asp-for="SupplierAddress" type="text" class="form-control" placeholder="Address">
+        <span asp-validation-for="SupplierAddress" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="RepresentativePerson">Manager</label>
+        <input asp-for="RepresentativePerson" type="text" class="form-control" placeholder="Manager name">
+        <span asp-validation-for="RepresentativePerson" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="Email">Email</label>
+        <input asp-for="Email" type="text" class="form-control" placeholder="Email">
+        <span asp-validation-for="Email" class="small text-danger"></span>
+    </div>
+
+    
+        <input type="submit" class="btn btn-primary text-center" value="Save">
+        <br />
+        <a href="~/Purchases/AddPurchase" class="btn btn-primary mb-3 mt-3 text-center">Back</a>
+   
+</form>
+   
+

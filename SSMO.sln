@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32602.215
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SSMO", "SSMO\SSMO.csproj", "{64272021-AF8B-4A5F-A489-8932E26D73DA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{64272021-AF8B-4A5F-A489-8932E26D73DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{64272021-AF8B-4A5F-A489-8932E26D73DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{64272021-AF8B-4A5F-A489-8932E26D73DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{64272021-AF8B-4A5F-A489-8932E26D73DA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E2166AF1-06B3-4DD7-A506-A96ED411C735}
+	EndGlobalSection
+EndGlobal
