@@ -80,7 +80,8 @@ namespace SSMO.Controllers
                 };
             }
 
-
+            //check customerID
+            //check mycompany 
 
 
             var customerOrder = new CustomerOrder

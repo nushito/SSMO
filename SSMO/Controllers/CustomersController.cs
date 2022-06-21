@@ -50,7 +50,7 @@ namespace SSMO.Controllers
              // PhoneNumber = model
             };
 
-            this.dbContext.Clients.Add(customer);
+            this.dbContext.Customers.Add(customer);
             this.dbContext.SaveChanges();
 
             return RedirectToAction("Index","Home");

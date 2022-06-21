@@ -14,6 +14,7 @@ using SSMO.Services.MyCompany;
 using SSMO.Services.Product;
 using SSMO.Services.Customer;
 using SSMO.Services.Documents;
+using Microsoft.AspNetCore.Mvc;
 
 namespace SSMO
 {
@@ -32,11 +33,21 @@ namespace SSMO
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDatabaseDeveloperPageExceptionFilter();
 
-            services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDefaultIdentity<IdentityUser>(options => {
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
-            services.AddControllersWithViews();
+
+            services.AddControllersWithViews(options =>
+            {
+                options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+            });
 
             services.AddTransient<ISupplierService, SupplierService>();
             services.AddTransient<ICurrency, Currency>();
@@ -78,6 +89,7 @@ namespace SSMO
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapDefaultControllerRoute();
                 endpoints.MapRazorPages();
             });
         }

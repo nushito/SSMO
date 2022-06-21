@@ -116,6 +116,8 @@
                 new Grade {Name ="C/C"}
             });
 
+            data.SaveChanges();
+
         }
 
      
@@ -180,6 +182,8 @@
                 new Size {Name = "30/1220/2440"},
                 new Size {Name = "30/2440/1220"},
             });
+
+            data.SaveChanges();
         }
 
         

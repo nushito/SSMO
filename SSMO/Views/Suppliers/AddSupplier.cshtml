@@ -37,6 +37,18 @@
         <span asp-validation-for="SupplierAddress" class="small text-danger"></span>
     </div>
 
+     <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="FSCClaim">FSC Claim</label>
+        <input asp-for="FSCClaim" type="text" class="form-control" >
+        <span asp-validation-for="FSCClaim" class="small text-danger"></span>
+    </div>
+       <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="FSCSertificate">FSC Claim</label>
+        <input asp-for="FSCSertificate" type="text" class="form-control" >
+        <span asp-validation-for="FSCSertificate" class="small text-danger"></span>
+    </div>
+
+
     <div class="form-group  offset-3 mb-2 col-md-6">
         <label asp-for="RepresentativePerson">Manager</label>
         <input asp-for="RepresentativePerson" type="text" class="form-control" placeholder="Manager name">
@@ -52,7 +64,7 @@
     
         <input type="submit" class="btn btn-primary text-center" value="Save">
         <br />
-        <a href="~/Purchases/AddPurchase" class="btn btn-primary mb-3 mt-3 text-center">Back</a>
+      
    
 </form>
    

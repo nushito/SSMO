@@ -69,8 +69,7 @@ namespace SSMO.Controllers
             this.dbContext.Suppliers.Add(supplier);
             this.dbContext.SaveChanges();
 
-            return View();
-               
+            return RedirectToAction("Index", "Home");
 
         }
     }

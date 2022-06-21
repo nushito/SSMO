@@ -40,33 +40,8 @@
                                     </div>
                                 </div>
                             </li>
-
-
-                            <div class="row">
-            <div class="col-3 border-right-0 ml-sm-n1">
-                <aside class="navbar border-left-0">
-                    <partial name="_SideLayout" />
-
-                </aside>
-            </div>
-
-            <div class="col-12 align-content-between mb-0 pr-sm-1 border-left-0 border-right-0 m-5">
-
-                <main role="main" class="pb-9 m-0">
-                    @RenderBody()
-                </main>
-
-            </div>
-        </div>
-
-
-
                         }
 
-
-                        @*<li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Company" asp-action="Create">Company</a>
-                            </li>*@
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>
@@ -76,13 +51,27 @@
     </header>
 
    
-        
+         <div class="row">
+        <div class="col-3 border-right-0 ml-sm-n1">
+            <aside class="navbar">
+               <partial name="_SideLayout" />
+
+            </aside>
+        </div>
+        <div class="col-9 align-content-between mb-0 pr-sm-1 border-left-0 border-right-0">
+            
+                <main role="main" class="pb-9 m-0">
+                    @RenderBody()
+                </main>
+           
+        </div>
+    </div>
 
 
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2021 - SIAS - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+           SSMO - 2022 <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

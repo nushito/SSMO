@@ -23,7 +23,7 @@ namespace SSMO.Services.Customer
 
         public IEnumerable<string> GetCustomers()
         {
-            return dbContext.Clients.Select(a => a.Name).ToList();
+            return dbContext.Customers.Select(a => a.Name).ToList();
         }
 
         //public IEnumerable<int> GetInvoices(string name = null)
