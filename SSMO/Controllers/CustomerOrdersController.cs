@@ -8,10 +8,10 @@ using SSMO.Services;
 using SSMO.Services.Customer;
 using SSMO.Services.MyCompany;
 using SSMO.Services.Product;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace SSMO.Controllers
 {
@@ -22,12 +22,13 @@ namespace SSMO.Controllers
         private readonly IMycompanyService myCompanyService;
         private readonly ICustomerService customerService;
         private readonly IProductService productService;
+        private readonly IMapper mapper;
 
         public CustomerOrdersController(ISupplierService supplierService,
            ICurrency currency,
            IMycompanyService myCompanyService,
            ICustomerService customerService,
-           IProductService productService
+           IProductService productService, IMapper  mapper
            )
         {
             this.supplierService = supplierService;
@@ -35,6 +36,7 @@ namespace SSMO.Controllers
             this.myCompanyService = myCompanyService;
             this.customerService = customerService;
             this.productService = productService;
+            this.mapper = mapper;
         }
 
         [HttpGet]
@@ -47,8 +49,8 @@ namespace SSMO.Controllers
                 new CustomerOrderViewModel
                 {
                     Currencies = currency.AllCurrency(),
-                    Customers = (IEnumerable<AddCustomerFormModel>)customerService.AllCustomers(),
-                    MyCompanies = (IEnumerable<Models.MyCompany.MyCompanyFormModel>)myCompanyService.GetCompany(),
+                    Customers = customerService.CustomersData(),
+                    MyCompanies =myCompanyService.GetAllCompanies(),
                     Suppliers = supplierService.GetSuppliers(),
                     Products = new List<ProductViewModel>()
                  }
@@ -66,8 +68,8 @@ namespace SSMO.Controllers
                 new CustomerOrderViewModel
                 {
                     Currencies = currency.AllCurrency(),
-                    Customers = (IEnumerable<AddCustomerFormModel>)customerService.AllCustomers(),
-                    MyCompanies = (IEnumerable<Models.MyCompany.MyCompanyFormModel>)myCompanyService.GetCompany(),
+                    Customers = customerService.CustomersData(),
+                    MyCompanies = myCompanyService.GetAllCompanies(),
                     Suppliers = supplierService.GetSuppliers(),
                     Products = new List<ProductViewModel>()
                 };
@@ -80,18 +82,23 @@ namespace SSMO.Controllers
                 };
             }
 
+
+
             //check customerID
             //check mycompany 
-
+           
 
             var customerOrder = new CustomerOrder
-            { Amount = customermodel.Amount,
-             Balance = customermodel.Balance,
-               ClientId = customermodel.ClientId,
-              CurrencyId = customermodel.CurrencyId,
-               DeliveryTerms = customermodel.DeliveryTerms,
+                  { Id = customermodel.Id,
                 Number = customermodel.Number,
-                 PaidAmountStatus = customermodel.PaidAmountStatus,
+            
+                Amount = customermodel.Amount,
+                    Balance = customermodel.Balance,
+                    ClientId = customermodel.ClientId,
+                  CurrencyId = customermodel.CurrencyId,
+                  DeliveryTerms = customermodel.DeliveryTerms,
+                 
+                  PaidAmountStatus = customermodel.PaidAmountStatus,
                   PaidAvance = customermodel.PaidAvance,
               
             };

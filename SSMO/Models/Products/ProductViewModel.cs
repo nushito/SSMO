@@ -14,6 +14,8 @@ namespace SSMO.Models.Products
         [Required]
         public string Grade { get; set; }
         public IEnumerable<string> Grades { get; set; }
+        public string FSCClaim { get; set; }
+        public string FSCSertificate { get; set; }
         [Required]
         public int Pieces { get; set; }
         public decimal Cubic { get; set; }

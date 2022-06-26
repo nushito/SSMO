@@ -1,1 +1,49 @@
-﻿
+﻿@model CustomerOrderViewModel
+@{
+    ViewBag.Title = "Add Customer Order";
+}
+
+<form >
+      <div class="row col-md-4""> Order N:
+        <label asp-for="Number"></label>
+        <input asp-for="Number" class="form-control"/>
+        <span asp-validation-for="Number" class="small text-danger"></span>
+    </div>
+    <div class="row col-md-4"">
+        <label asp-for="Date"></label>
+        <input asp-for="Date" class="form-control"/>
+        <span asp-validation-for="Date" class="small text-danger"></span>
+    </div>
+    <div class="row">
+        <div class="form-group col-md-4">
+            <div class="form-group">
+                <label asp-for="ClientId"></label>
+                <select asp-for="ClientId" class="form-control">
+                    @foreach (var item in Model.Customers)
+                    {
+                        <option value="@item.Id">@item.Name</option>
+                        
+                    }
+                    <span asp-validation-for="ClientId" class="small text-danger"></span>
+                </select>
+            </div>
+
+        </div>
+        <div class="form-group col-md-4">
+            <div class="form-group">
+                <label asp-for="MyCompanyId"></label>
+                <select asp-for="MyCompanyId" class="form-control">
+                    @foreach (var company in Model.MyCompanies)
+                    {
+                        <option value="@company.Id">@company.Name</option>
+                    }
+                    <span asp-validation-for="MyCompanyId" class="small text-danger"></span>
+                </select>
+            </div>
+            
+        </div>
+
+    </div>
+  
+
+</form>

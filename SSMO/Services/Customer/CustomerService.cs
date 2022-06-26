@@ -4,27 +4,41 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace SSMO.Services.Customer
 {
     public class CustomerService : ICustomerService
     {
         private readonly ApplicationDbContext dbContext;
-        public CustomerService(ApplicationDbContext dbContex)
+        private readonly IMapper mapper;
+        public CustomerService(ApplicationDbContext dbContex, IMapper mapper)
         {
             this.dbContext = dbContex;
+            this.mapper = mapper;
         }
 
-        public ICollection<AddCustomerFormModel> AllCustomers()
+        public IEnumerable<AddCustomerFormModel> CustomersData()
         {
+            var listCustomers = dbContext.Customers.ToList();
 
-            return (ICollection<AddCustomerFormModel>)dbContext.MyCompanies.ToList();
+            var customers = mapper.Map<IEnumerable<AddCustomerFormModel>>(listCustomers);
+            return customers;
         }
 
-        public IEnumerable<string> GetCustomers()
+        public AddCustomerFormModel GetCustomer(int id)
+        {
+            var customer = dbContext.Customers.Where(a => a.Id == id).FirstOrDefault();
+            var getCustomer = mapper.Map<AddCustomerFormModel>(customer);
+            return getCustomer;
+        }
+
+        public IEnumerable<string> GetCustomerNames()
         {
             return dbContext.Customers.Select(a => a.Name).ToList();
         }
+
+
 
         //public IEnumerable<int> GetInvoices(string name = null)
         //{

@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 
+
 namespace SSMO.Models.CustomerOrders
 {
     public class CustomerOrderViewModel
@@ -22,7 +23,8 @@ namespace SSMO.Models.CustomerOrders
         [Required]
         public string DeliveryTerms { get; set; }
         public int ClientId { get; set; }
-        public string CustomerName { get; set; }
+        public AddCustomerFormModel Customer { get; set; }
+
         public IEnumerable<AddCustomerFormModel> Customers { get; set; }
         public int MyCompanyId { get; set; }
         public string MyCompanyName { get; set; }

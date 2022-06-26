@@ -87,6 +87,7 @@ namespace SSMO.Data
                 .WithMany(a => a.Orders)
                 .HasForeignKey(a => a.MyCompanyId)
                 .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<CustomerOrder>()
                 .HasOne(a => a.Currency)
                 .WithMany(a => a.CustomerOrders)
@@ -102,6 +103,12 @@ namespace SSMO.Data
                 .HasOne(a => a.Currency)
                 .WithMany(a => a.SupplierOrders)
                 .HasForeignKey(a => a.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SupplierOrder>()
+                .HasOne(a => a.MyCompany)
+                .WithMany(a => a.SupplierOrders)
+                .HasForeignKey(a => a.MyCompanyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<SupplierOrder>()

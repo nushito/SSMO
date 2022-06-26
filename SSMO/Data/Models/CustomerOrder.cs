@@ -23,9 +23,13 @@ namespace SSMO.Data.Models
         [Required]
         public string DeliveryTerms { get; set; }
         public int ClientId { get; set; }
-        public Customer Customer { get; set; }
         public int MyCompanyId { get; set; }
         public MyCompany MyCompany { get; set; }
+        public Customer Customer { get; set; }
+        [Required]
+        public string FSCClaim { get; set; }
+        [Required]
+        public string FSCSertificate { get; set; }
         public Status Status { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }

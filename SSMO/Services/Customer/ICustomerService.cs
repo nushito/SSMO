@@ -5,8 +5,10 @@ namespace SSMO.Services.Customer
 {
     public interface ICustomerService
     {
-        public IEnumerable<string> GetCustomers();
-        public ICollection<AddCustomerFormModel> AllCustomers();
-      //  public IEnumerable<int> GetInvoices(string name);
+        public IEnumerable<string> GetCustomerNames();
+
+        public IEnumerable<AddCustomerFormModel> CustomersData();
+        public AddCustomerFormModel GetCustomer(int id);   
+        //  public IEnumerable<int> GetInvoices(string name);
     }
 }

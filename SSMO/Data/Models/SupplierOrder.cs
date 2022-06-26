@@ -17,6 +17,8 @@ namespace SSMO.Data.Models
         public Supplier Supplier { get; set; }
         public int CustomerOrderId { get; set; }
         public CustomerOrder CustomerOrder { get; set; }
+        public int MyCompanyId { get; set; }
+        public MyCompany MyCompany { get; set; }
         public StatusEnum Status { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
