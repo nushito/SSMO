@@ -44,7 +44,9 @@ namespace SSMO.Data.Models
       
         public int SupplierId { get; set; }
         public Supplier Supplier { get; set; }
-             
+        //public int CustomerOrderId { get; set; }
+        //public CustomerOrder CustomerOrder { get; set; }
+
         public ICollection<CustomerOrder> CustomerOrders { get; set; }
         public ICollection<SupplierOrder> SupplierOrders { get; set; }
     }

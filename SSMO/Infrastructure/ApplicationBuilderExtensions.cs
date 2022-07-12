@@ -55,6 +55,24 @@
             data.SaveChanges();
         }
 
+        private static void SeedStatus(IServiceProvider provider)
+        {
+            var data = provider.GetRequiredService<ApplicationDbContext>();
+            if (data.Statuses.Any())
+            {
+                return;
+            }
+
+            data.Statuses.AddRange(new[]
+            {
+                new Status{Name = "Active"},
+                new Status {Name = "Finished"},
+                new Status {Name = "Canceled"}
+            }
+                );
+            data.SaveChanges();
+
+        }
 
         public static void SeedDescriptionProducts(IServiceProvider service)
         {

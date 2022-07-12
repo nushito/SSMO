@@ -15,6 +15,7 @@ using SSMO.Services.Product;
 using SSMO.Services.Customer;
 using SSMO.Services.Documents;
 using Microsoft.AspNetCore.Mvc;
+using SSMO.Services.CustomerOrderService;
 
 namespace SSMO
 {
@@ -58,6 +59,7 @@ namespace SSMO
             services.AddTransient<IProductService, ProductService>();
             services.AddTransient<ICustomerService, CustomerService>();
             services.AddTransient<IDocumentService, DocumentService>();
+            services.AddTransient<ICustomerOrderService, CustomerOrderService>();
 
 
         }

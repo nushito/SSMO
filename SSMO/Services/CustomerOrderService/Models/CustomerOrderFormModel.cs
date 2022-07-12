@@ -11,7 +11,8 @@ namespace SSMO.Services.CustomerOrder.Models
         [Required]
         public string Number { get; set; }
         [Required]
-        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
+        [DataType(DataType.Date)]
+       // [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
         public string LoadingPlace { get; set; }
         [Required]

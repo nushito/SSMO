@@ -20,6 +20,7 @@ namespace SSMO.Data.Models
         [DisplayFormat(DataFormatString ="{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
         public string LoadingPlace { get; set; }
+        public string DeliveryAddress { get; set; }
         [Required]
         public string DeliveryTerms { get; set; }
         public int ClientId { get; set; }

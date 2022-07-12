@@ -1,20 +1,52 @@
-﻿@model CustomerOrderViewModel
+﻿@using SSMO.Models.Products
+@using SSMO.Services.Curruncies
+
+@model CustomerOrderViewModel
 @{
     ViewBag.Title = "Add Customer Order";
+
 }
 
-<form >
-      <div class="row col-md-4""> Order N:
+ <form enctype="multipart/form-data" method="post" asp-route-purchaseId="@Model.Id">
+      <div class="row col-md-4">
         <label asp-for="Number"></label>
         <input asp-for="Number" class="form-control"/>
         <span asp-validation-for="Number" class="small text-danger"></span>
     </div>
-    <div class="row col-md-4"">
+    <div class="row col-md-4">
         <label asp-for="Date"></label>
-        <input asp-for="Date" class="form-control"/>
+        <input asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
+       
         <span asp-validation-for="Date" class="small text-danger"></span>
     </div>
-    <div class="row">
+    <div class="form-group row col-md-4">
+        <label asp-for="DeliveryTerms"></label>
+        <input asp-for="DeliveryTerms" type="text" class="form-control" placeholder="Delivery Terms" />
+        <span asp-validation-for="DeliveryTerms" class="small text-danger"></span>
+    </div>
+    <div class="form-group row col-md-4">
+        <label asp-for="LoadingPlace"></label>
+        <input asp-for="LoadingPlace" type="text" class="form-control" placeholder="Loading place" />
+       
+    </div>
+        <div class="form-group row col-md-4">
+        <label asp-for="DeliveryAddress"></label>
+        <input asp-for="DeliveryAddress" type="text" class="form-control" placeholder="Delivery address" />
+       
+    </div>
+
+    <div class="form-group">
+        <label asp-for="CurrencyId"></label>
+        <select asp-for="CurrencyId" class="form-control">
+            @foreach (var item in Model.Currencies )
+            {
+                <option value="@item.Id">@item.Name</option>
+            }   
+
+        </select>
+
+    </div>
+    <div class="row" id="customer-row">
         <div class="form-group col-md-4">
             <div class="form-group">
                 <label asp-for="ClientId"></label>
@@ -44,6 +76,21 @@
         </div>
 
     </div>
-  
+    
 
+     <input type="hidden" name="purchaseId" value="@Model.Id" />
+        <input type="submit" value="Add Products" class="btn btn-primary mt-3" asp-route-purchaseId="@Model.Id"/>
 </form>
+        
+
+
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+<script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.css" rel="stylesheet">
+<script type="text/javascript">
+    $(function () {
+        $("#datepicker").datepicker();
+    });
+</script>

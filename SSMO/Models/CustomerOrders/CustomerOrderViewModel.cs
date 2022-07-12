@@ -22,6 +22,7 @@ namespace SSMO.Models.CustomerOrders
         public string LoadingPlace { get; set; }
         [Required]
         public string DeliveryTerms { get; set; }
+        public string DeliveryAddress { get; set; }
         public int ClientId { get; set; }
         public AddCustomerFormModel Customer { get; set; }
 
