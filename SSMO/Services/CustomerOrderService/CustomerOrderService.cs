@@ -36,7 +36,8 @@ namespace SSMO.Services.CustomerOrderService
                 DeliveryAddress = deliveryAddress,
                 FSCClaim = fscClaim,
                 FSCSertificate = fscCertificate,
-                CurrencyId = currency
+                CurrencyId = currency,
+              
             };
 
 

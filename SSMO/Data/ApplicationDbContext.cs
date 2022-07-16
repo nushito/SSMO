@@ -82,6 +82,7 @@ namespace SSMO.Data
               .Property(a => a.TotalAmount)
               .HasColumnType("decimal");
 
+         
             builder.Entity<CustomerOrder>()
                 .HasOne(a => a.MyCompany)
                 .WithMany(a => a.Orders)
@@ -131,11 +132,6 @@ namespace SSMO.Data
                 .Property(a => a.Cost)
                 .HasColumnType("decimal");
 
-            builder.Entity<SupplierOrder>()
-                .HasOne(a => a.CustomerOrder)
-                .WithOne(a => a.SupplierOrder)
-                .HasForeignKey<CustomerOrder>(a => a.SupplierOrderId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<SupplierOrder>()
                 .Property(a => a.Status)

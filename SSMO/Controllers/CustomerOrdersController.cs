@@ -102,10 +102,11 @@ namespace SSMO.Controllers
                 customermodel.MyCompanyId,
                 customermodel.DeliveryTerms,
                 customermodel.LoadingPlace,
-                customermodel.DeliveryAddress);
+                customermodel.DeliveryAddress,
+                customermodel.CurrencyId);
 
            
-            return RedirectToAction("AddPurchaseProducts", new { CustomerOrderId = customerorderId });
+            return RedirectToAction("AddOrderProducts", new { CustomerOrderId = customerorderId });
         }
 
 
@@ -126,7 +127,7 @@ namespace SSMO.Controllers
         [HttpPost]
         [Authorize]
         public IActionResult AddPurchaseProducts(int purchaseId,
-           ProductViewModel model)
+           List<ProductViewModel> model)
         {
 
 

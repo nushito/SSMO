@@ -1,0 +1,32 @@
+﻿@model CustomerOrderReportAll
+
+@{
+    var names = 
+}
+<form method="get">
+    <div class="row">
+        <div class="form-group">
+            <label asp-for="Search"></label>
+            <select asp-for="Search" class="form-control">
+                @foreach (var item in Model.Searches)
+                {
+                    <option value="@item">@item</option>
+                }
+
+            </select>
+        </div>
+    </div>
+</form>
+<div class="row">
+@foreach(var order in Model.CustomerOrderCollection)
+{
+    <div class="row">
+    <h2>@order.Number @order.Date @order.LoadingPlace @order.DeliveryAddress @order.Status</h2>
+    <a asp-controller="Reports" asp-action="CustomerOrderDetails" asp-route-id="@order.Number" class="btn btn-warning">Details</a>
+    <a asp-controller="Reports" asp-action="CustomerOrderEdit" asp-route-id="@order.Number" class="btn btn-warning">Edit</a>
+
+    <a asp-controller="Reports" asp-action="Delete" asp-route-id="@order.Number" class="btn btn-danger">Delete</a>
+
+    </div>
+}
+</div>
