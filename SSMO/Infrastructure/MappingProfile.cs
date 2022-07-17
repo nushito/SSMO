@@ -13,6 +13,7 @@ namespace SSMO.Infrastructure
             this.CreateMap<Customer, AddCustomerFormModel>();
             this.CreateMap<MyCompany, MyCompanyFormModel>();
             this.CreateMap<CustomerOrder, CustomerOrderReport>();
+            this.CreateMap<CustomerOrder, CustomerOrderViewModel>();
         }
     }
 }

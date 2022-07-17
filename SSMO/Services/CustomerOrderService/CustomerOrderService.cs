@@ -16,7 +16,6 @@ namespace SSMO.Services.CustomerOrderService
             string loadingAddress, string deliveryAddress,int currency)
         {
            
-
             var fscClaim = dbContext.MyCompanies
                 .Where(a => a.Id == company)
                 .Select(a => a.FSCClaim).FirstOrDefault();
@@ -24,6 +23,9 @@ namespace SSMO.Services.CustomerOrderService
             var fscCertificate = dbContext.MyCompanies
                .Where(a => a.Id == company)
                .Select(a => a.FSCSertificate).FirstOrDefault();
+
+            var status = dbContext.Statuses.Where(a => a.Name == "Active").FirstOrDefault();
+
 
             var order = new SSMO.Data.Models.CustomerOrder
             {
@@ -37,7 +39,7 @@ namespace SSMO.Services.CustomerOrderService
                 FSCClaim = fscClaim,
                 FSCSertificate = fscCertificate,
                 CurrencyId = currency,
-              
+                Status = status   
             };
 
 

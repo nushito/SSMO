@@ -36,6 +36,8 @@ namespace SSMO.Models.CustomerOrders
         public string Currency { get; set; }
         public IEnumerable<GetCurrencyModel> Currencies { get; set; }
         public IEnumerable<ProductViewModel> Products { get; set; }
+        public string FscClaim { get; set; }
+        public string FscCertificate { get; set; }
         public decimal TotalQuantity { get; set; }
         public decimal TotalAmount { get; set; }
         public int? Vat { get; set; }

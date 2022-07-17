@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SSMO.Models.CustomerOrders;
 using SSMO.Services.Reports;
+using System;
+using System.Globalization;
 
 namespace SSMO.Controllers
 {
@@ -24,14 +26,37 @@ namespace SSMO.Controllers
             return View(listOfOrders);
         }
 
-        public IActionResult CustomerOrderDetails(int number)
+        public IActionResult Details(int id)
         {
+           var order = service.Details(id);
 
-            return View();
+            return View(order);
         }
 
-        public IActionResult CustomerOrderEdit(int number)
+        public IActionResult Edit(int id,CustomerOrderViewModel model)
         {
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+           
+        
+            var editOrder = service.Edit
+                (id, model.Number,
+                model.Date,
+                model.ClientId,
+                model.MyCompanyId,
+                model.DeliveryTerms,
+                model.LoadingPlace,
+                model.DeliveryAddress,
+                model.CurrencyId,
+                model.Status, model.FscClaim, model.FscCertificate);
+
+            if (!editOrder)
+            {
+                return BadRequest();
+            }
 
             return View();
         }

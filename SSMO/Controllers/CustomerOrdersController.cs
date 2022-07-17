@@ -2,15 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Data.Models;
 using SSMO.Models.CustomerOrders;
-using SSMO.Models.Customers;
 using SSMO.Models.Products;
 using SSMO.Services;
 using SSMO.Services.Customer;
 using SSMO.Services.MyCompany;
 using SSMO.Services.Product;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
 using SSMO.Data;
 using SSMO.Services.CustomerOrderService;
@@ -66,7 +63,6 @@ namespace SSMO.Controllers
         }
 
 
-
         [HttpPost]
         [Authorize]
         public IActionResult AddCustomerOrder(CustomerOrderViewModel customermodel)
@@ -92,7 +88,6 @@ namespace SSMO.Controllers
                     Sizes = productService.GetSizes()
                 };
             }
-
          
 
             var customerorderId = cusomerOrderService.CreateOrder
@@ -110,23 +105,9 @@ namespace SSMO.Controllers
         }
 
 
-        [Authorize]
-        public IActionResult AddPurchaseProducts()
-        {
-            return View(
-                 new ProductViewModel
-                 {
-                     Descriptions = productService.GetDescriptions(),
-                     Grades = productService.GetGrades(),
-                     Sizes = productService.GetSizes(),
-                     
-
-                 });
-        }
-
         [HttpPost]
         [Authorize]
-        public IActionResult AddPurchaseProducts(int purchaseId,
+        public IActionResult AddPurchaseProducts(int customerorderId,
            List<ProductViewModel> model)
         {
 
@@ -142,14 +123,11 @@ namespace SSMO.Controllers
                 };
             }
 
-
-         
-            var thisPurchase = dbContext.CustomerOrders.Find(purchaseId);
+            var thisorder = dbContext.CustomerOrders.Find(customerorderId);
          
 
             //for (int i = 0; i < model.ProductSpecificationFormModels.Count; i++)
             //{
-
 
             //    var productDescription = Request.Form["Description[" + i + "]"];
             //    var size = Request.Form["Size[" + i + "]"];
@@ -220,10 +198,9 @@ namespace SSMO.Controllers
             //    }
             //}
 
-
-
             //thisPurchase.Products = listProducts;
             //dbContext.SaveChanges();
+
 
             return RedirectToAction("Home");
         }
