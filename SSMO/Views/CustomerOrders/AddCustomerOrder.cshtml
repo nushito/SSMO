@@ -8,36 +8,37 @@
 }
 
  <form enctype="multipart/form-data" method="post" asp-route-purchaseId="@Model.Id">
+   
       <div class="row col-md-4">
         <label asp-for="Number"></label>
-        <input asp-for="Number" class="form-control"/>
+        <input id="number" asp-for="Number" class="form-control"/>
         <span asp-validation-for="Number" class="small text-danger"></span>
     </div>
     <div class="row col-md-4">
         <label asp-for="Date"></label>
-        <input asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
+        <input itemid="date" asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
        
         <span asp-validation-for="Date" class="small text-danger"></span>
     </div>
     <div class="form-group row col-md-4">
         <label asp-for="DeliveryTerms"></label>
-        <input asp-for="DeliveryTerms" type="text" class="form-control" placeholder="Delivery Terms" />
+        <input id="deliveryterms" asp-for="DeliveryTerms" type="text" class="form-control" placeholder="Delivery Terms" />
         <span asp-validation-for="DeliveryTerms" class="small text-danger"></span>
     </div>
     <div class="form-group row col-md-4">
         <label asp-for="LoadingPlace"></label>
-        <input asp-for="LoadingPlace" type="text" class="form-control" placeholder="Loading place" />
+        <input id="loadingplace" asp-for="LoadingPlace" type="text" class="form-control" placeholder="Loading place" />
        
     </div>
         <div class="form-group row col-md-4">
         <label asp-for="DeliveryAddress"></label>
-        <input asp-for="DeliveryAddress" type="text" class="form-control" placeholder="Delivery address" />
+        <input id="deliveryaddress" asp-for="DeliveryAddress" type="text" class="form-control" placeholder="Delivery address" />
        
     </div>
 
     <div class="form-group">
         <label asp-for="CurrencyId"></label>
-        <select asp-for="CurrencyId" class="form-control">
+        <select id="currency" asp-for="CurrencyId" class="form-control">
             @foreach (var item in Model.Currencies )
             {
                 <option value="@item.Id">@item.Name</option>
@@ -50,7 +51,7 @@
         <div class="form-group col-md-4">
             <div class="form-group">
                 <label asp-for="ClientId"></label>
-                <select asp-for="ClientId" class="form-control">
+                <select id="client" asp-for="ClientId" class="form-control">
                     @foreach (var item in Model.Customers)
                     {
                         <option value="@item.Id">@item.Name</option>
@@ -64,7 +65,7 @@
         <div class="form-group col-md-4">
             <div class="form-group">
                 <label asp-for="MyCompanyId"></label>
-                <select asp-for="MyCompanyId" class="form-control">
+                <select id="mycompany" asp-for="MyCompanyId" class="form-control">
                     @foreach (var company in Model.MyCompanies)
                     {
                         <option value="@company.Id">@company.Name</option>
@@ -76,15 +77,10 @@
         </div>
 
     </div>
-    
-
-     <input type="hidden" name="purchaseId" value="@Model.Id" />
-        <input type="submit" value="Add Products" class="btn btn-primary mt-3" asp-route-purchaseId="@Model.Id"/>
-</form>
-        
 
 
 
+ </form> 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
 <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
@@ -94,3 +90,17 @@
         $("#datepicker").datepicker();
     });
 </script>
+
+
+
+  <input type="hidden" name="purchaseId" value="@Model.Id" />
+        <input type="submit" value="Add Products" class="btn btn-primary mt-3" asp-route-purchaseId="@Model.Id"/>
+
+        
+
+
+
+
+
+
+

@@ -26,14 +26,14 @@ namespace SSMO.Controllers
             return View(listOfOrders);
         }
 
-        public IActionResult Details(int id)
+        public IActionResult CustomerOrderDetails(int id)
         {
            var order = service.Details(id);
 
             return View(order);
         }
 
-        public IActionResult Edit(int id,CustomerOrderViewModel model)
+        public IActionResult CustomerOrderEdit(int id,CustomerOrderViewModel model)
         {
 
             if (!ModelState.IsValid)
