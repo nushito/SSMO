@@ -57,6 +57,8 @@ namespace SSMO.Controllers
                     Street = model.Street
                 },
                 RepresentativePerson = model.RepresentativePerson,
+                FSCClaim = model.FSCClaim,
+                FSCSertificate = model.FSCSertificate,
                 UserId = userId
            };
             

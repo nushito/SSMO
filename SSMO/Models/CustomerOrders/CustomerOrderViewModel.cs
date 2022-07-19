@@ -7,13 +7,16 @@ using SSMO.Services.Supplier;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-
-
+using System.Linq;
 
 namespace SSMO.Models.CustomerOrders
 {
     public class CustomerOrderViewModel
     {
+        public CustomerOrderViewModel()
+        {
+            Products = new List<ProductViewModel>();
+        }
         public int Id { get; init; }
         public string Number { get; set; }
         [Required]
@@ -35,20 +38,21 @@ namespace SSMO.Models.CustomerOrders
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public IEnumerable<GetCurrencyModel> Currencies { get; set; }
-        public IEnumerable<ProductViewModel> Products { get; set; }
+        public IList<ProductViewModel> Products { get; set; }
         public string FscClaim { get; set; }
         public string FscCertificate { get; set; }
         public decimal TotalQuantity { get; set; }
-        public decimal TotalAmount { get; set; }
+        public decimal TotalAmount { get { if (Products.Count == 0)  return 0;   return Products.Sum(a => a.Amount); } } 
         public int? Vat { get; set; }
         public decimal PaidAvance { get; set; }
         public decimal Balance { get; set; }
         public bool PaidAmountStatus { get; set; }
         public decimal Amount { get; set; }
         public decimal SubTotal { get; set; }
-        public decimal Total { get; set; }
+     
         public int SupplierOrderId { get; set; }
         public string Supplier { get; set; }
         public IEnumerable<AllSuppliers>  Suppliers { get; set; }
+        public int ProductsCount { get; set; }
     }
 }

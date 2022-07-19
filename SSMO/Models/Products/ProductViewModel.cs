@@ -31,5 +31,6 @@ namespace SSMO.Models.Products
         public decimal Income { get; set; }
         public int SupplierId { get; set; }
         public string SupplierName { get; set; }
+        public decimal Amount { get; set; }
     }
 }

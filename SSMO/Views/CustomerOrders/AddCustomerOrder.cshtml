@@ -7,7 +7,7 @@
 
 }
 
- <form enctype="multipart/form-data" method="post" asp-route-purchaseId="@Model.Id">
+ <form enctype="multipart/form-data" method="post" asp-route-customerorderId="@Model.Id">
    
       <div class="row col-md-4">
         <label asp-for="Number"></label>
@@ -36,7 +36,7 @@
        
     </div>
 
-    <div class="form-group">
+    <div class="form-group col-md-4">
         <label asp-for="CurrencyId"></label>
         <select id="currency" asp-for="CurrencyId" class="form-control">
             @foreach (var item in Model.Currencies )
@@ -78,8 +78,14 @@
 
     </div>
 
-
-
+    <div class="form-group row col-md-4">
+       
+                <label asp-for="ProductsCount"></label>
+                <input type="number" asp-for="ProductsCount" class="form-control"/>
+        
+    </div>
+     <input type="hidden" name="customerorderIdId" value="@Model.Id" />
+        <input type="submit" value="Add Products" class="btn btn-primary mt-3" asp-route-customerorderId="@Model.Id"/>
  </form> 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
@@ -93,8 +99,7 @@
 
 
 
-  <input type="hidden" name="purchaseId" value="@Model.Id" />
-        <input type="submit" value="Add Products" class="btn btn-primary mt-3" asp-route-purchaseId="@Model.Id"/>
+ 
 
         
 
