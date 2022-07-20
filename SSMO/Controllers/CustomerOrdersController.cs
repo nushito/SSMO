@@ -172,15 +172,16 @@ namespace SSMO.Controllers
 
           //  var count = ViewBag.ProductsCount;
 
-            var thisorder = reportService.Details(customerorderId);
+            var thisorder = cusomerOrderService.OrderPerIndex(customerorderId);
        
 
             foreach (var item in model)
             {
                 item.Amount = Math.Round( item.CostPrice * item.Cubic,4);
-                productService.CreateProduct(item);
-                thisorder.Products.Add(item);
-                dbContext.SaveChanges();
+                item.CustomerOrderId = customerorderId;
+                item.TotalSheets = item.Pallets * item.SheetsPerPallet;
+                 productService.CreateProduct(item,customerorderId);
+
             }
 
             thisorder.Amount = model.Select(a => a.Amount).Sum();

@@ -23,7 +23,8 @@
                 <td>Pieces</td>
                 <td>Quantity m3</td>
                 <td>Price</td>
-               
+               <td>Pallets</td>
+               <td>Sheets/pallet</td>
                 </tr>
             </thead>
             <tbody>
@@ -91,7 +92,21 @@
                             </td>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <input asp-for="@Model[i].Cubic"  class="text-box single-line"  value="" required="required">
+
+                                    <input asp-for="@Model[i].Pallets" class="text-box single-line"  value="" required="required">
+                                </div>
+                            </td>
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+
+                                    <input asp-for="@Model[i].SheetsPerPallet" class="text-box single-line"  value="" required="required">
+                                </div>
+                            </td>
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+                                    
+                                    <input asp-for="@Model[i].Cubic" type="number"  class="text-box single-line"  required="required">
+                                   
                                 </div>
                             </td>
                             <td class="col-sm-1">

@@ -17,7 +17,7 @@ namespace SSMO.Data.Models
         [Required]
         public string Name { get; set; }
         [Required]
-        [StringLength(9, ErrorMessage = "Your EIK is invalid!")]
+        [StringLength(11, ErrorMessage = "Your EIK is invalid!")]
         public string EIK { get; set; }
         [Required]
         [StringLength(11, ErrorMessage ="Your VAT is invalid")]

@@ -143,11 +143,6 @@ namespace SSMO.Data
                 .Property(a => a.Status)
                 .HasConversion<string>();
 
-            builder.Entity<Product>()
-                .HasOne(a => a.Supplier)
-                .WithMany(a => a.Products)
-                .HasForeignKey(a => a.SupplierId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Product>()
                    .HasOne(a => a.Description)
@@ -234,11 +229,6 @@ namespace SSMO.Data
                 .HasConversion<string>();
 
 
-            builder.Entity<Supplier>()
-                .HasMany(a => a.Products)
-                .WithOne(a => a.Supplier)
-                .HasForeignKey(a => a.SupplierId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Supplier>()
                 .HasOne(a => a.Address)

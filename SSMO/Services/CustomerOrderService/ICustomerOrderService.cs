@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using SSMO.Models.Products;
+using System;
 
 namespace SSMO.Services.CustomerOrderService
 {
@@ -11,6 +9,9 @@ namespace SSMO.Services.CustomerOrderService
             (string num, DateTime date, int customer, 
             int company, string deliveryTerms, 
             string loadingAddress, string deliveryAddress, int currency);
+
+        public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id);
+      
         
     }
 }

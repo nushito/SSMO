@@ -8,7 +8,7 @@ namespace SSMO.Services.Products
 {
     public interface IProductService
     {
-        public void CreateProduct(ProductViewModel model);
+        public void CreateProduct(ProductViewModel model, int customerorderId);
         public bool DescriptionExist(string name);
         public void AddDescription(string name);
         public void AddGrade(string name);

@@ -26,18 +26,16 @@ namespace SSMO.Data.Models
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
         public int TotalSheets { get; set; }
-        [Required]
+      
         public decimal Price { get; set; }
-        [Required]
+    
         public decimal Amount { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
 
-        [Required]
        // public ICollection<ProductSpecification> ProductSpecifications { get; set; }
       
-        public int SupplierId { get; set; }
-        public Supplier Supplier { get; set; }
+    
         //public int CustomerOrderId { get; set; }
         //public CustomerOrder CustomerOrder { get; set; }
 

@@ -19,7 +19,7 @@ namespace SSMO.Services.Products
             this.mapper = mapper;
         }
 
-        public void CreateProduct(ProductViewModel model)
+        public void CreateProduct(ProductViewModel model,int customerorderId)
         {
             var description = new Description
             {
@@ -43,11 +43,15 @@ namespace SSMO.Services.Products
                  FSCClaim = model.FSCClaim,
      FSCSertificate = model.FSCSertificate,
  OrderedQuantity = model.Cubic,
- Price = model.CostPrice
+ Price = model.CostPrice,
+  Pallets = model.Pallets,
+  SheetsPerPallet = model.SheetsPerPallet
   
-
             };
-            _dbContext.Products.Add(product);   
+            _dbContext.Products.Add(product);
+            var order = _dbContext.CustomerOrders.Where(a => a.Id == customerorderId).FirstOrDefault();
+            order.Products.ToList().Add(product);
+            _dbContext.SaveChanges();
         }
 
         public void AddDescription(string name)

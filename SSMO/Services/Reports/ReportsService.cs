@@ -41,7 +41,7 @@ namespace SSMO.Services.Reports
         {
             var findorder = _context.CustomerOrders.Where(a => a.Id == id).FirstOrDefault();
             var order = mapper.Map<CustomerOrderViewModel>(findorder);
-            return order;
+            return (CustomerOrderViewModel)order;
 
         }
 

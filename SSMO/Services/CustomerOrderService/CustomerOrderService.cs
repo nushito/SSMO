@@ -1,5 +1,7 @@
-﻿using SSMO.Data;
+﻿using AutoMapper;
+using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Models.Products;
 using System;
 using System.Linq;
 
@@ -8,10 +10,14 @@ namespace SSMO.Services.CustomerOrderService
     public class CustomerOrderService : ICustomerOrderService
     {
         private readonly ApplicationDbContext dbContext;
-        public CustomerOrderService(ApplicationDbContext dbContext)
+        private readonly IMapper mapper;
+        public CustomerOrderService(ApplicationDbContext dbContext, IMapper mapper)
         {
             this.dbContext = dbContext;
+            this.mapper = mapper;
         }
+
+      
         public int CreateOrder(string num, DateTime date, int customerId, int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,int currency)
         {
@@ -39,7 +45,8 @@ namespace SSMO.Services.CustomerOrderService
                 FSCClaim = fscClaim,
                 FSCSertificate = fscCertificate,
                 CurrencyId = currency,
-                Status = status   
+                Status = status,
+               
             };
 
 
@@ -47,6 +54,11 @@ namespace SSMO.Services.CustomerOrderService
             dbContext.SaveChanges();
             return order.Id;
 
+        }
+
+        public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id)
+        {
+            return dbContext.CustomerOrders.Where(a => a.Id == id).FirstOrDefault();
         }
     }
 }
