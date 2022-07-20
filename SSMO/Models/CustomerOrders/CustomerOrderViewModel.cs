@@ -1,5 +1,4 @@
-﻿using SSMO.Models.Currency;
-using SSMO.Models.Customers;
+﻿using SSMO.Models.Customers;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Services.Curruncies;
@@ -15,7 +14,7 @@ namespace SSMO.Models.CustomerOrders
     {
         public CustomerOrderViewModel()
         {
-            Products = new List<ProductViewModel>();
+            
         }
         public int Id { get; init; }
         public string Number { get; set; }
@@ -26,14 +25,15 @@ namespace SSMO.Models.CustomerOrders
         [Required]
         public string DeliveryTerms { get; set; }
         public string DeliveryAddress { get; set; }
-        public int ClientId { get; set; }
+        public int CustomerId { get; set; }
         public AddCustomerFormModel Customer { get; set; }
 
         public IEnumerable<AddCustomerFormModel> Customers { get; set; }
         public int MyCompanyId { get; set; }
         public string MyCompanyName { get; set; }
         public IEnumerable<MyCompanyFormModel> MyCompanies { get; set; }
-        public string Status { get; set; } = "active";
+        public int StatusId { get; set; }
+        public StatusModel Status { get; set; } 
         public IEnumerable<StatusModel> Statuses { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
@@ -42,7 +42,7 @@ namespace SSMO.Models.CustomerOrders
         public string FscClaim { get; set; }
         public string FscCertificate { get; set; }
         public decimal TotalQuantity { get; set; }
-        public decimal TotalAmount { get { if (Products.Count == 0)  return 0;   return Products.Sum(a => a.Amount); } } 
+        public decimal TotalAmount { get; set; }
         public int? Vat { get; set; }
         public decimal PaidAvance { get; set; }
         public decimal Balance { get; set; }
@@ -51,6 +51,7 @@ namespace SSMO.Models.CustomerOrders
         public decimal SubTotal { get; set; }
      
         public int SupplierOrderId { get; set; }
+        public int SupplierId { get; set; }
         public string Supplier { get; set; }
         public IEnumerable<AllSuppliers>  Suppliers { get; set; }
         public int ProductsCount { get; set; }

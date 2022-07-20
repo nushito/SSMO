@@ -31,7 +31,7 @@ namespace SSMO.Services.CustomerOrderService
             {
                 Number = num,
                 Date = date,
-                ClientId = customerId,
+                CustomerId = customerId,
                 MyCompanyId = company,
                 DeliveryTerms = deliveryTerms,
                 LoadingPlace = loadingAddress,

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SSMO.Models.CustomerOrders
+namespace SSMO.Models
 {
     public class StatusModel
     {

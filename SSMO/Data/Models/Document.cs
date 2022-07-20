@@ -38,7 +38,7 @@ namespace SSMO.Data.Models
         public string DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
         public decimal CurrencyExchangeRateUsdToBGN { get; set; }
-        public ServiceOrder serviceOrder { get; set; }
+        public ServiceOrder ServiceOrder { get; set; }
 
 
     }

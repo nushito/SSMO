@@ -1,12 +1,14 @@
-﻿using System;
+﻿using SSMO.Models.Products;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SSMO.Services.Product
+namespace SSMO.Services.Products
 {
     public interface IProductService
     {
+        public void CreateProduct(ProductViewModel model);
         public bool DescriptionExist(string name);
         public void AddDescription(string name);
         public void AddGrade(string name);

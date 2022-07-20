@@ -17,6 +17,7 @@ namespace SSMO.Models.Products
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
         public int CustomerOrderId { get; set; }
+     
         [Required]
         public int Pieces { get; set; }
         public decimal Cubic { get; set; }

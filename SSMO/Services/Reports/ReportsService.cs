@@ -12,12 +12,12 @@ namespace SSMO.Services.Reports
     public class ReportsService : IReportsService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IConfigurationProvider mapper;
+        private readonly IMapper mapper;
 
         public ReportsService(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
-            this.mapper = mapper.ConfigurationProvider;
+            this.mapper = mapper;
 
         }
         public IEnumerable<CustomerOrderViewModel> AllCustomerOrders(string name)
@@ -31,7 +31,7 @@ namespace SSMO.Services.Reports
                                 .FirstOrDefault();
 
             var listOrders = _context.CustomerOrders
-                    .Where(a => a.ClientId == customerId)
+                    .Where(a => a.CustomerId == customerId)
                     .ToList();
 
             return (ICollection<CustomerOrderViewModel>)listOrders;
@@ -39,10 +39,9 @@ namespace SSMO.Services.Reports
 
         public CustomerOrderViewModel Details(int id)
         {
-            return _context.CustomerOrders
-                .Where(a => a.Id == id)
-                .ProjectTo<CustomerOrderViewModel>(this.mapper)
-                .FirstOrDefault();
+            var findorder = _context.CustomerOrders.Where(a => a.Id == id).FirstOrDefault();
+            var order = mapper.Map<CustomerOrderViewModel>(findorder);
+            return order;
 
         }
 
@@ -60,7 +59,7 @@ namespace SSMO.Services.Reports
             }
 
             order.Number = number;
-            order.ClientId = clientId;
+            order.CustomerId = clientId;
             order.MyCompanyId = myCompanyId;
             order.DeliveryTerms = deliveryTerms;    
             order.LoadingPlace = loadingPlace;

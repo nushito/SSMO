@@ -59,6 +59,12 @@ namespace SSMO.Data
                  .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<CustomerOrder>()
+                .HasOne(a => a.Customer)
+                .WithMany(a => a.Orders)
+                .HasForeignKey(a => a.CustomerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<CustomerOrder>()
                .Property(a => a.SubTotal)
                .HasColumnType("decimal");
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Models.Sizes;
-using SSMO.Services.Product;
+using SSMO.Services.Products;
 using System;
 using System.Collections.Generic;
 using System.Linq;

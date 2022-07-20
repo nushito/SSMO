@@ -11,9 +11,10 @@ using SSMO.Infrastructure;
 using SSMO.Data;
 using SSMO.Services;
 using SSMO.Services.MyCompany;
-using SSMO.Services.Product;
+using SSMO.Services.Products;
 using SSMO.Services.Customer;
 using SSMO.Services.Documents;
+using SSMO.Services.Status;
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Services.CustomerOrderService;
 using SSMO.Services.Reports;
@@ -62,6 +63,7 @@ namespace SSMO
             services.AddTransient<IDocumentService, DocumentService>();
             services.AddTransient<ICustomerOrderService, CustomerOrderService>();
             services.AddTransient<IReportsService, ReportsService>();
+            services.AddTransient<IStatusService, StatusService>();
 
 
         }

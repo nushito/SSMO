@@ -23,6 +23,7 @@
             SeedDescriptionProducts(services);
             SeedGrades(services);
             SeedSizes(services);
+            SeedStatus(services);
           //  SeedAdministrator(services);
 
             return app;

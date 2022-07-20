@@ -45,13 +45,13 @@ namespace SSMO.Controllers
             var editOrder = service.Edit
                 (id, model.Number,
                 model.Date,
-                model.ClientId,
+                model.CustomerId,
                 model.MyCompanyId,
                 model.DeliveryTerms,
                 model.LoadingPlace,
                 model.DeliveryAddress,
                 model.CurrencyId,
-                model.Status, model.FscClaim, model.FscCertificate);
+                model.Status.Name, model.FscClaim, model.FscCertificate);
 
             if (!editOrder)
             {

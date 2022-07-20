@@ -50,14 +50,14 @@
     <div class="row" id="customer-row">
         <div class="form-group col-md-4">
             <div class="form-group">
-                <label asp-for="ClientId"></label>
-                <select id="client" asp-for="ClientId" class="form-control">
+                <label asp-for="CustomerId"></label>
+                <select id="client" asp-for="CustomerId" class="form-control">
                     @foreach (var item in Model.Customers)
                     {
                         <option value="@item.Id">@item.Name</option>
                         
                     }
-                    <span asp-validation-for="ClientId" class="small text-danger"></span>
+                    <span asp-validation-for="CustomerId" class="small text-danger"></span>
                 </select>
             </div>
 
@@ -79,9 +79,21 @@
     </div>
 
     <div class="form-group row col-md-4">
-       
-                <label asp-for="ProductsCount"></label>
+       <td>
+            <label asp-for="ProductsCount"></label>
                 <input type="number" asp-for="ProductsCount" class="form-control"/>
+
+       </td>
+             <td><label asp-for="StatusId"></label>
+                <select  asp-for="StatusId" class="form-control">
+                    @foreach (var status in Model.Statuses)
+                    {
+                        <option value="@status.Id">@status.Name</option>
+                    }
+                    <span asp-validation-for="StatusId" class="small text-danger"></span>
+                </select>
+
+             </td>  
         
     </div>
      <input type="hidden" name="customerorderIdId" value="@Model.Id" />

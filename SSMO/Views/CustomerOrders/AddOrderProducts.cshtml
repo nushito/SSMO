@@ -1,6 +1,6 @@
-﻿@model IList<ProductViewModel>
+﻿@model List<ProductViewModel>
 
-@using SSMO.Services.Product
+@using SSMO.Services.Products
 @inject IProductService service;
 @{
    
@@ -35,7 +35,7 @@
                      <tr>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <select name="Description" asp-for="@Model[i].Description" >
+                                    <select asp-for="@Model[i].Description" >
                                         <option value="">All</option>
                                         @foreach (var type in service.GetDescriptions())
                                         {
@@ -46,7 +46,7 @@
                             </td>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <select name="Size[i]" id="Size" asp-for="@Model[i].Size)">
+                                    <select id="Size" asp-for="@Model[i].Size">
                                         <option value="">All</option>
                                         @foreach (var size in service.GetSizes())
                                         {
@@ -57,7 +57,7 @@
                             </td>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <select name="Grade[i]" id="Grade" asp-for="@Model[i].Grade)">
+                                    <select asp-for="@Model[i].Grade">
                                         <option value="">All</option>
                                         @foreach (var grade in service.GetGrades())
                                         {
@@ -74,30 +74,30 @@
                                         <option value="">-</option>*@
                                       
                                   
-                                    <input asp-for="@Model[i].FSCClaim" id="FSCclaim" class="text-box single-line" name="FSCClaim" value="" required="required">
+                                    <input asp-for="@Model[i].FSCClaim"  class="text-box single-line"  value="" required="required">
                                 </div>
                             </td>
 
                              <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <input asp-for="@Model[i].FSCSertificate" id="FSCCertificate" class="text-box single-line" name="FSCSertificate" value="" required="required">
+                                    <input asp-for="@Model[i].FSCSertificate" class="text-box single-line"  value="" required="required">
                                 </div>
                             </td>
 
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <input  asp-for="@Model[i].Pieces" id="Pieces" class="text-box single-line" name="Pieces" value="" required="required">
+                                    <input  asp-for="@Model[i].Pieces" class="text-box single-line"  value="" required="required">
                                 </div>
                             </td>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <input asp-for="@Model[i].Cubic" id="Cubic" class="text-box single-line" name="Cubic" value="" required="required">
+                                    <input asp-for="@Model[i].Cubic"  class="text-box single-line"  value="" required="required">
                                 </div>
                             </td>
                             <td class="col-sm-1">
                                 <div class="editor-field">
 
-                                    <input asp-for="@Model[i].CostPrice" id="Price" class="text-box single-line" name="CostPrice" value="" required="required">
+                                    <input asp-for="@Model[i].CostPrice" class="text-box single-line"  value="" required="required">
                                 </div>
                             </td>
                             
@@ -112,7 +112,8 @@
        
         <hr />
         <p>
-            <button type="submit" class="btn btn-primary">Save</button>
+            <input type="submit" value="Save" class="btn btn-primary mt-3"/>
+           
         </p>
       
     </fieldset>

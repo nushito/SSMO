@@ -23,7 +23,7 @@ namespace SSMO.Data.Models
         public string DeliveryAddress { get; set; }
         [Required]
         public string DeliveryTerms { get; set; }
-        public int ClientId { get; set; }
+        public int CustomerId { get; set; }
         public int MyCompanyId { get; set; }
         public MyCompany MyCompany { get; set; }
         public Customer Customer { get; set; }
@@ -31,6 +31,7 @@ namespace SSMO.Data.Models
         public string FSCClaim { get; set; }
         [Required]
         public string FSCSertificate { get; set; }
+        public int StatusId { get; set; }
         public Status Status { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }

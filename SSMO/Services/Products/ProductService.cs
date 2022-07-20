@@ -1,18 +1,53 @@
-﻿using SSMO.Data;
+﻿using AutoMapper;
+using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Models.Products;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace SSMO.Services.Product
+namespace SSMO.Services.Products
 {
     public class ProductService : IProductService
     {
         private readonly ApplicationDbContext _dbContext;
+        private readonly IMapper mapper;
 
-        public  ProductService(ApplicationDbContext dbContext)
+        public  ProductService(ApplicationDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
+            this.mapper = mapper;
+        }
+
+        public void CreateProduct(ProductViewModel model)
+        {
+            var description = new Description
+            {
+                Name = model.Description
+            
+            };
+            var size = new Size
+            {
+                Name = model.Size
+            };
+            var grade = new Grade
+            {
+                Name = model.Grade
+            };
+            var product = new Product
+            {
+                Amount = model.Amount,
+                Description = description,
+                Grade = grade,
+                Size = size,
+                 FSCClaim = model.FSCClaim,
+     FSCSertificate = model.FSCSertificate,
+ OrderedQuantity = model.Cubic,
+ Price = model.CostPrice
+  
+
+            };
+            _dbContext.Products.Add(product);   
         }
 
         public void AddDescription(string name)

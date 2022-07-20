@@ -8,13 +8,7 @@ namespace SSMO.Data.Models
 {
    public class Product
     {
-        public Product()
-        {
-           
-            CustomerOrders = new HashSet<CustomerOrder>();
-           
-        }
-        
+      
         public int Id { get; init; }
         [Required]
       //  public DescriptionEnum Description { get; set; }

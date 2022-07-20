@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Data.Models;
 using SSMO.Models.Descriptions;
-using SSMO.Services.Product;
+using SSMO.Services.Products;
 
 namespace SSMO.Controllers
 {

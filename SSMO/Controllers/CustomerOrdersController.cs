@@ -6,7 +6,7 @@ using SSMO.Models.Products;
 using SSMO.Services;
 using SSMO.Services.Customer;
 using SSMO.Services.MyCompany;
-using SSMO.Services.Product;
+using SSMO.Services.Products;
 using System.Collections.Generic;
 using AutoMapper;
 using SSMO.Data;
@@ -14,6 +14,7 @@ using SSMO.Services.CustomerOrderService;
 using System.Linq;
 using SSMO.Services.Reports;
 using System;
+using SSMO.Services.Status;
 
 namespace SSMO.Controllers
 {
@@ -28,12 +29,13 @@ namespace SSMO.Controllers
         private readonly IMapper mapper;
         private readonly IReportsService reportService;
         private readonly ApplicationDbContext dbContext;
+        private readonly IStatusService statusService;
         public CustomerOrdersController(ISupplierService supplierService,
            ICurrency currency,
            IMycompanyService myCompanyService,
            ICustomerService customerService,
            IProductService productService, IMapper  mapper,
- ApplicationDbContext dbContext, ICustomerOrderService cusomerOrderService, IReportsService reportService)
+ ApplicationDbContext dbContext, ICustomerOrderService cusomerOrderService, IReportsService reportService, IStatusService statusService)
         {
             this.supplierService = supplierService;
             this.currency = currency;
@@ -43,7 +45,8 @@ namespace SSMO.Controllers
             this.mapper = mapper;
             this.dbContext = dbContext;
             this.cusomerOrderService = cusomerOrderService;
-            this.reportService = reportService; 
+            this.reportService = reportService;
+            this.statusService = statusService;
         }
 
         [HttpGet]
@@ -60,7 +63,7 @@ namespace SSMO.Controllers
                     MyCompanies =myCompanyService.GetAllCompanies(),
                     Suppliers = supplierService.GetSuppliers(),
                     Products = new List<ProductViewModel>(),
-                    
+                    Statuses = statusService.GetAllStatus()
                  }
 
                 ) ;
@@ -82,7 +85,7 @@ namespace SSMO.Controllers
                     MyCompanies = myCompanyService.GetAllCompanies(),
                     Suppliers = supplierService.GetSuppliers(),
                     Products = new List<ProductViewModel>(),
-                    
+                    Statuses = statusService.GetAllStatus()
                 };
 
                 new ProductViewModel
@@ -97,7 +100,7 @@ namespace SSMO.Controllers
             var customerorderId = cusomerOrderService.CreateOrder
                 (customermodel.Number, 
                 customermodel.Date,
-                customermodel.ClientId,
+                customermodel.CustomerId,
                 customermodel.MyCompanyId,
                 customermodel.DeliveryTerms,
                 customermodel.LoadingPlace,
@@ -136,7 +139,7 @@ namespace SSMO.Controllers
         [HttpPost]
         [Authorize]
         public IActionResult AddOrderProducts(int customerorderId,
-           IList<ProductViewModel> model)
+           IEnumerable<ProductViewModel> model)
         {
            // var count = int.Parse(TempData["Count"].ToString());
 
@@ -162,7 +165,7 @@ namespace SSMO.Controllers
                 //}
             }
 
-            if(model.Count == 0)
+            if(model.Count() == 0)
             {
                 return View(model);
             }
@@ -175,15 +178,15 @@ namespace SSMO.Controllers
             foreach (var item in model)
             {
                 item.Amount = Math.Round( item.CostPrice * item.Cubic,4);
+                productService.CreateProduct(item);
                 thisorder.Products.Add(item);
                 dbContext.SaveChanges();
             }
-         
-            //thisPurchase.Products = listProducts;
-            //dbContext.SaveChanges();
 
+            thisorder.Amount = model.Select(a => a.Amount).Sum();
+            dbContext.SaveChanges();
 
-            return RedirectToAction("Home");
+            return RedirectToAction("Index", "Home");
         }
 
     }
