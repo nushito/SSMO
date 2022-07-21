@@ -41,11 +41,11 @@ namespace SSMO.Services.Products
                 Grade = grade,
                 Size = size,
                  FSCClaim = model.FSCClaim,
-     FSCSertificate = model.FSCSertificate,
- OrderedQuantity = model.Cubic,
- Price = model.CostPrice,
-  Pallets = model.Pallets,
-  SheetsPerPallet = model.SheetsPerPallet
+                FSCSertificate = model.FSCSertificate,
+             OrderedQuantity = model.Cubic,
+             Price = model.CostPrice,
+              Pallets = model.Pallets,
+              SheetsPerPallet = model.SheetsPerPallet
   
             };
             _dbContext.Products.Add(product);

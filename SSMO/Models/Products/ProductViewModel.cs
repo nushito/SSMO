@@ -19,13 +19,13 @@ namespace SSMO.Models.Products
         public int CustomerOrderId { get; set; }
      
         
-        [Range(0, 9999999999999.99999)]
+        [Range(0.0, 9999999999999.99999)]
         public int Pieces { get; set; }
-        [Range(0, 9999999999999.99999)]
+        [Range(0.0, 9999999999999.99999)]
         public decimal Cubic { get; set; }
-        [Range(0, 9999999999999.99999)]
+        [Range(0.0, 9999999999999.99999)]
         public decimal CostPrice { get; set; }
-        [Range(0, 9999999999999.99999)]
+        [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
