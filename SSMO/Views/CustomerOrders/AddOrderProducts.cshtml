@@ -20,17 +20,15 @@
                 <td>Grade</td>
                 <td>FSC claim</td>
                 <td>FSC certificate</td>
-                <td>Pieces</td>
-                <td>Quantity m3</td>
-                <td>Price</td>
-               <td>Pallets</td>
+                 <td>Pallets</td>
                <td>Sheets/pallet</td>
+             @*  <td>Quantity m3</td>*@
+                <td>Price</td>
+              
                 </tr>
             </thead>
             <tbody>
-
-              
-               
+ 
                         @for (int i = 0; i < count; i++)
                 {
                      <tr>
@@ -85,12 +83,7 @@
                                 </div>
                             </td>
 
-                            <td class="col-sm-1">
-                                <div class="editor-field">
-                                    <input  asp-for="@Model[i].Pieces" class="text-box single-line"  value="" required="required">
-                                </div>
-                            </td>
-                            <td class="col-sm-1">
+                             <td class="col-sm-1">
                                 <div class="editor-field">
 
                                     <input asp-for="@Model[i].Pallets" class="text-box single-line"  value="" required="required">
@@ -102,19 +95,27 @@
                                     <input asp-for="@Model[i].SheetsPerPallet" class="text-box single-line"  value="" required="required">
                                 </div>
                             </td>
+
+                           @* <td class="col-sm-1">
+                                <div class="editor-field">
+                                    <input  asp-for="@Model[i].Pieces" class="text-box single-line"  value="" required="required">
+                                </div>
+                            </td>
+                            
                             <td class="col-sm-1">
                                 <div class="editor-field">
                                     
                                     <input asp-for="@Model[i].Cubic" type="number" min="0.0000" step="0.0001" class="text-box single-line"  required="required">
                                    
                                 </div>
-                            </td>
+                            </td>*@
                             <td class="col-sm-1">
                                 <div class="editor-field">
 
-                                    <input asp-for="@Model[i].CostPrice" type="number" min="0.0000" step="0.0001" class="text-box single-line"  value="" required="required">
+                                    <input asp-for="@Model[i].Price" type="number" min="0.0000" step="0.0001" class="text-box single-line"  value="" required="required">
                                 </div>
                             </td>
+                           
                             
                         </tr>
                 }                

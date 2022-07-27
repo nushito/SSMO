@@ -22,13 +22,25 @@ namespace SSMO.Models.Products
         [Range(0.0, 9999999999999.99999)]
         public int Pieces { get; set; }
         [Range(0.0, 9999999999999.99999)]
-        public decimal Cubic { get; set; }
+        public decimal OrderedQuantity { get; set; }
         [Range(0.0, 9999999999999.99999)]
-        public decimal CostPrice { get; set; }
+        public decimal Price { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
         public int TotalSheets { get; set; }
+
+
+        public decimal? PurchaseTransportCost { get; set; }
+        public decimal? DeliveryTrasnportCost { get; set; }
+        public decimal? BankExpenses { get; set; }
+        public decimal? Duty { get; set; }
+        public decimal? CustomsExpenses { get; set; }
+        public decimal? Factoring { get; set; }
+        public decimal? FiscalAgentExpenses { get; set; }
+        public decimal? ProcentComission { get; set; }
+        public decimal? OtherExpenses { get; set; }
+
     }
 }

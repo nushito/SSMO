@@ -15,6 +15,9 @@ using System.Linq;
 using SSMO.Services.Reports;
 using System;
 using SSMO.Services.Status;
+using System.IO;
+using iTextSharp.text.pdf;
+using iTextSharp.text;
 
 namespace SSMO.Controllers
 {
@@ -95,7 +98,12 @@ namespace SSMO.Controllers
                     Sizes = productService.GetSizes()
                 };
             }
-         
+
+            if (cusomerOrderService.CheckOrderNumberExist(customermodel.Number))
+            {
+                return View(customermodel);
+            }
+
 
             var customerorderId = cusomerOrderService.CreateOrder
                 (customermodel.Number, 
@@ -110,7 +118,7 @@ namespace SSMO.Controllers
             ViewBag.ProductsCount = customermodel.ProductsCount;
             TempData["Count"] = customermodel.ProductsCount;  
 
-            return RedirectToAction("AddOrderProducts", new { CustomerOrderId = customerorderId, ViewBag.ProductsCount });
+            return RedirectToAction("AddOrderProducts", new { CustomerOrderId = customerorderId });
         }
 
 
@@ -177,23 +185,22 @@ namespace SSMO.Controllers
 
             foreach (var item in model)
             {
-                item.Amount = Math.Round( item.CostPrice * item.Cubic,4);
-                item.CustomerOrderId = customerorderId;
-                item.TotalSheets = item.Pallets * item.SheetsPerPallet;
+               
                  productService.CreateProduct(item,customerorderId);
 
             }
 
-            thisorder.Amount = model.Select(a => a.Amount).Sum();
+            thisorder.Vat = 0;
+            thisorder.TotalAmount = (decimal)(thisorder.Amount + thisorder.Vat);
             dbContext.SaveChanges();
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction("PrintCustomerOrder");
         }
 
 
         public IActionResult PrintCustomerOrder()
         {
-
+            
             return RedirectToAction("Index", "Home");
         }
 

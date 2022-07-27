@@ -12,35 +12,38 @@ namespace SSMO.Services.Reports
     public class ReportsService : IReportsService
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMapper mapper;
+        private readonly IConfigurationProvider mapper;
 
         public ReportsService(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
-            this.mapper = mapper;
+            this.mapper = mapper.ConfigurationProvider;
 
         }
-        public IEnumerable<CustomerOrderViewModel> AllCustomerOrders(string name)
+        public IEnumerable<CustomerOrderViewModel> AllCustomerOrders(string customerName)
         {
-            if (String.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(customerName))
             {
                return new List<CustomerOrderViewModel>();
             }
-            var customerId = _context.Customers.Where(a => a.Name.ToLower() == name.ToLower())
+
+            var customerId = _context.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
                                 .Select(a => a.Id)
                                 .FirstOrDefault();
 
             var listOrders = _context.CustomerOrders
-                    .Where(a => a.CustomerId == customerId)
-                    .ToList();
+                    .Where(a => a.CustomerId == customerId);
+                    
 
-            return (ICollection<CustomerOrderViewModel>)listOrders;
+            var orders = listOrders.ProjectTo<CustomerOrderViewModel>(this.mapper).ToList();
+
+            return orders;
         }
 
         public CustomerOrderViewModel Details(int id)
         {
-            var findorder = _context.CustomerOrders.Where(a => a.Id == id).FirstOrDefault();
-            var order = mapper.Map<CustomerOrderViewModel>(findorder);
+            var findorder = _context.CustomerOrders.Where(a => a.Id == id);
+            var order = findorder.ProjectTo<CustomerOrderViewModel>(mapper).FirstOrDefault();
             return (CustomerOrderViewModel)order;
 
         }

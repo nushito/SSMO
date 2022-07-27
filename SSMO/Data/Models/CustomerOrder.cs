@@ -44,7 +44,7 @@ namespace SSMO.Data.Models
         public bool PaidAmountStatus { get; set; }
         public decimal Amount { get; set; }
         public decimal SubTotal { get; set; }
-        public decimal Total { get; set; }
+       
      
         public SupplierOrder SupplierOrder { get; set; }
     }

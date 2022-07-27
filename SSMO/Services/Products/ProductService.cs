@@ -21,19 +21,11 @@ namespace SSMO.Services.Products
 
         public void CreateProduct(ProductViewModel model,int customerorderId)
         {
-            var description = new Description
-            {
-                Name = model.Description
+            var description = _dbContext.Descriptions.Where(a => a.Name == model.Description).FirstOrDefault();            
             
-            };
-            var size = new Size
-            {
-                Name = model.Size
-            };
-            var grade = new Grade
-            {
-                Name = model.Grade
-            };
+            var size = _dbContext.Sizes.Where(a => a.Name == model.Size).FirstOrDefault();
+            var grade = _dbContext.Grades.Where(a => a.Name == model.Grade).FirstOrDefault();
+
             var product = new Product
             {
                 Amount = model.Amount,
@@ -42,15 +34,33 @@ namespace SSMO.Services.Products
                 Size = size,
                  FSCClaim = model.FSCClaim,
                 FSCSertificate = model.FSCSertificate,
-             OrderedQuantity = model.Cubic,
-             Price = model.CostPrice,
+            // OrderedQuantity = model.Cubic,
+             Price = model.Price,
               Pallets = model.Pallets,
-              SheetsPerPallet = model.SheetsPerPallet
-  
+              SheetsPerPallet = model.SheetsPerPallet,
+               CustomerOrderId = customerorderId, 
+             
             };
+
+           
+
+            var dimensionArray = size.Name.Split('/').ToArray();
+            var countArray = dimensionArray.Count();
+            decimal sum = 1M;
+
+            for (int i = 0; i < countArray; i++)
+            {
+                sum*= Math.Round(decimal.Parse(dimensionArray[i])/1000,4);
+            }
+
+            product.TotalSheets = product.Pallets * product.SheetsPerPallet;
+            product.OrderedQuantity = Math.Round( sum * product.TotalSheets,4);
+            product.Amount = Math.Round(product.Price * product.OrderedQuantity, 4);
             _dbContext.Products.Add(product);
             var order = _dbContext.CustomerOrders.Where(a => a.Id == customerorderId).FirstOrDefault();
             order.Products.ToList().Add(product);
+
+            order.Amount += product.Amount;
             _dbContext.SaveChanges();
         }
 

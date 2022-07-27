@@ -1,29 +1,44 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SSMO.Data;
 using SSMO.Models.CustomerOrders;
 using SSMO.Services.Reports;
 using System;
 using System.Globalization;
+using System.Linq;
 
 namespace SSMO.Controllers
 {
     public class ReportsController : Controller
     {
         private readonly IReportsService service;
+        private readonly ApplicationDbContext dbContext;
 
-        public ReportsController(IReportsService service)
+        public ReportsController(IReportsService service, ApplicationDbContext dbContext)
         {
             this.service = service;
+            this.dbContext = dbContext;
         }
-    
-        public IActionResult AllCustomerOrders(CustomerOrderReportAll model)
+
+        [HttpGet]
+        public IActionResult AllCustomerOrders(string customerName)
         {
-           
+            
+            var orders = dbContext.CustomerOrders.AsQueryable();
+            
+          var customerNames = dbContext.Customers.Select(a=>a.Name).ToList();
 
-          model.CustomerOrderCollection = (System.Collections.Generic.ICollection<CustomerOrderReport>)service.AllCustomerOrders(model.Search);
+        var customerOrderCollection = service.AllCustomerOrders("Villafranca");
+            
 
-           var listOfOrders = model.CustomerOrderCollection;
+            var model = new CustomerOrderReportAll
+            {
 
-            return View(listOfOrders);
+                CustomerNames = customerNames,
+                CustomerOrderCollection = customerOrderCollection,
+            };
+
+          
+            return View(model);
         }
 
         public IActionResult CustomerOrderDetails(int id)

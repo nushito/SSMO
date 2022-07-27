@@ -68,9 +68,7 @@ namespace SSMO.Data
                .Property(a => a.SubTotal)
                .HasColumnType("decimal");
 
-            builder.Entity<CustomerOrder>()
-                .Property(a => a.Total)
-                .HasColumnType("decimal");
+          
 
             builder.Entity<CustomerOrder>()
               .Property(a => a.Amount)

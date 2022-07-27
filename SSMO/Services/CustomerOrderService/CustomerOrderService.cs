@@ -17,7 +17,16 @@ namespace SSMO.Services.CustomerOrderService
             this.mapper = mapper;
         }
 
-      
+        public bool CheckOrderNumberExist(string number)
+        {
+            if(dbContext.CustomerOrders.Any(o => o.Number.ToLower() == number.ToLower()))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public int CreateOrder(string num, DateTime date, int customerId, int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,int currency)
         {

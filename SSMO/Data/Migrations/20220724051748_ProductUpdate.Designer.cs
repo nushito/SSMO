@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSMO.Data;
 
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220724051748_ProductUpdate")]
+    partial class ProductUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -419,6 +421,9 @@ namespace SSMO.Data.Migrations
                     b.Property<decimal>("SubTotal")
                         .HasColumnType("decimal");
 
+                    b.Property<decimal>("Total")
+                        .HasColumnType("decimal");
+
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("decimal");
 
@@ -608,35 +613,17 @@ namespace SSMO.Data.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal");
 
-                    b.Property<decimal?>("BankExpenses")
-                        .HasColumnType("decimal(18,4)");
-
                     b.Property<int>("CustomerOrderId")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("CustomsExpenses")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<decimal?>("DeliveryTrasnportCost")
-                        .HasColumnType("decimal(18,4)");
-
                     b.Property<int>("DescriptionId")
                         .HasColumnType("int");
-
-                    b.Property<decimal?>("Duty")
-                        .HasColumnType("decimal(18,4)");
 
                     b.Property<string>("FSCClaim")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FSCSertificate")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal?>("Factoring")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<decimal?>("FiscalAgentExpenses")
-                        .HasColumnType("decimal(18,4)");
 
                     b.Property<int>("GradeId")
                         .HasColumnType("int");
@@ -647,20 +634,11 @@ namespace SSMO.Data.Migrations
                     b.Property<decimal>("OrderedQuantity")
                         .HasColumnType("decimal");
 
-                    b.Property<decimal?>("OtherExpenses")
-                        .HasColumnType("decimal(18,4)");
-
                     b.Property<int>("Pallets")
                         .HasColumnType("int");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal");
-
-                    b.Property<decimal?>("ProcentComission")
-                        .HasColumnType("decimal(18,4)");
-
-                    b.Property<decimal?>("PurchaseTransportCost")
-                        .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("QuantityM2")
                         .HasColumnType("decimal");

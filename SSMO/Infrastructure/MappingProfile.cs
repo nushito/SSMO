@@ -14,15 +14,16 @@ namespace SSMO.Infrastructure
         {
             this.CreateMap<Customer, AddCustomerFormModel>();
             this.CreateMap<MyCompany, MyCompanyFormModel>();
-            this.CreateMap<CustomerOrder, CustomerOrderReport>();
-            this.CreateMap<CustomerOrder, CustomerOrderViewModel>();
+                this.CreateMap<CustomerOrder, CustomerOrderViewModel>();
             this.CreateMap<Product, ProductViewModel>()
-                .ForMember(a=>a.Cubic,b=>b.MapFrom(a=>a.OrderedQuantity))
-                .ForMember(a=>a.CostPrice, b=>b.MapFrom(a=>a.Price));
+                .ForMember(a=>a.OrderedQuantity, b=>b.MapFrom(a=>a.OrderedQuantity))
+                .ForMember(a=>a.Price, b=>b.MapFrom(a=>a.Price));
 
             this.CreateMap<ProductViewModel, Product>()
-                .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.Cubic))
-                .ForMember(a => a.Price, b => b.MapFrom(a => a.CostPrice));
+                .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.OrderedQuantity))
+                .ForMember(a => a.Price, b => b.MapFrom(a => a.Price));
+
+            this.CreateMap<Product, ProductSupplierFormModel>();
 
             this.CreateMap<Status, StatusModel>();
         }

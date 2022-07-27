@@ -1,27 +1,30 @@
 ﻿@model CustomerOrderReportAll
 
-@{
-    var names = 
-}
 <form method="get">
     <div class="row">
-        <div class="form-group">
-            <label asp-for="Search"></label>
-            <select asp-for="Search" class="form-control">
-                @foreach (var item in Model.Searches)
+        <div class="form-group col-md-4">
+            <label asp-for="CustomerName"></label>
+            <select asp-for="CustomerName" class="form-control">
+            <option value="">All</option>
+                @foreach (var customerName in Model.CustomerNames)
                 {
-                    <option value="@item">@item</option>
+                    <option value="@customerName">@customerName</option>
                 }
 
             </select>
         </div>
     </div>
+    <div class="row">
+<a class="btn btn-info" asp-route="@Model.CustomerName"> ENTER </a></div>
 </form>
+
+
+
 <div class="row">
 @foreach(var order in Model.CustomerOrderCollection)
 {
     <div class="row">
-    <h2>@order.Number @order.Date @order.LoadingPlace @order.DeliveryAddress @order.Status</h2>
+    <h5>@order.Number - @order.Date - @order.LoadingPlace - @order.DeliveryAddress - @order.Status</h5>
     <a asp-controller="Reports" asp-action="Details" asp-route-id="@order.Id" class="btn btn-warning">Details</a>
     <a asp-controller="Reports" asp-action="Edit" asp-route-id="@order.Id" class="btn btn-warning">Edit</a>
 
@@ -30,3 +33,5 @@
     </div>
 }
 </div>
+
+

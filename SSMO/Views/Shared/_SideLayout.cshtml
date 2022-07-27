@@ -10,84 +10,93 @@
 
                         <div class="dropdown ">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                MySales
+                                My Documents
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateInvoice">Invoice</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateProforma">Proforma Invoice</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateOrder">Order</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateProforma">Packing list</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateOrder">Debit Note</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateCreditNote">Credit Note</a>
                             </div>
                         </div>
                     </li>
-
-
-                    <li class="nav-item active">
-                        <a href="~/Descriptions/Add" class="nav-link">
-                            <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>New Product Description</span>
-                        </a>
-                    </li>
-
                      <li class="nav-item active">
-                        <a href="~/Descriptions/AddSize" class="nav-link">
-                            <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>New Product Size</span>
-                        </a>
-                    </li>
-                           <li class="nav-item active">
-                        <a href="~/Descriptions/AddGrade" class="nav-link">
-                            <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>New Product Grade</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-item active">
-                        <a href="~/Purchases/AddPurchase" class="nav-link">
-                            <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>Purchase</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-item active">
-                        <a href="~/Customers/Add" class="nav-link">
-                            <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>New Customer</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-item active">
-                        <a href="~/Suppliers/AddSupplier" class="nav-link">
-                            <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>New Supplier</span>
-                        </a>
-                    </li>
-
-                    <li class="nav-item active">
                         <a href="~/CustomerOrders/AddCustomerOrder" class="nav-link">
                             <i class="fas fa-fw fa-tachometer-alt"></i>
                             <span>New Customer Order</span>
                         </a>
                     </li>
 
+                    
+                    <li class="nav-item active">
+                        <a href="~/Purchases/AddPurchase" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>New Supplier Specification</span>
+                        </a>
+                    </li>
+
+                       <li class="nav-item active">
+                        <a href="~/Purchases/AddPurchase" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>New Purchase</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item active">
+                        <a href="~/Descriptions/Add" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Add Product Description</span>
+                        </a>
+                    </li>
+
+                     <li class="nav-item active">
+                        <a href="~/Descriptions/AddSize" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Add Product Size</span>
+                        </a>
+                    </li>
+                           <li class="nav-item active">
+                        <a href="~/Descriptions/AddGrade" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Add Product Grade</span>
+                        </a>
+                    </li>
+
+
+                    <li class="nav-item active">
+                        <a href="~/Customers/Add" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Add Customer</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-item active">
+                        <a href="~/Suppliers/AddSupplier" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Add Supplier</span>
+                        </a>
+                    </li>
+
+                   
+
                     <!-- Heading -->
                     <div class="sidebar-heading text-capitalize">
                         <br />
-                        Records
+                        Reports
                         <br />
                     </div>
 
                     <li class="nav-item active">
-                        <a href="~/Customers/CustomersReport" class="nav-link">
+                        <a href="~/Reports/AllCustomerOrders" class="nav-link">
                             <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>Customer Invoice Records</span>
+                            <span>Customer Orders Report</span>
                         </a>
                     </li>
 
                     <li class="nav-item active">
                         <a href="~/Customers/Add" class="nav-link">
                             <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>Supplier Purchases Records</span>
+                            <span>Supplier Purchases Reports</span>
                         </a>
                     </li>
 
