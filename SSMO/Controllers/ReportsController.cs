@@ -27,7 +27,7 @@ namespace SSMO.Controllers
             
           var customerNames = dbContext.Customers.Select(a=>a.Name).ToList();
 
-        var customerOrderCollection = service.AllCustomerOrders("Villafranca");
+        var customerOrderCollection = service.AllCustomerOrders(customerName);
             
 
             var model = new CustomerOrderReportAll

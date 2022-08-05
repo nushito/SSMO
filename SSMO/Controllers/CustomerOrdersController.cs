@@ -167,18 +167,13 @@ namespace SSMO.Controllers
                     };
                     products.Add(product);
                 }
-                //for (int i = 0; i < count; i++)
-                //{
-                    
-                //}
+                
             }
 
             if(model.Count() == 0)
             {
                 return View(model);
             }
-
-          //  var count = ViewBag.ProductsCount;
 
             var thisorder = cusomerOrderService.OrderPerIndex(customerorderId);
        

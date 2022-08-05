@@ -27,8 +27,9 @@ namespace SSMO.Models.Products
             public decimal Duty { get; set; }
             public decimal CustomsExpenses { get; set; }
             public decimal BankExpenses { get; set; }
-            public decimal CostPrice { get; set; }
-            public decimal SoldPrice { get; set; }
+   
+        public decimal CostPrice { get; set; }
+        public decimal Price { get; set; }
             public decimal Income { get; set; }
             public int SupplierId { get; set; }
             public string SupplierName { get; set; }

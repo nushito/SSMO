@@ -105,6 +105,11 @@ namespace SSMO.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<SupplierOrder>()
+                .HasOne(a=>a.Status)
+                .WithMany(a=>a.SupplierOrders)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SupplierOrder>()
                 .HasOne(a => a.Currency)
                 .WithMany(a => a.SupplierOrders)
                 .HasForeignKey(a => a.CurrencyId)
@@ -137,12 +142,7 @@ namespace SSMO.Data
                 .HasColumnType("decimal");
 
 
-            builder.Entity<SupplierOrder>()
-                .Property(a => a.Status)
-                .HasConversion<string>();
-
-
-            builder.Entity<Product>()
+           builder.Entity<Product>()
                    .HasOne(a => a.Description)
                    .WithMany(a => a.Products)
                    .HasForeignKey(a => a.DescriptionId)
@@ -155,6 +155,14 @@ namespace SSMO.Data
             builder.Entity<Product>()
                 .Property(a => a.Price)
                 .HasColumnType("decimal");
+
+            builder.Entity<Product>()
+                .Property(a=>a.PurchasePrice)
+                .HasPrecision(18,4);
+
+            builder.Entity<Product>()
+                .Property(a => a.CostPrice)
+                .HasPrecision(18, 4);
 
             builder.Entity<Product>()
                 .Property(a => a.OrderedQuantity)

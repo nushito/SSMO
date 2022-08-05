@@ -30,14 +30,15 @@ namespace SSMO.Data.Models
         public int TotalSheets { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal Price { get; set; }
+        public decimal PurchasePrice { get; set; }
+        public decimal CostPrice { get; set; }
+
         [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
 
-        // public ICollection<ProductSpecification> ProductSpecifications { get; set; }
-
-
+      
         public int CustomerOrderId { get; set; }
         public CustomerOrder CustomerOrder { get; set; }
 

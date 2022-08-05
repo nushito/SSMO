@@ -25,6 +25,10 @@ namespace SSMO.Models.Products
         public decimal OrderedQuantity { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal Price { get; set; }
+
+        public decimal PurchasePrice { get; set; }
+        public decimal CostPrice { get; set; }
+
         [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
         public int Pallets { get; set; }

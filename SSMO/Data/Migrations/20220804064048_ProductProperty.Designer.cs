@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSMO.Data;
 
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220804064048_ProductProperty")]
+    partial class ProductProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -612,8 +614,7 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("CostPrice")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("CustomerOrderId")
                         .HasColumnType("int");
@@ -664,8 +665,7 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("PurchasePrice")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal?>("PurchaseTransportCost")
                         .HasColumnType("decimal(18,4)");
@@ -839,9 +839,6 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("CustomerOrderId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("DatePaidAmount")
                         .HasColumnType("nvarchar(max)");
 
@@ -857,8 +854,9 @@ namespace SSMO.Data.Migrations
                     b.Property<bool>("PaidStatus")
                         .HasColumnType("bit");
 
-                    b.Property<int>("StatusId")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SupplierId")
                         .HasColumnType("int");
@@ -874,8 +872,6 @@ namespace SSMO.Data.Migrations
                         .IsUnique();
 
                     b.HasIndex("MyCompanyId");
-
-                    b.HasIndex("StatusId");
 
                     b.HasIndex("SupplierId");
 
@@ -1140,12 +1136,6 @@ namespace SSMO.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SSMO.Data.Models.Status", "Status")
-                        .WithMany("SupplierOrders")
-                        .HasForeignKey("StatusId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("SSMO.Data.Models.Supplier", "Supplier")
                         .WithMany()
                         .HasForeignKey("SupplierId")
@@ -1157,8 +1147,6 @@ namespace SSMO.Data.Migrations
                     b.Navigation("CustomerOrder");
 
                     b.Navigation("MyCompany");
-
-                    b.Navigation("Status");
 
                     b.Navigation("Supplier");
                 });
@@ -1223,8 +1211,6 @@ namespace SSMO.Data.Migrations
             modelBuilder.Entity("SSMO.Data.Models.Status", b =>
                 {
                     b.Navigation("CustomerOrders");
-
-                    b.Navigation("SupplierOrders");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.Supplier", b =>

@@ -4,7 +4,7 @@ namespace SSMO.Controllers
 {
     public class SupplierOrdersController : Controller
     {
-        public IActionResult Index()
+        public IActionResult AddSupplierConfirmation()
         {
             return View();
         }
