@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSMO.Data;
 
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220811134805_ListSupplierOrders")]
+    partial class ListSupplierOrders
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -663,10 +665,6 @@ namespace SSMO.Data.Migrations
                     b.Property<decimal?>("ProcentComission")
                         .HasColumnType("decimal(18,4)");
 
-                    b.Property<decimal>("PurchaseAmount")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
                     b.Property<decimal>("PurchasePrice")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
@@ -867,15 +865,8 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("SupplierId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("TotalAmount")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
-
                     b.Property<decimal>("TotalQuantity")
                         .HasColumnType("decimal");
-
-                    b.Property<int?>("VAT")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

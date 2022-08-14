@@ -15,8 +15,10 @@ namespace SSMO.Data.Models
         public int DescriptionId { get; set; }
         [Required]
         public Description Description { get; set; }
+        public int SizeId { get; set; }
         [Required]
         public Size Size { get; set; }
+        public int GradeId { get; set; }
         [Required]
         public Grade Grade { get; set; }
         [Required]
@@ -35,6 +37,8 @@ namespace SSMO.Data.Models
 
         [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
+        [Range(0.0, 9999999999999.99999)]
+        public decimal PurchaseAmount { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
 

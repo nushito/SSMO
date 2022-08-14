@@ -27,6 +27,9 @@ namespace SSMO.Services.CustomerOrderService
             return false;
         }
 
+
+
+
         public int CreateOrder(string num, DateTime date, int customerId, int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,int currency)
         {
@@ -65,9 +68,41 @@ namespace SSMO.Services.CustomerOrderService
 
         }
 
+
+
+        public bool EditProductAsPerSupplierSpec(int productId, int descriptionId, int sizeId, 
+            int gradeId, string fscClaim, string fscCertificate,
+            int cusomerOrderId, decimal quantity, 
+            decimal purchasePrice, int pallets, int sheetsPerPallet)
+        {
+            var customerOrder = dbContext.CustomerOrders.Find(cusomerOrderId);
+
+            if(customerOrder == null)
+            {
+                return false;
+            }
+
+
+            var productList = customerOrder.Products;
+
+
+            return true;
+        }
+
+
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id)
         {
             return dbContext.CustomerOrders.Where(a => a.Id == id).FirstOrDefault();
         }
+
+        public Data.Models.CustomerOrder OrderPerNumber(string number)
+        {
+            return dbContext.CustomerOrders.Where(a => a.Number.ToLower() == number.ToLower()).FirstOrDefault();
+        }
+
+
+
+
+
     }
 }

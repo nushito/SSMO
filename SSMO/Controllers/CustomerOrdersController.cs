@@ -115,7 +115,7 @@ namespace SSMO.Controllers
                 customermodel.DeliveryAddress,
                 customermodel.CurrencyId);
 
-            ViewBag.ProductsCount = customermodel.ProductsCount;
+          //  ViewBag.ProductsCount = customermodel.ProductsCount;
             TempData["Count"] = customermodel.ProductsCount;  
 
             return RedirectToAction("AddOrderProducts", new { CustomerOrderId = customerorderId });
@@ -153,9 +153,8 @@ namespace SSMO.Controllers
 
             if (!ModelState.IsValid)
             {
-                
-
                 var products = new List<ProductViewModel>();
+
                 foreach (var item in products)
                 {
                     var product = new ProductViewModel()
@@ -170,7 +169,7 @@ namespace SSMO.Controllers
                 
             }
 
-            if(model.Count() == 0)
+            if(!model.Any())
             {
                 return View(model);
             }

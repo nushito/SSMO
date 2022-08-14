@@ -52,12 +52,7 @@ namespace SSMO.Data
                 .HasForeignKey(a => a.CurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<CustomerOrder>()
-                 .HasOne(a => a.SupplierOrder)
-                 .WithOne(a => a.CustomerOrder)
-                 .HasForeignKey<SupplierOrder>(a => a.CustomerOrderId)
-                 .OnDelete(DeleteBehavior.Restrict);
-
+            
             builder.Entity<CustomerOrder>()
                 .HasOne(a => a.Customer)
                 .WithMany(a => a.Orders)
@@ -68,20 +63,22 @@ namespace SSMO.Data
                .Property(a => a.SubTotal)
                .HasColumnType("decimal");
 
-          
-
             builder.Entity<CustomerOrder>()
               .Property(a => a.Amount)
               .HasColumnType("decimal");
+
             builder.Entity<CustomerOrder>()
               .Property(a => a.Balance)
               .HasColumnType("decimal");
+
             builder.Entity<CustomerOrder>()
               .Property(a => a.PaidAvance)
               .HasColumnType("decimal");
+
             builder.Entity<CustomerOrder>()
               .Property(a => a.TotalQuantity)
               .HasColumnType("decimal");
+
             builder.Entity<CustomerOrder>()
               .Property(a => a.TotalAmount)
               .HasColumnType("decimal");
@@ -102,6 +99,17 @@ namespace SSMO.Data
             builder.Entity<CustomerOrder>()
                 .HasOne(a => a.Status)
                 .WithMany(a=>a.CustomerOrders)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<SupplierOrder>()
+                .Property(a => a.TotalAmount)
+                 .HasColumnType("decimal")
+                 .HasPrecision(18,4);
+                
+
+            builder.Entity<SupplierOrder>()
+                .HasOne(a => a.CustomerOrder)
+                .WithMany(a => a.SupplierOrder)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<SupplierOrder>()
@@ -158,7 +166,11 @@ namespace SSMO.Data
 
             builder.Entity<Product>()
                 .Property(a=>a.PurchasePrice)
+
                 .HasPrecision(18,4);
+            builder.Entity<Product>()
+               .Property(a => a.PurchaseAmount)
+               .HasPrecision(18, 4);
 
             builder.Entity<Product>()
                 .Property(a => a.CostPrice)

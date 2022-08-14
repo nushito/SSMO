@@ -1,12 +1,7 @@
-﻿using SSMO.Data.Enums;
-using SSMO.Enums;
-//using SSMO.Services;
+﻿
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SSMO.Data.Models
 {
@@ -45,7 +40,6 @@ namespace SSMO.Data.Models
         public decimal Amount { get; set; }
         public decimal SubTotal { get; set; }
        
-     
-        public SupplierOrder SupplierOrder { get; set; }
+        public IEnumerable<SupplierOrder> SupplierOrder { get; set; }
     }
 }

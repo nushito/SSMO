@@ -11,9 +11,21 @@ namespace SSMO.Services.CustomerOrderService
             string loadingAddress, string deliveryAddress, int currency);
 
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id);
+        public SSMO.Data.Models.CustomerOrder OrderPerNumber(string number);
 
-        public bool CheckOrderNumberExist(string number); 
-      
-        
+        public bool CheckOrderNumberExist(string number);
+
+        public bool EditProductAsPerSupplierSpec(int productId,int descriptionId,
+            int sizeId,
+            int gradeId,
+            string fscClaim,
+            string fscCertificate,
+            int cusomerOrderId,
+            decimal quantity,
+            decimal purchasePrice,
+            int pallets,
+            int sheetsPerPallet
+            );
+       
     }
 }

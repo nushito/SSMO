@@ -18,6 +18,7 @@ using SSMO.Services.Status;
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Services.CustomerOrderService;
 using SSMO.Services.Reports;
+using SSMO.Services.SupplierOrders;
 
 namespace SSMO
 {
@@ -64,6 +65,7 @@ namespace SSMO
             services.AddTransient<ICustomerOrderService, CustomerOrderService>();
             services.AddTransient<IReportsService, ReportsService>();
             services.AddTransient<IStatusService, StatusService>();
+            services.AddTransient<ISupplierOrderService, SupplierOrderService>();
 
 
         }
