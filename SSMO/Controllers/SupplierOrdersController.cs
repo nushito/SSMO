@@ -95,7 +95,7 @@ namespace SSMO.Controllers
             };
 
             var supplierOrderId = supplierOrderService.CreateSupplierOrder(model.MyCompanyId, model.SupplierId,model.Date,
-                model.Number,model.CustomerOrderNumber, model.StatusId, model.CurrencyId, model.VAT);
+                model.Number,model.CustomerOrderNumber, model.StatusId, model.CurrencyId, model.VAT??0);
 
             var thisCustomerOrder = cusomerOrderService.OrderPerNumber(model.CustomerOrderNumber);
             var customerorderId = thisCustomerOrder.Id;
@@ -186,10 +186,9 @@ namespace SSMO.Controllers
                     return BadRequest();
                 }
 
-                
-
             }
 
+            supplierOrderService.TotalAmountSum(supplierOrderId);
 
             return RedirectToAction("PrintSupplierOrder", supplierOrderId);
         }

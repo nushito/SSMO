@@ -38,7 +38,8 @@ namespace SSMO.Controllers
            IMycompanyService myCompanyService,
            ICustomerService customerService,
            IProductService productService, IMapper  mapper,
- ApplicationDbContext dbContext, ICustomerOrderService cusomerOrderService, IReportsService reportService, IStatusService statusService)
+ ApplicationDbContext dbContext, ICustomerOrderService cusomerOrderService, 
+ IReportsService reportService, IStatusService statusService)
         {
             this.supplierService = supplierService;
             this.currency = currency;
@@ -56,8 +57,6 @@ namespace SSMO.Controllers
         [Authorize]
         public IActionResult AddCustomerOrder()
         {
-
-
             return View(
                 new CustomerOrderViewModel
                 {

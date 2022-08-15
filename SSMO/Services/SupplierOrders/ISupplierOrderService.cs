@@ -10,7 +10,6 @@ namespace SSMO.Services.SupplierOrders
                 string number,
                string customerOrderNumber ,
                 int statusId, int currencyId, int vat );
-
-       
+        void TotalAmountSum(int supplierOrderId);
     }
 }

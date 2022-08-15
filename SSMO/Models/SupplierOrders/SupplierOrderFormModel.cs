@@ -42,7 +42,7 @@ namespace SSMO.Models.SupplierOrders
                     return 0;
                 }
 
-                var vatAmount = Products.Sum(a => a.PurchaseAmount) * VAT / 100;
+                var vatAmount = Products.Sum(a => a.PurchaseAmount) * VAT / 100??0;
                 return Products.Sum(a => a.PurchaseAmount) + vatAmount;
                     } 
         }
@@ -50,7 +50,7 @@ namespace SSMO.Models.SupplierOrders
         public decimal Balance { get; set; }
         public string DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
-        public int VAT { get; set; }
+        public int? VAT { get; set; }
 
         public IList<ProductViewModel> Products { get; set; }
         public decimal TotalQuantity { get; set; }

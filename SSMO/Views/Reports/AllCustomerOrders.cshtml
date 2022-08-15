@@ -15,16 +15,31 @@
         </div>
     </div>
     <div class="row">
-<a class="btn btn-info" asp-route="@Model.CustomerName"> ENTER </a></div>
+<input type="submit" class="btn btn-info" value="Search"/></div>
 </form>
 
 
 
-<div class="row">
+<div class="container">
 @foreach(var order in Model.CustomerOrderCollection)
 {
     <div class="row">
-    <h5>@order.Number - @order.Date - @order.LoadingPlace - @order.DeliveryAddress - @order.Status</h5>
+        <div class="col">
+            @order.Number
+        </div>
+         <div class="col">
+            @order.Date
+        </div>
+         <div class="col">
+           @order.LoadingPlace
+        </div>
+         <div class="col">
+           @order.DeliveryAddress
+        </div>
+     <div class="col">
+           @order.Status
+        </div>
+  
     <a asp-controller="Reports" asp-action="Details" asp-route-id="@order.Id" class="btn btn-warning">Details</a>
     <a asp-controller="Reports" asp-action="Edit" asp-route-id="@order.Id" class="btn btn-warning">Edit</a>
 

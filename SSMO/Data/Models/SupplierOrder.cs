@@ -4,6 +4,7 @@ using SSMO.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace SSMO.Data.Models
 {
@@ -35,7 +36,8 @@ namespace SSMO.Data.Models
         public decimal Balance { get; set; }
         public string DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
-        public decimal TotalAmount { get; set; }
+        public decimal TotalAmount
+        { get; set; }
 
         public int? VAT { get; set; }
 

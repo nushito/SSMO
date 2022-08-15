@@ -6,8 +6,8 @@ namespace SSMO.Services.Reports
 {
     public interface IReportsService
     {
-        IEnumerable<CustomerOrderViewModel> AllCustomerOrders(string name);
-        CustomerOrderViewModel Details(int id);
+        IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders(string name);
+        CustomerOrderDetailsModel Details(int id);
 
         bool Edit(int id,string number,
                 System.DateTime date,

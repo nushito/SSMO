@@ -186,6 +186,7 @@ namespace SSMO.Services.Products
 
             spOrder.Amount += product.PurchaseAmount;
            
+           
             spOrder.Products.Add(product);
             
             _dbContext.SaveChanges();

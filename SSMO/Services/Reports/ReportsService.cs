@@ -20,31 +20,31 @@ namespace SSMO.Services.Reports
             this.mapper = mapper.ConfigurationProvider;
 
         }
-        public IEnumerable<CustomerOrderViewModel> AllCustomerOrders(string customerName)
+        public IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders(string customerName)
         {
             if (String.IsNullOrEmpty(customerName))
             {
-               return new List<CustomerOrderViewModel>();
+               return new List<CustomerOrderDetailsModel>();
             }
 
             var customerId = _context.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
                                 .Select(a => a.Id)
                                 .FirstOrDefault();
 
-            var listOrders = _context.CustomerOrders
+            var queryOrders = _context.CustomerOrders
                     .Where(a => a.CustomerId == customerId);
                     
 
-            var orders = listOrders.ProjectTo<CustomerOrderViewModel>(this.mapper).ToList();
+            var orders = queryOrders.ProjectTo<CustomerOrderDetailsModel>(this.mapper).ToList();
 
             return orders;
         }
 
-        public CustomerOrderViewModel Details(int id)
+        public CustomerOrderDetailsModel Details(int id)
         {
             var findorder = _context.CustomerOrders.Where(a => a.Id == id);
-            var order = findorder.ProjectTo<CustomerOrderViewModel>(mapper).FirstOrDefault();
-            return (CustomerOrderViewModel)order;
+            var order = findorder.ProjectTo<CustomerOrderDetailsModel>(mapper).FirstOrDefault();
+            return (CustomerOrderDetailsModel)order;
 
         }
 

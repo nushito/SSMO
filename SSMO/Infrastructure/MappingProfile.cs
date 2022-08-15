@@ -26,6 +26,8 @@ namespace SSMO.Infrastructure
 
             this.CreateMap<Product, ProductSupplierDetails>();
 
+            this.CreateMap<CustomerOrder, CustomerOrderDetailsModel>();
+
             this.CreateMap<Status, StatusModel>();
         }
     }

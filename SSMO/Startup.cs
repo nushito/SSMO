@@ -19,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using SSMO.Services.CustomerOrderService;
 using SSMO.Services.Reports;
 using SSMO.Services.SupplierOrders;
+using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace SSMO
 {
@@ -66,6 +67,20 @@ namespace SSMO
             services.AddTransient<IReportsService, ReportsService>();
             services.AddTransient<IStatusService, StatusService>();
             services.AddTransient<ISupplierOrderService, SupplierOrderService>();
+
+            services.AddMvc(options =>
+            {
+                options.AllowEmptyInputInBodyModelBinding = true;
+                foreach (var formatter in options.InputFormatters)
+                {
+                    if (formatter.GetType() == typeof(SystemTextJsonInputFormatter))
+                        ((SystemTextJsonInputFormatter)formatter).SupportedMediaTypes.Add(
+                        Microsoft.Net.Http.Headers.MediaTypeHeaderValue.Parse("text/plain"));
+                }
+            }).AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+            });
 
 
         }

@@ -42,6 +42,12 @@ namespace SSMO.Services.SupplierOrders
             return supplierSpec.Id;
         }
 
-       
+        public void TotalAmountSum(int supplierOrderId)
+        {
+           var spOrder = dbContext.SupplierOrders.Find(supplierOrderId);
+           spOrder.TotalAmount = spOrder.Amount + (spOrder.Amount * spOrder.VAT / 100)??0;
+            dbContext.SaveChanges();    
+          
+        }
     }
 }

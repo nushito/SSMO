@@ -19,26 +19,26 @@ namespace SSMO.Controllers
             this.dbContext = dbContext;
         }
 
-        [HttpGet]
+
         public IActionResult AllCustomerOrders(string customerName)
         {
-            
-            var orders = dbContext.CustomerOrders.AsQueryable();
-            
-          var customerNames = dbContext.Customers.Select(a=>a.Name).ToList();
 
-        var customerOrderCollection = service.AllCustomerOrders(customerName);
-            
+            //var orders = dbContext.CustomerOrders.AsQueryable();
 
-            var model = new CustomerOrderReportAll
+            var customerNames = dbContext.Customers
+                .Select(a => a.Name).ToList();
+
+            var customerOrderCollection = service.AllCustomerOrders(customerName);
+
+            var queryOrder = new CustomerOrderReportAll
             {
-
+                CustomerName = customerName,    
                 CustomerNames = customerNames,
-                CustomerOrderCollection = customerOrderCollection,
+                CustomerOrderCollection = customerOrderCollection
             };
-
           
-            return View(model);
+          
+            return View(queryOrder);
         }
 
         public IActionResult CustomerOrderDetails(int id)
