@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SSMO.Data;
 using SSMO.Models.CustomerOrders;
+using SSMO.Models.Reports;
 using SSMO.Services.Reports;
 using System;
 using System.Globalization;
@@ -20,7 +21,7 @@ namespace SSMO.Controllers
         }
 
 
-        public IActionResult AllCustomerOrders(string customerName)
+        public IActionResult AllCustomerOrders(CustomerOrderReportAll model)
         {
 
             //var orders = dbContext.CustomerOrders.AsQueryable();
@@ -28,17 +29,16 @@ namespace SSMO.Controllers
             var customerNames = dbContext.Customers
                 .Select(a => a.Name).ToList();
 
-            var customerOrderCollection = service.AllCustomerOrders(customerName);
+            var customerOrderCollection = service.AllCustomerOrders(
+                model.CustomerName, 
+                model.CurrentPage,CustomerOrderReportAll.CustomerOrdersPerPage);
 
-            var queryOrder = new CustomerOrderReportAll
-            {
-                CustomerName = customerName,    
-                CustomerNames = customerNames,
-                CustomerOrderCollection = customerOrderCollection
-            };
+            model.CustomerOrderCollection = customerOrderCollection;    
+
+            model.CustomerNames = customerNames;
+
           
-          
-            return View(queryOrder);
+            return View(model);
         }
 
         public IActionResult CustomerOrderDetails(int id)

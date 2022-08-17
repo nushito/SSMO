@@ -64,7 +64,7 @@ namespace SSMO.Controllers
                     Customers = customerService.CustomersData(),
                     MyCompanies =myCompanyService.GetAllCompanies(),
                     Suppliers = supplierService.GetSuppliers(),
-                    Products = new List<ProductViewModel>(),
+                    Products = new List<ProductCustomerFormModel>(),
                     Statuses = statusService.GetAllStatus()
                  }
 
@@ -81,16 +81,16 @@ namespace SSMO.Controllers
             {
                 new CustomerOrderViewModel
                 {
-                    Id = customermodel.Id,  
+                   // Id = customermodel.Id,  
                     Currencies = currency.AllCurrency(),
                     Customers = customerService.CustomersData(),
                     MyCompanies = myCompanyService.GetAllCompanies(),
                     Suppliers = supplierService.GetSuppliers(),
-                    Products = new List<ProductViewModel>(),
+                    Products = new List<ProductCustomerFormModel>(),
                     Statuses = statusService.GetAllStatus()
                 };
 
-                new ProductViewModel
+                new ProductCustomerFormModel
                 {
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),
@@ -127,10 +127,10 @@ namespace SSMO.Controllers
 
             var count = int.Parse(TempData["Count"].ToString());
                      
-            var products = new List<ProductViewModel>();
+            var products = new List<ProductCustomerFormModel>();
             for (int i = 0; i < count; i++)
             {
-               var product = new ProductViewModel()
+               var product = new ProductCustomerFormModel()
                 {
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),
@@ -146,17 +146,17 @@ namespace SSMO.Controllers
         [HttpPost]
         [Authorize]
         public IActionResult AddOrderProducts(int customerorderId,
-           IEnumerable<ProductViewModel> model)
+           IEnumerable<ProductCustomerFormModel> model)
         {
            // var count = int.Parse(TempData["Count"].ToString());
 
             if (!ModelState.IsValid)
             {
-                var products = new List<ProductViewModel>();
+                var products = new List<ProductCustomerFormModel>();
 
                 foreach (var item in products)
                 {
-                    var product = new ProductViewModel()
+                    var product = new ProductCustomerFormModel()
                     {
                         Descriptions = productService.GetDescriptions(),
                         Grades = productService.GetGrades(),

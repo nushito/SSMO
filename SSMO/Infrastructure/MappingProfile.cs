@@ -6,6 +6,7 @@ using SSMO.Models.Customers;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Services.Products;
+using SSMO.Services.Reports;
 
 namespace SSMO.Infrastructure
 {
@@ -16,11 +17,11 @@ namespace SSMO.Infrastructure
             this.CreateMap<Customer, AddCustomerFormModel>();
             this.CreateMap<MyCompany, MyCompanyFormModel>();
                 this.CreateMap<CustomerOrder, CustomerOrderViewModel>();
-            this.CreateMap<Product, ProductViewModel>()
+            this.CreateMap<Product, ProductCustomerFormModel>()
                 .ForMember(a=>a.OrderedQuantity, b=>b.MapFrom(a=>a.OrderedQuantity))
                 .ForMember(a=>a.Price, b=>b.MapFrom(a=>a.Price));
 
-            this.CreateMap<ProductViewModel, Product>()
+            this.CreateMap<ProductCustomerFormModel, Product>()
                 .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.OrderedQuantity))
                 .ForMember(a => a.Price, b => b.MapFrom(a => a.Price));
 

@@ -110,7 +110,7 @@ namespace SSMO.Controllers
         {
             if (!ModelState.IsValid)
             {
-                new ProductViewModel
+                new ProductSupplierFormModel
                 {
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),
@@ -126,11 +126,11 @@ namespace SSMO.Controllers
                 return RedirectToAction("AddCustomerOrder", "CustomerOrdersController", customerorderId);
             }
 
-            var listProducts = new List<ProductViewModel>();
+            var listProducts = new List<ProductSupplierFormModel>();
 
             foreach (var product in corder)
             {
-              var productSupp =  new ProductViewModel
+              var productSupp =  new ProductSupplierFormModel
               {
                     Id = product.Id,  
                     Description = product.Description,  
@@ -158,11 +158,11 @@ namespace SSMO.Controllers
         [HttpPost]
         [Authorize]
         public IActionResult EditProductAsPerSupplier(
-          int customerorderId, int supplierOrderId, List<ProductViewModel> productmodel)
+          int customerorderId, int supplierOrderId, List<ProductSupplierFormModel> productmodel)
         {
             if (!ModelState.IsValid)
             {
-                new ProductViewModel
+                new ProductSupplierFormModel
                 {
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),

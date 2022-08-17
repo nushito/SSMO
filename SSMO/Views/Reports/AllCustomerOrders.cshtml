@@ -16,8 +16,43 @@
     </div>
     <div class="row">
 <input type="submit" class="btn btn-info" value="Search"/></div>
+<br />
 </form>
 
+@{
+    var previouspage = Model.CurrentPage - 1;
+    if(previouspage < 1)
+    {
+        previouspage = 1;
+    }
+
+    var maxpage = Math.Ceiling((double)Model.TotalCustomerOrders / CustomerOrderReportAll.CustomerOrdersPerPage);
+}
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
+           asp-controller="Reports"
+           asp-action="AllCustomerOrders"
+           asp-route-currentPage="@previouspage"
+           asp-route-customerName="@Model.CustomerName"
+          ><<</a>
+    </div>
+    
+    @{
+        var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
+                                     !Model.CustomerOrderCollection.Any();
+    }
+
+    <div class="col-md-6">
+        <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
+           asp-controller="Cars"
+           asp-action="All"
+           asp-route-currentPage="@(Model.CurrentPage + 1)"
+           asp-route-customerName="@Model.CustomerName"
+           >>></a>
+    </div>
+</div>
 
 
 <div class="container">
@@ -41,6 +76,7 @@
         </div>
   
     <a asp-controller="Reports" asp-action="Details" asp-route-id="@order.Id" class="btn btn-warning">Details</a>
+
     <a asp-controller="Reports" asp-action="Edit" asp-route-id="@order.Id" class="btn btn-warning">Edit</a>
 
     <a asp-controller="Reports" asp-action="Delete" asp-route-id="@order.Id" class="btn btn-danger">Delete</a>

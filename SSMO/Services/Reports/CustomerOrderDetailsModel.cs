@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace SSMO.Models.CustomerOrders
+namespace SSMO.Services.Reports
 {
     public class CustomerOrderDetailsModel
     {

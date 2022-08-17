@@ -52,7 +52,7 @@ namespace SSMO.Models.SupplierOrders
         public bool PaidStatus { get; set; }
         public int? VAT { get; set; }
 
-        public IList<ProductViewModel> Products { get; set; }
+        public IList<ProductCustomerFormModel> Products { get; set; }
         public decimal TotalQuantity { get; set; }
 
 

@@ -16,7 +16,7 @@ namespace SSMO.Models.CustomerOrders
         {
             
         }
-        public int Id { get; init; }
+       // public int Id { get; init; }
         public string Number { get; set; }
         [Required]
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
@@ -38,7 +38,7 @@ namespace SSMO.Models.CustomerOrders
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public IEnumerable<GetCurrencyModel> Currencies { get; set; }
-        public IList<ProductViewModel> Products { get; set; }
+        public IList<ProductCustomerFormModel> Products { get; set; }
         public string FscClaim { get; set; }
         public string FscCertificate { get; set; }
         public decimal TotalQuantity { get; set; }

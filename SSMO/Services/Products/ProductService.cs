@@ -20,7 +20,7 @@ namespace SSMO.Services.Products
             this.mapper = mapper.ConfigurationProvider;
         }
 
-        public void CreateProduct(ProductViewModel model,int customerorderId)
+        public void CreateProduct(ProductCustomerFormModel model,int customerorderId)
         {
             var description = _dbContext.Descriptions.Where(a => a.Name == model.Description).FirstOrDefault();            
             

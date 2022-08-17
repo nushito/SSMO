@@ -1,12 +1,11 @@
-﻿using SSMO.Models.CustomerOrders;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace SSMO.Services.Reports
 {
     public interface IReportsService
     {
-        IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders(string name);
+        IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders(string name, int currentpage, int customerOrdersPerPage);
         CustomerOrderDetailsModel Details(int id);
 
         bool Edit(int id,string number,

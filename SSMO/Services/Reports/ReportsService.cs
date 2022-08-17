@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using SSMO.Data;
-using SSMO.Models.CustomerOrders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +19,8 @@ namespace SSMO.Services.Reports
             this.mapper = mapper.ConfigurationProvider;
 
         }
-        public IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders(string customerName)
+        public IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders(string customerName,
+            int currentpage, int customerOrdersPerPage)
         {
             if (String.IsNullOrEmpty(customerName))
             {
@@ -34,10 +34,13 @@ namespace SSMO.Services.Reports
             var queryOrders = _context.CustomerOrders
                     .Where(a => a.CustomerId == customerId);
                     
+            var totalOrders = queryOrders.Count();  
 
             var orders = queryOrders.ProjectTo<CustomerOrderDetailsModel>(this.mapper).ToList();
 
-            return orders;
+            var customerOrdersList = orders.Skip((currentpage - 1) * customerOrdersPerPage).Take(customerOrdersPerPage);
+
+            return customerOrdersList;
         }
 
         public CustomerOrderDetailsModel Details(int id)
