@@ -112,10 +112,13 @@ namespace SSMO.Controllers
                 customermodel.DeliveryTerms,
                 customermodel.LoadingPlace,
                 customermodel.DeliveryAddress,
-                customermodel.CurrencyId);
+                customermodel.CurrencyId,
+                customermodel.Origin,
+                customermodel.PaidAmountStatus,
+                customermodel.PaidAvance, customermodel.Vat??0);
 
           //  ViewBag.ProductsCount = customermodel.ProductsCount;
-            TempData["Count"] = customermodel.ProductsCount;  
+                TempData["Count"] = customermodel.ProductsCount;  
 
             return RedirectToAction("AddOrderProducts", new { CustomerOrderId = customerorderId });
         }
@@ -139,6 +142,8 @@ namespace SSMO.Controllers
                 }; 
                 products.Add(product);
             }
+
+
 
             return View(products);  
         }
@@ -173,9 +178,6 @@ namespace SSMO.Controllers
                 return View(model);
             }
 
-            var thisorder = cusomerOrderService.OrderPerIndex(customerorderId);
-       
-
             foreach (var item in model)
             {
                
@@ -183,10 +185,8 @@ namespace SSMO.Controllers
 
             }
 
-            thisorder.Vat = 0;
-            thisorder.TotalAmount = (decimal)(thisorder.Amount + thisorder.Vat);
-            dbContext.SaveChanges();
-
+            cusomerOrderService.CustomerOrderCounting(customerorderId);
+           
             return RedirectToAction("PrintCustomerOrder");
         }
 

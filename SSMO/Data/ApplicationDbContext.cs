@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using SSMO.Data.Enums;
 using SSMO.Data.Models;
 using System;
 using System.Collections.Generic;
@@ -244,7 +245,7 @@ namespace SSMO.Data
 
             builder.Entity<Document>()
                 .Property(a => a.DocumentType)
-                .HasConversion<string>();
+                .HasConversion(a=>a.ToString(),a=>(DocumentTypes)Enum.Parse(typeof(DocumentTypes),a));
 
 
 

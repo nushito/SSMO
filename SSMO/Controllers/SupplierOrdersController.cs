@@ -148,6 +148,7 @@ namespace SSMO.Controllers
                     Sizes = productService.GetSizes()
 
                 };
+
                 listProducts.Add(productSupp);
 
             };
@@ -177,7 +178,7 @@ namespace SSMO.Controllers
 
             foreach (var product in productmodel)
             {
-              var check =  productService.Edit(product.Id, customerorderId, supplierOrderId,product.Description, product.Grade, product.Size 
+              var check =  productService.EditProduct(product.Id, customerorderId, supplierOrderId,product.Description, product.Grade, product.Size 
                    , product.FSCClaim, product.FSCSertificate, product.Pallets, product.SheetsPerPallet,
                     product.PurchasePrice);
 

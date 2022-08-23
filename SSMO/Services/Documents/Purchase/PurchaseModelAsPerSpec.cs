@@ -1,0 +1,13 @@
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using SSMO.Models.SupplierOrders;
+using System;
+using System.Collections.Generic;
+
+namespace SSMO.Services.Documents.Purchase
+{
+    public class PurchaseModelAsPerSpec
+    {
+        public string Number { get; set; }
+        public DateTime Date { get; set; }
+    }
+}

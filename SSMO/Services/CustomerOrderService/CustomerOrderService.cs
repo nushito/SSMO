@@ -31,7 +31,8 @@ namespace SSMO.Services.CustomerOrderService
 
 
         public int CreateOrder(string num, DateTime date, int customerId, int company, string deliveryTerms,
-            string loadingAddress, string deliveryAddress,int currency)
+            string loadingAddress, string deliveryAddress,int currency,string origin, 
+            bool paidStatus, decimal paidAdvance, int vat)
         {
            
             var fscClaim = dbContext.MyCompanies
@@ -58,36 +59,56 @@ namespace SSMO.Services.CustomerOrderService
                 FSCSertificate = fscCertificate,
                 CurrencyId = currency,
                 Status = status,
-               
+               Origin = origin,
+               PaidAmountStatus = paidStatus,   
+               PaidAvance  = paidAdvance, 
+               Vat = vat
             };
 
-
+           
             dbContext.CustomerOrders.Add(order);
             dbContext.SaveChanges();
             return order.Id;
 
         }
 
-
-
-        public bool EditProductAsPerSupplierSpec(int productId, int descriptionId, int sizeId, 
-            int gradeId, string fscClaim, string fscCertificate,
-            int cusomerOrderId, decimal quantity, 
-            decimal purchasePrice, int pallets, int sheetsPerPallet)
+        public void CustomerOrderCounting(int customerorderId)
         {
-            var customerOrder = dbContext.CustomerOrders.Find(cusomerOrderId);
+            var thisorder = OrderPerIndex(customerorderId);
 
-            if(customerOrder == null)
+            thisorder.TotalAmount = (decimal)(thisorder.Amount + thisorder.Vat);
+
+            if(thisorder.PaidAmountStatus == false)
             {
-                return false;
+                thisorder.Balance = thisorder.TotalAmount - thisorder.PaidAvance;
+            }
+            else
+            {
+                thisorder.Balance = 0;
             }
 
+            dbContext.SaveChanges();
 
-            var productList = customerOrder.Products;
-
-
-            return true;
         }
+
+        //public bool EditProductAsPerSupplierSpec(int productId, int descriptionId, int sizeId, 
+        //    int gradeId, string fscClaim, string fscCertificate,
+        //    int cusomerOrderId, decimal quantity, 
+        //    decimal purchasePrice, int pallets, int sheetsPerPallet)
+        //{
+        //    var customerOrder = dbContext.CustomerOrders.Find(cusomerOrderId);
+
+        //    if(customerOrder == null)
+        //    {
+        //        return false;
+        //    }
+
+
+        //    var productList = customerOrder.Products;
+
+
+        //    return true;
+        //}
 
 
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id)

@@ -5,6 +5,7 @@ using SSMO.Models.CustomerOrders;
 using SSMO.Models.Customers;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
+using SSMO.Services.Documents.Purchase;
 using SSMO.Services.Products;
 using SSMO.Services.Reports;
 
@@ -30,6 +31,8 @@ namespace SSMO.Infrastructure
             this.CreateMap<CustomerOrder, CustomerOrderDetailsModel>();
 
             this.CreateMap<Status, StatusModel>();
+
+            this.CreateMap<SupplierOrder, PurchaseModelAsPerSpec>();
         }
     }
 }

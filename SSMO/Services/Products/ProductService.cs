@@ -139,7 +139,7 @@ namespace SSMO.Services.Products
             return _dbContext.Grades.Select(a => a.Name).ToList();
         }
 
-        public bool Edit(int id, int customerorderId,
+        public bool EditProduct(int id, int customerorderId,
             int supplierOrderId,
            string description, string grade,
             string size, string fscClaim, string fscCertificate,

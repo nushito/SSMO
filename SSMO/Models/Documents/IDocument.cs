@@ -8,7 +8,7 @@ namespace SSMO.Models.Documents
 {
     public interface IDocument
     {
-        public int Id { get; set; }
+      
         public int Number { get; set; }
         [Required]
         public DateTime Date { get; set; }

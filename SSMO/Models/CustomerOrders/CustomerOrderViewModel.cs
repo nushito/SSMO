@@ -27,7 +27,6 @@ namespace SSMO.Models.CustomerOrders
         public string DeliveryAddress { get; set; }
         public int CustomerId { get; set; }
         public AddCustomerFormModel Customer { get; set; }
-
         public IEnumerable<AddCustomerFormModel> Customers { get; set; }
         public int MyCompanyId { get; set; }
         public string MyCompanyName { get; set; }
@@ -41,6 +40,7 @@ namespace SSMO.Models.CustomerOrders
         public IList<ProductCustomerFormModel> Products { get; set; }
         public string FscClaim { get; set; }
         public string FscCertificate { get; set; }
+        public string Origin { get; set; }
         public decimal TotalQuantity { get; set; }
         public decimal TotalAmount { get; set; }
         public int? Vat { get; set; }

@@ -8,24 +8,28 @@ namespace SSMO.Services.CustomerOrderService
         public int CreateOrder
             (string num, DateTime date, int customer, 
             int company, string deliveryTerms, 
-            string loadingAddress, string deliveryAddress, int currency);
+            string loadingAddress, string deliveryAddress,
+            int currency,string origin, bool paidStatus, 
+            decimal paidAdvance,
+            int vat);
 
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id);
         public SSMO.Data.Models.CustomerOrder OrderPerNumber(string number);
 
         public bool CheckOrderNumberExist(string number);
 
-        public bool EditProductAsPerSupplierSpec(int productId,int descriptionId,
-            int sizeId,
-            int gradeId,
-            string fscClaim,
-            string fscCertificate,
-            int cusomerOrderId,
-            decimal quantity,
-            decimal purchasePrice,
-            int pallets,
-            int sheetsPerPallet
-            );
+        //public bool EditProductAsPerSupplierSpec(int productId,int descriptionId,
+        //    int sizeId,
+        //    int gradeId,
+        //    string fscClaim,
+        //    string fscCertificate,
+        //    int cusomerOrderId,
+        //    decimal quantity,
+        //    decimal purchasePrice,
+        //    int pallets,
+        //    int sheetsPerPallet
+        //    );
        
+        public void CustomerOrderCounting(int customerorderId); 
     }
 }

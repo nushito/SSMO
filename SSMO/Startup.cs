@@ -20,6 +20,7 @@ using SSMO.Services.CustomerOrderService;
 using SSMO.Services.Reports;
 using SSMO.Services.SupplierOrders;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using SSMO.Services.Documents.Purchase;
 
 namespace SSMO
 {
@@ -67,6 +68,7 @@ namespace SSMO
             services.AddTransient<IReportsService, ReportsService>();
             services.AddTransient<IStatusService, StatusService>();
             services.AddTransient<ISupplierOrderService, SupplierOrderService>();
+            services.AddTransient<IPurchaseService, PurchaseService>();
 
             services.AddMvc(options =>
             {

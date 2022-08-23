@@ -33,7 +33,7 @@ namespace SSMO.Models.SupplierOrders
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public IEnumerable<GetCurrencyModel> Currencies { get; set; }
-
+        [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
         public decimal TotalAmount {
             get {
@@ -46,13 +46,16 @@ namespace SSMO.Models.SupplierOrders
                 return Products.Sum(a => a.PurchaseAmount) + vatAmount;
                     } 
         }
+        [Range(0.0, 9999999999999.99999)]
         public decimal PaidAvance { get; set; }
+        [Range(0.0, 9999999999999.99999)]
         public decimal Balance { get; set; }
         public string DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
         public int? VAT { get; set; }
 
         public IList<ProductCustomerFormModel> Products { get; set; }
+        [Range(0.0, 9999999999999.99999)]
         public decimal TotalQuantity { get; set; }
 
 

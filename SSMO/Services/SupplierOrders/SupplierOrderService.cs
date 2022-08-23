@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Services.Documents.Purchase;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SSMO.Services.SupplierOrders
@@ -9,12 +12,13 @@ namespace SSMO.Services.SupplierOrders
     public class SupplierOrderService : ISupplierOrderService
     {
         private readonly ApplicationDbContext dbContext;
-        private readonly IMapper mapper;
+        private readonly IConfigurationProvider mapper;
 
         public SupplierOrderService(ApplicationDbContext dbContext, IMapper mapper)
         {
             this.dbContext = dbContext;
-            this.mapper = mapper;
+            this.mapper = mapper.ConfigurationProvider;
+            
         }
 
         public int CreateSupplierOrder(int myCompanyId, int supplierId, DateTime Date, 
@@ -40,6 +44,13 @@ namespace SSMO.Services.SupplierOrders
             dbContext.SaveChanges();
 
             return supplierSpec.Id;
+        }
+
+        
+
+        public IEnumerable<string> GetSuppliers()
+        {
+            return dbContext.Suppliers.Select(a=>a.Name).ToList();
         }
 
         public void TotalAmountSum(int supplierOrderId)

@@ -21,7 +21,7 @@ namespace SSMO.Services.Products
 
         public IEnumerable<ProductSupplierDetails> Details(int customerId);
 
-        public bool Edit(int id, int customerorderId,
+        public bool EditProduct(int id, int customerorderId,
             int supplierOrderId,
             string description, string grade,
             string size, string fscClaim, string fscCertificate,

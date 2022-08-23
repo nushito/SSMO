@@ -2,7 +2,6 @@
 
 @{
     ViewBag.Title = "Add Supplier Specification";
-
 }
 
 
@@ -13,14 +12,14 @@
         <input id="number" asp-for="Number" class="form-control"/>
         <span asp-validation-for="Number" class="small text-danger"></span>
     </div>
-    <div class="row col-md-4">
+    <div class="row col-md-4 mb-2">
         <label asp-for="Date"></label>
         <input itemid="date" asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
         <span asp-validation-for="Date" class="small text-danger"></span>
     </div>
    
 
-    <div class="form-group col-md-4">
+    <div class="row col-md-4 mb-2">
         <label asp-for="CurrencyId"></label>
         <select asp-for="CurrencyId" class="form-control">
             @foreach (var item in Model.Currencies )
@@ -32,10 +31,10 @@
 
     </div>
    
-        <div class="form-group col-md-4">
-            <div class="form-group">
+        <div class="row col-md-4 mb-2">
+            
                <td>
-                    <label asp-for="MyCompanyId"></label>
+                    <label asp-for="MyCompanyId">Seller</label>
                 <select id="mycompany" asp-for="MyCompanyId" class="form-control">
                     @foreach (var company in Model.MyCompanies)
                     {
@@ -45,7 +44,7 @@
                 </select>
                </td>
                <td>
-                   <label asp-for="SupplierId"></label>
+                   <label asp-for="SupplierId">Supplier</label>
                    <select asp-for="SupplierId" class="form-control">
                         @foreach(var supplier in Model.Suppliers)
                         {
@@ -55,18 +54,13 @@
                </td>
             </div>
             
-        </div>
     
-   
-   <div class="row col-md-4">
+   <div class="row col-md-4 mb-2">
        <label asp-for="CustomerOrderNumber">Customer Order No:</label>
        <input asp-for="CustomerOrderNumber" class="form-control" />
    </div>
-
-
-
-            <div class="row col-md-4"> 
-                <label asp-for="StatusId">Status</label>
+   <div class="row col-md-4 mb-2"> 
+                <label asp-for="StatusId">Status of the order</label>
                 <select asp-for="StatusId" class="form-control">
                     @foreach (var status in Model.Statuses)
                     {
@@ -74,12 +68,25 @@
                     }
                     <span asp-validation-for="StatusId" class="small text-danger"></span>
                 </select>
-                </div>
+    </div>
+    <div class="form-group col-sm-4 mb-2">      
+            
+      <input class="form-check-input" type="checkbox" asp-for="PaidStatus">
+      <label class="form-check-label" asp-for="PaidStatus">
+        Paid
+      </label> 
+    </div>
+         
+    <div class="row col-md-4">
+                    <label asp-for="PaidAvance">Paid Advance</label>
+                    <input asp-for="PaidAvance" class="form-control" />
+
+     </div>
  <div class="row col-md-4">
      <label asp-for="VAT">Enter VAT %</label>
      <input asp-for="VAT" class="form-control" />
  </div>
-    
+    <br />
         <input type="submit" value="Add Products" class="btn btn-primary mt-3" asp-route-customerorderId="@Model.CustomerOrderId"/>
  </form> 
 

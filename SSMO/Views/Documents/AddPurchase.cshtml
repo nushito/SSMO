@@ -1,0 +1,77 @@
+﻿@model SupplierOrderListModel
+
+<form method="get">
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="SupplierName"></label>
+            <select asp-for="SupplierName" class="form-control">
+            <option value="">All</option>
+                @foreach (var supplierName in Model.SupplierNames)
+                {
+                    <option value="@supplierName">@supplierName</option>
+                }
+
+            </select>
+        </div>
+    </div>
+    <div class="row">
+<input type="submit" class="btn btn-info" value="Search"/></div>
+<br />
+</form>
+
+@{
+    var previouspage = Model.CurrentPage - 1;
+    if(previouspage < 1)
+    {
+        previouspage = 1;
+    }
+
+    var maxpage = Math.Ceiling((double)Model.TotalSupplierOrders / SupplierOrderListModel.SupplierOrdersPerPage);
+}
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
+           asp-controller="Documents"
+           asp-action="AddPurchase"
+           asp-route-currentPage="@previouspage"
+           asp-route-customerName="@Model.SupplierName"
+          ><<</a>
+    </div>
+    
+    @{
+        var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
+                                     !Model.SupplierOrderNumbers.Any();
+    }
+
+    <div class="col-md-6">
+        <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
+           asp-controller="Documents"
+           asp-action="AddPurchase"
+           asp-route-currentPage="@(Model.CurrentPage + 1)"
+           asp-route-customerName="@Model.SupplierName"
+           >>></a>
+    </div>
+</div>
+
+
+<div class="container">
+@foreach(var order in Model.SupplierOrderNumbers)
+{
+    <div class="row">
+        <div class="col">
+            @order.Number
+       </div>
+       <div class="col">
+            @order.Date
+       </div>
+  
+    <a asp-controller="Documents" asp-action="PurchaseDetails" asp-route-number="@order.Number" class="btn btn-warning">Add Purchase Details</a>
+
+ 
+
+    </div>
+}
+</div>
+
+

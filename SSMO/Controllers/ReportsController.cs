@@ -2,6 +2,7 @@
 using SSMO.Data;
 using SSMO.Models.CustomerOrders;
 using SSMO.Models.Reports;
+using SSMO.Services.Customer;
 using SSMO.Services.Reports;
 using System;
 using System.Globalization;
@@ -12,12 +13,13 @@ namespace SSMO.Controllers
     public class ReportsController : Controller
     {
         private readonly IReportsService service;
-        private readonly ApplicationDbContext dbContext;
+        private readonly ICustomerService customerService;
 
-        public ReportsController(IReportsService service, ApplicationDbContext dbContext)
+        public ReportsController(IReportsService service, 
+           ICustomerService customerService )
         {
             this.service = service;
-            this.dbContext = dbContext;
+            this.customerService = customerService;
         }
 
 
@@ -26,8 +28,7 @@ namespace SSMO.Controllers
 
             //var orders = dbContext.CustomerOrders.AsQueryable();
 
-            var customerNames = dbContext.Customers
-                .Select(a => a.Name).ToList();
+            var customerNames = customerService.GetCustomerNames();
 
             var customerOrderCollection = service.AllCustomerOrders(
                 model.CustomerName, 
