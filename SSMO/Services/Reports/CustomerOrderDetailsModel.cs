@@ -5,12 +5,12 @@ namespace SSMO.Services.Reports
     public class CustomerOrderDetailsModel
     {
         public int Id { get; init; }
-        public string Number { get; set; }
-
+        public int OrderConfirmationNumber { get; set; }
         public DateTime Date { get; set; }
         public string LoadingPlace { get; set; }
         public string DeliveryAddress { get; set; }
-        public string Status { get; set; }
+        public int StatusId { get; set; }
+        public string StatusName { get; set; }
         public string CustomerName { get; set; }
     }
 }

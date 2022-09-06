@@ -13,7 +13,7 @@ $(document).ready(function () {
 
     $("#create-invoice-btn").on("click", function () {
         submitForm();
-    });
+    }));
 
     //--------------------------------- ADD ROW EVENT HANDLER
     $("#add-row-btn").on("click", function () {

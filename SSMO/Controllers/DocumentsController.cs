@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SSMO.Models.Documents.Purchase;
-using SSMO.Services.Documents;
+using SSMO.Services.Documents.Purchase;
 using SSMO.Services.SupplierOrders;
 
 namespace SSMO.Controllers
@@ -32,8 +32,50 @@ namespace SSMO.Controllers
             return View(model);  
         }
 
+        [HttpGet]
+        public IActionResult PurchaseDetails(string supplierOrderNumber)
+        {
+            return View(new PurchaseDetailsFormModel
+            {
+                SupplierOrderNumber = supplierOrderNumber
+            });
+        }
 
-        public IActionResult PurchaseDetails(string number)
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult PurchaseDetails(string supplierOrderNumber, PurchaseDetailsFormModel model)
+        {
+            if(!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            if (string.IsNullOrEmpty(supplierOrderNumber))
+            {
+                return BadRequest();
+            }
+
+            if(model.GrossWeight < model.NetWeight)
+            {
+                return View(model);
+            }
+
+            var purchase = purchaseService.CreatePurchaseAsPerSupplierOrder(
+                supplierOrderNumber, model.Number, model.Date,
+                model.PaidAvance, model.DatePaidAmount, model.PaidStatus, model.NetWeight,
+                model.GrossWeight, model.Duty, model.Factoring,model.CustomsExpenses, model.FiscalAgentExpenses,
+                model.ProcentComission, model.PurchaseTransportCost, model.BankExpenses, model.OtherExpenses);
+
+            if (!purchase)
+            {
+                return View();
+            }
+
+            return View(model);
+        }
+
+
+        public IActionResult Invoice()
         {
             return View();
         }

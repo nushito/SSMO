@@ -32,7 +32,8 @@ namespace SSMO.Infrastructure
 
             this.CreateMap<Status, StatusModel>();
 
-            this.CreateMap<SupplierOrder, PurchaseModelAsPerSpec>();
+            this.CreateMap<SupplierOrder, PurchaseModelAsPerSpec>()
+                .ForMember(a=>a.SupplierOrderNumber , b=>b.MapFrom(a=>a.Number));
         }
     }
 }

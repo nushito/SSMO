@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SSMO.Models.Documents
 {
-    public class InvoiceModel : IDocument
+    public class InvoiceModel 
     {
         public int Id { get; set; }
         public int Number { get; set; }
@@ -18,11 +18,10 @@ namespace SSMO.Models.Documents
        
        // public ICollection<AddProductsFormModel> Products { get; set; }
         public int SellerId { get; set; }
-        public SupplierModel Seller { get; set; }
-       
+               
         public int MyProperty { get; set; }
         public int ClientId { get; set; }
-        public AddCustomerFormModel Client { get; set; }
+        public AddCustomerFormModel Customer { get; set; }
         public ICollection<string> Customers { get; set; }
         public decimal SubTotal { get ; set; }
         public decimal Total { get ; set ; }

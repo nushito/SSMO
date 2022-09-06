@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSMO.Data;
 
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220828124059_Document")]
+    partial class Document
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -219,6 +221,21 @@ namespace SSMO.Data.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
+            modelBuilder.Entity("ProductSupplierOrder", b =>
+                {
+                    b.Property<int>("ProductsId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SupplierOrdersId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ProductsId", "SupplierOrdersId");
+
+                    b.HasIndex("SupplierOrdersId");
+
+                    b.ToTable("ProductSupplierOrder");
+                });
+
             modelBuilder.Entity("SSMO.Data.Models.Address", b =>
                 {
                     b.Property<int>("Id")
@@ -364,9 +381,6 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CustomerPoNumber")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -391,8 +405,9 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("MyCompanyId")
                         .HasColumnType("int");
 
-                    b.Property<int>("OrderConfirmationNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Origin")
                         .HasColumnType("nvarchar(max)");
@@ -479,9 +494,6 @@ namespace SSMO.Data.Migrations
 
                     b.Property<decimal>("DeliveryTrasnportCost")
                         .HasColumnType("decimal");
-
-                    b.Property<int>("DocumentNumber")
-                        .HasColumnType("int");
 
                     b.Property<string>("DocumentType")
                         .IsRequired()
@@ -690,9 +702,6 @@ namespace SSMO.Data.Migrations
                     b.Property<int?>("SupplierId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SupplierOrderId")
-                        .HasColumnType("int");
-
                     b.Property<int>("TotalSheets")
                         .HasColumnType("int");
 
@@ -707,8 +716,6 @@ namespace SSMO.Data.Migrations
                     b.HasIndex("SizeId");
 
                     b.HasIndex("SupplierId");
-
-                    b.HasIndex("SupplierOrderId");
 
                     b.ToTable("Products");
                 });
@@ -952,6 +959,21 @@ namespace SSMO.Data.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("ProductSupplierOrder", b =>
+                {
+                    b.HasOne("SSMO.Data.Models.Product", null)
+                        .WithMany()
+                        .HasForeignKey("ProductsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SSMO.Data.Models.SupplierOrder", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierOrdersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("SSMO.Data.Models.BankDetails", b =>
                 {
                     b.HasOne("SSMO.Data.Models.MyCompany", "Company")
@@ -1079,10 +1101,6 @@ namespace SSMO.Data.Migrations
                         .WithMany("Products")
                         .HasForeignKey("SupplierId");
 
-                    b.HasOne("SSMO.Data.Models.SupplierOrder", "SupplierOrder")
-                        .WithMany("Products")
-                        .HasForeignKey("SupplierOrderId");
-
                     b.Navigation("CustomerOrder");
 
                     b.Navigation("Description");
@@ -1090,8 +1108,6 @@ namespace SSMO.Data.Migrations
                     b.Navigation("Grade");
 
                     b.Navigation("Size");
-
-                    b.Navigation("SupplierOrder");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.ServiceOrder", b =>
@@ -1249,11 +1265,6 @@ namespace SSMO.Data.Migrations
                 {
                     b.Navigation("BankDetails");
 
-                    b.Navigation("Products");
-                });
-
-            modelBuilder.Entity("SSMO.Data.Models.SupplierOrder", b =>
-                {
                     b.Navigation("Products");
                 });
 #pragma warning restore 612, 618

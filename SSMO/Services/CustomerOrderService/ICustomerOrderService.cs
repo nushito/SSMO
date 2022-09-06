@@ -1,5 +1,6 @@
 ﻿using SSMO.Models.Products;
 using System;
+using System.Collections.Generic;
 
 namespace SSMO.Services.CustomerOrderService
 {
@@ -13,10 +14,18 @@ namespace SSMO.Services.CustomerOrderService
             decimal paidAdvance,
             int vat);
 
-        public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id);
-        public SSMO.Data.Models.CustomerOrder OrderPerNumber(string number);
+        public int CreateFirstOrder
+            (int number, string num, DateTime date, int customer,
+            int company, string deliveryTerms,
+            string loadingAddress, string deliveryAddress,
+            int currency, string origin, bool paidStatus,
+            decimal paidAdvance,
+            int vat);
 
-        public bool CheckOrderNumberExist(string number);
+        public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id);
+        public SSMO.Data.Models.CustomerOrder OrderPerNumber(int number);
+
+        public bool CheckOrderNumberExist(int number);
 
         //public bool EditProductAsPerSupplierSpec(int productId,int descriptionId,
         //    int sizeId,
@@ -30,6 +39,10 @@ namespace SSMO.Services.CustomerOrderService
         //    int sheetsPerPallet
         //    );
        
-        public void CustomerOrderCounting(int customerorderId); 
+        public void CustomerOrderCounting(int customerorderId);
+
+        public bool AnyCustomerOrderExist();
+
+        public ICollection<int> AllCustomerOrderNumbers();
     }
 }

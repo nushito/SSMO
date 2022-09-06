@@ -22,24 +22,29 @@ namespace SSMO.Services.SupplierOrders
         }
 
         public int CreateSupplierOrder(int myCompanyId, int supplierId, DateTime Date, 
-            string number, string customerOrderNumber, int statusId, int currencyId, int vat)
+            string number, int customerOrderNumber, int statusId, decimal paidAdvance, int currencyId, int vat)
         {
             var customerOrder = dbContext.CustomerOrders
-                .Where(a => a.Number.ToLower() == customerOrderNumber)
+                .Where(a => a.OrderConfirmationNumber == customerOrderNumber)
                 .FirstOrDefault();
+
+            var thisSupplier = dbContext.Suppliers.Where(a=>a.Id == supplierId).FirstOrDefault();   
 
             var supplierSpec = new SupplierOrder
             {
                 MyCompanyId = myCompanyId,
                 SupplierId = supplierId,
+                Supplier = thisSupplier,
                 Date = Date,
                 Number = number,
                 CustomerOrderId = customerOrder.Id,
                 StatusId = statusId,
                 CurrencyId = currencyId,
+                PaidAvance = paidAdvance,
                 VAT = vat
             };
 
+           
             dbContext.SupplierOrders.Add(supplierSpec);
             dbContext.SaveChanges();
 
@@ -57,7 +62,8 @@ namespace SSMO.Services.SupplierOrders
         {
            var spOrder = dbContext.SupplierOrders.Find(supplierOrderId);
            spOrder.TotalAmount = spOrder.Amount + (spOrder.Amount * spOrder.VAT / 100)??0;
-            dbContext.SaveChanges();    
+           spOrder.Balance = spOrder.TotalAmount - spOrder.PaidAvance;
+           dbContext.SaveChanges();    
           
         }
     }

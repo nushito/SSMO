@@ -7,7 +7,7 @@ namespace SSMO.Services.Documents.Purchase
 {
     public class PurchaseModelAsPerSpec
     {
-        public string Number { get; set; }
+        public string SupplierOrderNumber { get; set; }
         public DateTime Date { get; set; }
     }
 }

@@ -24,7 +24,7 @@ namespace SSMO.Models.Documents
         public decimal Total { get; set ; }
         public int VatPercent { get ; set ; }
         public decimal Amount { get ; set ; }
-        public SupplierModel Seller { get; set; }
+       
 
     }
 }

@@ -33,7 +33,8 @@ namespace SSMO.Controllers
            IMycompanyService myCompanyService,
            ICustomerService customerService,
            IProductService productService, IMapper mapper,
- ApplicationDbContext dbContext, ICustomerOrderService cusomerOrderService,  IStatusService statusService,
+ ApplicationDbContext dbContext, 
+ ICustomerOrderService cusomerOrderService,  IStatusService statusService,
             ISupplierOrderService supplierOrderService)
         {
             this.supplierService = supplierService;
@@ -59,8 +60,8 @@ namespace SSMO.Controllers
                 Currencies = currency.AllCurrency(),
                 MyCompanies = myCompanyService.GetAllCompanies(),
                 Suppliers = supplierService.GetSuppliers(),              
-                Statuses = statusService.GetAllStatus()
-
+                Statuses = statusService.GetAllStatus(),
+                CustomerOrders = cusomerOrderService.AllCustomerOrderNumbers()
             });
         }
 
@@ -78,8 +79,8 @@ namespace SSMO.Controllers
                     Currencies = currency.AllCurrency(),
                     MyCompanies = myCompanyService.GetAllCompanies(),
                     Suppliers = supplierService.GetSuppliers(),
-                    Statuses = statusService.GetAllStatus()
-
+                    Statuses = statusService.GetAllStatus(),
+                    CustomerOrders = cusomerOrderService.AllCustomerOrderNumbers()
                 };
 
             };
@@ -94,19 +95,20 @@ namespace SSMO.Controllers
                 return BadRequest();
             };
 
-            var supplierOrderId = supplierOrderService.CreateSupplierOrder(model.MyCompanyId, model.SupplierId,model.Date,
-                model.Number,model.CustomerOrderNumber, model.StatusId, model.CurrencyId, model.VAT??0);
-
             var thisCustomerOrder = cusomerOrderService.OrderPerNumber(model.CustomerOrderNumber);
             var customerorderId = thisCustomerOrder.Id;
+            var supplierOrderId = supplierOrderService.CreateSupplierOrder
+                                  (model.MyCompanyId, model.SupplierId,model.Date,
+                                  model.Number,model.CustomerOrderNumber, model.StatusId, 
+                                  model.PaidAvance, model.CurrencyId, model.VAT??0);
 
            return RedirectToAction("EditProductAsPerSupplier", new {customerOrderId = customerorderId, supplierOrderId = supplierOrderId} );
         }
 
-
+        
         [HttpGet]
         public IActionResult EditProductAsPerSupplier(
-            int customerorderId)
+            int customerorderId, int supplierOrderId)
         {
             if (!ModelState.IsValid)
             {
@@ -145,9 +147,11 @@ namespace SSMO.Controllers
                     SheetsPerPallet = product.Pallets,
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),
-                    Sizes = productService.GetSizes()
+                    Sizes = productService.GetSizes(),
+                    CustomerOrderId = customerorderId,
+                    SupplierOrderId =  supplierOrderId
 
-                };
+              };
 
                 listProducts.Add(productSupp);
 
@@ -178,9 +182,9 @@ namespace SSMO.Controllers
 
             foreach (var product in productmodel)
             {
-              var check =  productService.EditProduct(product.Id, customerorderId, supplierOrderId,product.Description, product.Grade, product.Size 
-                   , product.FSCClaim, product.FSCSertificate, product.Pallets, product.SheetsPerPallet,
-                    product.PurchasePrice);
+              var check =  productService.EditProduct(product.Id, customerorderId, supplierOrderId,product.Description, product.Grade, 
+                           product.Size, product.FSCClaim, product.FSCSertificate, product.Pallets, product.SheetsPerPallet,
+                           product.PurchasePrice);
 
                 if(!check )
                 {
@@ -193,6 +197,10 @@ namespace SSMO.Controllers
 
             return RedirectToAction("PrintSupplierOrder", supplierOrderId);
         }
+
+
+
+
 
         public IActionResult PrintSupplierOrder(int supplierOrderId)
         {

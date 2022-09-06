@@ -1,4 +1,5 @@
 ﻿
+using Microsoft.AspNetCore.Mvc.Rendering;
 using SSMO.Data.Models;
 using SSMO.Services.Supplier;
 using System;
@@ -12,6 +13,8 @@ namespace SSMO.Services
     {
         public ICollection<AllSuppliers> GetSuppliers();
        
+        public IEnumerable<SupplierDetailsList> GetSuppliersNames(int id);
+        //public List<SelectListItem> GetSuppliersByCustomerId(int id);
        
     }
 }

@@ -4,15 +4,26 @@
 @model CustomerOrderViewModel
 @{
     ViewBag.Title = "Add Customer Order";
-
+    var checkNumber = ViewBag.NumberExist;
 }
 
  <form enctype="multipart/form-data" method="post" >
+
+    
+        @if(checkNumber == 0)
+        {
+              <div class="row col-md-4">
+        <label asp-for="OrderConfirmationNumber"></label>
+        <input id="number" asp-for="OrderConfirmationNumber" type="number" class="form-control"/>
+        <span asp-validation-for="OrderConfirmationNumber" class="small text-danger"></span>
+    </div>
+        }
+    
    
       <div class="row col-md-4">
-        <label asp-for="Number"></label>
-        <input id="number" asp-for="Number" class="form-control"/>
-        <span asp-validation-for="Number" class="small text-danger"></span>
+        <label asp-for="CustomerPoNumber"></label>
+        <input id="number" asp-for="CustomerPoNumber" class="form-control"/>
+        <span asp-validation-for="CustomerPoNumber" class="small text-danger"></span>
     </div>
     <div class="row col-md-4">
         <label asp-for="Date"></label>
@@ -89,10 +100,10 @@
         Paid
       </label> 
             </div>
-            <div>
+            <div  class="form-group col-sm-4">
             <tr>
                 <label asp-for="PaidAvance"></label>
-                <input asp-for="PaidAvance" type="number" class="form-control"/>
+                <input asp-for="PaidAvance" min="0.0000" step="0.0001" type="number" class="form-control"/>
             </tr>
         
             

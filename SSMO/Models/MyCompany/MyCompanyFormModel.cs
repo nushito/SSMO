@@ -35,7 +35,7 @@ namespace SSMO.Models.MyCompany
         public string FSCSertificate { get; set; }
         public ICollection<AddBankDetailsFormModel> BankDetails { get; set; }
 
-        // public ICollection<AddBankDetailsFormModel> BankDetails { get; set; }
+        
 
     }
 }

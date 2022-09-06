@@ -10,8 +10,8 @@ namespace SSMO.Services.SupplierOrders
                 int supplierId,
                 DateTime Date,
                 string number,
-               string customerOrderNumber ,
-                int statusId, int currencyId, int vat );
+               int customerOrderNumber ,
+                int statusId, decimal paidAdvance,int currencyId, int vat );
         void TotalAmountSum(int supplierOrderId);
 
         public IEnumerable<string> GetSuppliers();

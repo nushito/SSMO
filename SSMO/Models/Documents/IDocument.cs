@@ -13,7 +13,7 @@ namespace SSMO.Models.Documents
         [Required]
         public DateTime Date { get; set; }
         public int SellerId { get; set; }
-        public SupplierModel Seller { get; set; }
+       
 
         public int ClientId { get; set; }
         public AddCustomerFormModel Client { get; set; }

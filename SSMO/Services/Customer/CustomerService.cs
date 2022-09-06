@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using SSMO.Models.Reports.PrrobaCascadeDropDown;
 
 namespace SSMO.Services.Customer
 {
@@ -36,6 +37,17 @@ namespace SSMO.Services.Customer
         public IEnumerable<string> GetCustomerNames()
         {
             return dbContext.Customers.Select(a => a.Name).ToList();
+        }
+
+        public IEnumerable<CustomerListView> GetCustomerNamesAndId()
+        {
+            var customers = dbContext.Customers.Select(a => new CustomerListView
+            {
+                Id = a.Id,
+                Name = a.Name
+            }).ToList();
+
+            return customers; ;
         }
 
 

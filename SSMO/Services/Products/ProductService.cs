@@ -165,6 +165,7 @@ namespace SSMO.Services.Products
             product.Pallets = pallets;  
             product.SheetsPerPallet = sheetsPerPallet;
             product.PurchasePrice = purchasePrice;
+            product.SupplierOrderId = supplierOrderId;
 
 
             var dimensionArray = size.Split('/').ToArray();
@@ -186,8 +187,8 @@ namespace SSMO.Services.Products
 
             spOrder.Amount += product.PurchaseAmount;
            
-           
-            spOrder.Products.Add(product);
+          
+            spOrder.Products.ToList().Add(product);
             
             _dbContext.SaveChanges();
 

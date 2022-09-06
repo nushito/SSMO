@@ -28,7 +28,7 @@ namespace SSMO.Controllers
         private readonly IMycompanyService myCompanyService;
         private readonly ICustomerService customerService;
         private readonly IProductService productService;
-        private readonly ICustomerOrderService cusomerOrderService;
+        private readonly ICustomerOrderService customerOrderService;
         private readonly IMapper mapper;
         private readonly IReportsService reportService;
         private readonly ApplicationDbContext dbContext;
@@ -48,10 +48,14 @@ namespace SSMO.Controllers
             this.productService = productService;
             this.mapper = mapper;
             this.dbContext = dbContext;
-            this.cusomerOrderService = cusomerOrderService;
+            this.customerOrderService = cusomerOrderService;
             this.reportService = reportService;
             this.statusService = statusService;
         }
+
+
+            
+
 
         [HttpGet]
         [Authorize]
@@ -98,26 +102,48 @@ namespace SSMO.Controllers
                 };
             }
 
-            if (cusomerOrderService.CheckOrderNumberExist(customermodel.Number))
+            if (customerOrderService.CheckOrderNumberExist(customermodel.OrderConfirmationNumber))
             {
                 return View(customermodel);
             }
 
+            var customerorderId = 0;
 
-            var customerorderId = cusomerOrderService.CreateOrder
-                (customermodel.Number, 
-                customermodel.Date,
-                customermodel.CustomerId,
-                customermodel.MyCompanyId,
-                customermodel.DeliveryTerms,
-                customermodel.LoadingPlace,
-                customermodel.DeliveryAddress,
-                customermodel.CurrencyId,
-                customermodel.Origin,
-                customermodel.PaidAmountStatus,
-                customermodel.PaidAvance, customermodel.Vat??0);
+            if (!customerOrderService.AnyCustomerOrderExist())
+            {
+                customerorderId = customerOrderService.CreateFirstOrder
+                                (customermodel.OrderConfirmationNumber,
+                                 customermodel.CustomerPoNumber,
+                                 customermodel.Date,
+                                 customermodel.CustomerId,
+                                 customermodel.MyCompanyId,
+                                 customermodel.DeliveryTerms,
+                                 customermodel.LoadingPlace,
+                                 customermodel.DeliveryAddress,
+                                 customermodel.CurrencyId,
+                                 customermodel.Origin,
+                                 customermodel.PaidAmountStatus,
+                                 customermodel.PaidAvance, customermodel.Vat ?? 0);
+                                 ViewBag.NumberExist = 0;
+            }
+            else {
+               customerorderId = customerOrderService.CreateOrder
+                                (customermodel.CustomerPoNumber,
+                                customermodel.Date,
+                                customermodel.CustomerId,
+                                customermodel.MyCompanyId,
+                                customermodel.DeliveryTerms,
+                                customermodel.LoadingPlace,
+                                customermodel.DeliveryAddress,
+                                customermodel.CurrencyId,
+                                customermodel.Origin,
+                                customermodel.PaidAmountStatus,
+                                customermodel.PaidAvance, customermodel.Vat ?? 0);
+                                 ViewBag.NumberExist = 1;
+            }
+            
 
-          //  ViewBag.ProductsCount = customermodel.ProductsCount;
+         
                 TempData["Count"] = customermodel.ProductsCount;  
 
             return RedirectToAction("AddOrderProducts", new { CustomerOrderId = customerorderId });
@@ -185,7 +211,7 @@ namespace SSMO.Controllers
 
             }
 
-            cusomerOrderService.CustomerOrderCounting(customerorderId);
+            customerOrderService.CustomerOrderCounting(customerorderId);
            
             return RedirectToAction("PrintCustomerOrder");
         }

@@ -54,13 +54,33 @@
     </div>
 </div>
 
-
+<div class="container">
+   <div class="row">
+        <div class="col">
+            OC Number
+        </div>
+         <div class="col">
+            Date
+        </div>
+         <div class="col">
+          Loading Address
+        </div>
+         <div class="col">
+          Delivery Address
+        </div>
+     <div class="col">
+         Order Status
+        </div>
+        </div>
+<hr />
+<br />
+</div>
 <div class="container">
 @foreach(var order in Model.CustomerOrderCollection)
 {
     <div class="row">
         <div class="col">
-            @order.Number
+            @order.OrderConfirmationNumber
         </div>
          <div class="col">
             @order.Date
@@ -72,16 +92,17 @@
            @order.DeliveryAddress
         </div>
      <div class="col">
-           @order.Status
+           @order.StatusName
         </div>
   
-    <a asp-controller="Reports" asp-action="Details" asp-route-id="@order.Id" class="btn btn-warning">Details</a>
+    <a asp-controller="Reports" asp-action="Details" asp-route-id="@order.Id" class="btn btn-info">Details</a>
 
-    <a asp-controller="Reports" asp-action="Edit" asp-route-id="@order.Id" class="btn btn-warning">Edit</a>
+    <a asp-controller="Reports" asp-action="Edit" asp-route-id="@order.Id" class="btn btn-outline-info">Edit</a>
 
-    <a asp-controller="Reports" asp-action="Delete" asp-route-id="@order.Id" class="btn btn-danger">Delete</a>
+    <a asp-controller="Reports" asp-action="Delete" asp-route-id="@order.Id" class="btn btn-outline-info">Delete</a>
 
     </div>
+    <hr />
 }
 </div>
 

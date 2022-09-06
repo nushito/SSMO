@@ -6,7 +6,7 @@
 
 
  <form enctype="multipart/form-data" method="post" >
-   
+      
       <div class="row col-md-4">
         <label asp-for="Number"></label>
         <input id="number" asp-for="Number" class="form-control"/>
@@ -56,9 +56,16 @@
             
     
    <div class="row col-md-4 mb-2">
-       <label asp-for="CustomerOrderNumber">Customer Order No:</label>
-       <input asp-for="CustomerOrderNumber" class="form-control" />
+       <label asp-for="CustomerOrderNumber">Choose Customer Order No</label>
+        <select asp-for="CustomerOrderNumber" class="form-control">
+            @foreach (var item in Model.CustomerOrders )
+            {
+                <option value="@item">@item</option>
+            }   
+
+        </select>
    </div>
+
    <div class="row col-md-4 mb-2"> 
                 <label asp-for="StatusId">Status of the order</label>
                 <select asp-for="StatusId" class="form-control">

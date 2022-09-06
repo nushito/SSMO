@@ -20,7 +20,7 @@ namespace SSMO.Services.Documents
 
         public string GetLastNumOrder()
         {
-            var n = dbContext.CustomerOrders.OrderByDescending(a => a.Number).Select(a => a.Number).FirstOrDefault();
+            var n = dbContext.CustomerOrders.OrderByDescending(a => a.CustomerPoNumber).Select(a => a.CustomerPoNumber).FirstOrDefault();
             return n;
         }
 

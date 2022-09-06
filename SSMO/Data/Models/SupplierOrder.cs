@@ -10,10 +10,7 @@ namespace SSMO.Data.Models
 {
     public class SupplierOrder
     {
-        public SupplierOrder()
-        {
-            Products = new List<Product>();
-        }
+      
         public int Id { get; init; }
         public string Number { get; set; }
         [Required]
@@ -41,7 +38,7 @@ namespace SSMO.Data.Models
 
         public int? VAT { get; set; }
 
-        public ICollection<Product> Products { get; set; }
+        public IEnumerable<Product> Products { get; set; }
         public decimal TotalQuantity { get; set; }
     }
 }

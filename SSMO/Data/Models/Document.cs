@@ -11,11 +11,16 @@ namespace SSMO.Data.Models
     public class Document
     {
         public int Id { get; init; }
-        public int CustomerOrderId { get; set; }
+      
         [Required]
         public DocumentTypes DocumentType { get; set; }
-      [Required]
+        public int DocumentNumber { get; set; }
+        public string Number { get; set; }
+        public int CustomerOrderId { get; set; }
+        [Required]
         public CustomerOrder CustomerOrder { get; set; }
+        public int SupplierOrderId { get; set; }
+        public SupplierOrder SupplierOrder { get; set; }
         [Required]
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
@@ -35,11 +40,13 @@ namespace SSMO.Data.Models
         public decimal OtherExpenses { get; set; }
         public decimal PaidAvance { get; set; }
         public decimal Balance { get; set; }
-        public string DatePaidAmount { get; set; }
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
+        public DateTime DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
         public decimal CurrencyExchangeRateUsdToBGN { get; set; }
         public ServiceOrder ServiceOrder { get; set; }
 
+        public decimal Amount { get; set; }
 
     }
 }

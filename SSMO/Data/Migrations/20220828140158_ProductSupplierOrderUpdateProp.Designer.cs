@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSMO.Data;
 
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220828140158_ProductSupplierOrderUpdateProp")]
+    partial class ProductSupplierOrderUpdateProp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -364,9 +366,6 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("CustomerId")
                         .HasColumnType("int");
 
-                    b.Property<string>("CustomerPoNumber")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -391,8 +390,9 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("MyCompanyId")
                         .HasColumnType("int");
 
-                    b.Property<int>("OrderConfirmationNumber")
-                        .HasColumnType("int");
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Origin")
                         .HasColumnType("nvarchar(max)");
@@ -479,9 +479,6 @@ namespace SSMO.Data.Migrations
 
                     b.Property<decimal>("DeliveryTrasnportCost")
                         .HasColumnType("decimal");
-
-                    b.Property<int>("DocumentNumber")
-                        .HasColumnType("int");
 
                     b.Property<string>("DocumentType")
                         .IsRequired()

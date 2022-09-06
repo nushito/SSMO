@@ -34,7 +34,7 @@ namespace SSMO.Services.Reports
             var queryOrders = _context.CustomerOrders
                     .Where(a => a.CustomerId == customerId);
                     
-            var totalOrders = queryOrders.Count();  
+           // var totalOrders = queryOrders.Count();  
 
             var orders = queryOrders.ProjectTo<CustomerOrderDetailsModel>(this.mapper).ToList();
 
@@ -64,7 +64,7 @@ namespace SSMO.Services.Reports
                 return false;
             }
 
-            order.Number = number;
+            order.CustomerPoNumber = number;
             order.CustomerId = clientId;
             order.MyCompanyId = myCompanyId;
             order.DeliveryTerms = deliveryTerms;    

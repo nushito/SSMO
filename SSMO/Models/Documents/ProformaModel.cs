@@ -17,7 +17,7 @@ namespace SSMO.Models.Documents
         public AddCustomerFormModel Client { get; set; }
       // public ICollection<AddProductsFormModel> Products { get; set; }
         public int SellerId { get; set; }
-        public SupplierModel Seller { get; set; }
+   
         public int ClientId { get; set; }
         public ICollection<string> Customers { get; set; }
         public decimal SubTotal { get ; set ; }

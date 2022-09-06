@@ -10,7 +10,8 @@ namespace SSMO.Data.Models
         
         public int Id { get; init; }
         [Required]
-        public string Number { get; set; }
+        public int OrderConfirmationNumber { get; set; }
+        public string CustomerPoNumber { get; set; }
         [Required]
         [DisplayFormat(DataFormatString ="{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }

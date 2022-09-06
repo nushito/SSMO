@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Folder Include="Services\Customer\CustomerModels\" />
+    <Folder Include="Services\Documents\Invoice\" />
   </ItemGroup>
 
 </Project>

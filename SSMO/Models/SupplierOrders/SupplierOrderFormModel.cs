@@ -14,6 +14,7 @@ namespace SSMO.Models.SupplierOrders
     public class SupplierOrderFormModel
     {
         public string Number { get; set; }
+        public string DocumentType { get; set; }
         [Required]
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
@@ -21,9 +22,9 @@ namespace SSMO.Models.SupplierOrders
         public string Supplier { get; set; }
         public IEnumerable<AllSuppliers> Suppliers { get; set; }
         public int CustomerOrderId { get; set; }
-        public string CustomerOrderNumber { get; set; }
-        public CustomerOrderViewModel CustomerOrder { get; set; }
-        public IEnumerable<CustomerOrderViewModel> CustomerOrders { get; set; }
+        public int CustomerOrderNumber { get; set; }
+      
+        public IEnumerable<int> CustomerOrders { get; set; }
         public int MyCompanyId { get; set; }
         public string MyCompanyName { get; set; }
         public IEnumerable<MyCompanyFormModel> MyCompanies { get; set; }

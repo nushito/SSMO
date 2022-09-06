@@ -130,6 +130,7 @@ namespace SSMO.Data
                 .HasForeignKey(a => a.MyCompanyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+           
             builder.Entity<SupplierOrder>()
                   .Property(a => a.TotalQuantity)
                   .HasColumnType("decimal");
@@ -189,6 +190,9 @@ namespace SSMO.Data
                 .Property(a => a.Amount)
                 .HasColumnType("decimal");
 
+          
+
+
             builder.Entity<Document>()
                 .HasKey(a => a.Id);
 
@@ -208,14 +212,12 @@ namespace SSMO.Data
             builder.Entity<Document>()
                 .Property(a => a.OtherExpenses)
                 .HasColumnType("decimal");
-
             builder.Entity<Document>()
-                .Property(a => a.NetWeight)
-                .HasColumnType("decimal");
-
+               .Property(a => a.GrossWeight)
+               .HasColumnType("decimal");
             builder.Entity<Document>()
-                 .Property(a => a.GrossWeight)
-                 .HasColumnType("decimal");
+               .Property(a => a.NetWeight)
+               .HasColumnType("decimal");
 
             builder.Entity<Document>()
                 .Property(a => a.FiscalAgentExpenses)
@@ -246,7 +248,9 @@ namespace SSMO.Data
             builder.Entity<Document>()
                 .Property(a => a.DocumentType)
                 .HasConversion(a=>a.ToString(),a=>(DocumentTypes)Enum.Parse(typeof(DocumentTypes),a));
-
+            builder.Entity<Document>()
+                .Property(a => a.Amount)
+                .HasColumnType("decimal");
 
 
             builder.Entity<Supplier>()
