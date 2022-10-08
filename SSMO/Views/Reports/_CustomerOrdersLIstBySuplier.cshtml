@@ -1,0 +1,32 @@
+﻿@model IEnumerable<CustomerOrderListViewBySupplier>
+
+<div class="container">
+    @foreach(var item in Model)
+    {
+        <div class="row">
+            <div class="col">
+                @item.OrderConfirmationNumber
+            </div>
+            <div class="col">
+                @item.Date
+            </div>
+            <div class="col">
+                @item.CustomerPoNumber
+            </div>
+            <div class="col">
+                @item.LoadingPlace
+            </div>
+            <div class="col">
+                @item.DeliveryAddress
+            </div>
+            <div class="col">
+                @item.StatusName
+            </div>
+             <div class="col">
+                @item.PaidAmountStatus
+            </div>
+        </div>
+        <hr />
+    }
+</div>
+

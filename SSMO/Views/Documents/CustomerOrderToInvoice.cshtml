@@ -1,0 +1,81 @@
+﻿@model CustomerOrderNumbersListView
+
+@{
+    ViewBag.Title = "Select Customer Order";
+}
+
+<form method="post">
+
+    @if (!ViewBag.CheckInvoice)
+    { <div class="row col-md-4">
+        <label asp-for="Number">Fill First Invoice Number</label>
+        <input asp-for="Number" type="text" class="form-control" class="form-control">
+        </div>
+
+    }
+
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="MyCompanyName"></label>
+            <select asp-for="MyCompanyName" class="form-control">
+            <option value="">All</option>
+                @foreach (var name in Model.MyCompanyNames)
+                {
+                    <option value="@name">@name</option>
+                }
+
+            </select>
+        </div>
+    </div>
+
+    
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="OrderConfirmationNumber"></label>
+            <select asp-for="OrderConfirmationNumber" class="form-control">
+            <option value="">All</option>
+                @foreach (var order in Model.OrderConfirmationNumberList)
+                {
+                    <option value="@order">@order</option>
+                }
+
+            </select>
+        </div>
+    </div>
+
+    <div class="row col-md-4">
+        <label asp-for="Date">Date of the Invoice</label>
+        <input asp-for="Date" type="date" class="form-control" id="datepicker" class="form-control">
+    </div>
+    
+    <div class="row col-md-4">
+        <label asp-for="CurrencyExchangeRateUsdToBGN">Currency Exchange Rate to BGN</label>
+        <input asp-for="CurrencyExchangeRateUsdToBGN" type="number"  min="0.0000" step="0.0001" class="form-control" >
+    </div>
+    <hr />
+
+    <input type="submit" value="Create Invoice" class="btn btn-primary mt-3"  asp-route-orderConfirmationNumber="@Model.OrderConfirmationNumber"
+        asp-route-date="@Model.Date" 
+        asp-route-currencyExchangeRateUsdToBGN="@Model.CurrencyExchangeRateUsdToBGN" 
+        asp-route-number="@Model.Number"
+        asp-route-mycompanyname = "@Model.MyCompanyName"/>
+
+  @*<div class="row">
+        <a class="btn btn-primary float-sm-right"
+        asp-controller="Documents"
+         asp-action="CreateInvoice"
+        asp-route-orderConfirmationNumber="@Model.OrderConfirmationNumber"
+        asp-route-date="@Model.Date" 
+        asp-route-currencyExchangeRateUsdToBGN="@Model.CurrencyExchangeRateUsdToBGN" 
+        asp-route-number="@Model.Number"
+        asp-route-mycompanyname = "@Model.MyCompanyName"
+       > Create Invoice</a>
+    </div>*@
+   
+</form>
+
+        <script type="text/javascript">
+    $(function () {
+        $("#datepicker").datepicker();
+    });
+</script>
