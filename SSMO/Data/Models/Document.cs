@@ -2,7 +2,9 @@
 using SSMO.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -16,6 +18,8 @@ namespace SSMO.Data.Models
         public DocumentTypes DocumentType { get; set; }
         public int DocumentNumber { get; set; }
         public string Number { get; set; }
+        public string FSCClaim { get; set; }
+        public string FSCSertificate { get; set; }
         public int CustomerOrderId { get; set; }
         [Required]
         public CustomerOrder CustomerOrder { get; set; }
@@ -45,8 +49,9 @@ namespace SSMO.Data.Models
         public bool PaidStatus { get; set; }
         public decimal CurrencyExchangeRateUsdToBGN { get; set; }
         public ServiceOrder ServiceOrder { get; set; }
-
+        public int? Vat { get; set; }
         public decimal Amount { get; set; }
-
+        public decimal TotalAmount { get; set; }
+        public  ICollection<Product> Products { get; set; }
     }
 }

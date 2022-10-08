@@ -10,8 +10,7 @@ namespace SSMO.Services.Documents.Purchase
 
         public bool CreatePurchaseAsPerSupplierOrder(
             string supplierOrderNumber, string number, DateTime date,
-            decimal paidAdvance, DateTime datePaidAmount, bool paidStatus,
-            decimal netWeight, decimal brutoWeight,
+           bool paidStatus, decimal netWeight, decimal brutoWeight,
             decimal duty, decimal factoring, decimal customsExpenses, decimal fiscalAgentExpenses,
             decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses);
     }

@@ -23,15 +23,15 @@ namespace SSMO.Data.Models
         public int MyCompanyId { get; set; }
         public MyCompany MyCompany { get; set; }
         public Customer Customer { get; set; }
-        [Required]
+  
         public string FSCClaim { get; set; }
-        [Required]
+     
         public string FSCSertificate { get; set; }
         public int StatusId { get; set; }
         public Status Status { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
-        public IEnumerable<Product> Products { get; set; }
+        public ICollection<Product> Products { get; set; }
         public decimal TotalQuantity { get; set; }
         public decimal TotalAmount { get; set; }
         public int? Vat { get; set; }
@@ -42,6 +42,7 @@ namespace SSMO.Data.Models
         public decimal SubTotal { get; set; }
 
         public string Origin { get; set; }
+        public ICollection<Document> Documents { get; set; }
         public IEnumerable<SupplierOrder> SupplierOrder { get; set; }
     }
 }

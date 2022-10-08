@@ -10,7 +10,6 @@ namespace SSMO.Data.Models
 {
     public class SupplierOrder
     {
-      
         public int Id { get; init; }
         public string Number { get; set; }
         [Required]
@@ -33,12 +32,13 @@ namespace SSMO.Data.Models
         public decimal Balance { get; set; }
         public string DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
-        public decimal TotalAmount
-        { get; set; }
-
+        public decimal TotalAmount  { get; set; }
+        public string FSCClaim { get; set; }
+        public string FSCSertificate { get; set; }
         public int? VAT { get; set; }
 
-        public IEnumerable<Product> Products { get; set; }
+        public ICollection<Document> Documents { get; set; }
+        public ICollection<Product> Products { get; set; }
         public decimal TotalQuantity { get; set; }
     }
 }

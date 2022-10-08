@@ -33,7 +33,7 @@ namespace SSMO.Services.CustomerOrderService
 
         public int CreateOrder(string num, DateTime date, int customerId, int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,int currency,string origin, 
-            bool paidStatus, decimal paidAdvance, int vat)
+            bool paidStatus, int vat)
         {
            
             var fscClaim = dbContext.MyCompanies
@@ -65,7 +65,6 @@ namespace SSMO.Services.CustomerOrderService
                 Status = status,
                Origin = origin,
                PaidAmountStatus = paidStatus,   
-               PaidAvance  = paidAdvance, 
                Vat = vat
             };
 
@@ -97,26 +96,6 @@ namespace SSMO.Services.CustomerOrderService
 
         }
 
-        //public bool EditProductAsPerSupplierSpec(int productId, int descriptionId, int sizeId, 
-        //    int gradeId, string fscClaim, string fscCertificate,
-        //    int cusomerOrderId, decimal quantity, 
-        //    decimal purchasePrice, int pallets, int sheetsPerPallet)
-        //{
-        //    var customerOrder = dbContext.CustomerOrders.Find(cusomerOrderId);
-
-        //    if(customerOrder == null)
-        //    {
-        //        return false;
-        //    }
-
-
-        //    var productList = customerOrder.Products;
-
-
-        //    return true;
-        //}
-
-
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id)
         {
             return dbContext.CustomerOrders.Where(a => a.Id == id).FirstOrDefault();
@@ -142,7 +121,7 @@ namespace SSMO.Services.CustomerOrderService
         public int CreateFirstOrder(int number, string num, DateTime date, 
             int customerId, int company, string deliveryTerms, string loadingAddress, 
             string deliveryAddress, int currency, string origin, bool paidStatus, 
-            decimal paidAdvance, int vat)
+           int vat)
         {
             var fscClaim = dbContext.MyCompanies
                  .Where(a => a.Id == company)
@@ -170,7 +149,6 @@ namespace SSMO.Services.CustomerOrderService
                 Status = status,
                 Origin = origin,
                 PaidAmountStatus = paidStatus,
-                PaidAvance = paidAdvance,
                 Vat = vat
             };
 

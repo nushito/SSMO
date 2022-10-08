@@ -16,6 +16,7 @@ namespace SSMO.Data.Models
         public string Country { get; set; }
         public IEnumerable<Supplier> Suppliers { get; set; }
         public IEnumerable<Customer> Customers { get; set; }
+        public IEnumerable<MyCompany> MyCompanies { get; set; }
 
     }
 }

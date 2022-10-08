@@ -23,17 +23,13 @@ namespace SSMO.Data
         public DbSet<BankDetails> BankDetails { get; set; }
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Currency> Currencys { get; set; }
-
         public DbSet<SupplierOrder> SupplierOrders { get; set; }
-
         public DbSet<MyCompany> MyCompanies { get; set; }
         public DbSet<CustomerOrder> CustomerOrders { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ServiceOrder> ServiceOrders { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
-
         public DbSet<Document> Documents { get; set; }
-
         public DbSet<Description> Descriptions { get; set; }
         public DbSet<Grade> Grades { get; set; }
         public DbSet<Size> Sizes { get; set; }
@@ -62,27 +58,33 @@ namespace SSMO.Data
 
             builder.Entity<CustomerOrder>()
                .Property(a => a.SubTotal)
-               .HasColumnType("decimal");
+               .HasColumnType("decimal")
+               .HasPrecision(18, 5);
 
             builder.Entity<CustomerOrder>()
               .Property(a => a.Amount)
-              .HasColumnType("decimal");
+              .HasColumnType("decimal")
+              .HasPrecision(18, 5);
 
             builder.Entity<CustomerOrder>()
               .Property(a => a.Balance)
-              .HasColumnType("decimal");
+              .HasColumnType("decimal")
+              .HasPrecision(18, 5);
 
             builder.Entity<CustomerOrder>()
               .Property(a => a.PaidAvance)
-              .HasColumnType("decimal");
+              .HasColumnType("decimal")
+              .HasPrecision(18, 5);
 
             builder.Entity<CustomerOrder>()
               .Property(a => a.TotalQuantity)
-              .HasColumnType("decimal");
+              .HasColumnType("decimal")
+              .HasPrecision(18, 5);
 
             builder.Entity<CustomerOrder>()
               .Property(a => a.TotalAmount)
-              .HasColumnType("decimal");
+              .HasColumnType("decimal")
+              .HasPrecision(18, 5);
 
          
             builder.Entity<CustomerOrder>()
@@ -133,43 +135,43 @@ namespace SSMO.Data
            
             builder.Entity<SupplierOrder>()
                   .Property(a => a.TotalQuantity)
-                  .HasColumnType("decimal");
+                  .HasColumnType("decimal")
+                  .HasPrecision(18, 5);
 
             builder.Entity<SupplierOrder>()
                 .Property(a => a.PaidAvance)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
             builder.Entity<SupplierOrder>()
                 .Property(a => a.Balance)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
             builder.Entity<SupplierOrder>()
                 .Property(a => a.Amount)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
             builder.Entity<ServiceOrder>()
                 .Property(a => a.Cost)
-                .HasColumnType("decimal");
-
-
-           builder.Entity<Product>()
-                   .HasOne(a => a.Description)
-                   .WithMany(a => a.Products)
-                   .HasForeignKey(a => a.DescriptionId)
-                   .OnDelete(DeleteBehavior.Restrict);
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
             builder.Entity<Product>()
                 .Property(a => a.QuantityM2)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
             builder.Entity<Product>()
                 .Property(a => a.Price)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
             builder.Entity<Product>()
                 .Property(a=>a.PurchasePrice)
-
                 .HasPrecision(18,4);
+
             builder.Entity<Product>()
                .Property(a => a.PurchaseAmount)
                .HasPrecision(18, 4);
@@ -180,41 +182,50 @@ namespace SSMO.Data
 
             builder.Entity<Product>()
                 .Property(a => a.OrderedQuantity)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
             builder.Entity<Product>()
                 .Property(a => a.LoadedQuantityM3)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18,5);
 
             builder.Entity<Product>()
                 .Property(a => a.Amount)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
-          
+            builder.Entity<Product>()
+                .HasOne(a => a.SupplierOrder)
+                .WithMany(p => p.Products)
+                .HasForeignKey(s => s.SupplierOrderId)
+                .IsRequired(false);
 
-
-            builder.Entity<Document>()
-                .HasKey(a => a.Id);
-
-
+           
             builder.Entity<Document>()
                 .Property(a => a.PurchaseTransportCost)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
             builder.Entity<Document>()
                 .Property(a => a.ProcentComission)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
             builder.Entity<Document>()
                 .Property(a => a.PaidAvance)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
             builder.Entity<Document>()
                 .Property(a => a.OtherExpenses)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
             builder.Entity<Document>()
                .Property(a => a.GrossWeight)
                .HasColumnType("decimal");
+
             builder.Entity<Document>()
                .Property(a => a.NetWeight)
                .HasColumnType("decimal");
@@ -225,33 +236,64 @@ namespace SSMO.Data
 
             builder.Entity<Document>()
                 .Property(a => a.Factoring)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
             builder.Entity<Document>()
                 .Property(a => a.Duty)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
             builder.Entity<Document>()
                 .Property(a => a.DeliveryTrasnportCost)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
             builder.Entity<Document>()
                 .Property(a => a.CurrencyExchangeRateUsdToBGN)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
             builder.Entity<Document>()
                 .Property(a => a.CustomsExpenses)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
             builder.Entity<Document>()
                 .Property(a => a.BankExpenses)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
             builder.Entity<Document>()
                 .Property(a => a.Balance)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
+            builder.Entity<Document>()
+               .Property(a => a.TotalAmount)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 5);
 
             builder.Entity<Document>()
                 .Property(a => a.DocumentType)
                 .HasConversion(a=>a.ToString(),a=>(DocumentTypes)Enum.Parse(typeof(DocumentTypes),a));
+
             builder.Entity<Document>()
                 .Property(a => a.Amount)
-                .HasColumnType("decimal");
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
 
+            builder.Entity<Document>()
+                .HasOne(s => s.SupplierOrder)
+                .WithMany(d => d.Documents)
+                .HasForeignKey(s => s.SupplierOrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Document>()
+               .HasOne(s => s.CustomerOrder)
+               .WithMany(d => d.Documents)
+               .HasForeignKey(s => s.CustomerOrderId)
+               .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Supplier>()
                 .HasOne(a => a.Address)

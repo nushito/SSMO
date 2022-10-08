@@ -10,8 +10,7 @@ namespace SSMO.Models.MyCompany
         {
             BankDetails = new List<AddBankDetailsFormModel>();
         }
-        public int Id { get; init; } 
-        [Required]
+        public int Id { get; init; }
         public string Name { get; set; }
 
         [Required]
@@ -20,22 +19,15 @@ namespace SSMO.Models.MyCompany
         [Required]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "VAT number should be 11 symbols long.")]
         public string VAT { get; set; }
-    
-        [Required]
         public string Country { get; set; }
-        [Required]
         public string City { get; set; }
-        [Required]
         public string Street { get; set; }
-        [Required]
         public string RepresentativePerson { get; set; }
-        [Required]
         public string FSCClaim { get; set; }
-        [Required]
         public string FSCSertificate { get; set; }
         public ICollection<AddBankDetailsFormModel> BankDetails { get; set; }
 
-        
+
 
     }
 }

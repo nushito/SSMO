@@ -13,7 +13,7 @@
                                 My Documents
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateInvoice">Invoice</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CustomerOrderToInvoice">Invoice</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateProforma">Packing list</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateOrder">Debit Note</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateCreditNote">Credit Note</a>
@@ -35,13 +35,6 @@
                             <span>New Supplier Specification</span>
                         </a>
                     </li>
-@*
-                       <li class="nav-item active">
-                        <a href="~/Documents/AddPurchase" class="nav-link">
-                            <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>Add Purchase</span>
-                        </a>
-                    </li>*@
 
                     <li class="nav-item active">
                         <a href="~/Descriptions/Add" class="nav-link">
@@ -86,6 +79,20 @@
                         Reports
                         <br />
                     </div>
+                     <li>
+
+                        <div class="dropdown ">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                               Payment Reports
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="">Invoice</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="">Purchase</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="">Customer Order</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="">Supplier Order</a>
+                            </div>
+                        </div>
+                    </li>
 
                     <li class="nav-item active">
                         <a href="~/Reports/AllCustomerOrders" class="nav-link">
@@ -95,7 +102,7 @@
                     </li>
 
                      <li class="nav-item active">
-                        <a href="~/Reports/CascadeMenu" class="nav-link">
+                        <a href="~/Reports/CustomerOrdersBySupplier" class="nav-link">
                             <i class="fas fa-fw fa-tachometer-alt"></i>
                             <span>Customer Orders by Supplier</span>
                         </a>

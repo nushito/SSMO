@@ -21,6 +21,7 @@ using SSMO.Services.Reports;
 using SSMO.Services.SupplierOrders;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using SSMO.Services.Documents.Purchase;
+using SSMO.Services.Documents.Invoice;
 
 namespace SSMO
 {
@@ -36,8 +37,6 @@ namespace SSMO
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddAutoMapper(typeof(Startup));
-
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -51,6 +50,8 @@ namespace SSMO
                 options.Password.RequireUppercase = false;
             })
                 .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddAutoMapper(typeof(Startup));
 
             services.AddControllersWithViews(options =>
             {
@@ -69,6 +70,7 @@ namespace SSMO
             services.AddTransient<IStatusService, StatusService>();
             services.AddTransient<ISupplierOrderService, SupplierOrderService>();
             services.AddTransient<IPurchaseService, PurchaseService>();
+            services.AddTransient<IInvoiceService, InvoiceService>();
 
             services.AddMvc(options =>
             {

@@ -31,14 +31,13 @@ namespace SSMO.Controllers
         private readonly ICustomerOrderService customerOrderService;
         private readonly IMapper mapper;
         private readonly IReportsService reportService;
-        private readonly ApplicationDbContext dbContext;
         private readonly IStatusService statusService;
         public CustomerOrdersController(ISupplierService supplierService,
            ICurrency currency,
            IMycompanyService myCompanyService,
            ICustomerService customerService,
-           IProductService productService, IMapper  mapper,
- ApplicationDbContext dbContext, ICustomerOrderService cusomerOrderService, 
+           IProductService productService, IMapper mapper,
+ ApplicationDbContext dbContext, ICustomerOrderService cusomerOrderService,
  IReportsService reportService, IStatusService statusService)
         {
             this.supplierService = supplierService;
@@ -47,32 +46,36 @@ namespace SSMO.Controllers
             this.customerService = customerService;
             this.productService = productService;
             this.mapper = mapper;
-            this.dbContext = dbContext;
             this.customerOrderService = cusomerOrderService;
             this.reportService = reportService;
             this.statusService = statusService;
         }
 
 
-            
+
 
 
         [HttpGet]
         [Authorize]
         public IActionResult AddCustomerOrder()
         {
+            if (customerOrderService.AnyCustomerOrderExist())
+            {
+                ViewBag.NumberExist = 1;
+
+            }
             return View(
                 new CustomerOrderViewModel
                 {
                     Currencies = currency.AllCurrency(),
                     Customers = customerService.CustomersData(),
-                    MyCompanies =myCompanyService.GetAllCompanies(),
+                    MyCompanies = myCompanyService.GetAllCompanies(),
                     Suppliers = supplierService.GetSuppliers(),
                     Products = new List<ProductCustomerFormModel>(),
                     Statuses = statusService.GetAllStatus()
-                 }
+                }
 
-                ) ;
+                );
         }
 
 
@@ -85,7 +88,6 @@ namespace SSMO.Controllers
             {
                 new CustomerOrderViewModel
                 {
-                   // Id = customermodel.Id,  
                     Currencies = currency.AllCurrency(),
                     Customers = customerService.CustomersData(),
                     MyCompanies = myCompanyService.GetAllCompanies(),
@@ -102,13 +104,7 @@ namespace SSMO.Controllers
                 };
             }
 
-            if (customerOrderService.CheckOrderNumberExist(customermodel.OrderConfirmationNumber))
-            {
-                return View(customermodel);
-            }
-
-            var customerorderId = 0;
-
+            int customerorderId;
             if (!customerOrderService.AnyCustomerOrderExist())
             {
                 customerorderId = customerOrderService.CreateFirstOrder
@@ -123,28 +119,27 @@ namespace SSMO.Controllers
                                  customermodel.CurrencyId,
                                  customermodel.Origin,
                                  customermodel.PaidAmountStatus,
-                                 customermodel.PaidAvance, customermodel.Vat ?? 0);
-                                 ViewBag.NumberExist = 0;
+                                  customermodel.Vat ?? 0);
+                ViewBag.NumberExist = 0;
             }
-            else {
-               customerorderId = customerOrderService.CreateOrder
-                                (customermodel.CustomerPoNumber,
-                                customermodel.Date,
-                                customermodel.CustomerId,
-                                customermodel.MyCompanyId,
-                                customermodel.DeliveryTerms,
-                                customermodel.LoadingPlace,
-                                customermodel.DeliveryAddress,
-                                customermodel.CurrencyId,
-                                customermodel.Origin,
-                                customermodel.PaidAmountStatus,
-                                customermodel.PaidAvance, customermodel.Vat ?? 0);
-                                 ViewBag.NumberExist = 1;
+            else
+            {
+                customerorderId = customerOrderService.CreateOrder
+                                 (customermodel.CustomerPoNumber,
+                                 customermodel.Date,
+                                 customermodel.CustomerId,
+                                 customermodel.MyCompanyId,
+                                 customermodel.DeliveryTerms,
+                                 customermodel.LoadingPlace,
+                                 customermodel.DeliveryAddress,
+                                 customermodel.CurrencyId,
+                                 customermodel.Origin,
+                                 customermodel.PaidAmountStatus,
+                                 customermodel.Vat ?? 0);
+                ViewBag.NumberExist = 1;
             }
-            
 
-         
-                TempData["Count"] = customermodel.ProductsCount;  
+            TempData["Count"] = customermodel.ProductsCount;
 
             return RedirectToAction("AddOrderProducts", new { CustomerOrderId = customerorderId });
         }
@@ -155,23 +150,23 @@ namespace SSMO.Controllers
         {
 
             var count = int.Parse(TempData["Count"].ToString());
-                     
+
             var products = new List<ProductCustomerFormModel>();
             for (int i = 0; i < count; i++)
             {
-               var product = new ProductCustomerFormModel()
+                var product = new ProductCustomerFormModel()
                 {
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),
                     Sizes = productService.GetSizes()
 
-                }; 
+                };
                 products.Add(product);
             }
 
 
 
-            return View(products);  
+            return View(products);
         }
 
         [HttpPost]
@@ -179,7 +174,7 @@ namespace SSMO.Controllers
         public IActionResult AddOrderProducts(int customerorderId,
            IEnumerable<ProductCustomerFormModel> model)
         {
-           // var count = int.Parse(TempData["Count"].ToString());
+            // var count = int.Parse(TempData["Count"].ToString());
 
             if (!ModelState.IsValid)
             {
@@ -196,30 +191,30 @@ namespace SSMO.Controllers
                     };
                     products.Add(product);
                 }
-                
+
             }
 
-            if(!model.Any())
+            if (!model.Any())
             {
                 return View(model);
             }
 
             foreach (var item in model)
             {
-               
-                 productService.CreateProduct(item,customerorderId);
+
+                productService.CreateProduct(item, customerorderId);
 
             }
 
             customerOrderService.CustomerOrderCounting(customerorderId);
-           
+
             return RedirectToAction("PrintCustomerOrder");
         }
 
 
         public IActionResult PrintCustomerOrder()
         {
-            
+
             return RedirectToAction("Index", "Home");
         }
 

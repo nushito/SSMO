@@ -48,7 +48,7 @@ namespace SSMO.Controllers
                     Country = model.Country
                 },
                 RepresentativePerson = model.RepresentativePerson,
-                FSCClaim = model.FSCClaim,
+              //  FSCClaim = model.FSCClaim,
                 FSCSertificate = model.FSCSertificate
             };
 

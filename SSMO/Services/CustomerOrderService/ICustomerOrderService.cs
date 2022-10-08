@@ -11,7 +11,6 @@ namespace SSMO.Services.CustomerOrderService
             int company, string deliveryTerms, 
             string loadingAddress, string deliveryAddress,
             int currency,string origin, bool paidStatus, 
-            decimal paidAdvance,
             int vat);
 
         public int CreateFirstOrder
@@ -19,7 +18,6 @@ namespace SSMO.Services.CustomerOrderService
             int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,
             int currency, string origin, bool paidStatus,
-            decimal paidAdvance,
             int vat);
 
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id);

@@ -12,18 +12,6 @@
         <span asp-validation-for="Date" class="small text-danger"></span>
     </div>
 
-    <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="PaidAvance">Paid Advance</label>
-        <input asp-for="PaidAvance" min="0.0000" step="0.0001" type="number" class="form-control" >
-        <span asp-validation-for="PaidAvance" class="small text-danger"></span>
-    </div>
-
-    <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="DatePaidAmount">Date Paid Amount</label>
-        <input asp-for="DatePaidAmount" type="date" class="form-control" >
-        <span asp-validation-for="DatePaidAmount" class="small text-danger"></span>
-    </div>
-
    <div class="form-group col-sm-4 mb-2">      
             
       <input class="form-check-input" type="checkbox" asp-for="PaidStatus">
@@ -51,7 +39,7 @@
     </div>
 
     <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="Factoring">Factoring</label>
+        <label asp-for="Factoring">Factoring %</label>
         <input asp-for="Factoring" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="Factoring" class="small text-danger"></span>
     </div>
@@ -69,7 +57,7 @@
     </div>
 
      <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="ProcentComission">Comission</label>
+        <label asp-for="ProcentComission">Comission %</label>
         <input asp-for="ProcentComission" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="ProcentComission" class="small text-danger"></span>
     </div>

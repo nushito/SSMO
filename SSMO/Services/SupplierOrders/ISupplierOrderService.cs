@@ -1,4 +1,5 @@
-﻿using SSMO.Services.Documents.Purchase;
+﻿using SSMO.Models.Products;
+using SSMO.Services.Documents.Purchase;
 using System;
 using System.Collections.Generic;
 
@@ -11,10 +12,12 @@ namespace SSMO.Services.SupplierOrders
                 DateTime Date,
                 string number,
                int customerOrderNumber ,
-                int statusId, decimal paidAdvance,int currencyId, int vat );
-        void TotalAmountSum(int supplierOrderId);
+                int statusId, int currencyId, int vat );
+        void TotalAmountAndQuantitySum(int supplierOrderId);
 
         public IEnumerable<string> GetSuppliers();
-      
+
+       
+
     }
 }

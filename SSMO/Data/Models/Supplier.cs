@@ -33,9 +33,9 @@ namespace SSMO.Data.Models
         public ICollection<BankDetails> BankDetails { get; init; }
         public int AddressId { get; set; }
         public Address Address { get; set; }
-        [Required]
+   
         public string FSCClaim { get; set; }
-        [Required]
+      
         public string FSCSertificate { get; set; }
 
         public string RepresentativePerson { get; set; }

@@ -14,16 +14,16 @@ namespace SSMO.Services.Products
         private readonly ApplicationDbContext _dbContext;
         private readonly IConfigurationProvider mapper;
 
-        public  ProductService(ApplicationDbContext dbContext, IMapper mapper)
+        public ProductService(ApplicationDbContext dbContext, IMapper mapper)
         {
             _dbContext = dbContext;
             this.mapper = mapper.ConfigurationProvider;
         }
 
-        public void CreateProduct(ProductCustomerFormModel model,int customerorderId)
+        public void CreateProduct(ProductCustomerFormModel model, int customerorderId)
         {
-            var description = _dbContext.Descriptions.Where(a => a.Name == model.Description).FirstOrDefault();            
-            
+            var description = _dbContext.Descriptions.Where(a => a.Name == model.Description).FirstOrDefault();
+
             var size = _dbContext.Sizes.Where(a => a.Name == model.Size).FirstOrDefault();
             var grade = _dbContext.Grades.Where(a => a.Name == model.Grade).FirstOrDefault();
 
@@ -33,17 +33,17 @@ namespace SSMO.Services.Products
                 Description = description,
                 Grade = grade,
                 Size = size,
-                 FSCClaim = model.FSCClaim,
+                FSCClaim = model.FSCClaim,
                 FSCSertificate = model.FSCSertificate,
-            // OrderedQuantity = model.Cubic,
-             Price = model.Price,
-              Pallets = model.Pallets,
-              SheetsPerPallet = model.SheetsPerPallet,
-               CustomerOrderId = customerorderId, 
-             
+
+                Price = model.Price,
+                Pallets = model.Pallets,
+                SheetsPerPallet = model.SheetsPerPallet,
+                CustomerOrderId = customerorderId,
+
             };
 
-           
+
 
             var dimensionArray = size.Name.Split('/').ToArray();
             var countArray = dimensionArray.Count();
@@ -51,11 +51,11 @@ namespace SSMO.Services.Products
 
             for (int i = 0; i < countArray; i++)
             {
-                sum*= Math.Round(decimal.Parse(dimensionArray[i])/1000,4);
+                sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 4);
             }
 
             product.TotalSheets = product.Pallets * product.SheetsPerPallet;
-            product.OrderedQuantity = Math.Round( sum * product.TotalSheets,4);
+            product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
             product.Amount = Math.Round(product.Price * product.OrderedQuantity, 4);
             _dbContext.Products.Add(product);
             var order = _dbContext.CustomerOrders.Where(a => a.Id == customerorderId).FirstOrDefault();
@@ -88,9 +88,9 @@ namespace SSMO.Services.Products
 
         public bool DescriptionExist(string name)
         {
-            var check = _dbContext.Descriptions.Where(a=>a.Name.ToLower() == name.ToLower()).FirstOrDefault();
+            var check = _dbContext.Descriptions.Where(a => a.Name.ToLower() == name.ToLower()).FirstOrDefault();
 
-           if(check == null)
+            if (check == null)
             {
                 return false;
             }
@@ -122,11 +122,9 @@ namespace SSMO.Services.Products
             return true;
         }
 
-
-
-      public  IEnumerable<string> GetDescriptions()
+        public IEnumerable<string> GetDescriptions()
         {
-            return _dbContext.Descriptions.Select(a=>a.Name).ToList();
+            return _dbContext.Descriptions.Select(a => a.Name).ToList();
         }
 
         public IEnumerable<string> GetSizes()
@@ -148,7 +146,7 @@ namespace SSMO.Services.Products
 
 
             var product = _dbContext.Products.Find(id);
-            var descriptionEdit = _dbContext.Descriptions.Where(a => a.Name == description).Select(a=>a.Id).FirstOrDefault();
+            var descriptionEdit = _dbContext.Descriptions.Where(a => a.Name == description).Select(a => a.Id).FirstOrDefault();
             var gradeEdit = _dbContext.Grades.Where(a => a.Name == grade).Select(a => a.Id).FirstOrDefault();
             var sizeEdit = _dbContext.Sizes.Where(a => a.Name == size).Select(a => a.Id).FirstOrDefault();
 
@@ -162,11 +160,10 @@ namespace SSMO.Services.Products
             product.SizeId = sizeEdit;
             product.FSCClaim = fscClaim;
             product.FSCSertificate = fscCertificate;
-            product.Pallets = pallets;  
+            product.Pallets = pallets;
             product.SheetsPerPallet = sheetsPerPallet;
             product.PurchasePrice = purchasePrice;
             product.SupplierOrderId = supplierOrderId;
-
 
             var dimensionArray = size.Split('/').ToArray();
             var countArray = dimensionArray.Count();
@@ -179,17 +176,15 @@ namespace SSMO.Services.Products
 
             product.TotalSheets = product.Pallets * product.SheetsPerPallet;
             product.LoadedQuantityM3 = Math.Round(sum * product.TotalSheets, 4);
-        
-            product.PurchaseAmount = Math.Round(product.PurchasePrice * product.OrderedQuantity, 4);
-            product.Amount = Math.Round(product.Price * product.OrderedQuantity, 4);
 
-            var spOrder = _dbContext.SupplierOrders.Find(supplierOrderId);
+            product.PurchaseAmount = Math.Round(product.PurchasePrice * product.LoadedQuantityM3, 4);
+            product.Amount = Math.Round(product.Price * product.LoadedQuantityM3, 4);
+
+            var spOrder = _dbContext.SupplierOrders.Where(i => i.Id == supplierOrderId).FirstOrDefault();
 
             spOrder.Amount += product.PurchaseAmount;
-           
-          
-            spOrder.Products.ToList().Add(product);
-            
+            spOrder.Products.Add(product);
+
             _dbContext.SaveChanges();
 
             return true;
@@ -227,8 +222,40 @@ namespace SSMO.Services.Products
             return products;
 
         }
-        
 
-         
+
+        public ICollection<ProductCustomerFormModel> DetailsPerCustomerOrder(int customerId)
+        {
+            var products = _dbContext.Products
+                .Where(a => a.CustomerOrderId == customerId)
+                .ProjectTo<ProductCustomerFormModel>(mapper)
+                .ToList();
+          
+            foreach (var item in products)
+            {
+                var descriptionName = _dbContext.Descriptions
+               .Where(a => a.Id == item.DescriptionId)
+               .Select(a => a.Name)
+               .FirstOrDefault();
+
+                var gradeName = _dbContext.Grades
+               .Where(a => a.Id == item.GradeId)
+               .Select(a => a.Name)
+               .FirstOrDefault();
+
+                var sizeName = _dbContext.Sizes
+                     .Where(a => a.Id == item.SizeId)
+               .Select(a => a.Name)
+               .FirstOrDefault();
+
+                item.Description = descriptionName;
+                item.Grade = gradeName;
+                item.Size = sizeName;
+                    
+        }
+
+            return products;
+
+        }
     }
 }

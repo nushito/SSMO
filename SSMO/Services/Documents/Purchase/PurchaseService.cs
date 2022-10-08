@@ -20,15 +20,15 @@ namespace SSMO.Services.Documents.Purchase
         }
 
         public bool CreatePurchaseAsPerSupplierOrder(
-            string supplierOrderNumber, string number, DateTime date
-            , decimal paidAdvance, DateTime datePaidAmount, bool paidStatus,
+            string supplierOrderNumber, string number, DateTime date, bool paidStatus,
             decimal netWeight, decimal brutoWeight,
             decimal duty, decimal factoring, decimal customsExpenses, decimal fiscalAgentExpenses,
             decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses)
         {
             var supplierOrder = dbContext.SupplierOrders.FirstOrDefault(o => o.Number.ToLower() == supplierOrderNumber.ToLower());
-            var purchaseId = supplierOrder.Id;
             var amount = supplierOrder.TotalAmount;
+            var customerOrder = dbContext.CustomerOrders.Where(sp => sp.Id == supplierOrder.CustomerOrderId)
+                                 .FirstOrDefault();
 
             var purchase = new Document
             {
@@ -36,9 +36,8 @@ namespace SSMO.Services.Documents.Purchase
                 Date = date,
                 DocumentType = Data.Enums.DocumentTypes.Purchase,
                 SupplierOrder = supplierOrder,
-                SupplierOrderId = purchaseId,
-                PaidAvance = paidAdvance,
-                DatePaidAmount = datePaidAmount,
+                SupplierOrderId = supplierOrder.Id,
+                CustomerOrderId = supplierOrder.CustomerOrderId,
                 PaidStatus = paidStatus,    
                 NetWeight = netWeight,
                 GrossWeight = brutoWeight,
@@ -50,31 +49,31 @@ namespace SSMO.Services.Documents.Purchase
                 PurchaseTransportCost = purchaseTransportCost,
                 BankExpenses = bankExpenses,
                 OtherExpenses = otherExpenses,
-                Amount = amount
+                Amount = amount,
+                Incoterms = customerOrder.DeliveryTerms,
+                Products = new List<Product>()
 
             };
 
-            var expenses = purchase.Duty + purchase.Factoring +
+            var expenses = purchase.Duty + purchase.Factoring*amount/100 +
                        purchase.CustomsExpenses + purchase.FiscalAgentExpenses +
-                       purchase.ProcentComission + purchase.PurchaseTransportCost + purchase.BankExpenses + purchase.OtherExpenses;
+                       purchase.ProcentComission*amount/100 + purchase.PurchaseTransportCost + purchase.BankExpenses + purchase.OtherExpenses;
 
-            foreach (var product in supplierOrder.Products)
+            var productList = dbContext.Products.Where(s=>s.SupplierOrderId == supplierOrder.Id).ToList();
+
+            foreach (var product in productList)
             {
-                product.CostPrice = (product.Amount + (expenses / supplierOrder.TotalQuantity * product.LoadedQuantityM3)) / product.LoadedQuantityM3;
-                 
-
+               product.CostPrice = (product.Amount + (expenses / supplierOrder.TotalQuantity * product.LoadedQuantityM3)) / product.LoadedQuantityM3;
+               purchase.Products.Add(product);                                
             }
 
             if(purchase == null)
             {
                 return false;
             }
-
-
-
+            
             dbContext.Documents.Add(purchase);
             dbContext.SaveChanges();
-
 
             return true;
         }

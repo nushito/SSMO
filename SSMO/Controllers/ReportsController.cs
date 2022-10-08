@@ -1,32 +1,49 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using SSMO.Data;
 using SSMO.Models.CustomerOrders;
+using SSMO.Models.Products;
 using SSMO.Models.Reports;
+using SSMO.Models.Reports.CustomerOrderReportForEdit;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
 using SSMO.Services;
 using SSMO.Services.Customer;
+using SSMO.Services.CustomerOrderService;
+using SSMO.Services.MyCompany;
+using SSMO.Services.Products;
 using SSMO.Services.Reports;
-using System;
+using SSMO.Services.Status;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
 
 namespace SSMO.Controllers
 {
     public class ReportsController : Controller
     {
-        private readonly IReportsService service;
+        private readonly IReportsService reportService;
         private readonly ICustomerService customerService;
         private readonly ISupplierService supplierService;
+        private readonly ICurrency currency;
+        private readonly IMycompanyService myCompanyService;
+        private readonly IProductService productService;
+        private readonly ICustomerOrderService customerOrderService;
+        private readonly IMapper mapper;
+        private readonly IStatusService statusService;
 
         public ReportsController(IReportsService service,
-           ICustomerService customerService, ISupplierService supplierService)
+           ICustomerService customerService, ISupplierService supplierService,
+           ICurrency currency, IMycompanyService mycompanyService, IProductService productService,
+           ICustomerOrderService customerOrderService, IStatusService statusService, IMapper mapper)
         {
-            this.service = service;
+            this.reportService = service;
             this.customerService = customerService;
             this.supplierService = supplierService;
+            this.mapper = mapper;
+            this.statusService = statusService;
+            this.currency = currency;
+            this.myCompanyService = mycompanyService;
+            this.productService = productService;
+            this.customerOrderService = customerOrderService;
         }
 
 
@@ -36,7 +53,7 @@ namespace SSMO.Controllers
 
             var customerNames = customerService.GetCustomerNames();
 
-            var customerOrderCollection = service.AllCustomerOrders(
+            var customerOrderCollection = reportService.AllCustomerOrders(
                 model.CustomerName,
                 model.CurrentPage, CustomerOrderReportAll.CustomerOrdersPerPage);
 
@@ -50,76 +67,136 @@ namespace SSMO.Controllers
 
         public IActionResult CustomerOrderDetails(int id)
         {
-            var order = service.Details(id);
+            var order = reportService.Details(id);
 
             return View(order);
         }
 
-        public IActionResult CustomerOrderEdit(int id, CustomerOrderViewModel model)
+        [HttpGet]
+        public IActionResult CustomerOrderEdit(int id)
         {
 
             if (!ModelState.IsValid)
             {
-                return View(model);
+                new CustomerOrderForEdit
+                {
+                    Currencies = currency.AllCurrency(),
+                    MyCompanies = myCompanyService.GetAllCompanies(),
+                    Suppliers = supplierService.GetSuppliers(),
+                    Products = new List<ProductCustomerFormModel>(),
+                    Statuses = statusService.GetAllStatus()
+                };
             }
 
 
-            var editOrder = service.Edit
-                (id, model.CustomerPoNumber,
+            var customerOrderForEdit = reportService.CustomerOrderDetailsForEdit(id);
+            customerOrderForEdit.Suppliers = supplierService.GetSuppliers();
+            customerOrderForEdit.Currencies = currency.AllCurrency();
+            customerOrderForEdit.MyCompanies = myCompanyService.GetAllCompanies();
+            customerOrderForEdit.Statuses = statusService.GetAllStatus();            
+            customerOrderForEdit.Products = (List<ProductCustomerFormModel>)productService.DetailsPerCustomerOrder(id);
+            foreach (var item in customerOrderForEdit.Products)
+            {
+                item.Descriptions = productService.GetDescriptions();
+                item.Grades = productService.GetGrades();
+                item.Sizes = productService.GetSizes();
+
+            }
+
+            return View(customerOrderForEdit);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult CustomerOrderEdit(int id, CustomerOrderForEdit model)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                new CustomerOrderForEdit
+                {
+                    Currencies = currency.AllCurrency(),
+                    MyCompanies = myCompanyService.GetAllCompanies(),
+                    Suppliers = supplierService.GetSuppliers(),
+                    Products = new List<ProductCustomerFormModel>(),
+                    Statuses = statusService.GetAllStatus()
+                };
+            }
+
+            var editOrder = reportService.EditCustomerOrder
+                (id,
+                model.CustomerPoNumber,
                 model.Date,
-                model.CustomerId,
                 model.MyCompanyId,
                 model.DeliveryTerms,
                 model.LoadingPlace,
                 model.DeliveryAddress,
                 model.CurrencyId,
-                model.Status.Name, model.FscClaim, model.FscCertificate);
+                model.StatusId,
+                model.FscClaim,
+                model.FscCertificate,
+                model.PaidAdvance,
+                model.PaidAmountStatus,
+                (System.Collections.Generic.List<Models.Products.ProductCustomerFormModel>)model.Products);
 
             if (!editOrder)
             {
                 return BadRequest();
             }
 
-            return View();
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
-        public IActionResult CascadeMenu()
+        public IActionResult CustomerOrdersBySupplier()
         {
             var customersList = customerService.GetCustomerNamesAndId();
 
-            CascadeViewModel cascade = new CascadeViewModel()
+            CustomerBySupplierOrdersViewModel cascade = new()
             {
                 Customers = customersList,
             };
 
-           
             ViewData["Selectedsupplier"] = 0;
             cascade.ProductList = null;
             return View(cascade);
         }
 
-        [HttpPost, ValidateAntiForgeryToken]
-        public IActionResult CasscadeMenu(FormCollection fc, CascadeViewModel model)
+        [HttpPost]
+        public IActionResult CustomerOrdersBySupplier(FormCollection fc, CustomerBySupplierOrdersViewModel model)
         {
+            var customersList = customerService.GetCustomerNamesAndId();
+            if (!ModelState.IsValid)
+            {
+                new CustomerBySupplierOrdersViewModel()
+                {
+                    Customers = customersList
+                };
+            };
 
             var supplierId = fc["Supplier"];
             ViewData["SelectedSupplier"] = supplierId;
-            return View(model);
+            var ordersList = reportService.GetCustomerOrdersBySupplier(model.CustomerId, supplierId);
+            var finalListOrders = new CustomerBySupplierOrdersViewModel
+            {
+                Customers = customersList,
+                CustomerId = model.CustomerId,
+                ProductList = ordersList
+            };
+
+
+            return View(finalListOrders);
         }
 
         public JsonResult GetSupplier(int id)
         {
-            //if (id == null)
-            //{
-            //    id = "0";
-            //}
-
-            //var customerId = int.Parse(id.ToString());
-
             var selectedSuppliers = supplierService.GetSuppliersNames(id);
-           return Json(selectedSuppliers);
-           // return Json(new SelectList(selectedSuppliers, "SupplierId", "SupplierName"));
+            return Json(selectedSuppliers);
+
         }
     }
 }

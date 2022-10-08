@@ -100,7 +100,7 @@ namespace SSMO.Controllers
             var supplierOrderId = supplierOrderService.CreateSupplierOrder
                                   (model.MyCompanyId, model.SupplierId,model.Date,
                                   model.Number,model.CustomerOrderNumber, model.StatusId, 
-                                  model.PaidAvance, model.CurrencyId, model.VAT??0);
+                                 model.CurrencyId, model.VAT??0);
 
            return RedirectToAction("EditProductAsPerSupplier", new {customerOrderId = customerorderId, supplierOrderId = supplierOrderId} );
         }
@@ -193,13 +193,10 @@ namespace SSMO.Controllers
 
             }
 
-            supplierOrderService.TotalAmountSum(supplierOrderId);
+            supplierOrderService.TotalAmountAndQuantitySum(supplierOrderId);
 
             return RedirectToAction("PrintSupplierOrder", supplierOrderId);
         }
-
-
-
 
 
         public IActionResult PrintSupplierOrder(int supplierOrderId)

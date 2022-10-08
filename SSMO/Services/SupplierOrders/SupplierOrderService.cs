@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Models.Products;
 using SSMO.Services.Documents.Purchase;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace SSMO.Services.SupplierOrders
         }
 
         public int CreateSupplierOrder(int myCompanyId, int supplierId, DateTime Date, 
-            string number, int customerOrderNumber, int statusId, decimal paidAdvance, int currencyId, int vat)
+            string number, int customerOrderNumber, int statusId, int currencyId, int vat)
         {
             var customerOrder = dbContext.CustomerOrders
                 .Where(a => a.OrderConfirmationNumber == customerOrderNumber)
@@ -40,8 +41,8 @@ namespace SSMO.Services.SupplierOrders
                 CustomerOrderId = customerOrder.Id,
                 StatusId = statusId,
                 CurrencyId = currencyId,
-                PaidAvance = paidAdvance,
-                VAT = vat
+                VAT = vat,
+                Products = new List<Product>()  
             };
 
            
@@ -58,11 +59,12 @@ namespace SSMO.Services.SupplierOrders
             return dbContext.Suppliers.Select(a=>a.Name).ToList();
         }
 
-        public void TotalAmountSum(int supplierOrderId)
+        public void TotalAmountAndQuantitySum(int supplierOrderId)
         {
            var spOrder = dbContext.SupplierOrders.Find(supplierOrderId);
            spOrder.TotalAmount = spOrder.Amount + (spOrder.Amount * spOrder.VAT / 100)??0;
            spOrder.Balance = spOrder.TotalAmount - spOrder.PaidAvance;
+            spOrder.TotalQuantity = spOrder.Products.Sum(a => a.LoadedQuantityM3);
            dbContext.SaveChanges();    
           
         }

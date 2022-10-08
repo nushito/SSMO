@@ -20,8 +20,6 @@ namespace SSMO.Models.MyCompany
 
         [Required]
         public string BankName { get; set; }
-
-        [StringLength(IbanLength, ErrorMessage = "Your IBAN is invalid!")]
         public string Iban { get; set; }
         [Required]
         public string Swift { get; set; }
@@ -30,8 +28,8 @@ namespace SSMO.Models.MyCompany
       
         public int CompanyId { get; set; }
         public string CompanyName { get; set; }
-      public ICollection<string> CompanyNames { get; set; }
-      public ICollection<string> Currency { get; set; }
+        public ICollection<string> CompanyNames { get; set; }
+        public ICollection<string> Currency { get; set; }
 
 
         //  public ICollection<MyCompanyGetNameModel> Company { get; set; } = new List<MyCompanyGetNameModel>();

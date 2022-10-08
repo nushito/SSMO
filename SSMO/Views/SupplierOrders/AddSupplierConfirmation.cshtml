@@ -84,14 +84,10 @@
       </label> 
     </div>
          
-    <div class="row col-md-4">
-                    <label asp-for="PaidAvance">Paid Advance</label>
-                    <input asp-for="PaidAvance" class="form-control" />
-
-     </div>
+   
  <div class="row col-md-4">
      <label asp-for="VAT">Enter VAT %</label>
-     <input asp-for="VAT" class="form-control" />
+     <input asp-for="VAT"  min="0" step="1" class="form-control" />
  </div>
     <br />
         <input type="submit" value="Add Products" class="btn btn-primary mt-3" asp-route-customerorderId="@Model.CustomerOrderId"/>

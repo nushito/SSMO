@@ -41,13 +41,13 @@ namespace SSMO.Data.Models
         public decimal PurchaseAmount { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
-
-      
         public int CustomerOrderId { get; set; }
         public CustomerOrder CustomerOrder { get; set; }
 
         public int? SupplierOrderId { get; set; }
         public SupplierOrder SupplierOrder { get; set; }
+        public int? DocumentId { get; set; }
+        public Document Document { get; set; }
 
         [Column(TypeName = "decimal(18,4)")]
         public decimal? PurchaseTransportCost { get; set; }

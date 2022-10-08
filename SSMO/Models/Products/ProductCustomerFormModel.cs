@@ -20,17 +20,14 @@ namespace SSMO.Models.Products
         public string FSCSertificate { get; set; }
         public int CustomerOrderId { get; set; }
      
-      
         [Range(0.0, 9999999999999.99999)]
         public decimal OrderedQuantity { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
         public decimal Price { get; set; }
 
-
         [Range(0.0, 9999999999999.99999)]
         public decimal PurchaseAmount { get; set; }
-       
        
         [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }

@@ -16,8 +16,6 @@ namespace SSMO.Data.Models
         public Currency Currency { get; init; }
         [Required]
         public string BankName { get; set; }
-
-        [StringLength(IbanLength, ErrorMessage ="Your IBAN is invalid!")]
         public string Iban { get; set; }
         [Required]
         public string Swift { get; set; }
