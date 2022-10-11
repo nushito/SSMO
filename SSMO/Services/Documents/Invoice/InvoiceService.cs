@@ -32,7 +32,7 @@ namespace SSMO.Services.Documents.Invoice
         }
 
         public InvoicePrintViewModel CreateInvoice(
-            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int number, string myCompanyName)
+            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int number, string myCompanyName, string truckNumber)
         {
             var customerOrder = dbContext.CustomerOrders
                 .Where(on => on.OrderConfirmationNumber == orderConfirmationNumber).FirstOrDefault();
@@ -47,7 +47,7 @@ namespace SSMO.Services.Documents.Invoice
             var invoiceCreate = new Document
             {
                 DocumentType = Data.Enums.DocumentTypes.Invoice,
-                
+                Amount = customerOrder.Amount,
                 TotalAmount = customerOrder.TotalAmount,
                 Vat = customerOrder.Vat,
                 Balance = customerOrder.Balance,
@@ -57,7 +57,7 @@ namespace SSMO.Services.Documents.Invoice
                 PaidStatus = customerOrder.PaidAmountStatus,
                 Products = (System.Collections.Generic.ICollection<Product>)customerOrder.Products,
                 SupplierOrderId = supplierOdrerForThisInvoiceId,
-                
+                TruckNumber = truckNumber
              };
 
             if (CheckFirstInvoice())

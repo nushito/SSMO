@@ -31,6 +31,7 @@ namespace SSMO.Models.SupplierOrders
         public int StatusId { get; set; }
         public StatusModel Status { get; set; }
         public IEnumerable<StatusModel> Statuses { get; set; }
+        public string FscClaim { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public IEnumerable<GetCurrencyModel> Currencies { get; set; }

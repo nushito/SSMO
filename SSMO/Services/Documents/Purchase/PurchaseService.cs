@@ -23,7 +23,7 @@ namespace SSMO.Services.Documents.Purchase
             string supplierOrderNumber, string number, DateTime date, bool paidStatus,
             decimal netWeight, decimal brutoWeight,
             decimal duty, decimal factoring, decimal customsExpenses, decimal fiscalAgentExpenses,
-            decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses)
+            decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses,string truckNumber)
         {
             var supplierOrder = dbContext.SupplierOrders.FirstOrDefault(o => o.Number.ToLower() == supplierOrderNumber.ToLower());
             var amount = supplierOrder.TotalAmount;
@@ -51,6 +51,7 @@ namespace SSMO.Services.Documents.Purchase
                 OtherExpenses = otherExpenses,
                 Amount = amount,
                 Incoterms = customerOrder.DeliveryTerms,
+                TruckNumber = truckNumber,  
                 Products = new List<Product>()
 
             };

@@ -35,7 +35,6 @@ namespace SSMO.Services.Products
                 Size = size,
                 FSCClaim = model.FSCClaim,
                 FSCSertificate = model.FSCSertificate,
-
                 Price = model.Price,
                 Pallets = model.Pallets,
                 SheetsPerPallet = model.SheetsPerPallet,
@@ -256,6 +255,12 @@ namespace SSMO.Services.Products
 
             return products;
 
+        }
+
+        public ICollection<string> GetFascCertMyCompany()
+        {
+            var fscCert = _dbContext.MyCompanies.Select(f => f.FSCSertificate).ToList();
+            return fscCert;
         }
     }
 }

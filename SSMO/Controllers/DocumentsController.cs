@@ -77,7 +77,7 @@ namespace SSMO.Controllers
                 supplierOrderNumber, model.Number, model.Date,
                 model.PaidStatus, model.NetWeight,
                 model.GrossWeight, model.Duty, model.Factoring,model.CustomsExpenses, model.FiscalAgentExpenses,
-                model.ProcentComission, model.PurchaseTransportCost, model.BankExpenses, model.OtherExpenses);
+                model.ProcentComission, model.PurchaseTransportCost, model.BankExpenses, model.OtherExpenses,model.TruckNumber);
 
             if (!purchase)
             {
@@ -136,13 +136,15 @@ namespace SSMO.Controllers
                     date = model.Date,
                     currencyExchangeRateUsdToBGN = model.CurrencyExchangeRateUsdToBGN,
                     number = model.Number,
-                    mycompanyname = model.MyCompanyName
+                    mycompanyname = model.MyCompanyName,
+                    truckNumber = model.TruckNumber
                 });
         }
 
-        public IActionResult CreateInvoice(int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int number, string mycompanyname)
+        public IActionResult CreateInvoice(
+            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int number, string mycompanyname, string truckNumber)
         {
-            var invoiceForPrint = invoiceService.CreateInvoice(orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname);    
+            var invoiceForPrint = invoiceService.CreateInvoice(orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname,truckNumber);    
 
             return View(invoiceForPrint);
         }

@@ -5,8 +5,7 @@
 }
 
 <form method="post">
-
-    @if (!ViewBag.CheckInvoice)
+  @if (!ViewBag.CheckInvoice)
     { <div class="row col-md-4">
         <label asp-for="Number">Fill First Invoice Number</label>
         <input asp-for="Number" type="text" class="form-control" class="form-control">
@@ -47,6 +46,10 @@
         <label asp-for="Date">Date of the Invoice</label>
         <input asp-for="Date" type="date" class="form-control" id="datepicker" class="form-control">
     </div>
+     <div class="row col-md-4">
+        <label asp-for="TruckNumber">Truck Number</label>
+        <input asp-for="TruckNumber" type="date" class="form-control"  class="form-control">
+    </div>
     
     <div class="row col-md-4">
         <label asp-for="CurrencyExchangeRateUsdToBGN">Currency Exchange Rate to BGN</label>
@@ -54,7 +57,8 @@
     </div>
     <hr />
 
-    <input type="submit" value="Create Invoice" class="btn btn-primary mt-3"  asp-route-orderConfirmationNumber="@Model.OrderConfirmationNumber"
+    <input type="submit" value="Create Invoice" class="btn btn-primary mt-3"  
+        asp-route-orderConfirmationNumber="@Model.OrderConfirmationNumber"
         asp-route-date="@Model.Date" 
         asp-route-currencyExchangeRateUsdToBGN="@Model.CurrencyExchangeRateUsdToBGN" 
         asp-route-number="@Model.Number"

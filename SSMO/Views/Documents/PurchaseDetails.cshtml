@@ -12,14 +12,17 @@
         <span asp-validation-for="Date" class="small text-danger"></span>
     </div>
 
-   <div class="form-group col-sm-4 mb-2">      
-            
+   <div class="form-group col-sm-4 mb-2">   
       <input class="form-check-input" type="checkbox" asp-for="PaidStatus">
       <label class="form-check-label" asp-for="PaidStatus">
         Paid
       </label> 
     </div>
-
+      <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="TruckNumber">Truck Number</label>
+        <input asp-for="TruckNumber" type="text" class="form-control" >
+        <span asp-validation-for="TruckNumber" class="small text-danger"></span>
+    </div>
     <div class="form-group  offset-3 mb-2 col-md-3">
         <label asp-for="NetWeight">Net Weight</label>
         <input asp-for="NetWeight"min="0.0000" step="0.0001" type="number" class="form-control" >

@@ -12,6 +12,10 @@ namespace SSMO.Data.Models
         public decimal Cost { get; set; }
         public int Vat { get; set; }
         public bool Paid { get; set; }
+        public string LoadingAddress { get; set; }
+        public string DeliveryAddress { get; set; }
+        public string TruckNumber { get; set; }
+        public decimal AmountAfterVat { get; set; }
         public int CustomerOrderId { get; set; }
         public CustomerOrder CustomerOrder { get; set; }
         public int SupplierOrderId { get; set; }

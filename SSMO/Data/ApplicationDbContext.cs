@@ -158,6 +158,11 @@ namespace SSMO.Data
                 .HasColumnType("decimal")
                 .HasPrecision(18, 5);
 
+            builder.Entity<ServiceOrder>()
+               .Property(a => a.AmountAfterVat)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 2);
+
             builder.Entity<Product>()
                 .Property(a => a.QuantityM2)
                 .HasColumnType("decimal")
@@ -324,6 +329,8 @@ namespace SSMO.Data
                 .WithOne(a => a.Currency)
                 .HasForeignKey(a => a.CurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+
 
             base.OnModelCreating(builder);
         }
