@@ -4,6 +4,7 @@ using SSMO.Data;
 using SSMO.Data.Models;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.CustomerOrderReportForEdit;
+using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
 using SSMO.Services.Products;
 using System;
@@ -75,6 +76,31 @@ namespace SSMO.Services.Reports
             orderForEdit.Products = (List<ProductCustomerFormModel>)productService.DetailsPerCustomerOrder(id);
 
             return orderForEdit;
+        }
+
+        public IEnumerable<CustomerOrderPaymentDetailsModel> CustomersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage)
+        {
+            if (String.IsNullOrEmpty(customerName))
+            {
+                return new List<CustomerOrderPaymentDetailsModel>();
+            }
+
+            var customerId = _context.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
+                                .Select(a => a.Id)
+                                .FirstOrDefault();
+
+            var customerOrdersId = _context.CustomerOrders.Where(c => c.CustomerId == customerId).Select(i => i.Id).ToList();
+
+            var queryInvoices = _context.Documents
+                    .Where(a => customerOrdersId.Contains(a.CustomerOrderId));
+
+            // var totalOrders = queryOrders.Count();  
+
+            var invoices = queryInvoices.ProjectTo<CustomerOrderPaymentDetailsModel>(this.mapper).ToList();
+
+            var customerPaymentList = invoices.Skip((currentpage - 1) * customerOrdersPerPage).Take(customerOrdersPerPage);
+
+            return customerPaymentList;
         }
 
         public CustomerOrderDetailsModel Details(int id)

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSMO.Data;
 
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221016183237_InvoicesToCustomers")]
+    partial class InvoicesToCustomers
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -761,10 +763,6 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<decimal>("AmountAfterVat")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("Cost")
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
@@ -772,14 +770,8 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("CustomerOrderId")
                         .HasColumnType("int");
 
-                    b.Property<string>("DeliveryAddress")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("DocumentId")
                         .HasColumnType("int");
-
-                    b.Property<string>("LoadingAddress")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("Paid")
                         .HasColumnType("bit");
@@ -788,9 +780,6 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("TransportCompany")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("TruckNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Vat")

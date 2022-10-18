@@ -6,6 +6,7 @@ using SSMO.Models.CustomerOrders;
 using SSMO.Models.Products;
 using SSMO.Models.Reports;
 using SSMO.Models.Reports.CustomerOrderReportForEdit;
+using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
 using SSMO.Services;
 using SSMO.Services.Customer;
@@ -58,10 +59,7 @@ namespace SSMO.Controllers
                 model.CurrentPage, CustomerOrderReportAll.CustomerOrdersPerPage);
 
             model.CustomerOrderCollection = customerOrderCollection;
-
             model.CustomerNames = customerNames;
-
-
             return View(model);
         }
 
@@ -152,6 +150,7 @@ namespace SSMO.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult CustomerOrdersBySupplier()
         {
             var customersList = customerService.GetCustomerNamesAndId();
@@ -160,14 +159,15 @@ namespace SSMO.Controllers
             {
                 Customers = customersList,
             };
-
+            
             ViewData["Selectedsupplier"] = 0;
             cascade.ProductList = null;
             return View(cascade);
         }
 
         [HttpPost]
-        public IActionResult CustomerOrdersBySupplier(FormCollection fc, CustomerBySupplierOrdersViewModel model)
+        [Authorize]
+        public IActionResult CustomerOrdersBySupplier(string supplierId, CustomerBySupplierOrdersViewModel model)
         {
             var customersList = customerService.GetCustomerNamesAndId();
             if (!ModelState.IsValid)
@@ -178,25 +178,60 @@ namespace SSMO.Controllers
                 };
             };
 
-            var supplierId = fc["Supplier"];
+           // var supplierId = fc["Supplier"];
             ViewData["SelectedSupplier"] = supplierId;
             var ordersList = reportService.GetCustomerOrdersBySupplier(model.CustomerId, supplierId);
             var finalListOrders = new CustomerBySupplierOrdersViewModel
             {
                 Customers = customersList,
-                CustomerId = model.CustomerId,
+                CustomerId = int.Parse(model.CustomerId.ToString()),
                 ProductList = ordersList
             };
 
 
             return View(finalListOrders);
         }
-
-        public JsonResult GetSupplier(int id)
+        [HttpGet]
+        public JsonResult GetSupplier(string id)
         {
-            var selectedSuppliers = supplierService.GetSuppliersNames(id);
+            if(id == null)
+            {
+                id = "0";
+            }
+            var customerId = int.Parse(id.ToString());
+            var selectedSuppliers = supplierService.GetSuppliersNames(customerId);
             return Json(selectedSuppliers);
 
+        }
+
+        public IActionResult InvoicePaymentReport(CustomerOrdersPaymentsReportsViewModel model)
+        {
+            //TODO When All are selected page is empty
+
+            var customerNames = customerService.GetCustomerNames();
+
+            var customerPaymentCollection = reportService.CustomersPaymentDetails(
+                model.CustomerName,
+                model.CurrentPage, CustomerOrdersPaymentsReportsViewModel.CustomerOrdersPerPage);
+
+            model.CustomerPaymentCollection = customerPaymentCollection;
+
+            model.CustomerNames = customerNames;
+
+
+            return View(model);
+        }
+        public IActionResult PurchasePaymentReport()
+        {
+            return View();
+        }
+        public IActionResult CustomerOrderPaymentReport()
+        {
+            return View();
+        }
+        public IActionResult SupplierOrderPaymentReport()
+        {
+            return View();
         }
     }
 }

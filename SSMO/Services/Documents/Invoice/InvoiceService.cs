@@ -39,6 +39,7 @@ namespace SSMO.Services.Documents.Invoice
 
             var supplierOdrerForThisInvoiceId = dbContext.SupplierOrders.Where(c => c.CustomerOrderId == customerOrder.Id)
                 .Select(i=>i.Id).FirstOrDefault();
+
             if (customerOrder == null)
             {
                 return null;
@@ -63,6 +64,7 @@ namespace SSMO.Services.Documents.Invoice
             if (CheckFirstInvoice())
             {
                 var lastInvoiceNumber = dbContext.Documents.Where(n => n.DocumentType == Data.Enums.DocumentTypes.Invoice)
+                    .OrderBy(n=>n.DocumentNumber)
                     .Select(n => n.DocumentNumber).LastOrDefault();
 
                 invoiceCreate.DocumentNumber = lastInvoiceNumber + 1;
@@ -112,7 +114,6 @@ namespace SSMO.Services.Documents.Invoice
                 FSCSertificate = myCompany.FSCSertificate,
                 RepresentativePerson = myCompany.RepresentativePerson,
                 VAT = myCompany.VAT
-
             };
 
 

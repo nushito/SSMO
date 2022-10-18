@@ -13,6 +13,7 @@ using SSMO.Services.Status;
 using SSMO.Services.SupplierOrders;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 
 namespace SSMO.Controllers
 {
@@ -100,7 +101,7 @@ namespace SSMO.Controllers
             var supplierOrderId = supplierOrderService.CreateSupplierOrder
                                   (model.MyCompanyId, model.SupplierId,model.Date,
                                   model.Number,model.CustomerOrderNumber, model.StatusId, 
-                                 model.CurrencyId, model.VAT??0);
+                                 model.CurrencyId, model.FscClaim, model.VAT??0, model.DatePaidAmount, model.PaidAvance, model.PaidStatus);
 
            return RedirectToAction("EditProductAsPerSupplier", new {customerOrderId = customerorderId, supplierOrderId = supplierOrderId} );
         }
@@ -173,6 +174,11 @@ namespace SSMO.Controllers
                     Grades = productService.GetGrades(),
                     Sizes = productService.GetSizes()
                 };
+            }
+
+            if (!User.Identity.IsAuthenticated)
+            {
+                return BadRequest();
             }
 
             if (!productmodel.Any())

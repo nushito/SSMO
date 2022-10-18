@@ -1,141 +1,131 @@
 ﻿@model CustomerBySupplierOrdersViewModel
 
-<div class="container">
-    <table width="70%">
-        <tr>
-            <td>
-                <div class="form-group col-md-5">
-                    <label asp-for="CustomerId">Select Customer</label>
-                    <select asp-for="CustomerId" class="form-control" id="CustomerId">
-                        <option value="">All</option>
-                        @foreach (var customer in Model.Customers)
-                        {
-                            <option value="@customer.Id">@customer.Name</option>
-                        }
+<form method="get">
+    <div class="container">
+    <div class="row">
+        <div class="col- col-md-2"> 
+                <label asp-for="CustomerId">Select Customer</label>
+                <select asp-for="CustomerId" class="form-control" id="CustomerId">
+                    <option value="">All</option>
+                    @foreach (var customer in Model.Customers)
+                    {
+                        <option value="@customer.Id">@customer.Name</option>
+                    }
 
-                    </select>
-                </div>
-            </td>
-            <td>
-                <div class="form-group col-md-5">
-                    <label class="control-label">Select Supplier</label>
-                    <select class="form-control" id="Supplier" name="Supplier" asp-items="@(new SelectList(string.Empty, "SupplierId", "SupplierName"))"></select>
-
-                </div>
-            </td>
-
-        </tr>
-        <tr>
-            <td>
-                 <button type="submit" class="btn btn-primary mt-3">Submit</button>
-            </td>
-           
-        </tr>
-    </table>
+                </select>                                      
+        </div>
+        <div class="col-">           
+                 <label class="control-label">Select Supplier</label>
+                 <select class="form-control" id="Supplier" name="Supplier" asp-items="@(new SelectList(string.Empty, "SupplierId", "SupplierName"))"></select>                 
+        </div>
+    </div>
+    <div class="row">    
+        <button type="submit" class="btn btn-primary mt-3"> Submit </button>  
+    </div>
+    
 </div>
-    <table id="products">
-        <tr>
-            @if (Model.ProductList != null)
-            {
-                <partial name="_CustomerOrdersLIstBySuplier" model="@Model.ProductList"></partial>
-            }
-
-        </tr>
+</form>
+<table id="products">
+    <tr>
+        @if (Model.ProductList != null)
+        {
+            <partial name="_CustomerOrdersLIstBySuplier" model="@Model.ProductList"></partial>
+        }
+    </tr>
     </table>
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
-<script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.css" rel="stylesheet">
 
-<script type="text/javascript">
-    $(document).ready(function() {
-        //Dropdownlist Selectedchange event
-        $("#CustomerId").change(function() {
-            $("#Supplier option").remove();
-            var customerId = $('#CustomerId option:selected').val();
-            $.ajax({
-                type: 'GET',
-                url: '@Url.Action("GetSupplier")', // we are calling json method
-                dataType: 'json',
-                data: { id: customerId },
-                success: function(selectedSuppliers) {
-                    // customers contains the JSON formatted list
-                    // of states passed from the controller
-                    
-                    $("#Supplier").append('<option value="' + "0" + '">' + "Select Supplier" + '</option>');
-                      debugger;
-                    for (var i = 0; i < selectedSuppliers.length; i++) {
-                         $("#Supplier").append('<option value="' + selectedSuppliers[i].supplierId + '">' +selectedSuppliers[i].supplierName + '</option>');
-                    }
+    <script type="text/javascript">
+        $(document).ready(function() {
+            //Dropdownlist Selectedchange event
+            $("#CustomerId").change(function() {
+                $("#Supplier option").remove();
+                var customerId = $('#CustomerId option:selected').val();
+                $.ajax({
+                    type: 'GET',
+                    url: '@Url.Action("GetSupplier")', // we are calling json method
+                    dataType: 'json',
+                    data: { id: customerId },
+                    success: function(selectedSuppliers) {
+                        // customers contains the JSON formatted list
+                        // of suppliers passed from the controller
 
-                    debugger;
-                    //$.each(selectedSuppliers, function(i, supplier) {
-                    //    $("#Supplier").append('<option value="' + supplier.SupplirId + '">' + supplier.SupplierName + '</option>');
-                    //    // here we are adding option for States
-                    //});
-                   
-                },
-                error: function(ex) {
-                    alert('Failed to retrieve supplier.' + ex);
-                }
-            });
-            return false;
-        })
-    });
-
-</script>
-
-<script type="text/javascript">
-    window.onload = function() { rebindSupplier() };
-</script>
-
-
-<script type="text/javascript">
-
-    function rebindSupplier() {
-        debugger;
-        if (@ViewData["SelectedSupplier"] != 0) {
-            $("#CustomerId").val(@Model.CustomerId);
-         
-            $.ajax({
-                type: 'POST',
-                url: '@Url.Action("GetSupplier")',
-                dataType: 'json',
-                data: {
-                    id: $("#CustomerId").val()
-                },
-                success: function(selectedSuppliers) {
-
-                    $.each(selectedSuppliers, function(i, supplier)
-                    {
-                        $("#Supplier").append('<option value="' + supplier.SupplirId + '">' + supplier.SupplierName + '</option>');
-                        
-                       // var valSupplier = @ViewData["SelectedSupplier"];
-                       // console.log(row);
-                       //for (var i = 0; i < selectedSuppliers.length; i++) {
-                       //  $("#Supplier").append('<option value="' + selectedSuppliers[i].supplierId + '">' + selectedSuppliers[i].supplierName + '</option>');
-                    //}
-                           
-                        console.log(Supplier);
-                        if (@ViewData["SelectedSupplier"] != 0) {
-                            $("#Supplier").val(@ViewData["SelectedSupplier"]);
+                        $("#Supplier").append('<option value="' + "0" + '">' + "Select Supplier" + '</option>');
+                        debugger;
+                        for (var i = 0; i < selectedSuppliers.length; i++) {
+                            $("#Supplier").append('<option value="' + selectedSuppliers[i].supplierId + '">' + selectedSuppliers[i].supplierName + '</option>');
                         }
-                         $("#products").html();
 
-                    });
-                },
-                error: function(ex) {
-                    alert('Failed to retrieve supplier.' + ex);
-                }
-            });
+                        debugger;
+                        //$.each(selectedSuppliers, function(i, supplier) {
+                        //    $("#Supplier").append('<option value="' + supplier.SupplirId + '">' + supplier.SupplierName + '</option>');
+                        //    // here we are adding option for Supplier
+                        //});
+
+                    },
+                    error: function(ex) {
+                        alert('Failed to retrieve supplier.' + ex);
+                    }
+                });
+                return false;
+            })
+        });
+
+    </script>
+
+    <script type="text/javascript">
+        window.onload = function() { rebindSupplier() };
+    </script>
+
+
+    <script type="text/javascript">
+
+        function rebindSupplier() {
+            debugger;
+            if (@ViewData["SelectedSupplier"] != 0) {
+                $("#CustomerId").val(@Model.CustomerId);
+
+                $.ajax({
+                    type: 'POST',
+                    url: '@Url.Action("GetSupplier")',
+                    dataType: 'json',
+                    data: {
+                        id: $("#CustomerId").val()
+                    },
+                    success: function(selectedSuppliers) {
+
+                        $.each(selectedSuppliers, function(i, supplier) {
+                            // $("#Supplier").append('<option value="' + supplier.SupplirId + '">' + supplier.SupplierName + '</option>');
+
+                            // var valSupplier = @ViewData["SelectedSupplier"];
+                            // console.log(row);
+                            for (var i = 0; i < selectedSuppliers.length; i++)
+                            {
+                                $("#Supplier").append('<option value="' + selectedSuppliers[i].supplierId + '">' + selectedSuppliers[i].supplierName + '</option>');
+                            };
+
+                            console.log(Supplier);
+                            if (@ViewData["SelectedSupplier"] != 0) {
+                                $("#Supplier").val(@ViewData["SelectedSupplier"]);
+                            }
+
+
+                        });
+                    },
+                    error: function(ex) {
+                        alert('Failed to retrieve supplier.' + ex);
+                    }
+                });
+            }
+
+
         }
-
-
-    }
-</script>   
+    </script>
 

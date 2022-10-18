@@ -33,5 +33,6 @@ namespace SSMO.Data.Models
 
         public string PhoneNumber { get; set; }
         public ICollection<CustomerOrder> Orders { get; set; }
+        public ICollection<Document> Invoices { get; set; }
     }
 }

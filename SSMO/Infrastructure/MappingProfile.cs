@@ -6,6 +6,7 @@ using SSMO.Models.Customers;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
+using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Services.Documents.Invoice;
 using SSMO.Services.Documents.Purchase;
 using SSMO.Services.Products;
@@ -43,6 +44,8 @@ namespace SSMO.Infrastructure
                   .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.OrderedQuantity))
                 .ForMember(a => a.Price, b => b.MapFrom(a => a.Price)); ;
             this.CreateMap<Document, InvoicePrintViewModel>();
+
+            this.CreateMap<Document, CustomerOrderPaymentDetailsModel>();
         }
     }
 }

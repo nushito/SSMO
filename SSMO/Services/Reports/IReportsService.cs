@@ -1,5 +1,6 @@
 ﻿using SSMO.Models.Products;
 using SSMO.Models.Reports.CustomerOrderReportForEdit;
+using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
 using System;
 using System.Collections.Generic;
@@ -22,6 +23,8 @@ namespace SSMO.Services.Reports
                List<ProductCustomerFormModel> products);
         public IEnumerable<CustomerOrderListViewBySupplier> GetCustomerOrdersBySupplier(int customerId, string supplierId);
 
+        public IEnumerable<CustomerOrderPaymentDetailsModel> CustomersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage);
+        
         public CustomerOrderForEdit CustomerOrderDetailsForEdit(int id);
 
     }

@@ -23,7 +23,7 @@ namespace SSMO.Models.SupplierOrders
         public IEnumerable<AllSuppliers> Suppliers { get; set; }
         public int CustomerOrderId { get; set; }
         public int CustomerOrderNumber { get; set; }
-      
+        public string FscClaim { get; set; }
         public IEnumerable<int> CustomerOrders { get; set; }
         public int MyCompanyId { get; set; }
         public string MyCompanyName { get; set; }
@@ -31,7 +31,6 @@ namespace SSMO.Models.SupplierOrders
         public int StatusId { get; set; }
         public StatusModel Status { get; set; }
         public IEnumerable<StatusModel> Statuses { get; set; }
-        public string FscClaim { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public IEnumerable<GetCurrencyModel> Currencies { get; set; }
@@ -52,10 +51,9 @@ namespace SSMO.Models.SupplierOrders
         public decimal PaidAvance { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal Balance { get; set; }
-        public string DatePaidAmount { get; set; }
+        public DateTime DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
         public int? VAT { get; set; }
-
         public IList<ProductCustomerFormModel> Products { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal TotalQuantity { get; set; }
