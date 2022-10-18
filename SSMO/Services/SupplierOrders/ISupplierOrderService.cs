@@ -12,7 +12,8 @@ namespace SSMO.Services.SupplierOrders
                 DateTime Date,
                 string number,
                int customerOrderNumber ,
-                int statusId, int currencyId, int vat );
+                int statusId, int currencyId, string fscClaim, int vat,
+                DateTime datePaidAmount, decimal paidAvance,  bool paidStatus );
         void TotalAmountAndQuantitySum(int supplierOrderId);
 
         public IEnumerable<string> GetSuppliers();

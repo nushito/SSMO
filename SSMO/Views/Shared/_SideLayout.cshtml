@@ -17,7 +17,7 @@
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateProforma">Packing list</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateOrder">Debit Note</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateCreditNote">Credit Note</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="AddPurchase">Add Purchase</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="AddPurchase">Purchase</a>
                             </div>
                         </div>
                     </li>
@@ -71,12 +71,10 @@
                         </a>
                     </li>
 
-                   
-
                     <!-- Heading -->
                     <div class="sidebar-heading text-capitalize">
                         <br />
-                        Reports
+                        <h2>Reports</h2>
                         <br />
                     </div>
                      <li>
@@ -86,10 +84,10 @@
                                Payment Reports
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="">Invoice</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="">Purchase</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="">Customer Order</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="">Supplier Order</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="InvoicePaymentReport">Invoice</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="PurchasePaymentReport">Purchase</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="CustomerOrderPaymentReport">Customer Order</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="SupplierOrderPaymentReport">Supplier Order</a>
                             </div>
                         </div>
                     </li>

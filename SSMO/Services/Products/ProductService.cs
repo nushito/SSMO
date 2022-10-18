@@ -35,15 +35,12 @@ namespace SSMO.Services.Products
                 Size = size,
                 FSCClaim = model.FSCClaim,
                 FSCSertificate = model.FSCSertificate,
-
                 Price = model.Price,
                 Pallets = model.Pallets,
                 SheetsPerPallet = model.SheetsPerPallet,
                 CustomerOrderId = customerorderId,
 
             };
-
-
 
             var dimensionArray = size.Name.Split('/').ToArray();
             var countArray = dimensionArray.Count();
@@ -58,8 +55,10 @@ namespace SSMO.Services.Products
             product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
             product.Amount = Math.Round(product.Price * product.OrderedQuantity, 4);
             _dbContext.Products.Add(product);
+            _dbContext.SaveChanges();
+
             var order = _dbContext.CustomerOrders.Where(a => a.Id == customerorderId).FirstOrDefault();
-            order.Products.ToList().Add(product);
+            order.Products.Add(product);
 
             order.Amount += product.Amount;
             _dbContext.SaveChanges();
@@ -256,6 +255,12 @@ namespace SSMO.Services.Products
 
             return products;
 
+        }
+
+        public ICollection<string> GetFascCertMyCompany()
+        {
+            var fscCert = _dbContext.MyCompanies.Select(f => f.FSCSertificate).ToList();
+            return fscCert;
         }
     }
 }

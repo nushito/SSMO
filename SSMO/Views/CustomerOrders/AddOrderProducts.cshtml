@@ -5,6 +5,7 @@
 @{
 
     var count = int.Parse(TempData["Count"].ToString());
+    var fscCert = service.GetFascCertMyCompany();
 }
 
 
@@ -66,19 +67,22 @@
                         </td>
 
                         <td class="col-sm-1">
-                            <div class="editor-field">
-                                @* <select name="FSCClaim[0]" id="FSCClaim" asp-for="@Model.FSCClaim">
-
-                            <option value="">-</option>*@
-
-
+                            <div class="editor-field">                              
                                 <input asp-for="@Model[i].FSCClaim" class="text-box single-line" value="" required="required">
                             </div>
                         </td>
 
                         <td class="col-sm-1">
                             <div class="editor-field">
-                                <input asp-for="@Model[i].FSCSertificate" class="text-box single-line" value="" required="required">
+                                 <select asp-for="@Model[i].FSCSertificate">
+                                    <option value="">-</option>
+                                    @foreach (var cert in fscCert)
+                                    {
+                                        <option value="@cert">@cert</option>
+                                    }
+                                </select>
+
+                               @* <input asp-for="@Model[i].FSCSertificate" class="text-box single-line" value="" required="required">*@
                             </div>
                         </td>
 
@@ -90,7 +94,6 @@
                         </td>
                         <td class="col-sm-1">
                             <div class="editor-field">
-
                                 <input asp-for="@Model[i].SheetsPerPallet" class="text-box single-line" value="" required="required">
                             </div>
                         </td>

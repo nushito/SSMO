@@ -12,9 +12,9 @@ namespace SSMO.Models.Documents.Purchase
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
         public string SupplierOrderNumber { get; set; }
-
         public int SupplierOrderId { get; set; }
-
+        public string FSCClaim { get; set; }
+        public string FSCSertificate { get; set; }
         public decimal PaidAvance { get; set; }
         public decimal Balance { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
@@ -23,13 +23,12 @@ namespace SSMO.Models.Documents.Purchase
         public decimal Amount { get; set; }
         public decimal NetWeight { get; set; }
         public decimal GrossWeight { get; set; }
-
         public decimal Duty { get; set; }
         public decimal CustomsExpenses { get; set; }
         public decimal Factoring { get; set; }
         public decimal FiscalAgentExpenses { get; set; }
-
-
+        public string TruckNumber { get; set; }
+        public int Vat { get; set; }
         public decimal ProcentComission { get; set; }
         public decimal OtherExpenses { get; set; }
 

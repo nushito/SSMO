@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSMO.Data;
 
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221011055217_ServiceOrderUpdate")]
+    partial class ServiceOrderUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -472,9 +474,6 @@ namespace SSMO.Data.Migrations
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
 
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("int");
-
                     b.Property<int>("CustomerOrderId")
                         .HasColumnType("int");
 
@@ -564,8 +563,6 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
 
                     b.HasIndex("CustomerOrderId");
 
@@ -1086,10 +1083,6 @@ namespace SSMO.Data.Migrations
 
             modelBuilder.Entity("SSMO.Data.Models.Document", b =>
                 {
-                    b.HasOne("SSMO.Data.Models.Customer", null)
-                        .WithMany("Invoices")
-                        .HasForeignKey("CustomerId");
-
                     b.HasOne("SSMO.Data.Models.CustomerOrder", "CustomerOrder")
                         .WithMany("Documents")
                         .HasForeignKey("CustomerOrderId")
@@ -1276,8 +1269,6 @@ namespace SSMO.Data.Migrations
 
             modelBuilder.Entity("SSMO.Data.Models.Customer", b =>
                 {
-                    b.Navigation("Invoices");
-
                     b.Navigation("Orders");
                 });
 

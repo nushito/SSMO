@@ -26,8 +26,9 @@ namespace SSMO.Services.Products
             string description, string grade,
             string size, string fscClaim, string fscCertificate,
             int pallets, int sheetsPerPallet, decimal purchasePrice);
-
         public ICollection<ProductCustomerFormModel> DetailsPerCustomerOrder(int id);
 
+        public ICollection<string> GetFascCertMyCompany();
+        
     }
 }

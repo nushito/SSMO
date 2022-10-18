@@ -12,6 +12,6 @@ namespace SSMO.Services.Documents.Purchase
             string supplierOrderNumber, string number, DateTime date,
            bool paidStatus, decimal netWeight, decimal brutoWeight,
             decimal duty, decimal factoring, decimal customsExpenses, decimal fiscalAgentExpenses,
-            decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses);
+            decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses, int vat, string truckNumber);
     }
 }

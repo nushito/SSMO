@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.Purchase;
 using SSMO.Services.CustomerOrderService;
@@ -54,6 +55,7 @@ namespace SSMO.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public IActionResult PurchaseDetails(string supplierOrderNumber, PurchaseDetailsFormModel model)
         {
@@ -77,14 +79,14 @@ namespace SSMO.Controllers
                 supplierOrderNumber, model.Number, model.Date,
                 model.PaidStatus, model.NetWeight,
                 model.GrossWeight, model.Duty, model.Factoring,model.CustomsExpenses, model.FiscalAgentExpenses,
-                model.ProcentComission, model.PurchaseTransportCost, model.BankExpenses, model.OtherExpenses);
+                model.ProcentComission, model.PurchaseTransportCost, model.BankExpenses, model.OtherExpenses, model.Vat, model.TruckNumber);
 
             if (!purchase)
             {
                 return View();
             }
 
-            return View("Home");
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpGet]
@@ -102,32 +104,27 @@ namespace SSMO.Controllers
 
             };
 
-
             return View(collectionCustomerOrders);
         }
 
         [HttpPost]
+        [Authorize]
         public IActionResult CustomerOrderToInvoice(CustomerOrderNumbersListView model)
         {
             model.OrderConfirmationNumberList = customerOrderService.AllCustomerOrderNumbers();
             model.MyCompanyNames = mycompanyService.GetCompany();
-
-            //if (!ModelState.IsValid)
-            //{
-            //     new CustomerOrderNumbersListView
-            //    {
-            //        OrderConfirmationNumberList = customerOrdersList,
-            //        MyCompanyNames = companiesNames
-
-            //    };
-            //}
-
             ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
-            //if (!ViewBag.CheckInvoice)
-            //{
-            //    model.Number = 0;
 
-            //}
+            if (!ModelState.IsValid)
+            {
+                new CustomerOrderNumbersListView
+                {
+                    OrderConfirmationNumberList = customerOrderService.AllCustomerOrderNumbers(),
+                MyCompanyNames = mycompanyService.GetCompany()
+
+                 };
+                ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
+            }
 
             return RedirectToAction("CreateInvoice",
                 new
@@ -136,13 +133,15 @@ namespace SSMO.Controllers
                     date = model.Date,
                     currencyExchangeRateUsdToBGN = model.CurrencyExchangeRateUsdToBGN,
                     number = model.Number,
-                    mycompanyname = model.MyCompanyName
+                    mycompanyname = model.MyCompanyName,
+                    truckNumber = model.TruckNumber
                 });
         }
 
-        public IActionResult CreateInvoice(int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int number, string mycompanyname)
+        public IActionResult CreateInvoice(
+            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int number, string mycompanyname, string truckNumber)
         {
-            var invoiceForPrint = invoiceService.CreateInvoice(orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname);    
+            var invoiceForPrint = invoiceService.CreateInvoice(orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname,truckNumber);    
 
             return View(invoiceForPrint);
         }
