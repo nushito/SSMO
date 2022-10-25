@@ -34,6 +34,9 @@ namespace SSMO.Models.SupplierOrders
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public IEnumerable<GetCurrencyModel> Currencies { get; set; }
+        public string LoadingAddress { get; set; }
+        public string DeliveryAddress { get; set; }
+
         [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
         public decimal TotalAmount {

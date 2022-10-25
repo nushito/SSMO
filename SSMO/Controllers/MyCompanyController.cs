@@ -36,6 +36,11 @@ namespace SSMO.Controllers
         [HttpPost]
         public IActionResult Register(MyCompanyFormModel model)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View();

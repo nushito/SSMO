@@ -52,13 +52,15 @@ namespace SSMO.Controllers
         }
 
 
-
-
-
         [HttpGet]
         [Authorize]
         public IActionResult AddCustomerOrder()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (customerOrderService.AnyCustomerOrderExist())
             {
                 ViewBag.NumberExist = 1;
@@ -164,8 +166,6 @@ namespace SSMO.Controllers
                 products.Add(product);
             }
 
-
-
             return View(products);
         }
 
@@ -201,9 +201,7 @@ namespace SSMO.Controllers
 
             foreach (var item in model)
             {
-
                 productService.CreateProduct(item, customerorderId);
-
             }
 
             customerOrderService.CustomerOrderCounting(customerorderId);
@@ -214,7 +212,6 @@ namespace SSMO.Controllers
 
         public IActionResult PrintCustomerOrder()
         {
-
             return RedirectToAction("Index", "Home");
         }
 

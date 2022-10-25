@@ -24,7 +24,7 @@ namespace SSMO.Services.SupplierOrders
 
         public int CreateSupplierOrder(int myCompanyId, int supplierId, DateTime Date, 
             string number, int customerOrderNumber, int statusId, int currencyId, string fscClaim, int vat,
-            DateTime datePaidAmount, decimal paidAvance, bool paidStatus)
+            DateTime datePaidAmount, decimal paidAvance, bool paidStatus,string loadingAddress, string deliveryAddress)
         {
             var customerOrder = dbContext.CustomerOrders
                 .Where(a => a.OrderConfirmationNumber == customerOrderNumber)
@@ -46,7 +46,9 @@ namespace SSMO.Services.SupplierOrders
                 FSCClaim = fscClaim,
                 Products = new List<Product>(),
                 PaidAvance = paidAvance,               
-                PaidStatus = paidStatus
+                PaidStatus = paidStatus,
+                LoadingAddress = loadingAddress,
+                DeliveryAddress = deliveryAddress
             };
 
            if(datePaidAmount.ToString() != null)

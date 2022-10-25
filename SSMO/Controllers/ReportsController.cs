@@ -110,6 +110,10 @@ namespace SSMO.Controllers
         {
             if (!User.Identity.IsAuthenticated)
             {
+                return RedirectToAction("Index", "Home");
+            }
+            if (!User.Identity.IsAuthenticated)
+            {
                 return BadRequest();
             }
 
@@ -169,6 +173,10 @@ namespace SSMO.Controllers
         [Authorize]
         public IActionResult CustomerOrdersBySupplier(string supplierId, CustomerBySupplierOrdersViewModel model)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             var customersList = customerService.GetCustomerNamesAndId();
             if (!ModelState.IsValid)
             {

@@ -31,6 +31,11 @@ namespace SSMO.Controllers
           AddSupplierModel model
             )
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View();

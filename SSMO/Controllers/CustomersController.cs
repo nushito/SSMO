@@ -30,7 +30,7 @@ namespace SSMO.Controllers
         {
             if (!User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Home");
+                return RedirectToAction("Index", "Home");
             }
 
             var customer = new Customer

@@ -48,6 +48,10 @@ namespace SSMO.Controllers
         [HttpGet]
         public IActionResult PurchaseDetails(string supplierOrderNumber)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View(new PurchaseDetailsFormModel
             {
                 SupplierOrderNumber = supplierOrderNumber
@@ -59,7 +63,12 @@ namespace SSMO.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult PurchaseDetails(string supplierOrderNumber, PurchaseDetailsFormModel model)
         {
-            if(!ModelState.IsValid)
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (!ModelState.IsValid)
             {
                 return View();
             }
@@ -92,6 +101,10 @@ namespace SSMO.Controllers
         [HttpGet]
         public IActionResult CustomerOrderToInvoice()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             var customerOrdersList = customerOrderService.AllCustomerOrderNumbers();
             ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
 
@@ -111,6 +124,11 @@ namespace SSMO.Controllers
         [Authorize]
         public IActionResult CustomerOrderToInvoice(CustomerOrderNumbersListView model)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             model.OrderConfirmationNumberList = customerOrderService.AllCustomerOrderNumbers();
             model.MyCompanyNames = mycompanyService.GetCompany();
             ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
@@ -141,6 +159,11 @@ namespace SSMO.Controllers
         public IActionResult CreateInvoice(
             int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int number, string mycompanyname, string truckNumber)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             var invoiceForPrint = invoiceService.CreateInvoice(orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname,truckNumber);    
 
             return View(invoiceForPrint);

@@ -3,7 +3,9 @@ using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
 using SSMO.Models.Documents.Invoice;
+using SSMO.Services.Products;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SSMO.Services.Documents.Invoice
@@ -12,23 +14,23 @@ namespace SSMO.Services.Documents.Invoice
     {
         private readonly ApplicationDbContext dbContext;
         private readonly IMapper mapper;
+        private readonly IProductService productService;
 
-        public InvoiceService(ApplicationDbContext dbContext, IMapper mapper)
+        public InvoiceService(ApplicationDbContext dbContext, IMapper mapper, IProductService productSevice)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
+            this.productService = productSevice;
         }
 
         public bool CheckFirstInvoice()
         {
-
             var invoiceCheck = dbContext.Documents.Where(a => a.DocumentType == Data.Enums.DocumentTypes.Invoice).Any();
             if (!invoiceCheck)
             {
                 return false;
             }
             return true;
-
         }
 
         public InvoicePrintViewModel CreateInvoice(
@@ -39,6 +41,9 @@ namespace SSMO.Services.Documents.Invoice
 
             var supplierOdrerForThisInvoiceId = dbContext.SupplierOrders.Where(c => c.CustomerOrderId == customerOrder.Id)
                 .Select(i=>i.Id).FirstOrDefault();
+            
+            var productList = dbContext.Products.
+                Where(co=>co.CustomerOrderId == customerOrder.Id).ToList();
 
             if (customerOrder == null)
             {
@@ -56,9 +61,10 @@ namespace SSMO.Services.Documents.Invoice
                 CustomerOrderId = customerOrder.Id,
                 Date = date,
                 PaidStatus = customerOrder.PaidAmountStatus,
-                Products = (System.Collections.Generic.ICollection<Product>)customerOrder.Products,
+                Products = productList,
                 SupplierOrderId = supplierOdrerForThisInvoiceId,
-                TruckNumber = truckNumber
+                TruckNumber = truckNumber,
+                Incoterms = customerOrder.DeliveryTerms
              };
 
             if (CheckFirstInvoice())
@@ -79,8 +85,6 @@ namespace SSMO.Services.Documents.Invoice
             var customerId = dbContext.CustomerOrders.Where(i => i.Id == customerOrder.Id)
                 .Select(c => c.CustomerId).FirstOrDefault();
 
-            // var customer = .FirstOrDefault();
-
             var customerDetails = dbContext.Customers.Where(i => i.Id == customerId).Select(a => new CustomerForInvoicePrint
             {
                 Name = a.Name,
@@ -93,16 +97,13 @@ namespace SSMO.Services.Documents.Invoice
                     Country = a.ClientAddress.Country,
                     Street = a.ClientAddress.Street
                 }
-
-
             }).FirstOrDefault();
 
             invoiceForPrint.Customer = customerDetails;
+            invoiceForPrint.OrderConfirmationNumber = orderConfirmationNumber;
 
             var myCompany = dbContext.MyCompanies.Where(n => n.Name.ToLower() == myCompanyName.ToLower()).FirstOrDefault();
-
             var addressCompany = dbContext.Addresses.Where(co=>co.Id == myCompany.AddressId).FirstOrDefault();
-
             invoiceForPrint.Seller = new MyCompanyForInvoicePrint
             {
                 Name = myCompany.Name,
@@ -115,7 +116,16 @@ namespace SSMO.Services.Documents.Invoice
                 RepresentativePerson = myCompany.RepresentativePerson,
                 VAT = myCompany.VAT
             };
+            invoiceForPrint.Products = this.mapper.Map<ICollection<ProductsForInvoiceModel>>(productList);
 
+            foreach (var product in invoiceForPrint.Products)
+            {
+                product.Description = productService.GetDescriptionName(product.DescriptionId);
+                product.Grade = productService.GetGradeName(product.GradeId);
+                product.Size = productService.GetSizeName(product.SizeId);
+            }
+
+            invoiceForPrint.VatAmount = customerOrder.Amount * customerOrder.Vat / 100??0;
 
             dbContext.Documents.Add(invoiceCreate);
             dbContext.SaveChanges();

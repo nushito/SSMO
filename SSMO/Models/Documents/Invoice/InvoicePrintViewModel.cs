@@ -33,9 +33,9 @@ namespace SSMO.Models.Documents.Invoice
         public bool PaidStatus { get; set; }
         public decimal CurrencyExchangeRateUsdToBGN { get; set; }
       //  public ServiceOrder ServiceOrder { get; set; }
-
         public decimal Amount { get; set; }
         public int? VAT { get; set; }
+        public decimal VatAmount { get; set; }
         public decimal TotalAmount { get; set; }
         public IEnumerable<ProductsForInvoiceModel> Products { get; set; }
     }

@@ -52,10 +52,10 @@
            asp-route-customerName="@Model.CustomerName">>></a>
     </div>
 </div>
-<table class="table">
+<table class="table">   
     <thead>
         <tr>
-            <th">
+                <th>
                 Invoice Number
                 </th>
                 <th>
@@ -92,7 +92,7 @@
             <th> @order.PaidAdvance</th>
             <th> @order.DatePaidAmount</th>
             <th> @order.Balance</th>
-            <a asp-controller="Reports" asp-action="InvoicePaymentEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
+           <th><a asp-controller="Reports" asp-action="InvoicePaymentEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a></th> 
         </tr>
         }
     </tbody>
