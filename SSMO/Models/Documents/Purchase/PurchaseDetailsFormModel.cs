@@ -31,7 +31,6 @@ namespace SSMO.Models.Documents.Purchase
         public int Vat { get; set; }
         public decimal ProcentComission { get; set; }
         public decimal OtherExpenses { get; set; }
-
         public decimal PurchaseTransportCost { get; set; }
         public decimal BankExpenses { get; set; }
        

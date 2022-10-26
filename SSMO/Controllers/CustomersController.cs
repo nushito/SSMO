@@ -8,7 +8,7 @@ using SSMO.Models.Customers;
 
 namespace SSMO.Controllers
 {
-    public class CustomersController: Controller
+    public class CustomersController : Controller
     {
         private readonly ApplicationDbContext dbContext;
 
@@ -35,25 +35,25 @@ namespace SSMO.Controllers
 
             var customer = new Customer
             {
-              ClientAddress = new Address 
-              {
-                  Country = model.Country,
-                  City = model.City,
-                  Street = model.Street
-              } ,
-               Email = model.Email,
-               Name = model.Name,
-              VAT = model.VAT,
-              EIK = model.EIK,
-              RepresentativePerson = model.RepresentativePerson,
-              
-             // PhoneNumber = model
+                ClientAddress = new Address
+                {
+                    Country = model.Country,
+                    City = model.City,
+                    Street = model.Street
+                },
+                Email = model.Email,
+                Name = model.Name,
+                VAT = model.VAT,
+                EIK = model.EIK,
+                RepresentativePerson = model.RepresentativePerson,
+
+                // PhoneNumber = model
             };
 
             this.dbContext.Customers.Add(customer);
             this.dbContext.SaveChanges();
 
-            return RedirectToAction("Index","Home");
+            return RedirectToAction("Index", "Home");
         }
 
 

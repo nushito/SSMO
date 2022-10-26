@@ -8,8 +8,7 @@
 }
 
  <form enctype="multipart/form-data" method="post" >
-
-    
+         
         @if(checkNumber == 0)
         {
               <div class="row col-md-4">
@@ -18,9 +17,8 @@
         <span asp-validation-for="OrderConfirmationNumber" class="small text-danger"></span>
     </div>
         }
-    
-   
-      <div class="row col-md-4">
+       
+     <div class="row col-md-4">
         <label asp-for="CustomerPoNumber"></label>
         <input asp-for="CustomerPoNumber" class="form-control"/>
         <span asp-validation-for="CustomerPoNumber" class="small text-danger"></span>
@@ -37,13 +35,12 @@
     </div>
     <div class="form-group row col-md-4">
         <label asp-for="LoadingPlace"></label>
-        <input id="loadingplace" asp-for="LoadingPlace" type="text" class="form-control" placeholder="Loading place" />
-       
+        <input id="loadingplace" asp-for="LoadingPlace" type="text" class="form-control" placeholder="Loading place" />       
     </div>
-        <div class="form-group row col-md-4">
+
+    <div class="form-group row col-md-4">
         <label asp-for="DeliveryAddress"></label>
-        <input id="deliveryaddress" asp-for="DeliveryAddress" type="text" class="form-control" placeholder="Delivery address" />
-       
+        <input id="deliveryaddress" asp-for="DeliveryAddress" type="text" class="form-control" placeholder="Delivery address" />       
     </div>
 
     <div class="form-group col-md-4">
@@ -55,8 +52,8 @@
             }   
 
         </select>
-
     </div>
+
     <div class="row" id="customer-row">
         <div class="form-group col-md-4">
             <div class="form-group">

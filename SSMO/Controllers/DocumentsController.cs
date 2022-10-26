@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SSMO.Infrastructure;
 using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.Purchase;
 using SSMO.Services.CustomerOrderService;
@@ -63,6 +64,13 @@ namespace SSMO.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult PurchaseDetails(string supplierOrderNumber, PurchaseDetailsFormModel model)
         {
+            string userId = this.User.UserId();
+            string userIdMyCompany = mycompanyService.GetUserIdMyCompanyBySupplierOrdreNum(supplierOrderNumber);
+            if (userIdMyCompany != userId)
+            {
+                return BadRequest();
+            }
+
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
@@ -159,6 +167,13 @@ namespace SSMO.Controllers
         public IActionResult CreateInvoice(
             int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int number, string mycompanyname, string truckNumber)
         {
+            string userId = this.User.UserId();
+            string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(mycompanyname);
+
+            if (userIdMyCompany != userId)
+            {
+                return BadRequest();
+            }
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");

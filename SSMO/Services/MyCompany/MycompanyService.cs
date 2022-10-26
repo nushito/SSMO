@@ -1,4 +1,4 @@
-﻿
+﻿using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
@@ -12,13 +12,13 @@ namespace SSMO.Services.MyCompany
     {
         private readonly ApplicationDbContext dbContext;
         private readonly IMapper mapper;
+       
+        public MycompanyService(ApplicationDbContext dbContext, IMapper mapper)
 
-        public MycompanyService(ApplicationDbContext dbContext, IMapper mapper
-            )
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
-        }
+         }
 
         public ICollection<MyCompanyFormModel> GetAllCompanies()
         {
@@ -36,6 +36,34 @@ namespace SSMO.Services.MyCompany
                     .ToList();
          }
 
-        
+        public string GetUserIdMyCompanyByName(string name)
+        {
+            var userId = dbContext.MyCompanies
+                    .Where(x => x.Name.ToLower() == name.ToLower())
+                    .Select(id=>id.UserId)
+                    .FirstOrDefault();
+            return userId;
+        }
+        public string GetUserIdMyCompanyById(int id)
+        {
+            var userId = dbContext.MyCompanies
+                    .Where(x =>x.Id == id)
+                    .Select(id => id.UserId)
+                    .FirstOrDefault();
+            return userId;
+        }
+
+        public string GetUserIdMyCompanyBySupplierOrdreNum(string supplierOrder)
+        {
+            var myCompanyId = dbContext.SupplierOrders
+                   .Where(x => x.Number.ToLower() == supplierOrder.ToLower())
+                   .Select(id => id.MyCompanyId)
+                   .FirstOrDefault();
+
+            return dbContext.MyCompanies
+                    .Where(x => x.Id == myCompanyId)
+                    .Select(id => id.UserId)
+                    .FirstOrDefault();
+        }
     }
 }

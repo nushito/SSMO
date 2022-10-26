@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Data;
+using SSMO.Infrastructure;
 using SSMO.Models.Products;
 using SSMO.Models.SupplierOrders;
 using SSMO.Services;
@@ -71,6 +72,14 @@ namespace SSMO.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddSupplierConfirmation(SupplierOrderFormModel model)
         {
+            string userId = this.User.UserId();
+            string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(model.MyCompanyId);
+
+            if (userIdMyCompany != userId)
+            {
+                return BadRequest();
+            }
+
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");

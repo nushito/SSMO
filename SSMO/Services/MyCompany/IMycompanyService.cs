@@ -10,6 +10,8 @@ namespace SSMO.Services.MyCompany
     {
       public ICollection<string> GetCompany();
         public ICollection<MyCompanyFormModel> GetAllCompanies();
-     
+        public string GetUserIdMyCompanyByName(string name);
+        public string GetUserIdMyCompanyById(int id); 
+        public string GetUserIdMyCompanyBySupplierOrdreNum(string supplierOrder);
     }
 }

@@ -8,6 +8,7 @@ using SSMO.Models.MyCompany;
 using SSMO.Services;
 using SSMO.Services.MyCompany;
 using SSMO.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace SSMO.Controllers
 {
@@ -92,6 +93,13 @@ namespace SSMO.Controllers
                 bankmodel.CompanyNames = this.mycompany.GetCompany();
             }
                 
+            var userCompanyId = mycompany.GetUserIdMyCompanyByName(bankmodel.CompanyName);
+            string userId = this.User.UserId();
+
+            if (userCompanyId != userId)
+            {
+                return BadRequest();
+            }
 
                 if (mycompany.GetCompany() == null)
             {

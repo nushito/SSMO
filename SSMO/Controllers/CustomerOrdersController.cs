@@ -18,6 +18,7 @@ using SSMO.Services.Status;
 using System.IO;
 using iTextSharp.text.pdf;
 using iTextSharp.text;
+using SSMO.Infrastructure;
 
 namespace SSMO.Controllers
 {
@@ -86,6 +87,14 @@ namespace SSMO.Controllers
         public IActionResult AddCustomerOrder(CustomerOrderViewModel customermodel)
 
         {
+            string userId = this.User.UserId();
+            string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(customermodel.CustomerId);
+
+            if (userIdMyCompany != userId)
+            {
+                return BadRequest();
+            }
+
             if (!ModelState.IsValid)
             {
                 new CustomerOrderViewModel

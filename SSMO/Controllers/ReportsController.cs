@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using SSMO.Models.CustomerOrders;
+using SSMO.Infrastructure;
 using SSMO.Models.Products;
 using SSMO.Models.Reports;
 using SSMO.Models.Reports.CustomerOrderReportForEdit;
@@ -51,6 +50,13 @@ namespace SSMO.Controllers
         public IActionResult AllCustomerOrders(CustomerOrderReportAll model)
         {
             //TODO When All are selected page is empty
+            string userId = this.User.UserId();
+            string userIdMyCompany = myCompanyService.GetUserIdMyCompanyByName(model.CustomerName);
+
+            if (userIdMyCompany != userId)
+            {
+                return BadRequest();
+            }
 
             var customerNames = customerService.GetCustomerNames();
 
@@ -108,9 +114,12 @@ namespace SSMO.Controllers
         [Authorize]
         public IActionResult CustomerOrderEdit(int id, CustomerOrderForEdit model)
         {
-            if (!User.Identity.IsAuthenticated)
+            string userId = this.User.UserId();
+            string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(model.MyCompanyId);
+
+            if (userIdMyCompany != userId)
             {
-                return RedirectToAction("Index", "Home");
+                return BadRequest();
             }
             if (!User.Identity.IsAuthenticated)
             {
@@ -215,7 +224,13 @@ namespace SSMO.Controllers
         public IActionResult InvoicePaymentReport(CustomerOrdersPaymentsReportsViewModel model)
         {
             //TODO When All are selected page is empty
+            string userId = this.User.UserId();
+            string userIdMyCompany = myCompanyService.GetUserIdMyCompanyByName(model.CustomerName);
 
+            if (userIdMyCompany != userId)
+            {
+                return BadRequest();
+            }
             var customerNames = customerService.GetCustomerNames();
 
             var customerPaymentCollection = reportService.CustomersPaymentDetails(
