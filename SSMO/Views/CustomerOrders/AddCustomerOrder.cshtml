@@ -16,8 +16,7 @@
         <input id="number" asp-for="OrderConfirmationNumber" type="number" class="form-control"/>
         <span asp-validation-for="OrderConfirmationNumber" class="small text-danger"></span>
     </div>
-        }
-       
+        }       
      <div class="row col-md-4">
         <label asp-for="CustomerPoNumber"></label>
         <input asp-for="CustomerPoNumber" class="form-control"/>
@@ -88,12 +87,12 @@
         <label asp-for="Origin"></label>
         <input asp-for="Origin" type="text" class="form-control" />
         <span asp-validation-for="Origin" class="small text-danger"></span>
-    </div>
+   @* </div>
     <div class="form-group col-sm-4">
       <input class="form-check-input" type="checkbox" asp-for="PaidAmountStatus">
       <label class="form-check-label" asp-for="PaidAmountStatus"> Paid</label> 
     </div>
-            
+            *@
     <div class="form-group row col-md-4">
         <td>
             <label asp-for="Vat"></label>
@@ -101,7 +100,7 @@
         </td>
        <td>
             <label asp-for="ProductsCount"></label>
-                <input type="number" asp-for="ProductsCount" class="form-control"/>
+            <input type="number" asp-for="ProductsCount" min="0" step="1" class="form-control"/>
 
        </td>
              <td><label asp-for="StatusId"></label>

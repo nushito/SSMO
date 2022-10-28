@@ -112,11 +112,12 @@ namespace SSMO.Controllers
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
+
             }
             var customerOrdersList = customerOrderService.AllCustomerOrderNumbers();
             ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
 
-            var companiesNames = mycompanyService.GetCompany();
+            var companiesNames = mycompanyService.GetCompaniesNames();
 
             var collectionCustomerOrders = new CustomerOrderNumbersListView
             {
@@ -132,13 +133,20 @@ namespace SSMO.Controllers
         [Authorize]
         public IActionResult CustomerOrderToInvoice(CustomerOrderNumbersListView model)
         {
+            string userId = this.User.UserId();
+            string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(model.MyCompanyName);
+            if (userIdMyCompany != userId)
+            {
+                return BadRequest();
+            }
+
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
             }
 
             model.OrderConfirmationNumberList = customerOrderService.AllCustomerOrderNumbers();
-            model.MyCompanyNames = mycompanyService.GetCompany();
+            model.MyCompanyNames = mycompanyService.GetCompaniesNames();
             ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
 
             if (!ModelState.IsValid)
@@ -146,7 +154,7 @@ namespace SSMO.Controllers
                 new CustomerOrderNumbersListView
                 {
                     OrderConfirmationNumberList = customerOrderService.AllCustomerOrderNumbers(),
-                MyCompanyNames = mycompanyService.GetCompany()
+                MyCompanyNames = mycompanyService.GetCompaniesNames()
 
                  };
                 ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
@@ -169,7 +177,7 @@ namespace SSMO.Controllers
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(mycompanyname);
-
+           
             if (userIdMyCompany != userId)
             {
                 return BadRequest();

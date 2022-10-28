@@ -50,14 +50,18 @@ namespace SSMO.Controllers
         public IActionResult AllCustomerOrders(CustomerOrderReportAll model)
         {
             //TODO When All are selected page is empty
-            string userId = this.User.UserId();
-            string userIdMyCompany = myCompanyService.GetUserIdMyCompanyByName(model.CustomerName);
-
-            if (userIdMyCompany != userId)
+            if(model.CustomerName != null)
             {
-                return BadRequest();
-            }
+                string userId = this.User.UserId();
 
+                var listMyCompany = myCompanyService.MyCompaniesNamePerCustomer(model.CustomerName);
+
+                if (!listMyCompany.Contains(userId))
+                {
+                    return BadRequest();
+                }
+            }
+           
             var customerNames = customerService.GetCustomerNames();
 
             var customerOrderCollection = reportService.AllCustomerOrders(

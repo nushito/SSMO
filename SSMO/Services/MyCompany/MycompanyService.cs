@@ -28,9 +28,8 @@ namespace SSMO.Services.MyCompany
             return allCompanies;
         }
 
-        public ICollection<string> GetCompany()
+        public ICollection<string> GetCompaniesNames()
         {
-            
                 return dbContext.MyCompanies
                     .Select(x => x.Name)
                     .ToList();
@@ -64,6 +63,26 @@ namespace SSMO.Services.MyCompany
                     .Where(x => x.Id == myCompanyId)
                     .Select(id => id.UserId)
                     .FirstOrDefault();
+        }
+
+        public List<string> MyCompaniesNamePerCustomer(string name)
+        {
+            var customerId = dbContext.Customers
+                .Where(c => c.Name.ToLower() == name.ToLower())
+                .Select(id => id.Id)
+                .FirstOrDefault();
+
+            var mycompanyIdList = dbContext.CustomerOrders.
+                Where(cus=>cus.CustomerId == customerId)
+                .Select(comp=>comp.MyCompanyId)
+                .ToList();
+
+            var listMycompaniesUserId = dbContext.MyCompanies.
+                Where(i => mycompanyIdList.Contains(i.Id)).
+                Select(u => u.UserId).
+                ToList();
+
+            return listMycompaniesUserId; 
         }
     }
 }

@@ -78,7 +78,7 @@ namespace SSMO.Controllers
         {
             return View(new AddBankDetailsFormModel
             { 
-                CompanyNames = mycompany.GetCompany(),
+                CompanyNames = mycompany.GetCompaniesNames(),
                 Currency = icurrency.GetCurrency()
             }); 
         }
@@ -90,7 +90,7 @@ namespace SSMO.Controllers
             if (!ModelState.IsValid)
             {
                 bankmodel.Currency = this.icurrency.GetCurrency().ToList();
-                bankmodel.CompanyNames = this.mycompany.GetCompany();
+                bankmodel.CompanyNames = this.mycompany.GetCompaniesNames();
             }
                 
             var userCompanyId = mycompany.GetUserIdMyCompanyByName(bankmodel.CompanyName);
@@ -101,7 +101,7 @@ namespace SSMO.Controllers
                 return BadRequest();
             }
 
-                if (mycompany.GetCompany() == null)
+                if (mycompany.GetCompaniesNames() == null)
             {
                 return RedirectToAction("Register", "MyCompany");
             }

@@ -107,8 +107,31 @@ namespace SSMO.Services.Reports
         {
             var findorder = _context.CustomerOrders.Where(a => a.Id == id);
             var order = findorder.ProjectTo<CustomerOrderDetailsModel>(mapper).FirstOrDefault();
-            return (CustomerOrderDetailsModel)order;
+            var supplierOrderDetail = _context.SupplierOrders
+                .Where(o => o.CustomerOrderId == id)
+                .Select(a => new
+                {
+                    supplierNumber = a.Number,
+                    supplierId = a.SupplierId
+                }).FirstOrDefault();
 
+            var myCompanyId = findorder.
+                Select(id=>id.MyCompanyId).
+                FirstOrDefault();
+
+            var myCompanyName = _context.MyCompanies
+                .Where(id => id.Id == myCompanyId)
+                .Select(n => n.Name)
+                .FirstOrDefault();
+
+            order.SupplierOrderNumber = supplierOrderDetail.supplierNumber;
+            var supplierName = _context.Suppliers
+                .Where(id => id.Id == supplierOrderDetail.supplierId)
+                .Select(n => n.Name)
+                .FirstOrDefault();
+            order.SupplierName = supplierName;  
+            order.MyCompanyName = myCompanyName;
+            return (CustomerOrderDetailsModel)order;
         }
 
         public bool EditCustomerOrder(int id, 

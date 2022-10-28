@@ -88,7 +88,7 @@ namespace SSMO.Controllers
 
         {
             string userId = this.User.UserId();
-            string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(customermodel.CustomerId);
+            string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(customermodel.MyCompanyId);
 
             if (userIdMyCompany != userId)
             {

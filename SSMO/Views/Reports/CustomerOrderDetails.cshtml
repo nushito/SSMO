@@ -1,1 +1,73 @@
-﻿
+﻿@model CustomerOrderDetailsModel
+@{
+    ViewBag.Title = "Customer Order Details";
+}
+<h6><strong> Company:</strong> @Model.MyCompanyName</h6>
+<h6><strong>Customer:</strong> @Model.CustomerName</h6>
+
+
+<dl class="row">
+     <dt class="col-sm-3">
+        Order No:
+    </dt>
+    <dd class="col-sm-5">
+        @Model.OrderConfirmationNumber
+    </dd>
+</dl>
+<dl class="row">
+    <dt class="col-sm-3">
+        Date:
+    </dt>
+    <dd class="col-sm-5">
+         @Model.Date
+    </dd>
+</dl>
+<dl class="row">
+    <dt class="col-sm-3">
+        Loading Address:
+    </dt>
+    <dd class="col-sm-5">
+          @Model.LoadingPlace
+    </dd>
+</dl>
+    <dl class="row">
+      <dt class="col-sm-3">
+        Delivery Address:
+    </dt>
+    <dd class="col-sm-5">
+         @Model.DeliveryAddress
+    </dd>
+</dl>
+<dl class="row">
+    <dt class="col-sm-3">
+        Delivery Terms:
+    </dt>
+    <dd class="col-sm-5">
+         @Model.DeliveryTerms
+    </dd>
+ </dl>
+ <dl class="row">
+    <dt class="col-sm-3">
+        Order Status:
+    </dt>
+    <dd class="col-sm-5">
+         @Model.StatusName
+    </dd>
+</dl>
+<dl class="row">
+    <dt class="col-sm-3">
+        Supplier:
+    </dt>
+    <dd class="col-sm-5">
+         @Model.SupplierName
+    </dd>
+</dl>
+<dl class="row">
+     <dt class="col-sm-3">
+        Supplier Specification No:
+    </dt>
+    <dd class="col-sm-5">
+         @Model.SupplierOrderNumber
+    </dd>
+</dl>
+

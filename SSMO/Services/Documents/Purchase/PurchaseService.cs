@@ -55,7 +55,6 @@ namespace SSMO.Services.Documents.Purchase
                 Products = new List<Product>(),
                 Vat = vat,
                 TruckNumber = truckNumber
-
             };
 
             purchase.TotalAmount = purchase.Amount + purchase.Amount * vat / 100;
@@ -74,6 +73,15 @@ namespace SSMO.Services.Documents.Purchase
             if(purchase == null)
             {
                 return false;
+            }
+
+            if(purchase.PaidStatus == true)
+            {
+                supplierOrder.PaidStatus = true;
+                supplierOrder.Balance = 0;
+                purchase.Balance = 0;
+                purchase.PaidAvance = purchase.Amount;
+                supplierOrder.PaidAvance = purchase.Amount;
             }
             
             dbContext.Documents.Add(purchase);
