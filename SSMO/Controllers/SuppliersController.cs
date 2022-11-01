@@ -53,12 +53,8 @@ namespace SSMO.Controllers
                     Country = model.Country
                 },
                 RepresentativePerson = model.RepresentativePerson,
-              //  FSCClaim = model.FSCClaim,
                 FSCSertificate = model.FSCSertificate
             };
-
-            //var currencyList = model.Currency
-            //    .Select(a => (AccountCurrency) Enum.Parse(typeof(AccountCurrency), a)).ToList();
 
             //var bankDetail = new BankDetails
             //{
@@ -75,8 +71,22 @@ namespace SSMO.Controllers
             this.dbContext.SaveChanges();
 
             return RedirectToAction("Index", "Home");
+        }
 
+        [HttpGet]
+        [Authorize]
+        public IActionResult EditSupplier()
+        {
+            return View();
         }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult EditSupplier(string supplierName)
+        {
+            return View();
+        }
+
     }
-        }
+ }
   

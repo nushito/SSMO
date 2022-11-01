@@ -1,0 +1,102 @@
+﻿@model EditCustomerViewModel
+
+<form method="get">
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="CustomerName"></label>
+            <select asp-for="CustomerName" class="form-control">
+            <option value="">All</option>
+                @foreach (var customerName in Model.CustomerNames)
+                {
+                    <option value="@customerName">@customerName</option>
+                }
+
+            </select>
+        </div>
+    </div>
+    <div class="row">
+<input type="submit" class="btn btn-info" value="Search"/></div>
+<br />
+</form>
+
+<form method="post">
+     <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="addon-wrapping">Company Name</span>
+        </div>
+      
+        <input asp-for="CustomerForEdit.Name" class="form-control" placeholder="Customer Name" aria-label="Name" aria-describedby="addon-wrapping">
+        <span asp-validation-for="CustomerForEdit.Name" class="small text-danger"></span>
+    </div>
+
+    <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="addon-wrapping">EIK</span>
+        </div>
+       
+        <input asp-for="CustomerForEdit.EIK" class="form-control" placeholder="Eik" aria-label="EIK" aria-describedby="addon-wrapping">
+        <span asp-validation-for="CustomerForEdit.EIK" class="small text-danger"></span> 
+    </div>
+
+    <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="addon-wrapping">VAT</span>
+        </div>
+       
+        <input asp-for="CustomerForEdit.VAT" class="form-control" placeholder="Vat" aria-label="VAT" aria-describedby="addon-wrapping">
+        <span asp-validation-for="CustomerForEdit.VAT" class="small text-danger"></span>
+    </div>
+
+    <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="addon-wrapping">Country</span>
+        </div>
+       
+        <input asp-for="CustomerForEdit.CustomerAddress.Country" class="form-control" placeholder="Country" aria-label="Country" aria-describedby="addon-wrapping">
+        <span asp-validation-for="CustomerForEdit.CustomerAddress.Country" class="small text-danger"></span>
+    </div>
+
+    <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="addon-wrapping">City</span>
+        </div>
+        
+        <input asp-for="CustomerForEdit.CustomerAddress.City" class="form-control" placeholder="City" aria-label="City" aria-describedby="addon-wrapping">
+        <span asp-validation-for="CustomerForEdit.CustomerAddress.City" class="small text-danger"></span> 
+    </div>
+    <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="addon-wrapping">Street</span>
+        </div>
+       
+        <input asp-for="CustomerForEdit.CustomerAddress.Street" class="form-control" placeholder="Street" aria-label="Address" aria-describedby="addon-wrapping">
+        <span asp-validation-for="CustomerForEdit.CustomerAddress.Street" class="small text-danger"></span> 
+    </div>
+    <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="addon-wrapping">Representative person</span>
+        </div>
+      
+        <input asp-for="CustomerForEdit.RepresentativePerson" class="form-control" placeholder="Manager" aria-describedby="addon-wrapping">
+        <span asp-validation-for="CustomerForEdit.RepresentativePerson" class="small text-danger"></span>
+    </div>
+
+    <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="addon-wrapping">Email</span>
+        </div>
+       
+        <input asp-for="CustomerForEdit.Email" class="form-control" placeholder="Email" aria-describedby="addon-wrapping">
+        <span asp-validation-for="CustomerForEdit.Email" class="small text-danger"></span>
+    </div>
+
+    <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="addon-wrapping">Phone</span>
+        </div>
+        <input asp-for="CustomerForEdit.PhoneNumber" class="form-control" placeholder="Telephone Number" aria-describedby="addon-wrapping" />
+        <span asp-validation-for="CustomerForEdit.PhoneNumber" class="small text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Submit</button>
+</form>

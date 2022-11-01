@@ -125,6 +125,7 @@ namespace SSMO.Controllers
             {
                 return BadRequest();
             }
+
             if (!User.Identity.IsAuthenticated)
             {
                 return BadRequest();
@@ -156,7 +157,7 @@ namespace SSMO.Controllers
                 model.FscCertificate,
                 model.PaidAdvance,
                 model.PaidAmountStatus,
-                (System.Collections.Generic.List<Models.Products.ProductCustomerFormModel>)model.Products);
+                model.Products);
 
             if (!editOrder)
             {

@@ -6,7 +6,6 @@ namespace SSMO.Models.Suppliers
     public class AddSupplierModel
     {
        
-         
         [Required]
         public string Name { get; set; }
 

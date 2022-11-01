@@ -46,6 +46,8 @@ namespace SSMO.Infrastructure
             this.CreateMap<Document, InvoicePrintViewModel>();
 
             this.CreateMap<Document, CustomerOrderPaymentDetailsModel>();
+            this.CreateMap<Customer, EditCustomerFormModel>();
+            this.CreateMap<Address, CustomerForEditAddressFormModel>();
         }
     }
 }

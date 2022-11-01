@@ -27,10 +27,62 @@ namespace SSMO.Services.Customer
             return customers;
         }
 
+        public bool EditCustomer
+            (string customerName, string vat, string eik, string representativePerson,
+            string country, string city, string street, string email, string phoneNumber)
+        {
+            var customer = dbContext.Customers
+                .Where(a => a.Name.ToLower() == customerName.ToLower())
+                .FirstOrDefault();
+            if (customer == null) return false;
+            customer.Name = customerName;
+            customer.VAT = vat;
+            customer.EIK = eik;
+            customer.RepresentativePerson = representativePerson;
+
+            var address = dbContext.Addresses
+                .Where(c => c.Id == customer.AddressId)
+                .FirstOrDefault();
+
+            address.Country = country;
+            address.City = city;
+            address.Street = street;
+
+            customer.Email = email;
+            customer.PhoneNumber = phoneNumber;
+
+            dbContext.SaveChanges();
+            return true;
+        }
+
         public AddCustomerFormModel GetCustomer(int id)
         {
             var customer = dbContext.Customers.Where(a => a.Id == id).FirstOrDefault();
             var getCustomer = mapper.Map<AddCustomerFormModel>(customer);
+            return getCustomer;
+        }
+
+        public EditCustomerFormModel GetCustomerForEdit(string customerName)
+        {
+            if (String.IsNullOrEmpty(customerName))
+            {
+                return null;
+            }
+            var customer = dbContext.Customers.Where(a => a.Name.ToLower() == customerName.ToLower()).FirstOrDefault();
+            if (customer == null)
+            {
+                return null;
+            }
+            var address = dbContext.Addresses.Where(a => a.Id == customer.AddressId).FirstOrDefault();
+            var addressForEdit = mapper.Map<CustomerForEditAddressFormModel>(address);
+            var getCustomer = mapper.Map<EditCustomerFormModel>(customer);
+            getCustomer.CustomerAddress = new CustomerForEditAddressFormModel
+            {
+                City = addressForEdit.City,
+                Country = addressForEdit.Country,
+                Street = addressForEdit.Street
+            };
+
             return getCustomer;
         }
 

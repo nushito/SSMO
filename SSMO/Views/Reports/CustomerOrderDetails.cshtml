@@ -2,9 +2,16 @@
 @{
     ViewBag.Title = "Customer Order Details";
 }
-<h6><strong> Company:</strong> @Model.MyCompanyName</h6>
-<h6><strong>Customer:</strong> @Model.CustomerName</h6>
+<div class="card col-lg-3 col-md-6 mb-4">
+    <div class="card-body">
+        <p><strong> Company:</strong> <em> @Model.MyCompanyName</em></p>
+        <p><strong>Customer:</strong> <em>@Model.CustomerName</em></p>
 
+    </div>
+
+</div>
+
+<hr />
 
 <dl class="row">
      <dt class="col-sm-3">
@@ -19,7 +26,7 @@
         Date:
     </dt>
     <dd class="col-sm-5">
-         @Model.Date
+         @Model.Date.Date
     </dd>
 </dl>
 <dl class="row">
