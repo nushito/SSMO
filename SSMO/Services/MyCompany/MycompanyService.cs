@@ -84,5 +84,26 @@ namespace SSMO.Services.MyCompany
 
             return listMycompaniesUserId; 
         }
+        public List<string> MyCompaniesNamePerSupplier(string name)
+        {
+            var supplierId = dbContext.Suppliers
+                .Where(c => c.Name.ToLower() == name.ToLower())
+                .Select(id => id.Id)
+                .FirstOrDefault();
+
+            var mycompanyIdList = dbContext.SupplierOrders.
+                Where(cus => cus.SupplierId == supplierId)
+                .Select(comp => comp.MyCompanyId)
+                .ToList();
+
+            var listMycompaniesUserId = dbContext.MyCompanies.
+                Where(i => mycompanyIdList.Contains(i.Id)).
+                Select(u => u.UserId).
+                ToList();
+
+            return listMycompaniesUserId;
+        }
+
+
     }
 }

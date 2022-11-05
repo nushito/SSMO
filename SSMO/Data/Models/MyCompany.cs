@@ -38,10 +38,11 @@ namespace SSMO.Data.Models
         public ICollection<CustomerOrder> Orders { get; set; }
         public ICollection<SupplierOrder> SupplierOrders { get; set; }
         public ICollection<BankDetails> BankDetails { get; set; }
+        public ICollection<Document> Documents { get; set; }
 
-     
-        
-    
+
+
+
 
     }
 }

@@ -25,7 +25,8 @@
     
 </div>
 </form>
-<table id="products">
+<form method="post">
+    <table id="products">
     <tr>
         @if (Model.ProductList != null)
         {
@@ -33,6 +34,8 @@
         }
     </tr>
     </table>
+</form>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
@@ -62,13 +65,11 @@
                         for (var i = 0; i < selectedSuppliers.length; i++) {
                             $("#Supplier").append('<option value="' + selectedSuppliers[i].supplierId + '">' + selectedSuppliers[i].supplierName + '</option>');
                         }
-
                         debugger;
                         //$.each(selectedSuppliers, function(i, supplier) {
                         //    $("#Supplier").append('<option value="' + supplier.SupplirId + '">' + supplier.SupplierName + '</option>');
                         //    // here we are adding option for Supplier
                         //});
-
                     },
                     error: function(ex) {
                         alert('Failed to retrieve supplier.' + ex);
@@ -103,7 +104,6 @@
 
                         $.each(selectedSuppliers, function(i, supplier) {
                             // $("#Supplier").append('<option value="' + supplier.SupplirId + '">' + supplier.SupplierName + '</option>');
-
                             // var valSupplier = @ViewData["SelectedSupplier"];
                             // console.log(row);
                             for (var i = 0; i < selectedSuppliers.length; i++)
@@ -115,8 +115,6 @@
                             if (@ViewData["SelectedSupplier"] != 0) {
                                 $("#Supplier").val(@ViewData["SelectedSupplier"]);
                             }
-
-
                         });
                     },
                     error: function(ex) {
@@ -124,8 +122,6 @@
                     }
                 });
             }
-
-
         }
     </script>
 

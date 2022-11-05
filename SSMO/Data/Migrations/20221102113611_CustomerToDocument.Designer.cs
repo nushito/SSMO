@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSMO.Data;
 
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221102113611_CustomerToDocument")]
+    partial class CustomerToDocument
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -522,9 +524,6 @@ namespace SSMO.Data.Migrations
                     b.Property<string>("Incoterms")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MyCompanyId")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("NetWeight")
                         .HasColumnType("decimal");
 
@@ -571,8 +570,6 @@ namespace SSMO.Data.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("CustomerOrderId");
-
-                    b.HasIndex("MyCompanyId");
 
                     b.HasIndex("SupplierOrderId");
 
@@ -1107,11 +1104,6 @@ namespace SSMO.Data.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SSMO.Data.Models.MyCompany", "MyCompany")
-                        .WithMany("Documents")
-                        .HasForeignKey("MyCompanyId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("SSMO.Data.Models.SupplierOrder", "SupplierOrder")
                         .WithMany("Documents")
                         .HasForeignKey("SupplierOrderId")
@@ -1121,8 +1113,6 @@ namespace SSMO.Data.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("CustomerOrder");
-
-                    b.Navigation("MyCompany");
 
                     b.Navigation("SupplierOrder");
                 });
@@ -1330,8 +1320,6 @@ namespace SSMO.Data.Migrations
             modelBuilder.Entity("SSMO.Data.Models.MyCompany", b =>
                 {
                     b.Navigation("BankDetails");
-
-                    b.Navigation("Documents");
 
                     b.Navigation("Orders");
 

@@ -5,7 +5,6 @@ namespace SSMO.Models.Suppliers
 {
     public class AddSupplierModel
     {
-       
         [Required]
         public string Name { get; set; }
 
@@ -21,10 +20,8 @@ namespace SSMO.Models.Suppliers
         public string SupplierAddress { get; set; }
         public string City { get; set; }
         public string Country { get; set; }
-
         public string RepresentativePerson { get; set; }
         public string FSCClaim { get; set; }
-       
         public string FSCSertificate { get; set; }
         //   public ICollection<PurchaseProductFormModel> ProductList { get; set; }
         //  public string Currency { get; init; }

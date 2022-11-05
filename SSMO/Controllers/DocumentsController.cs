@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Infrastructure;
 using SSMO.Models.CustomerOrders;
+using SSMO.Models.Documents.Packing_List;
 using SSMO.Models.Documents.Purchase;
 using SSMO.Services.CustomerOrderService;
+using SSMO.Services.Documents;
 using SSMO.Services.Documents.Invoice;
 using SSMO.Services.Documents.Purchase;
 using SSMO.Services.MyCompany;
@@ -19,17 +21,19 @@ namespace SSMO.Controllers
         private readonly ICustomerOrderService customerOrderService;
         private readonly IInvoiceService invoiceService;
         private readonly IMycompanyService mycompanyService;
+        private readonly IDocumentService documentService;
   
         public DocumentsController
             (ISupplierOrderService supplierOrderService, 
             IPurchaseService purchaseService, ICustomerOrderService customerOrderService,
-            IInvoiceService invoiceService, IMycompanyService mycompanyService)
+            IInvoiceService invoiceService, IMycompanyService mycompanyService, IDocumentService documentService)
         {
             this.supplierOrderService = supplierOrderService;
             this.purchaseService = purchaseService;
             this.customerOrderService = customerOrderService;
             this.invoiceService = invoiceService;   
             this.mycompanyService = mycompanyService;
+            this.documentService = documentService;
         }
 
 
@@ -135,6 +139,7 @@ namespace SSMO.Controllers
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(model.MyCompanyName);
+
             if (userIdMyCompany != userId)
             {
                 return BadRequest();
@@ -186,10 +191,46 @@ namespace SSMO.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
 
             var invoiceForPrint = invoiceService.CreateInvoice(orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname,truckNumber);    
 
             return View(invoiceForPrint);
+        }
+        public IActionResult ChoosePackingListForPrint(ChoosePackingListFromInvoicesViewModel model)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            var invoiceCollectionNumbers = documentService.GetPackingList();
+            if(invoiceCollectionNumbers == null)
+            {
+                ModelState.AddModelError(string.Empty, "Missing");
+                return View(model);
+            }
+            model.PckingListNumbers = invoiceCollectionNumbers;
+            model.PackingListForPrint = documentService.PackingListForPrint(model.PackingListNumber);
+            return View(model);
+        }
+
+        public IActionResult PackingListForPrint(PackingListForPrintViewModel model, int invoiceNumber)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            return View();
         }
 
     }

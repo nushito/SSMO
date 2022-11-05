@@ -1,8 +1,10 @@
 ﻿
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Models.Suppliers;
 using SSMO.Services.Supplier;
 using System;
 using System.Collections;
@@ -15,10 +17,69 @@ namespace SSMO.Services
     public class SupplierService : ISupplierService
     {
         private readonly ApplicationDbContext dbContext;
-
-        public SupplierService(ApplicationDbContext dbContext)
+        private readonly IMapper mapper;
+        public SupplierService(ApplicationDbContext dbContext, IMapper mapper)
         {
             this.dbContext = dbContext;
+            this.mapper = mapper;       
+        }
+
+        public bool EditSupplier
+            (string supplierName, string vat, string eik, string representativePerson,
+            string country, string city, string street, string email, string fscCertificate)
+        {
+            var supplier = dbContext.Customers
+                .Where(a => a.Name.ToLower() == supplierName.ToLower())
+                .FirstOrDefault();
+            if (supplier == null) return false;
+            supplier.Name = supplierName;
+            supplier.VAT = vat;
+            supplier.EIK = eik;
+            supplier.RepresentativePerson = representativePerson;
+            supplier.Email = email;
+
+            var address = dbContext.Addresses
+                .Where(c => c.Id == supplier.AddressId)
+                .FirstOrDefault();
+
+            address.Country = country;
+            address.City = city;
+            address.Street = street;
+
+            dbContext.SaveChanges();
+            return true;
+        }
+
+        public EditSupplierFormModel GetSupplierForEdit(string supplierName)
+        {
+            if (String.IsNullOrEmpty(supplierName))
+            {
+                return null;
+            }
+            var suuplier = dbContext.Suppliers.Where(a => a.Name.ToLower() == supplierName.ToLower()).FirstOrDefault();
+            if (suuplier == null)
+            {
+                return null;
+            }
+            var address = dbContext.Addresses.Where(a => a.Id == suuplier.AddressId).FirstOrDefault();
+            var addressForEdit = mapper.Map<EditSupplierAddressFormModel>(address);
+            var getSupplier = mapper.Map<EditSupplierFormModel>(suuplier);
+            getSupplier.SupplierAddress = new EditSupplierAddressFormModel
+            {
+                City = addressForEdit.City,
+                Country = addressForEdit.Country,
+                Street = addressForEdit.Street
+            };
+
+            return getSupplier;
+        }
+
+        public IEnumerable<string> GetSupplierNames()
+        {
+            return dbContext
+                 .Suppliers
+                 .Select(n => n.Name
+                 ).ToList();
         }
 
         public ICollection<AllSuppliers> GetSuppliers()
@@ -32,7 +93,6 @@ namespace SSMO.Services
                     Name = a.Name
                  })
                  .ToList();
-
         }
 
         //public List<SelectListItem> GetSuppliersByCustomerId(int id)
@@ -55,7 +115,7 @@ namespace SSMO.Services
         //    return listItems;
         //}
 
-        public IEnumerable<SupplierDetailsList> GetSuppliersNames(int id)
+        public IEnumerable<SupplierDetailsList> GetSuppliersIdAndNames(int id)
         {
 
             var supplierDetailList = dbContext.CustomerOrders.

@@ -1,0 +1,29 @@
+﻿@model ChoosePackingListFromInvoicesViewModel
+
+@{
+    ViewBag.Title = "Choose Invoice number";
+}
+
+<form class="get">
+<div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="PackingListNumber"></label>
+            <select asp-for="PackingListNumber" class="form-control">
+            <option value="">All</option>
+                @foreach (var invoiceNum in Model.PckingListNumbers)
+                {
+                    <option value="@invoiceNum">@invoiceNum</option>
+                }
+
+            </select>
+        </div>
+    </div>
+   <input type="submit" value="Packing list" class="btn btn-primary mt-3"  
+        asp-route-invoiceNumber="@Model.PackingListNumber"/>
+</form>
+<hr />
+@if(Model.PackingListForPrint != null)
+{
+    <p>@Model.PackingListForPrint.DocumentType</p>
+<p>@Model.PackingListForPrint.DocumentNumber</p>
+}

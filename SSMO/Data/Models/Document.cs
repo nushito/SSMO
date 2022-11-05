@@ -12,19 +12,24 @@ namespace SSMO.Data.Models
 {
     public class Document
     {
-        public int Id { get; init; }
-      
+        public int Id { get; init; }      
         [Required]
         public DocumentTypes DocumentType { get; set; }
+        [DisplayName("Invoice Number")]
         public int DocumentNumber { get; set; }
+        [DisplayName("Supplier Invoice Number")]
         public string Number { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
+        public int? CustomerId { get; set; }
+        public Customer Customer { get; set; }
         public int CustomerOrderId { get; set; }
         [Required]
         public CustomerOrder CustomerOrder { get; set; }
         public int SupplierOrderId { get; set; }
         public SupplierOrder SupplierOrder { get; set; }
+        public int? MyCompanyId { get; set; }
+        public MyCompany MyCompany { get; set; }
         [Required]
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }

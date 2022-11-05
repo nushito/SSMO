@@ -6,6 +6,7 @@ using SSMO.Models.Products;
 using SSMO.Models.Reports.CustomerOrderReportForEdit;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
+using SSMO.Services.Documents.Invoice;
 using SSMO.Services.Products;
 using System;
 using System.Collections.Generic;
@@ -16,29 +17,32 @@ namespace SSMO.Services.Reports
 {
     public class ReportsService : IReportsService
     {
-        private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext dbcontext;
         private readonly IConfigurationProvider mapper;
         private readonly IProductService productService;
+        private readonly IInvoiceService invoiceService;
 
-        public ReportsService(ApplicationDbContext context, IConfigurationProvider mapper, IProductService productService)
+        public ReportsService
+            (ApplicationDbContext context, IConfigurationProvider mapper, IProductService productService, IInvoiceService invoiceService)
         {
-            _context = context;
+            dbcontext = context;
             this.mapper = mapper;//.ConfigurationProvider;
-            this.productService = productService;   
+            this.productService = productService;
+            this.invoiceService = invoiceService;
         }
-        public IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders(string customerName,
-            int currentpage, int customerOrdersPerPage)
+        public IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders
+            (string customerName, int currentpage, int customerOrdersPerPage)
         {
             if (String.IsNullOrEmpty(customerName))
             {
                return new List<CustomerOrderDetailsModel>();
             }
 
-            var customerId = _context.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
+            var customerId = dbcontext.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
                                 .Select(a => a.Id)
                                 .FirstOrDefault();
 
-            var queryOrders = _context.CustomerOrders
+            var queryOrders = dbcontext.CustomerOrders
                     .Where(a => a.CustomerId == customerId);
                     
            // var totalOrders = queryOrders.Count();  
@@ -52,8 +56,8 @@ namespace SSMO.Services.Reports
 
         public CustomerOrderForEdit CustomerOrderDetailsForEdit(int id)
         {
-            var corder = _context.CustomerOrders.Find(id);
-            var customerId = _context.CustomerOrders.Where(a => a.Id == id).Select(a=>a.CustomerId).FirstOrDefault();
+            var corder = dbcontext.CustomerOrders.Find(id);
+            var customerId = dbcontext.CustomerOrders.Where(a => a.Id == id).Select(a=>a.CustomerId).FirstOrDefault();
 
             var orderForEdit = new CustomerOrderForEdit
             {
@@ -78,25 +82,24 @@ namespace SSMO.Services.Reports
             return orderForEdit;
         }
 
-        public IEnumerable<CustomerOrderPaymentDetailsModel> CustomersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage)
+        public IEnumerable<CustomerInvoicePaymentDetailsModel> CustomersInvoicesPaymentDetails
+            (string customerName, int currentpage, int customerOrdersPerPage)
         {
             if (String.IsNullOrEmpty(customerName))
             {
-                return new List<CustomerOrderPaymentDetailsModel>();
+                return new List<CustomerInvoicePaymentDetailsModel>();
             }
 
-            var customerId = _context.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
+            var customerId = dbcontext.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
                                 .Select(a => a.Id)
                                 .FirstOrDefault();
 
-            var customerOrdersId = _context.CustomerOrders.Where(c => c.CustomerId == customerId).Select(i => i.Id).ToList();
+            var customerOrdersId = dbcontext.CustomerOrders.Where(c => c.CustomerId == customerId).Select(i => i.Id).ToList();
 
-            var queryInvoices = _context.Documents
-                    .Where(a => customerOrdersId.Contains(a.CustomerOrderId));
+            var queryInvoices = dbcontext.Documents
+                    .Where(a => customerOrdersId.Contains(a.CustomerOrderId) || a.CustomerId == customerId && a.DocumentType == Data.Enums.DocumentTypes.Invoice);
 
-            // var totalOrders = queryOrders.Count();  
-
-            var invoices = queryInvoices.ProjectTo<CustomerOrderPaymentDetailsModel>(this.mapper).ToList();
+            var invoices = queryInvoices.ProjectTo<CustomerInvoicePaymentDetailsModel>(this.mapper).ToList();
 
             var customerPaymentList = invoices.Skip((currentpage - 1) * customerOrdersPerPage).Take(customerOrdersPerPage);
 
@@ -105,9 +108,9 @@ namespace SSMO.Services.Reports
 
         public CustomerOrderDetailsModel Details(int id)
         {
-            var findorder = _context.CustomerOrders.Where(a => a.Id == id);
+            var findorder = dbcontext.CustomerOrders.Where(a => a.Id == id);
             var order = findorder.ProjectTo<CustomerOrderDetailsModel>(mapper).FirstOrDefault();
-            var supplierOrderDetail = _context.SupplierOrders
+            var supplierOrderDetail = dbcontext.SupplierOrders
                 .Where(o => o.CustomerOrderId == id)
                 .Select(a => new
                 {
@@ -119,13 +122,13 @@ namespace SSMO.Services.Reports
                 Select(id=>id.MyCompanyId).
                 FirstOrDefault();
 
-            var myCompanyName = _context.MyCompanies
+            var myCompanyName = dbcontext.MyCompanies
                 .Where(id => id.Id == myCompanyId)
                 .Select(n => n.Name)
                 .FirstOrDefault();
 
             order.SupplierOrderNumber = supplierOrderDetail.supplierNumber;
-            var supplierName = _context.Suppliers
+            var supplierName = dbcontext.Suppliers
                 .Where(id => id.Id == supplierOrderDetail.supplierId)
                 .Select(n => n.Name)
                 .FirstOrDefault();
@@ -142,7 +145,7 @@ namespace SSMO.Services.Reports
             string fscCertificate, decimal paidAdvance, bool paidStatus,
              List<ProductCustomerFormModel> products)
         {
-            var order = _context.CustomerOrders.Find(id);
+            var order = dbcontext.CustomerOrders.Find(id);
 
             if (order == null)
             {
@@ -163,17 +166,17 @@ namespace SSMO.Services.Reports
             order.PaidAmountStatus = paidStatus;
             order.Balance = order.TotalAmount - paidAdvance;
 
-            var productsPerCorder = _context.Products.Where(co => co.CustomerOrderId == order.Id).ToList();
+            var productsPerCorder = dbcontext.Products.Where(co => co.CustomerOrderId == order.Id).ToList();
 
             if (products.Count != 0) 
             {
                 for (int i = 0; i < products.Count; i++)
                 {
-                    var descriptionId = _context.Descriptions.Where(n=>n.Name == products[i].Description).Select(i=>i.Id).FirstOrDefault();
+                    var descriptionId = dbcontext.Descriptions.Where(n=>n.Name == products[i].Description).Select(i=>i.Id).FirstOrDefault();
                     productsPerCorder.ElementAt(i).DescriptionId = descriptionId;
-                    var gradeId = _context.Grades.Where(n => n.Name == products[i].Grade).Select(i => i.Id).FirstOrDefault();
+                    var gradeId = dbcontext.Grades.Where(n => n.Name == products[i].Grade).Select(i => i.Id).FirstOrDefault();
                     productsPerCorder.ElementAt(i).GradeId = gradeId;
-                    var sizeId= _context.Sizes.Where(n => n.Name == products[i].Size).Select(i => i.Id).FirstOrDefault();
+                    var sizeId= dbcontext.Sizes.Where(n => n.Name == products[i].Size).Select(i => i.Id).FirstOrDefault();
                     productsPerCorder.ElementAt(i).SizeId = sizeId;
                     productsPerCorder.ElementAt(i).Price = products.ElementAt(i).Price;
                     productsPerCorder.ElementAt(i).Pallets = products.ElementAt(i).Pallets;
@@ -182,8 +185,41 @@ namespace SSMO.Services.Reports
 
             }
 
-            _context.SaveChanges();
+            dbcontext.SaveChanges();
 
+            return true;
+        }
+
+        public bool EditInvoicePayment
+            (int id, int documentNumber, DateTime date, bool paidStatus, decimal paidAdvance, DateTime datePaidAmount)
+        {
+            if(id == 0)
+            {
+                return false;
+            }
+
+            var invoice = dbcontext.Documents
+                .Where(i=>i.Id == id)
+                .FirstOrDefault();
+          
+            invoice.PaidAvance = paidAdvance;
+            invoice.DatePaidAmount = datePaidAmount;
+            invoice.PaidStatus = paidStatus;
+            invoice.DocumentNumber = documentNumber;
+            invoice.Date = date;
+
+            invoice.Balance = invoice.TotalAmount - paidAdvance;
+
+            if(invoice.Balance > 0)
+            {
+                invoice.PaidStatus = false;
+            }
+            else
+            {
+                invoice.PaidStatus = true;
+            }
+
+            dbcontext.SaveChanges();
             return true;
         }
 
@@ -194,7 +230,7 @@ namespace SSMO.Services.Reports
 
         public IEnumerable<CustomerOrderListViewBySupplier> GetCustomerOrdersBySupplier(int customerId, string supplierId)
         {
-            var customerOrdersBySupplier = _context.CustomerOrders.Where(co => co.Id == customerId)
+            var customerOrdersBySupplier = dbcontext.CustomerOrders.Where(co => co.Id == customerId)
                 .Where(or => or.SupplierOrder.Any(i => i.Id == int.Parse(supplierId)))
                 .Select(n => new CustomerOrderListViewBySupplier
                 { 
@@ -205,7 +241,7 @@ namespace SSMO.Services.Reports
                     LoadingPlace = n.LoadingPlace,
                     StatusId = n.StatusId,
                     PaidAmountStatus = n.PaidAmountStatus,
-                    StatusName = _context.Statuses.Where(a=>a.Id == n.StatusId).Select(a=>a.Name).FirstOrDefault()
+                    StatusName = dbcontext.Statuses.Where(a=>a.Id == n.StatusId).Select(a=>a.Name).FirstOrDefault()
                 }).ToList();
 
             return customerOrdersBySupplier;

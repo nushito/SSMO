@@ -1,1 +1,81 @@
-﻿
+﻿@model EditSupplierViewModel
+
+@{
+    ViewBag.Title = "Edit Supplier";
+}
+
+<form method="get">
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="SupplierName"></label>
+            <select asp-for="SupplierName" class="form-control">
+            <option value="">All</option>
+                @foreach (var supplierName in Model.SupplierNames)
+                {
+                    <option value="@supplierName">@supplierName</option>
+                }
+
+            </select>
+        </div>
+    </div>
+    <div class="row">
+<input type="submit" class="btn btn-info" value="Search"/></div>
+<br />
+</form>
+
+<form method="post">
+    <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="SupplierForEdit.Name">Name</label>
+        <input asp-for="SupplierForEdit.Name" type="text" class="form-control" placeholder="Name">
+        <span asp-validation-for="SupplierForEdit.Name" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="SupplierForEdit.Eik">EIK</label>
+        <input asp-for="SupplierForEdit.Eik" type="text" class="form-control" placeholder="Eik">
+        <span asp-validation-for="SupplierForEdit.Eik" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="SupplierForEdit.VAT">VAT</label>
+        <input asp-for="SupplierForEdit.VAT" type="text" class="form-control" placeholder="VAT">
+        <span asp-validation-for="SupplierForEdit.VAT" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="SupplierForEdit.SupplierAddress.Country">Country</label>
+        <input asp-for="SupplierForEdit.SupplierAddress.Country" type="text" class="form-control" placeholder="Country">
+    </div>
+    <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="SupplierForEdit.SupplierAddress.City">City</label>
+        <input asp-for="SupplierForEdit.SupplierAddress.City" type="text" class="form-control" placeholder="City">
+        <span asp-validation-for="SupplierForEdit.SupplierAddress.City" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="SupplierForEdit.SupplierAddress.Street">Address</label>
+        <input asp-for="SupplierForEdit.SupplierAddress.Street" type="text" class="form-control" placeholder="Address">
+        <span asp-validation-for="SupplierForEdit.SupplierAddress.Street" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="SupplierForEdit.FSCSertificate">FSC Certificate Code</label>
+        <input asp-for="SupplierForEdit.FSCSertificate" type="text" class="form-control" >
+        <span asp-validation-for="SupplierForEdit.FSCSertificate" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="SupplierForEdit.RepresentativePerson">Manager</label>
+        <input asp-for="SupplierForEdit.RepresentativePerson" type="text" class="form-control" placeholder="Manager name">
+        <span asp-validation-for="SupplierForEdit.RepresentativePerson" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-6">
+        <label asp-for="SupplierForEdit.Email">Email</label>
+        <input asp-for="SupplierForEdit.Email" type="text" class="form-control" placeholder="Email">
+        <span asp-validation-for="SupplierForEdit.Email" class="small text-danger"></span>
+    </div>
+
+        <input type="submit" class="btn btn-primary text-center" value="Save">
+        <br /> 
+</form>

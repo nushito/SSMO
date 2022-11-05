@@ -12,7 +12,7 @@
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CustomerOrderToInvoice">Invoice</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateProforma">Packing list</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="ChoosePackingListForPrint">Packing list</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateOrder">Debit Note</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateCreditNote">Credit Note</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="AddPurchase">Purchase</a>
@@ -66,6 +66,7 @@
                             </div>
                         </div>
                     </li>
+                    <p></p>
                      <li>
                         <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

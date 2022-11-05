@@ -1,4 +1,4 @@
-﻿@model CustomerOrdersPaymentsReportsViewModel
+﻿@model CustomerInvoicePaymentsReportsViewModel
 
 <form method="get">
     <div class="row">
@@ -27,7 +27,7 @@
         previouspage = 1;
     }
 
-    var maxpage = Math.Ceiling((double)Model.TotalCustomerOrders / CustomerOrdersPaymentsReportsViewModel.CustomerOrdersPerPage);
+    var maxpage = Math.Ceiling((double)Model.TotalCustomerInvoices / CustomerInvoicePaymentsReportsViewModel.CustomerOrdersPerPage);
 }
 
 <div class="row mb-5">
@@ -89,10 +89,10 @@
             {
             <th>Not Paid</th>
             }
-            <th> @order.PaidAdvance</th>
+            <th> @order.PaidAvance</th>
             <th> @order.DatePaidAmount</th>
             <th> @order.Balance</th>
-           <th><a asp-controller="Reports" asp-action="InvoicePaymentEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a></th> 
+           <th><a asp-controller="Reports" asp-action="EditInvoicePayment" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a></th> 
         </tr>
         }
     </tbody>

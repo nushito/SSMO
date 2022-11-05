@@ -18,5 +18,6 @@ namespace SSMO.Models.Suppliers
         public string Email { get; set; }
         public EditSupplierAddressFormModel SupplierAddress { get; set; }
         public string FSCSertificate { get; set; }
+        public string RepresentativePerson { get; set; }
     }
 }

@@ -6,6 +6,6 @@ namespace SSMO.Models.Suppliers
     {
         public string SupplierName { get; set; }
         public IEnumerable<string> SupplierNames { get; set; }
-        public EditSupplierFormModel CustomerForEdit { get; set; }
+        public EditSupplierFormModel SupplierForEdit { get; set; }
     }
 }
