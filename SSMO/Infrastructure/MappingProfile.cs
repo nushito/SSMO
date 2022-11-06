@@ -4,6 +4,7 @@ using SSMO.Models;
 using SSMO.Models.CustomerOrders;
 using SSMO.Models.Customers;
 using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Documents.Packing_List;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.PaymentsModels;
@@ -26,6 +27,8 @@ namespace SSMO.Infrastructure
             this.CreateMap<Product, ProductCustomerFormModel>()
                 .ForMember(a=>a.OrderedQuantity, b=>b.MapFrom(a=>a.OrderedQuantity))
                 .ForMember(a=>a.Price, b=>b.MapFrom(a=>a.Price));
+
+            this.CreateMap<Product, ProductsForPackingListPrint>();
 
             this.CreateMap<ProductCustomerFormModel, Product>()
                 .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.OrderedQuantity))

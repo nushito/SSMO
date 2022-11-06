@@ -8,7 +8,7 @@ namespace SSMO.Models.Documents.Packing_List
         public string DocumentType { get; set; }
         public DateTime Date { get; set; }
         public int DocumentNumber { get; set; }
-       // public int? CustomerId { get; set; }
+        public int? CustomerId { get; set; }
         public string Incoterms { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }

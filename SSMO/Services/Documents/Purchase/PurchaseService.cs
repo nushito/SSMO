@@ -30,6 +30,10 @@ namespace SSMO.Services.Documents.Purchase
             //var totalAmount = supplierOrder.TotalAmount;
             var customerOrder = dbContext.CustomerOrders.Where(sp => sp.Id == supplierOrder.CustomerOrderId)
                                  .FirstOrDefault();
+            customerOrder.NetWeight = netWeight;
+            customerOrder.GrossWeight = brutoWeight;
+            supplierOrder.NetWeight = netWeight;
+            supplierOrder.GrossWeight = brutoWeight;
 
             var purchase = new Document
             {

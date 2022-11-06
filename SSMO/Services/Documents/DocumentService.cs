@@ -42,53 +42,77 @@ namespace SSMO.Services.Documents
 
         public ICollection<int> GetPackingList()
         {
+            //TODO change invoice with packing
             return dbContext.Documents
-                .Where(type => type.DocumentType == Data.Enums.DocumentTypes.PackingList)
+                .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Invoice)
                 .Select(num => num.DocumentNumber)
                 .ToList();
         }
 
         public PackingListForPrintViewModel PackingListForPrint(int packingListNumber)
         {
-            var packing = dbContext.Documents
-                .Where(num => num.DocumentNumber == packingListNumber && num.DocumentType == Data.Enums.DocumentTypes.PackingList)
+            if (packingListNumber == 0) return null;
+            //TODO change invoice with packing after testing
+            var packingList = dbContext.Documents
+                .Where(num => num.DocumentNumber == packingListNumber && num.DocumentType == Data.Enums.DocumentTypes.Invoice)
                 .FirstOrDefault();
 
-            if (packing == null) return null;
+            var products = dbContext.Products
+                .Where(co => co.CustomerOrderId == packingList.CustomerOrderId)
+                .ToList();
 
             var packinglist = new PackingListForPrintViewModel
             {
                 DocumentType = Data.Enums.DocumentTypes.PackingList.ToString(),
-                Date = packing.Date,
+                Date = packingList.Date,
                 DocumentNumber = packingListNumber,
-                // CustomerId = packing.CustomerId,
-                Incoterms = packing.Incoterms,
-                FSCClaim = packing.FSCClaim,
-                FSCSertificate = packing.FSCSertificate,
-                MyCompanyId = packing.MyCompanyId,
-                NetWeight = packing.NetWeight,
-                GrossWeight = packing.GrossWeight,
-                TruckNumber = packing.TruckNumber,
+                CustomerId = packingList.CustomerId,
+                Incoterms = packingList.Incoterms,
+                FSCClaim = packingList.FSCClaim,
+                FSCSertificate = packingList.FSCSertificate,
+                MyCompanyId = packingList.MyCompanyId,
+                NetWeight = packingList.NetWeight,
+                GrossWeight = packingList.GrossWeight,
+                TruckNumber = packingList.TruckNumber,
             };
 
-            var myCompanyAddress = dbContext.Addresses
-                .Where(id => id.Id == packing.MyCompany.AddressId)
+            var myCompany = dbContext.MyCompanies
+                .Where(i=>i.Id == packingList.MyCompanyId)
                 .FirstOrDefault();
+
+            var myCompanyAddress = dbContext.Addresses
+               .Where(id => id.Id == myCompany.AddressId)
+               .FirstOrDefault();
 
             packinglist.MyCompanyForPl = new MyCompanyForPackingPrint
             {
-                Name = packing.MyCompany.Name,
-                EIK = packing.MyCompany.Eik,
-                VAT = packing.MyCompany.VAT,
+                Name = myCompany.Name,
+                EIK = myCompany.Eik,
+                VAT = myCompany.VAT,
                 Street = myCompanyAddress.Street,
                 City = myCompanyAddress.City,
                 Country = myCompanyAddress.Country
             };
 
-            packinglist.Products = (ICollection<ProductsForPackingListPrint>)mapper.Map<ProductsForPackingListPrint>(packing.Products);
+          //  packinglist.Products = mapper.Map<ICollection<ProductsForPackingListPrint>>(products);
+            foreach (var item in products)
+            {
+
+                packinglist.Products.Add(new ProductsForPackingListPrint
+                {
+                    DescriptionName = dbContext.Descriptions.Where(i => i.Id == item.DescriptionId).Select(n => n.Name).FirstOrDefault(),
+                    GradeName = dbContext.Descriptions.Where(i => i.Id == item.GradeId).Select(n => n.Name).FirstOrDefault(),
+                    SizeName = dbContext.Descriptions.Where(i => i.Id == item.SizeId).Select(n => n.Name).FirstOrDefault(),
+                    FSCClaim = item.FSCClaim,
+                    FSCSertificate = item.FSCSertificate,
+                    Pallets = item.Pallets,
+                    SheetsPerPallet = item.SheetsPerPallet,
+                    OrderedQuantity = item.LoadedQuantityM3
+                }); 
+            }
 
             var customer = dbContext.Customers
-                .Where(id => id.Id == packing.CustomerId)
+                .Where(id => id.Id == packinglist.CustomerId)
                 .FirstOrDefault();
 
             var customerAddress = dbContext.Addresses

@@ -86,6 +86,16 @@ namespace SSMO.Data
               .HasPrecision(18, 5);
 
             builder.Entity<CustomerOrder>()
+              .Property(a => a.NetWeight)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 3);
+
+            builder.Entity<CustomerOrder>()
+              .Property(a => a.GrossWeight)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 3);
+
+            builder.Entity<CustomerOrder>()
                 .HasOne(a => a.MyCompany)
                 .WithMany(a => a.Orders)
                 .HasForeignKey(a => a.MyCompanyId)
@@ -107,6 +117,15 @@ namespace SSMO.Data
                  .HasColumnType("decimal")
                  .HasPrecision(18, 4);
 
+            builder.Entity<SupplierOrder>()
+              .Property(a => a.NetWeight)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 3);
+
+            builder.Entity<SupplierOrder>()
+              .Property(a => a.GrossWeight)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 3);
 
             builder.Entity<SupplierOrder>()
                 .HasOne(a => a.CustomerOrder)

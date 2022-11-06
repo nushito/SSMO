@@ -66,7 +66,9 @@ namespace SSMO.Services.Documents.Invoice
                 SupplierOrderId = supplierOdrerForThisInvoiceId,
                 TruckNumber = truckNumber,
                 Incoterms = customerOrder.DeliveryTerms,
-                CustomerId = customerOrder.CustomerId
+                CustomerId = customerOrder.CustomerId,
+                NetWeight = customerOrder.NetWeight,
+                GrossWeight = customerOrder.GrossWeight
             };
 
             if (CheckFirstInvoice())
@@ -144,17 +146,25 @@ namespace SSMO.Services.Documents.Invoice
                 .Where(i => i.Id == id)
                 .FirstOrDefault();
             if (invoice == null) return;
+
             var packingList = new Document
             {
                 DocumentType = Data.Enums.DocumentTypes.PackingList,
+                DocumentNumber = invoice.DocumentNumber,
                 Date = invoice.Date,
                 CustomerId = invoice.CustomerId,
                 CustomerOrderId = invoice.CustomerOrderId,
                 Products = invoice.Products,
                 TruckNumber = invoice.TruckNumber,
                 Incoterms = invoice.Incoterms,
-                MyCompanyId = invoice.MyCompanyId 
+                MyCompanyId = invoice.MyCompanyId,
+                NetWeight = invoice.NetWeight,
+                GrossWeight = invoice.GrossWeight,
+                SupplierOrderId = invoice.SupplierOrderId
             };
+
+            dbContext.Documents.Add(packingList);
+            dbContext.SaveChanges();
         }
 
         public EditInvoicePaymentModel InvoiceForEditById(int id)
