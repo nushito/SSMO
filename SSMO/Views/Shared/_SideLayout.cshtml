@@ -34,6 +34,13 @@
                             <span>New Supplier Specification</span>
                         </a>
                     </li>
+                     
+                    <li class="nav-item active">
+                        <a href="~/ServiceOrders/AddServiceOrder" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Transport Order</span>
+                        </a>
+                    </li>
 
                     <li class="nav-item active">
                         <a href="~/Descriptions/Add" class="nav-link">
@@ -93,8 +100,8 @@
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="InvoicePaymentReport">Invoice</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="PurchasePaymentReport">Purchase</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="CustomerOrderPaymentReport">Customer Order</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="SupplierOrderPaymentReport">Supplier Order</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="CustomerOrdersPaymentReport">Customer Order</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="SupplierOrdersPaymentReport">Supplier Order</a>
                             </div>
                         </div>
                      </li>

@@ -15,6 +15,7 @@ namespace SSMO.Models.Documents.Purchase
         public int SupplierOrderId { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
+        public string SupplierFSCCertificate { get; set; }
         public decimal PaidAvance { get; set; }
         public decimal Balance { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]

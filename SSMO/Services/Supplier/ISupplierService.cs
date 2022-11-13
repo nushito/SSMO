@@ -22,5 +22,7 @@ namespace SSMO.Services
         public bool EditSupplier(string supplierName, string vat, string eik, string representativePerson,
             string country, string city, string street, string email, string fscCertificate);
 
+        public string GetSupplierFscCertificateByOrderNumber(string orderNumber);
+
     }
 }

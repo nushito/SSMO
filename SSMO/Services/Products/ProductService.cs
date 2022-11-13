@@ -53,7 +53,7 @@ namespace SSMO.Services.Products
 
             product.TotalSheets = product.Pallets * product.SheetsPerPallet;
             product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
-            product.LoadedQuantityM3 = Math.Round(sum * product.TotalSheets, 4);
+          //  product.LoadedQuantityM3 = Math.Round(sum * product.TotalSheets, 4);
             product.Amount = Math.Round(product.Price * product.LoadedQuantityM3, 4);
             _dbContext.Products.Add(product);
             _dbContext.SaveChanges();
@@ -175,9 +175,9 @@ namespace SSMO.Services.Products
             }
 
             product.TotalSheets = product.Pallets * product.SheetsPerPallet;
-            product.LoadedQuantityM3 = Math.Round(sum * product.TotalSheets, 4);
-            product.PurchaseAmount = Math.Round(product.PurchasePrice * product.LoadedQuantityM3, 4);
-            product.Amount = Math.Round(product.Price * product.LoadedQuantityM3, 4);
+            product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
+            product.PurchaseAmount = Math.Round(product.PurchasePrice * product.OrderedQuantity, 4);
+            product.Amount = Math.Round(product.Price * product.OrderedQuantity, 4);
 
             var spOrder = _dbContext.SupplierOrders.Where(i => i.Id == supplierOrderId).FirstOrDefault();
 

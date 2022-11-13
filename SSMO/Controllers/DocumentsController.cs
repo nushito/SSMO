@@ -4,6 +4,7 @@ using SSMO.Infrastructure;
 using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.Packing_List;
 using SSMO.Models.Documents.Purchase;
+using SSMO.Services;
 using SSMO.Services.CustomerOrderService;
 using SSMO.Services.Documents;
 using SSMO.Services.Documents.Invoice;
@@ -22,11 +23,13 @@ namespace SSMO.Controllers
         private readonly IInvoiceService invoiceService;
         private readonly IMycompanyService mycompanyService;
         private readonly IDocumentService documentService;
-  
+        private readonly ISupplierService supplierService;
+     
         public DocumentsController
             (ISupplierOrderService supplierOrderService, 
             IPurchaseService purchaseService, ICustomerOrderService customerOrderService,
-            IInvoiceService invoiceService, IMycompanyService mycompanyService, IDocumentService documentService)
+            IInvoiceService invoiceService, IMycompanyService mycompanyService, 
+            IDocumentService documentService, ISupplierService supplierService)
         {
             this.supplierOrderService = supplierOrderService;
             this.purchaseService = purchaseService;
@@ -34,14 +37,26 @@ namespace SSMO.Controllers
             this.invoiceService = invoiceService;   
             this.mycompanyService = mycompanyService;
             this.documentService = documentService;
+            this.supplierService = supplierService;
         }
 
 
         public IActionResult AddPurchase(SupplierOrderListModel model)
         {
+            if(model.SupplierName != null)
+            {
+                string userId = this.User.UserId();
+                var userIdMyCompany = mycompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
+
+                if (!userIdMyCompany.Contains(userId))
+                {
+                    return BadRequest();
+                }
+
+            }
             var suppliersList = this.supplierOrderService.GetSuppliers();
 
-            var supplierOrdersList = this.purchaseService.GetSupplierOrders(
+            var supplierOrdersList = this.purchaseService.GetSupplierOrdersForPurchase(
                 model.SupplierName, model.CurrentPage, SupplierOrderListModel.SupplierOrdersPerPage);
 
             model.SupplierOrderNumbers = supplierOrdersList;
@@ -53,14 +68,26 @@ namespace SSMO.Controllers
         [HttpGet]
         public IActionResult PurchaseDetails(string supplierOrderNumber)
         {
+            if(supplierOrderNumber != null)
+            {
+                string userId = this.User.UserId();
+                var userIdMyCompany = mycompanyService.GetUserIdMyCompanyBySupplierOrdreNum(supplierOrderNumber);
+
+                if (userIdMyCompany != userId)
+                {
+                    return BadRequest();
+                }
+            }
+
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
             }
             return View(new PurchaseDetailsFormModel
             {
-                SupplierOrderNumber = supplierOrderNumber
-            });
+                SupplierOrderNumber = supplierOrderNumber,
+                SupplierFSCCertificate = supplierService.GetSupplierFscCertificateByOrderNumber(supplierOrderNumber)
+        });
         }
 
         [HttpPost]
@@ -94,13 +121,16 @@ namespace SSMO.Controllers
             {
                 ModelState.AddModelError("NetWeight", "Net Weight should be less than Gross Weight");
                 return View(model);
-            }   
+            }
 
             var purchase = purchaseService.CreatePurchaseAsPerSupplierOrder(
                 supplierOrderNumber, model.Number, model.Date,
                 model.PaidStatus, model.NetWeight,
-                model.GrossWeight, model.Duty, model.Factoring,model.CustomsExpenses, model.FiscalAgentExpenses,
-                model.ProcentComission, model.PurchaseTransportCost, model.BankExpenses, model.OtherExpenses, model.Vat, model.TruckNumber);
+                model.GrossWeight, model.Duty, model.Factoring,
+                model.CustomsExpenses, model.FiscalAgentExpenses,
+                model.ProcentComission, model.PurchaseTransportCost, 
+                model.BankExpenses, model.OtherExpenses, model.Vat, 
+                model.TruckNumber,model.FSCSertificate, model.FSCClaim);
 
             if (!purchase)
             {
@@ -127,7 +157,6 @@ namespace SSMO.Controllers
             {
                 OrderConfirmationNumberList = customerOrdersList,
                 MyCompanyNames = companiesNames
-
             };
 
             return View(collectionCustomerOrders);

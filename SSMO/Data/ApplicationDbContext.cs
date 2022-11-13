@@ -322,6 +322,12 @@ namespace SSMO.Data
                .HasForeignKey(s => s.CustomerOrderId)
                .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Document>()
+               .HasOne(s => s.Supplier)
+               .WithMany(d => d.Documents)
+               .HasForeignKey(s => s.SupplierId)
+               .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Supplier>()
                 .HasOne(a => a.Address)
                 .WithMany(a => a.Suppliers)

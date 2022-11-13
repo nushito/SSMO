@@ -37,11 +37,15 @@ namespace SSMO.Infrastructure
             this.CreateMap<Product, ProductSupplierDetails>();
 
             this.CreateMap<CustomerOrder, CustomerOrderDetailsModel>();
+            this.CreateMap<CustomerOrder, CustomerOrderDetailsPaymentModel>();
+            this.CreateMap<CustomerOrder, EditCustomerOrderPaymentModel>();
 
             this.CreateMap<Status, StatusModel>();
 
             this.CreateMap<SupplierOrder, PurchaseModelAsPerSpec>()
                 .ForMember(a=>a.SupplierOrderNumber , b=>b.MapFrom(a=>a.Number));
+            this.CreateMap<SupplierOrder, SupplierOrdersPaymentDetailsModel>()
+                .ForMember(a => a.SupplierOrderNumber, b => b.MapFrom(a => a.Number)); 
 
             this.CreateMap<Product, ProductsForInvoiceModel>();
             this.CreateProjection<ProductCustomerFormModel, Product>()
@@ -55,6 +59,7 @@ namespace SSMO.Infrastructure
             this.CreateMap<Address, EditSupplierAddressFormModel>();
             this.CreateMap<Supplier, EditSupplierFormModel>();
             this.CreateMap<Document, EditInvoicePaymentModel>();
+            this.CreateMap<Document, SupplierInvoicePaymentDetailsModel>();
         }
     }
 }

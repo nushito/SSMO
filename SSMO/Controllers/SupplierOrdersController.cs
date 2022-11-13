@@ -119,7 +119,6 @@ namespace SSMO.Controllers
            return RedirectToAction("EditProductAsPerSupplier", new {customerOrderId = customerorderId, supplierOrderId = supplierOrderId} );
         }
 
-        
         [HttpGet]
         public IActionResult EditProductAsPerSupplier(
             int customerorderId, int supplierOrderId)
@@ -138,7 +137,6 @@ namespace SSMO.Controllers
                     Sizes = productService.GetSizes()
                 };
             }
-
 
             var corder = productService.Details(customerorderId);
 
@@ -173,7 +171,6 @@ namespace SSMO.Controllers
               };
 
                 listProducts.Add(productSupp);
-
             };
 
             return View(listProducts);  

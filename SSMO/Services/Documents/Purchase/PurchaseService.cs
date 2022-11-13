@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Models.Reports.PaymentsModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,12 +19,12 @@ namespace SSMO.Services.Documents.Purchase
             this.dbContext = dbContext;
             this.mapper = mapper;
         }
-
         public bool CreatePurchaseAsPerSupplierOrder(
             string supplierOrderNumber, string number, DateTime date, bool paidStatus,
             decimal netWeight, decimal brutoWeight,
             decimal duty, decimal factoring, decimal customsExpenses, decimal fiscalAgentExpenses,
-            decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses, int vat, string truckNumber)
+            decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses, 
+            int vat, string truckNumber, string fscCertificate, string fscClaim)
         {
             var supplierOrder = dbContext.SupplierOrders.FirstOrDefault(o => o.Number.ToLower() == supplierOrderNumber.ToLower());
             var amount = supplierOrder.Amount;
@@ -43,12 +44,12 @@ namespace SSMO.Services.Documents.Purchase
                 SupplierOrder = supplierOrder,
                 SupplierOrderId = supplierOrder.Id,
                 CustomerOrderId = supplierOrder.CustomerOrderId,
-                PaidStatus = paidStatus,    
+                PaidStatus = paidStatus,
                 NetWeight = netWeight,
                 GrossWeight = brutoWeight,
                 Duty = duty,
                 Factoring = factoring,
-                CustomsExpenses = customsExpenses,  
+                CustomsExpenses = customsExpenses,
                 FiscalAgentExpenses = fiscalAgentExpenses,
                 ProcentComission = procentComission,
                 PurchaseTransportCost = purchaseTransportCost,
@@ -58,28 +59,33 @@ namespace SSMO.Services.Documents.Purchase
                 Incoterms = customerOrder.DeliveryTerms,
                 Products = new List<Product>(),
                 Vat = vat,
-                TruckNumber = truckNumber
+                TruckNumber = truckNumber,
+                SupplierId = supplierOrder.SupplierId,
+                MyCompanyId = supplierOrder.MyCompanyId,
+                FSCClaim = fscClaim,
+                FSCSertificate = fscCertificate
             };
 
             purchase.TotalAmount = purchase.Amount + purchase.Amount * vat / 100;
-            var expenses = purchase.Duty + purchase.Factoring*amount/100 +
+            var expenses = purchase.Duty + purchase.Factoring * amount / 100 +
                        purchase.CustomsExpenses + purchase.FiscalAgentExpenses +
-                       purchase.ProcentComission*amount/100 + purchase.PurchaseTransportCost + purchase.BankExpenses + purchase.OtherExpenses;
+                       purchase.ProcentComission * amount / 100 + purchase.PurchaseTransportCost + purchase.BankExpenses + purchase.OtherExpenses;
 
-            var productList = dbContext.Products.Where(s=>s.SupplierOrderId == supplierOrder.Id).ToList();
+            var productList = dbContext.Products.Where(s => s.SupplierOrderId == supplierOrder.Id).ToList();
 
             foreach (var product in productList)
             {
-               product.CostPrice = (product.Amount + (expenses / supplierOrder.TotalQuantity * product.LoadedQuantityM3)) / product.LoadedQuantityM3;
-               purchase.Products.Add(product);                                
+                product.LoadedQuantityM3 = product.OrderedQuantity;
+                product.CostPrice = (product.Amount + (expenses / supplierOrder.TotalQuantity * product.LoadedQuantityM3)) / product.LoadedQuantityM3;
+                purchase.Products.Add(product);
             }
 
-            if(purchase == null)
+            if (purchase == null)
             {
                 return false;
             }
 
-            if(purchase.PaidStatus == true)
+            if (purchase.PaidStatus == true)
             {
                 supplierOrder.PaidStatus = true;
                 supplierOrder.Balance = 0;
@@ -87,14 +93,53 @@ namespace SSMO.Services.Documents.Purchase
                 purchase.PaidAvance = purchase.Amount;
                 supplierOrder.PaidAvance = purchase.Amount;
             }
-            
+
             dbContext.Documents.Add(purchase);
             dbContext.SaveChanges();
 
             return true;
         }
 
-        public IEnumerable<PurchaseModelAsPerSpec> GetSupplierOrders(string supplierName
+        public bool EditPurchasePayment
+            (string number, bool paidStatus, decimal paidAvance, DateTime datePaidAmount)
+        {
+            if (number == null)
+            {
+                return false;
+            }
+
+            var purchase = dbContext.Documents
+                .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Purchase && type.Number.ToLower() == number.ToLower())
+                .FirstOrDefault(); 
+           
+            purchase.PaidStatus = paidStatus;
+            purchase.PaidAvance = paidAvance;
+            purchase.DatePaidAmount = datePaidAmount;
+            purchase.Balance = purchase.TotalAmount - purchase.PaidAvance;
+            if (purchase.Balance == 0)
+            {
+                purchase.PaidStatus = true;
+            }
+            else
+            {
+                purchase.PaidStatus = false;
+            }
+
+            return true;
+        }
+
+        public EditPurchasePaymentDetails GetPurchaseForPaymentEdit(string number)
+        {
+            var purchase = dbContext.Documents
+                .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Purchase && type.Number.ToLower() == number.ToLower());
+
+
+            var purchaseForEdit = purchase.ProjectTo<EditPurchasePaymentDetails>(mapper).FirstOrDefault();
+
+            return purchaseForEdit;
+        }
+
+        public IEnumerable<PurchaseModelAsPerSpec> GetSupplierOrdersForPurchase(string supplierName
             , int currentpage, int supplierOrdersPerPage)
         {
             if (String.IsNullOrEmpty(supplierName))
@@ -107,7 +152,7 @@ namespace SSMO.Services.Documents.Purchase
                 .Select(a => a.Id).FirstOrDefault();
 
             var queryOrders = dbContext.SupplierOrders.
-                Where(a => a.SupplierId == supplierId).OrderByDescending(a=>a.Date);
+                Where(a => a.SupplierId == supplierId).OrderByDescending(a => a.Date);
 
             var totalOrders = queryOrders.Count();
 
@@ -118,6 +163,6 @@ namespace SSMO.Services.Documents.Purchase
             return supplierOrdersList;
         }
 
-      
+
     }
 }

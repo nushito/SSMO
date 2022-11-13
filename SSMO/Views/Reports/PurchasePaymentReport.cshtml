@@ -1,18 +1,19 @@
-﻿@model CustomerInvoicePaymentsReportsViewModel
+﻿@model SupplierInvoicePaymentReportViewModel
 @{
-    ViewBag.Title = "Invoices Payment Report";
+    ViewBag.Title = "Purchase Invoices Payment Report";
 }
 
 <form method="get">
     <div class="row">
         <div class="form-group col-md-4">
-            <label asp-for="CustomerName"></label>
-            <select asp-for="CustomerName" class="form-control">
+            <label asp-for="SupplierName"></label>
+            <select asp-for="SupplierName" class="form-control">
                 <option value="">All</option>
-                @foreach (var customerName in Model.CustomerNames)
+                @foreach (var supplierName in Model.SupplierNames)
                 {
-                    <option value="@customerName">@customerName</option>
+                    <option value="@supplierName">@supplierName</option>
                 }
+
             </select>
         </div>
     </div>
@@ -29,36 +30,37 @@
         previouspage = 1;
     }
 
-    var maxpage = Math.Ceiling((double)Model.TotalCustomerInvoices / CustomerInvoicePaymentsReportsViewModel.CustomerInvoicesPerPage);
+    var maxpage = Math.Ceiling((double)Model.TotalSupplierInvoices / SupplierInvoicePaymentReportViewModel.SupplierInvoicePerPage);
+   
 }
 
 <div class="row mb-5">
     <div class="col-md-6">
         <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
            asp-controller="Reports"
-           asp-action="InvoicePaymentReport"
+           asp-action="PurchasePaymentReport"
            asp-route-currentPage="@previouspage"
-           asp-route-customerName="@Model.CustomerName"><<</a>
+           asp-route-customerName="@Model.SupplierName"><<</a>
     </div>
 
     @{
         var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
-        !Model.CustomerPaymentCollection.Any();
+        !Model.SupplierInvoicesPaymentCollection.Any();
     }
 
     <div class="col-md-6">
         <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
            asp-controller="Reports"
-           asp-action="InvoicePaymentReport"
+           asp-action="PurchasePaymentReport"
            asp-route-currentPage="@(Model.CurrentPage + 1)"
-           asp-route-customerName="@Model.CustomerName">>></a>
+           asp-route-customerName="@Model.SupplierName">>></a>
     </div>
 </div>
 <table class="table">   
     <thead>
         <tr>
                 <th>
-                Invoice Number
+                Purchase Number
                 </th>
                 <th>
                     Date
@@ -78,10 +80,10 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var order in Model.CustomerPaymentCollection)
+        @foreach(var order in Model.SupplierInvoicesPaymentCollection)
         {
         <tr>
-            <th> @order.DocumentNumber</th>
+            <th> @order.Number</th>
             <th> @order.Date</th>
             @if( @order.PaidStatus == true)
             {
@@ -94,10 +96,9 @@
             <th> @order.PaidAvance</th>
             <th> @order.DatePaidAmount</th>
             <th> @order.Balance</th>
-           <th><a asp-controller="Reports" asp-action="EditInvoicePayment" asp-route-documentNumber="@order.DocumentNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
+           <th><a asp-controller="Reports" asp-action="EditPurchasePayment" asp-route-number="@order.Number" class="btn btn-outline-info mr-1">Edit</a></th> 
         </tr>
         }
     </tbody>
+
 </table>
-
-

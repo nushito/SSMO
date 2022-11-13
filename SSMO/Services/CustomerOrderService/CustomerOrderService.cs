@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
 using SSMO.Models.Products;
+using SSMO.Models.Reports.PaymentsModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +13,8 @@ namespace SSMO.Services.CustomerOrderService
     public class CustomerOrderService : ICustomerOrderService
     {
         private readonly ApplicationDbContext dbContext;
-        private readonly IMapper mapper;
-        public CustomerOrderService(ApplicationDbContext dbContext, IMapper mapper)
+        private readonly IConfigurationProvider mapper;
+        public CustomerOrderService(ApplicationDbContext dbContext, IConfigurationProvider mapper)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
@@ -27,9 +29,6 @@ namespace SSMO.Services.CustomerOrderService
 
             return false;
         }
-
-
-
 
         public int CreateOrder(string num, DateTime date, int customerId, int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,int currency,string origin, 
@@ -51,7 +50,7 @@ namespace SSMO.Services.CustomerOrderService
 
             var order = new SSMO.Data.Models.CustomerOrder
             {
-                OrderConfirmationNumber = lastConfirmationNumber+1,
+                OrderConfirmationNumber = lastConfirmationNumber + 1,
                 CustomerPoNumber = num,
                 Date = date,
                 CustomerId = customerId,
@@ -63,16 +62,14 @@ namespace SSMO.Services.CustomerOrderService
                 FSCSertificate = fscCertificate,
                 CurrencyId = currency,
                 Status = status,
-               Origin = origin,
-               PaidAmountStatus = paidStatus,   
-               Vat = vat
+                Origin = origin,
+                PaidAmountStatus = paidStatus,
+                Vat = vat
             };
 
-           
             dbContext.CustomerOrders.Add(order);
             dbContext.SaveChanges();
             return order.Id;
-
         }
 
         public void CustomerOrderCounting(int customerorderId)
@@ -161,6 +158,42 @@ namespace SSMO.Services.CustomerOrderService
         public ICollection<int> AllCustomerOrderNumbers()
         {
             return dbContext.CustomerOrders.Select(a => a.OrderConfirmationNumber).ToList();
+        }
+
+        public EditCustomerOrderPaymentModel GetCustomerOrderPaymentForEdit(int orderConfirmationNumber)
+        {
+            var customerOrder = dbContext.CustomerOrders
+                .Where(num => num.OrderConfirmationNumber == orderConfirmationNumber);
+
+            var customerOrderforEdit = customerOrder.ProjectTo<EditCustomerOrderPaymentModel>(mapper).FirstOrDefault();
+
+            return customerOrderforEdit;
+        }
+
+        public bool EditCustomerOrdersPayment(int orderConfirmationNumber, bool paidStatus, decimal paidAdvance)
+        {
+            if (orderConfirmationNumber == 0)
+            {
+                return false;
+            }
+
+            var customerOrder = dbContext.CustomerOrders
+                .Where(num => num.OrderConfirmationNumber == orderConfirmationNumber)
+                .FirstOrDefault();
+           
+            customerOrder.PaidAmountStatus = paidStatus;
+            customerOrder.PaidAvance = paidAdvance;
+            customerOrder.Balance = customerOrder.TotalAmount - customerOrder.PaidAvance;
+            if (customerOrder.Balance == 0)
+            {
+                customerOrder.PaidAmountStatus = true;
+            }
+            else
+            {
+                customerOrder.PaidAmountStatus = false;
+            }
+
+            return true;
         }
     }
 }

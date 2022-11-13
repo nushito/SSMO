@@ -8,7 +8,6 @@
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
 
-
     public static class ApplicationBuilderExtensions
     {
         public static IApplicationBuilder PrepareDatabase(

@@ -128,9 +128,16 @@ namespace SSMO.Services.Documents.Invoice
                 product.Description = productService.GetDescriptionName(product.DescriptionId);
                 product.Grade = productService.GetGradeName(product.GradeId);
                 product.Size = productService.GetSizeName(product.SizeId);
+              
             }
 
             invoiceForPrint.VatAmount = customerOrder.Amount * customerOrder.Vat / 100 ?? 0;
+
+            foreach (var product in productList)
+            {
+                product.OrderedQuantity = 0;
+                product.LoadedQuantityM3 = 0;
+            }
 
             dbContext.Documents.Add(invoiceCreate);
             dbContext.SaveChanges();
@@ -167,10 +174,10 @@ namespace SSMO.Services.Documents.Invoice
             dbContext.SaveChanges();
         }
 
-        public EditInvoicePaymentModel InvoiceForEditById(int id)
+        public EditInvoicePaymentModel InvoiceForEditByNumber(int documentNumber)
         {
             return dbContext.Documents
-                .Where(i => i.Id == id)
+                .Where(i => i.DocumentNumber == documentNumber)
                 .Select(n => new EditInvoicePaymentModel
                 {
                     DocumentNumber = n.DocumentNumber,
@@ -181,5 +188,43 @@ namespace SSMO.Services.Documents.Invoice
                     PaidStatus = n.PaidStatus
                 }).FirstOrDefault();
         }
+
+        public bool EditInvoicePayment
+            (int documentNumber, bool paidStatus, decimal paidAdvance, DateTime datePaidAmount)
+        {
+            if (documentNumber == 0)
+            {
+                return false;
+            }
+
+            var invoice = dbContext.Documents
+                .Where(i => i.DocumentNumber == documentNumber)
+                .FirstOrDefault();
+
+            invoice.PaidAvance = paidAdvance;
+            invoice.DatePaidAmount = datePaidAmount;
+            invoice.PaidStatus = paidStatus;
+            
+
+            invoice.Balance = invoice.TotalAmount - paidAdvance;
+
+            if (invoice.Balance > 0)
+            {
+                invoice.PaidStatus = false;
+            }
+            else
+            {
+                invoice.PaidStatus = true;
+            }
+
+            dbContext.SaveChanges();
+            return true;
+        }
+
+        public ICollection<int> GetInvoiceDocumentNumbers()
+        => dbContext.Documents
+            .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Invoice)
+            .Select(num => num.DocumentNumber)
+            .ToList();
     }
 }

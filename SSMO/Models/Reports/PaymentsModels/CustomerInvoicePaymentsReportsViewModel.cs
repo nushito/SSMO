@@ -4,7 +4,7 @@ namespace SSMO.Models.Reports.PaymentsModels
 {
     public class CustomerInvoicePaymentsReportsViewModel
     {
-        public const int CustomerOrdersPerPage = 15;
+        public const int CustomerInvoicesPerPage = 15;
         public int CurrentPage { get; init; } = 1;
         public int TotalCustomerInvoices { get; set; }
         public string CustomerName { get; set; }

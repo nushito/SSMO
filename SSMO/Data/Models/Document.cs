@@ -26,6 +26,8 @@ namespace SSMO.Data.Models
         public int CustomerOrderId { get; set; }
         [Required]
         public CustomerOrder CustomerOrder { get; set; }
+        public int? SupplierId { get; set; }
+        public Supplier Supplier { get; set; }
         public int SupplierOrderId { get; set; }
         public SupplierOrder SupplierOrder { get; set; }
         public int? MyCompanyId { get; set; }

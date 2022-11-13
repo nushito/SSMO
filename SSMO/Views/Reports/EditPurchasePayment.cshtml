@@ -1,9 +1,11 @@
-﻿@model EditInvoicePaymentModel
+﻿@model EditPurchasePaymentDetails
 @{
-    ViewBag.Title = "Edit Invoice Payment Details";
+    ViewBag.Title = "Edit Purchase Payment";
 }
+
 <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
     <form method="post">
+       
         <div class="form-group">
             <label asp-for="PaidAvance">Paid Advance</label>
             <input type="text" class="form-control" asp-for="PaidAvance">

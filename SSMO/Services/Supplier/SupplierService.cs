@@ -74,6 +74,26 @@ namespace SSMO.Services
             return getSupplier;
         }
 
+        public string GetSupplierFscCertificateByOrderNumber(string orderNumber)
+        {
+            var supplierId = dbContext.SupplierOrders
+                .Where(num => num.Number.ToLower() == orderNumber.ToLower())
+                .Select(s => s.SupplierId)
+                .FirstOrDefault();
+
+            var supplierFsc = dbContext.Suppliers
+                .Where(id => id.Id == supplierId)
+                .Select(fs => fs.FSCSertificate)
+                .FirstOrDefault();
+
+            if(supplierFsc == null)
+            {
+                return null;
+            }
+
+            return supplierFsc;
+        }
+
         public IEnumerable<string> GetSupplierNames()
         {
             return dbContext

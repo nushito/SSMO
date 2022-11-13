@@ -33,14 +33,12 @@ namespace SSMO.Data.Models
         public ICollection<BankDetails> BankDetails { get; init; }
         public int AddressId { get; set; }
         public Address Address { get; set; }
-   
         public string FSCClaim { get; set; }
-      
         public string FSCSertificate { get; set; }
-
         public string RepresentativePerson { get; set; }
-
         public IEnumerable<Product> Products { get; set; }
+        public IEnumerable<Document> Documents { get; set; }
+        public IEnumerable<SupplierOrder> SupplierOrders { get; set; }
         // public int ProductId { get; set; }
 
     }

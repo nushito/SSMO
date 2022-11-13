@@ -11,11 +11,14 @@ using SSMO.Services;
 using SSMO.Services.Customer;
 using SSMO.Services.CustomerOrderService;
 using SSMO.Services.Documents.Invoice;
+using SSMO.Services.Documents.Purchase;
 using SSMO.Services.MyCompany;
 using SSMO.Services.Products;
 using SSMO.Services.Reports;
 using SSMO.Services.Status;
+using SSMO.Services.SupplierOrders;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SSMO.Controllers
 {
@@ -31,11 +34,14 @@ namespace SSMO.Controllers
 		private readonly IMapper mapper;
 		private readonly IStatusService statusService;
 		private readonly IInvoiceService invoiceService;
+		private readonly IPurchaseService purchaseService;
+		private readonly ISupplierOrderService supplierOrderService;
 
 		public ReportsController(IReportsService service,
 		   ICustomerService customerService, ISupplierService supplierService,
 		   ICurrency currency, IMycompanyService mycompanyService, IProductService productService,
-		   ICustomerOrderService customerOrderService, IStatusService statusService, IMapper mapper, IInvoiceService invoiceService)
+		   ICustomerOrderService customerOrderService, IStatusService statusService, IMapper mapper, IInvoiceService invoiceService,
+			IPurchaseService purchaseService, ISupplierOrderService supplierOrderService)
 		{
 			this.reportService = service;
 			this.customerService = customerService;
@@ -47,6 +53,8 @@ namespace SSMO.Controllers
 			this.productService = productService;
 			this.customerOrderService = customerOrderService;
 			this.invoiceService = invoiceService;
+			this.purchaseService = purchaseService;
+			this.supplierOrderService = supplierOrderService;
 		}
 
 
@@ -246,29 +254,27 @@ namespace SSMO.Controllers
 
 			var customerPaymentCollection = reportService.CustomersInvoicesPaymentDetails(
 				model.CustomerName,
-				model.CurrentPage, CustomerInvoicePaymentsReportsViewModel.CustomerOrdersPerPage);
+				model.CurrentPage, CustomerInvoicePaymentsReportsViewModel.CustomerInvoicesPerPage);
 
 			model.CustomerPaymentCollection = customerPaymentCollection;
-
 			model.CustomerNames = customerNames;
-
-
+			model.TotalCustomerInvoices = customerPaymentCollection.Count();
 			return View(model);
 		}
 		[HttpGet]
-		public IActionResult EditInvoicePayment(int id)
+		public IActionResult EditInvoicePayment(int documentNumber)
 		{
 			if (!ModelState.IsValid)
 			{
 				return BadRequest();
 			}
 
-			var invoiceForEdit = invoiceService.InvoiceForEditById(id);
+			var invoiceForEdit = invoiceService.InvoiceForEditByNumber(documentNumber);
 			return View(invoiceForEdit);
 		}
 		[HttpPost]
 		[Authorize]
-		public IActionResult EditInvoicePayment(EditInvoicePaymentModel model, int id)
+		public IActionResult EditInvoicePayment(EditInvoicePaymentModel model, int documentNumber)
 		{
 			if (!User.Identity.IsAuthenticated)
 			{
@@ -279,8 +285,8 @@ namespace SSMO.Controllers
 				return BadRequest();
 			}
 
-			var updatedInvoicePayment = reportService.EditInvoicePayment
-				(id,model.DocumentNumber,model.Date, model.PaidStatus, model.PaidAvance, model.DatePaidAmount);
+			var updatedInvoicePayment = invoiceService.EditInvoicePayment
+				(documentNumber, model.PaidStatus, model.PaidAvance, model.DatePaidAmount);
 
 			if(updatedInvoicePayment == false)
             {
@@ -288,17 +294,186 @@ namespace SSMO.Controllers
             }
 			return RedirectToAction("Index", "Home");
 		}
-		public IActionResult PurchasePaymentReport()
+		public IActionResult PurchasePaymentReport(SupplierInvoicePaymentReportViewModel model)
 		{
-			return View();
+			if (!ModelState.IsValid) return View();
+			if (model.SupplierName != null)
+			{
+				string userId = this.User.UserId();
+				var userIdMyCompany = myCompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
+
+				if (!userIdMyCompany.Contains(userId))
+				{
+					return BadRequest();
+				}
+			}
+
+			var supplierNames = supplierService.GetSupplierNames();
+			model.SupplierNames = supplierNames;
+
+			var supplierPaymentCollection = reportService.SuppliersInvoicesPaymentDetails(
+				model.SupplierName,
+				model.CurrentPage, SupplierInvoicePaymentReportViewModel.SupplierInvoicePerPage);
+			model.SupplierInvoicesPaymentCollection = supplierPaymentCollection;
+
+			model.TotalSupplierInvoices = supplierPaymentCollection.Count();
+
+			return View(model);
 		}
-		public IActionResult CustomerOrderPaymentReport()
+        [HttpGet]
+        [Authorize]
+		public IActionResult EditPurchasePayment(string number)
+        {
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+
+			var purchaseForpurchaseDetails = purchaseService.GetPurchaseForPaymentEdit(number);
+
+			return View(purchaseForpurchaseDetails);
+        }
+        [HttpPost]
+        [Authorize]
+		public IActionResult EditPurchasePayment(EditPurchasePaymentDetails model,string number)
+        {
+			if (!User.Identity.IsAuthenticated)
+			{
+				return BadRequest();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+			var updatedPurchasePayment = purchaseService.EditPurchasePayment
+				(number, model.PaidStatus, model.PaidAvance, model.DatePaidAmount);
+
+
+			if (updatedPurchasePayment == false)
+			{
+				return BadRequest();
+			}
+			return RedirectToAction("Index", "Home");
+		}
+		public IActionResult CustomerOrdersPaymentReport(CustomerOrderPaymentReportViewModel model)
 		{
-			return View();
+			if (model.CustomerName != null)
+			{
+				string userId = this.User.UserId();
+				var userIdMyCompany = myCompanyService.MyCompaniesNamePerCustomer(model.CustomerName);
+
+				if (!userIdMyCompany.Contains(userId))
+				{
+					return BadRequest();
+				}
+			}
+			if (!ModelState.IsValid) return View();
+			//TODO When All are selected page is empty
+
+			var customerNames = customerService.GetCustomerNames();
+
+			var customerOrdersPaymentCollection = reportService.CustomerOrdersPaymentDetails(
+				model.CustomerName,
+				model.CurrentPage, CustomerInvoicePaymentsReportsViewModel.CustomerInvoicesPerPage);
+
+			model.CustomerOrdersPaymentCollection = customerOrdersPaymentCollection;
+			model.CustomerNames = customerNames;
+			model.TotalCustomerOrders = customerOrdersPaymentCollection.Count();
+			return View(model);
 		}
-		public IActionResult SupplierOrderPaymentReport()
+
+        [HttpGet]
+        [Authorize]
+		public IActionResult EditCustomerOrderPayment(int orderConfirmationNumber)
+        {
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+
+			var customerOrderForEdit = customerOrderService.GetCustomerOrderPaymentForEdit(orderConfirmationNumber);
+
+			return View(customerOrderForEdit);
+		}
+
+        [HttpPost]
+        [Authorize]
+		public IActionResult EditCustomerOrderPayment(EditCustomerOrderPaymentModel model, int orderConfirmationNumber)
+        {
+			if (!User.Identity.IsAuthenticated)
+			{
+				return BadRequest();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+
+			var updatedCustomerOrderPayment = customerOrderService.EditCustomerOrdersPayment
+				(orderConfirmationNumber, model.PaidStatus, model.PaidAvance);
+
+			if (updatedCustomerOrderPayment == false)
+			{
+				return BadRequest();
+			}
+			return RedirectToAction("Index", "Home");
+		}
+
+		public IActionResult SupplierOrdersPaymentReport(SupplierOrdersPaymentReportViewModel model)
 		{
-			return View();
+            if (!ModelState.IsValid)
+            {
+				return View();
+            }
+
+			if (model.SupplierName != null)
+			{
+				string userId = this.User.UserId();
+				var userIdMyCompany = myCompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
+
+				if (!userIdMyCompany.Contains(userId))
+				{
+					return BadRequest();
+				}
+			}
+
+			var supplierNames = supplierService.GetSupplierNames();
+			model.SupplierNames = supplierNames;
+
+			model.SupplierOrderPaymentCollection = supplierOrderService.GetSupplierOrders(model.SupplierName);
+			
+			return View(model);
 		}
+        [HttpGet]
+        [Authorize]
+		public IActionResult EditSupplierOrder(string supplierOrderNumber)
+        {
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+
+			var supplierOrder = supplierOrderService.GetSupplierOrderForEdit(supplierOrderNumber);
+			return View(supplierOrder);
+        }
+        [HttpPost]
+        [Authorize]
+		public IActionResult EditSupplierOrder(string supplierOrderNumber, EditSupplierOrderPaymentModel model)
+        {
+			if (!User.Identity.IsAuthenticated)
+			{
+				return BadRequest();
+			}
+			if (!ModelState.IsValid)
+			{
+				return BadRequest();
+			}
+
+			var isSupplierOrderPaymentEdit = supplierOrderService.EditSupplierOrderPayment
+				(supplierOrderNumber, model.PaidAvance, model.DatePaidAmount, model.PaidStatus);
+
+			return View();
+        }
+
 	}
 }

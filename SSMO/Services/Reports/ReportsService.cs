@@ -83,7 +83,7 @@ namespace SSMO.Services.Reports
         }
 
         public IEnumerable<CustomerInvoicePaymentDetailsModel> CustomersInvoicesPaymentDetails
-            (string customerName, int currentpage, int customerOrdersPerPage)
+            (string customerName, int currentpage, int customerInvoicePerPage)
         {
             if (String.IsNullOrEmpty(customerName))
             {
@@ -101,11 +101,33 @@ namespace SSMO.Services.Reports
 
             var invoices = queryInvoices.ProjectTo<CustomerInvoicePaymentDetailsModel>(this.mapper).ToList();
 
-            var customerPaymentList = invoices.Skip((currentpage - 1) * customerOrdersPerPage).Take(customerOrdersPerPage);
+            var customerPaymentList = invoices.Skip((currentpage - 1) * customerInvoicePerPage).Take(customerInvoicePerPage);
 
             return customerPaymentList;
         }
 
+        public IEnumerable<SupplierInvoicePaymentDetailsModel> SuppliersInvoicesPaymentDetails
+            (string supplierName, int currentpage, int supplierInvoicePerPage)
+        {
+            if (String.IsNullOrEmpty(supplierName))
+            {
+                return new List<SupplierInvoicePaymentDetailsModel>();
+            }
+
+            var supplierId = dbcontext.Suppliers
+                .Where(n => n.Name.ToLower() == supplierName.ToLower())
+                .Select(i=>i.Id)
+                .FirstOrDefault();
+
+
+            var purchaseInvoices = dbcontext.Documents
+                .Where(n => n.SupplierId == supplierId && n.DocumentType == Data.Enums.DocumentTypes.Purchase);
+
+            var purchases = purchaseInvoices.ProjectTo<SupplierInvoicePaymentDetailsModel>(mapper).ToList();
+            var purchasePaymentList = purchases.Skip((currentpage - 1) * supplierInvoicePerPage).Take(supplierInvoicePerPage);
+
+            return purchasePaymentList;
+        }
         public CustomerOrderDetailsModel Details(int id)
         {
             var findorder = dbcontext.CustomerOrders.Where(a => a.Id == id);
@@ -190,44 +212,10 @@ namespace SSMO.Services.Reports
             return true;
         }
 
-        public bool EditInvoicePayment
-            (int id, int documentNumber, DateTime date, bool paidStatus, decimal paidAdvance, DateTime datePaidAmount)
-        {
-            if(id == 0)
-            {
-                return false;
-            }
-
-            var invoice = dbcontext.Documents
-                .Where(i=>i.Id == id)
-                .FirstOrDefault();
-          
-            invoice.PaidAvance = paidAdvance;
-            invoice.DatePaidAmount = datePaidAmount;
-            invoice.PaidStatus = paidStatus;
-            invoice.DocumentNumber = documentNumber;
-            invoice.Date = date;
-
-            invoice.Balance = invoice.TotalAmount - paidAdvance;
-
-            if(invoice.Balance > 0)
-            {
-                invoice.PaidStatus = false;
-            }
-            else
-            {
-                invoice.PaidStatus = true;
-            }
-
-            dbcontext.SaveChanges();
-            return true;
-        }
-
         public void EditProductFromOrder(ProductCustomerFormModel productModel)
         {
 
         }
-
         public IEnumerable<CustomerOrderListViewBySupplier> GetCustomerOrdersBySupplier(int customerId, string supplierId)
         {
             var customerOrdersBySupplier = dbcontext.CustomerOrders.Where(co => co.Id == customerId)
@@ -245,6 +233,27 @@ namespace SSMO.Services.Reports
                 }).ToList();
 
             return customerOrdersBySupplier;
+        }
+
+        public IEnumerable<CustomerOrderDetailsPaymentModel> CustomerOrdersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage)
+        {
+            if (String.IsNullOrEmpty(customerName))
+            {
+                return new List<CustomerOrderDetailsPaymentModel>();
+            }
+
+            var customerId = dbcontext.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
+                                .Select(a => a.Id)
+                                .FirstOrDefault();
+
+            var customerOrders = dbcontext.CustomerOrders.Where(c => c.CustomerId == customerId);
+
+            var incustomerOrdersCollectionvoices = customerOrders.ProjectTo<CustomerOrderDetailsPaymentModel>(this.mapper).ToList();
+
+            var customerOrdersPaymentList = incustomerOrdersCollectionvoices.Skip((currentpage - 1) * customerOrdersPerPage).Take(customerOrdersPerPage);
+
+            return customerOrdersPaymentList;
+        
         }
     }
 }

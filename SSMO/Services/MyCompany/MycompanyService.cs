@@ -1,10 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿
 using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using SSMO.Data;
-using SSMO.Infrastructure;
 using SSMO.Models.MyCompany;
+using SSMO.Infrastructure;
 
 namespace SSMO.Services.MyCompany
 {
@@ -12,41 +12,47 @@ namespace SSMO.Services.MyCompany
     {
         private readonly ApplicationDbContext dbContext;
         private readonly IMapper mapper;
-       
-        public MycompanyService(ApplicationDbContext dbContext, IMapper mapper)
+        private readonly HttpContextUserIdExtension _httpContextAccessor;
+        public MycompanyService
+            (ApplicationDbContext dbContext, IMapper mapper,
+             HttpContextUserIdExtension httpContextAccessor)
 
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
-         }
+            _httpContextAccessor = httpContextAccessor;
+        }
 
         public ICollection<MyCompanyFormModel> GetAllCompanies()
         {
-            var listDbCompanies = dbContext.MyCompanies.ToList();
-            var allCompanies = mapper.Map<ICollection<MyCompanyFormModel>>(listDbCompanies); 
+            var loggedUserId = _httpContextAccessor.ContextAccessUserId();
+            var listDbCompanies = dbContext.MyCompanies
+                .Where(idvalue=>idvalue.UserId == loggedUserId).ToList();
+            var allCompanies = mapper.Map<ICollection<MyCompanyFormModel>>(listDbCompanies);
 
             return allCompanies;
         }
 
         public ICollection<string> GetCompaniesNames()
         {
-                return dbContext.MyCompanies
-                    .Select(x => x.Name)
-                    .ToList();
-         }
-
+            var loggedUserId = _httpContextAccessor.ContextAccessUserId();
+            return dbContext.MyCompanies
+                     .Where(userId => userId.UserId == loggedUserId)
+                     .Select(x => x.Name)
+                     .ToList();
+        }
         public string GetUserIdMyCompanyByName(string name)
         {
             var userId = dbContext.MyCompanies
                     .Where(x => x.Name.ToLower() == name.ToLower())
-                    .Select(id=>id.UserId)
+                    .Select(id => id.UserId)
                     .FirstOrDefault();
             return userId;
         }
         public string GetUserIdMyCompanyById(int id)
         {
             var userId = dbContext.MyCompanies
-                    .Where(x =>x.Id == id)
+                    .Where(x => x.Id == id)
                     .Select(id => id.UserId)
                     .FirstOrDefault();
             return userId;
@@ -73,8 +79,8 @@ namespace SSMO.Services.MyCompany
                 .FirstOrDefault();
 
             var mycompanyIdList = dbContext.CustomerOrders.
-                Where(cus=>cus.CustomerId == customerId)
-                .Select(comp=>comp.MyCompanyId)
+                Where(cus => cus.CustomerId == customerId)
+                .Select(comp => comp.MyCompanyId)
                 .ToList();
 
             var listMycompaniesUserId = dbContext.MyCompanies.
@@ -82,7 +88,7 @@ namespace SSMO.Services.MyCompany
                 Select(u => u.UserId).
                 ToList();
 
-            return listMycompaniesUserId; 
+            return listMycompaniesUserId;
         }
         public List<string> MyCompaniesNamePerSupplier(string name)
         {
@@ -91,8 +97,8 @@ namespace SSMO.Services.MyCompany
                 .Select(id => id.Id)
                 .FirstOrDefault();
 
-            var mycompanyIdList = dbContext.SupplierOrders.
-                Where(cus => cus.SupplierId == supplierId)
+            var mycompanyIdList = dbContext.SupplierOrders
+                .Where(cus => cus.SupplierId == supplierId)
                 .Select(comp => comp.MyCompanyId)
                 .ToList();
 

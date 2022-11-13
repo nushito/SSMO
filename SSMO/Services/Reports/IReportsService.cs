@@ -23,11 +23,14 @@ namespace SSMO.Services.Reports
                List<ProductCustomerFormModel> products);
         public IEnumerable<CustomerOrderListViewBySupplier> GetCustomerOrdersBySupplier(int customerId, string supplierId);
 
-        public IEnumerable<CustomerInvoicePaymentDetailsModel> CustomersInvoicesPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage);
-        
+        public IEnumerable<CustomerInvoicePaymentDetailsModel> CustomersInvoicesPaymentDetails(string customerName, int currentpage, int customerInvoicePerPage);
+        public IEnumerable<SupplierInvoicePaymentDetailsModel> SuppliersInvoicesPaymentDetails(string supplierName, int currentpage, int supplierInvoicePerPage);
+
         public CustomerOrderForEdit CustomerOrderDetailsForEdit(int id);
 
-        public bool EditInvoicePayment(int id,int documentNumber, DateTime Date, bool paidStatus, decimal paidAdvance,DateTime datePaidAmount);
+        public IEnumerable<CustomerOrderDetailsPaymentModel> CustomerOrdersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage);
+
+
 
     }
 }

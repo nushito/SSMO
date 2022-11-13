@@ -1,7 +1,4 @@
-﻿@model CustomerInvoicePaymentsReportsViewModel
-@{
-    ViewBag.Title = "Invoices Payment Report";
-}
+﻿@model CustomerOrderPaymentReportViewModel
 
 <form method="get">
     <div class="row">
@@ -13,6 +10,7 @@
                 {
                     <option value="@customerName">@customerName</option>
                 }
+
             </select>
         </div>
     </div>
@@ -29,27 +27,27 @@
         previouspage = 1;
     }
 
-    var maxpage = Math.Ceiling((double)Model.TotalCustomerInvoices / CustomerInvoicePaymentsReportsViewModel.CustomerInvoicesPerPage);
+    var maxpage = Math.Ceiling((double)Model.TotalCustomerOrders / CustomerInvoicePaymentsReportsViewModel.CustomerInvoicesPerPage);
 }
 
 <div class="row mb-5">
     <div class="col-md-6">
         <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
            asp-controller="Reports"
-           asp-action="InvoicePaymentReport"
+           asp-action="CustomerOrdersPaymentReport"
            asp-route-currentPage="@previouspage"
            asp-route-customerName="@Model.CustomerName"><<</a>
     </div>
 
     @{
         var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
-        !Model.CustomerPaymentCollection.Any();
+        !Model.CustomerOrdersPaymentCollection.Any();
     }
 
     <div class="col-md-6">
         <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
            asp-controller="Reports"
-           asp-action="InvoicePaymentReport"
+           asp-action="CustomerOrdersPaymentReport"
            asp-route-currentPage="@(Model.CurrentPage + 1)"
            asp-route-customerName="@Model.CustomerName">>></a>
     </div>
@@ -78,10 +76,10 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var order in Model.CustomerPaymentCollection)
+        @foreach(var order in Model.CustomerOrdersPaymentCollection)
         {
         <tr>
-            <th> @order.DocumentNumber</th>
+            <th> @order.OrderConfirmationNumber</th>
             <th> @order.Date</th>
             @if( @order.PaidStatus == true)
             {
@@ -94,10 +92,8 @@
             <th> @order.PaidAvance</th>
             <th> @order.DatePaidAmount</th>
             <th> @order.Balance</th>
-           <th><a asp-controller="Reports" asp-action="EditInvoicePayment" asp-route-documentNumber="@order.DocumentNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
+           <th><a asp-controller="Reports" asp-action="EditCustomerOrderPayment" asp-route-orderConfirmationNumber="@order.OrderConfirmationNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
         </tr>
         }
     </tbody>
 </table>
-
-

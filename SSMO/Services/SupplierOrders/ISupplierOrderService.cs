@@ -1,4 +1,5 @@
 ﻿using SSMO.Models.Products;
+using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Services.Documents.Purchase;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,11 @@ namespace SSMO.Services.SupplierOrders
 
         public IEnumerable<string> GetSuppliers();
 
-       
+        public IEnumerable<SupplierOrdersPaymentDetailsModel> GetSupplierOrders(string supplierName);
+
+        public EditSupplierOrderPaymentModel GetSupplierOrderForEdit(string supplierOrderNumber);
+
+        public bool EditSupplierOrderPayment(string supplierOrderNumber, decimal paidAdvance, DateTime date, bool paidStatus);
 
     }
 }

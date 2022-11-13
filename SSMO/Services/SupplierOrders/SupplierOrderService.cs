@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
 using SSMO.Models.Products;
+using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Services.Documents.Purchase;
 using System;
 using System.Collections.Generic;
@@ -62,7 +63,66 @@ namespace SSMO.Services.SupplierOrders
             return supplierSpec.Id;
         }
 
-        
+        public bool EditSupplierOrderPayment
+            (string supplierOrderNumber, decimal paidAdvance, DateTime date, bool paidStatus)
+        {
+            if (supplierOrderNumber == null) return false;
+
+            var supplierOrder = dbContext.SupplierOrders
+                .Where(num => num.Number.ToLower() == supplierOrderNumber.ToLower())
+                .FirstOrDefault();
+            if(supplierOrder.Balance < paidAdvance)
+            {
+                return false;
+            }
+
+            supplierOrder.PaidAvance = paidAdvance;
+            supplierOrder.PaidStatus = paidStatus;
+            supplierOrder.DatePaidAmount = date.ToString();
+            supplierOrder.Balance = supplierOrder.TotalAmount - supplierOrder.PaidAvance;
+
+           if(supplierOrder.Balance > 0)
+            {
+                supplierOrder.PaidStatus = false;
+            }
+            else
+            {
+                supplierOrder.PaidStatus = true;
+            }
+
+            return true;
+        }
+
+        public EditSupplierOrderPaymentModel GetSupplierOrderForEdit(string supplierOrderNumber)
+        {
+            if (supplierOrderNumber == null) return null;
+
+           
+            var supplierOrder = dbContext.SupplierOrders
+                .Where(num=>num.Number.ToLower() == supplierOrderNumber.ToLower());
+
+            var supplierOrderForEdit = supplierOrder.ProjectTo<EditSupplierOrderPaymentModel>(mapper).FirstOrDefault();
+            return supplierOrderForEdit;
+        }
+
+        public IEnumerable<SupplierOrdersPaymentDetailsModel> GetSupplierOrders(string supplierName)
+        {
+            if(supplierName == null)
+            {
+                return null;
+            }
+
+            var supplierId = dbContext.Suppliers
+                .Where(name => name.Name.ToLower() == supplierName.ToLower())
+                .Select(i => i.Id)
+                .FirstOrDefault();
+
+            var supplierOrders = dbContext.SupplierOrders
+                .Where(sup=>sup.SupplierId == supplierId);
+
+            var supplierOrdersCollection = supplierOrders.ProjectTo<SupplierOrdersPaymentDetailsModel>(mapper).ToList();
+            return supplierOrdersCollection;    
+        }
 
         public IEnumerable<string> GetSuppliers()
         {
