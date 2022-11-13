@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Data;
+using SSMO.Infrastructure;
 using SSMO.Models.Products;
 using SSMO.Models.SupplierOrders;
 using SSMO.Services;
@@ -71,7 +72,18 @@ namespace SSMO.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddSupplierConfirmation(SupplierOrderFormModel model)
         {
+            string userId = this.User.UserId();
+            string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(model.MyCompanyId);
 
+            if (userIdMyCompany != userId)
+            {
+                return BadRequest();
+            }
+
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
 
             if (!ModelState.IsValid)
             {
@@ -100,17 +112,22 @@ namespace SSMO.Controllers
             var customerorderId = thisCustomerOrder.Id;
             var supplierOrderId = supplierOrderService.CreateSupplierOrder
                                   (model.MyCompanyId, model.SupplierId,model.Date,
-                                  model.Number,model.CustomerOrderNumber, model.StatusId, 
-                                 model.CurrencyId, model.FscClaim, model.VAT??0, model.DatePaidAmount, model.PaidAvance, model.PaidStatus);
+                                   model.Number,model.CustomerOrderNumber, model.StatusId, 
+                                   model.CurrencyId, model.FscClaim, model.VAT??0, model.DatePaidAmount, 
+                                   model.PaidAvance, model.PaidStatus, model.LoadingAddress, model.DeliveryAddress);
 
            return RedirectToAction("EditProductAsPerSupplier", new {customerOrderId = customerorderId, supplierOrderId = supplierOrderId} );
         }
 
-        
         [HttpGet]
         public IActionResult EditProductAsPerSupplier(
             int customerorderId, int supplierOrderId)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (!ModelState.IsValid)
             {
                 new ProductSupplierFormModel
@@ -120,7 +137,6 @@ namespace SSMO.Controllers
                     Sizes = productService.GetSizes()
                 };
             }
-
 
             var corder = productService.Details(customerorderId);
 
@@ -155,7 +171,6 @@ namespace SSMO.Controllers
               };
 
                 listProducts.Add(productSupp);
-
             };
 
             return View(listProducts);  
@@ -166,6 +181,11 @@ namespace SSMO.Controllers
         public IActionResult EditProductAsPerSupplier(
           int customerorderId, int supplierOrderId, List<ProductSupplierFormModel> productmodel)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (!ModelState.IsValid)
             {
                 new ProductSupplierFormModel

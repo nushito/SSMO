@@ -29,6 +29,10 @@ namespace SSMO.Services.Products
         public ICollection<ProductCustomerFormModel> DetailsPerCustomerOrder(int id);
 
         public ICollection<string> GetFascCertMyCompany();
-        
+
+        public string GetDescriptionName(int id);
+        public string GetGradeName(int id);
+        public string GetSizeName(int id);
+
     }
 }

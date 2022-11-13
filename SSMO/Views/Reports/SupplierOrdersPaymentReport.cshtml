@@ -1,0 +1,104 @@
+﻿@model SupplierOrdersPaymentReportViewModel
+@{
+    ViewBag.Title = "Edit Supplier Order Payment";
+}
+
+<form method="get">
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="SupplierName"></label>
+            <select asp-for="SupplierName" class="form-control">
+                <option value="">All</option>
+                @foreach (var supplierName in Model.SupplierNames)
+                {
+                    <option value="@supplierName">@supplierName</option>
+                }
+
+            </select>
+        </div>
+    </div>
+    <div class="row">
+        <input type="submit" class="btn btn-info" value="Search" />
+    </div>
+    <br />
+</form>
+
+@{
+    var previouspage = Model.CurrentPage - 1;
+    if (previouspage < 1)
+    {
+        previouspage = 1;
+    }
+
+    var maxpage = Math.Ceiling((double)Model.TotalSupplierOrders / SupplierInvoicePaymentReportViewModel.SupplierInvoicePerPage);
+   
+}
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
+           asp-controller="Reports"
+           asp-action="SupplierOrdersPaymentReport"
+           asp-route-currentPage="@previouspage"
+           asp-route-customerName="@Model.SupplierName"><<</a>
+    </div>
+
+    @{
+        var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
+        !Model.SupplierOrderPaymentCollection.Any();
+    }
+
+    <div class="col-md-6">
+        <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
+           asp-controller="Reports"
+           asp-action="SupplierOrdersPaymentReport"
+           asp-route-currentPage="@(Model.CurrentPage + 1)"
+           asp-route-customerName="@Model.SupplierName">>></a>
+    </div>
+</div>
+<table class="table">   
+    <thead>
+        <tr>
+                <th>
+                Purchase Number
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>
+                    Payment Status
+                </th>
+                <th>
+                    Advance Payment
+                </th>
+                <th>
+                    Date of Payment
+                </th>
+                <th>
+                    Balance
+                </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var order in Model.SupplierOrderPaymentCollection)
+        {
+        <tr>
+            <th> @order.SupplierOrderNumber</th>
+            <th> @order.Date</th>
+            @if( @order.PaidStatus == true)
+            {
+            <th>Paid</th>
+            }
+            else
+            {
+            <th>Not Paid</th>
+            }
+            <th> @order.PaidAvance</th>
+            <th> @order.DatePaidAmount</th>
+            <th> @order.Balance</th>
+           <th><a asp-controller="Reports" asp-action="EditSupplierOrder" asp-route-supplierOrderNumber="@order.SupplierOrderNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
+        </tr>
+        }
+    </tbody>
+
+</table>

@@ -38,10 +38,10 @@ namespace SSMO.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+
             builder.Entity<BankDetails>()
                .HasIndex(a => a.Iban)
                .IsUnique(true);
-
 
             builder.Entity<BankDetails>()
                 .HasOne(a => a.Currency)
@@ -49,7 +49,6 @@ namespace SSMO.Data
                 .HasForeignKey(a => a.CurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            
             builder.Entity<CustomerOrder>()
                 .HasOne(a => a.Customer)
                 .WithMany(a => a.Orders)
@@ -86,7 +85,16 @@ namespace SSMO.Data
               .HasColumnType("decimal")
               .HasPrecision(18, 5);
 
-         
+            builder.Entity<CustomerOrder>()
+              .Property(a => a.NetWeight)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 3);
+
+            builder.Entity<CustomerOrder>()
+              .Property(a => a.GrossWeight)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 3);
+
             builder.Entity<CustomerOrder>()
                 .HasOne(a => a.MyCompany)
                 .WithMany(a => a.Orders)
@@ -101,14 +109,23 @@ namespace SSMO.Data
 
             builder.Entity<CustomerOrder>()
                 .HasOne(a => a.Status)
-                .WithMany(a=>a.CustomerOrders)
+                .WithMany(a => a.CustomerOrders)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<SupplierOrder>()
                 .Property(a => a.TotalAmount)
                  .HasColumnType("decimal")
-                 .HasPrecision(18,4);
-                
+                 .HasPrecision(18, 4);
+
+            builder.Entity<SupplierOrder>()
+              .Property(a => a.NetWeight)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 3);
+
+            builder.Entity<SupplierOrder>()
+              .Property(a => a.GrossWeight)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 3);
 
             builder.Entity<SupplierOrder>()
                 .HasOne(a => a.CustomerOrder)
@@ -116,8 +133,8 @@ namespace SSMO.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<SupplierOrder>()
-                .HasOne(a=>a.Status)
-                .WithMany(a=>a.SupplierOrders)
+                .HasOne(a => a.Status)
+                .WithMany(a => a.SupplierOrders)
                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<SupplierOrder>()
@@ -132,7 +149,7 @@ namespace SSMO.Data
                 .HasForeignKey(a => a.MyCompanyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-           
+
             builder.Entity<SupplierOrder>()
                   .Property(a => a.TotalQuantity)
                   .HasColumnType("decimal")
@@ -174,8 +191,8 @@ namespace SSMO.Data
                 .HasPrecision(18, 5);
 
             builder.Entity<Product>()
-                .Property(a=>a.PurchasePrice)
-                .HasPrecision(18,4);
+                .Property(a => a.PurchasePrice)
+                .HasPrecision(18, 4);
 
             builder.Entity<Product>()
                .Property(a => a.PurchaseAmount)
@@ -193,7 +210,7 @@ namespace SSMO.Data
             builder.Entity<Product>()
                 .Property(a => a.LoadedQuantityM3)
                 .HasColumnType("decimal")
-                .HasPrecision(18,5);
+                .HasPrecision(18, 5);
 
             builder.Entity<Product>()
                 .Property(a => a.Amount)
@@ -206,7 +223,12 @@ namespace SSMO.Data
                 .HasForeignKey(s => s.SupplierOrderId)
                 .IsRequired(false);
 
-           
+            builder.Entity<Document>()
+                .HasOne(i => i.MyCompany)
+                .WithMany(a => a.Documents)
+                .HasForeignKey(key => key.MyCompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             builder.Entity<Document>()
                 .Property(a => a.PurchaseTransportCost)
                 .HasColumnType("decimal")
@@ -281,7 +303,7 @@ namespace SSMO.Data
 
             builder.Entity<Document>()
                 .Property(a => a.DocumentType)
-                .HasConversion(a=>a.ToString(),a=>(DocumentTypes)Enum.Parse(typeof(DocumentTypes),a));
+                .HasConversion(a => a.ToString(), a => (DocumentTypes)Enum.Parse(typeof(DocumentTypes), a));
 
             builder.Entity<Document>()
                 .Property(a => a.Amount)
@@ -298,6 +320,12 @@ namespace SSMO.Data
                .HasOne(s => s.CustomerOrder)
                .WithMany(d => d.Documents)
                .HasForeignKey(s => s.CustomerOrderId)
+               .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Document>()
+               .HasOne(s => s.Supplier)
+               .WithMany(d => d.Documents)
+               .HasForeignKey(s => s.SupplierId)
                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Supplier>()
@@ -329,8 +357,6 @@ namespace SSMO.Data
                 .WithOne(a => a.Currency)
                 .HasForeignKey(a => a.CurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
-
-
 
             base.OnModelCreating(builder);
         }

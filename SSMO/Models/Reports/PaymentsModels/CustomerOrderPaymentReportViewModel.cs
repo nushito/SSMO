@@ -2,13 +2,14 @@
 
 namespace SSMO.Models.Reports.PaymentsModels
 {
-    public class CustomerOrdersPaymentsReportsViewModel
+    public class CustomerOrderPaymentReportViewModel
     {
-        public const int CustomerOrdersPerPage = 15;
+        public const int CustomerOrderPerPage = 15;
         public int CurrentPage { get; init; } = 1;
         public int TotalCustomerOrders { get; set; }
+        public int OrderConfirmationNumber { get; set; }
         public string CustomerName { get; set; }
         public IEnumerable<string> CustomerNames { get; set; }
-        public IEnumerable<CustomerOrderPaymentDetailsModel> CustomerPaymentCollection { get; set; }
+        public IEnumerable<CustomerOrderDetailsPaymentModel> CustomerOrdersPaymentCollection { get; set; }
     }
 }

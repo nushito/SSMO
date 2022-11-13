@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Infrastructure;
 using SSMO.Models.Suppliers;
 using SSMO.Services;
+using SSMO.Services.MyCompany;
 
 namespace SSMO.Controllers
 {
@@ -12,11 +14,16 @@ namespace SSMO.Controllers
     {
         private readonly ApplicationDbContext dbContext;
         private readonly ICurrency currencyGet;
+        private readonly IMycompanyService mycompanyService;
+        private readonly ISupplierService supplierService;
         public SuppliersController(ApplicationDbContext dbContext, 
-            ICurrency currencyGet)
+            ICurrency currencyGet,
+            IMycompanyService mycompanyService, ISupplierService supplierService)
         {
             this.dbContext = dbContext;
             this.currencyGet = currencyGet;
+            this.mycompanyService = mycompanyService;
+            this.supplierService = supplierService;
         }
 
         [Authorize]
@@ -31,6 +38,11 @@ namespace SSMO.Controllers
           AddSupplierModel model
             )
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View();
@@ -48,12 +60,8 @@ namespace SSMO.Controllers
                     Country = model.Country
                 },
                 RepresentativePerson = model.RepresentativePerson,
-              //  FSCClaim = model.FSCClaim,
                 FSCSertificate = model.FSCSertificate
             };
-
-            //var currencyList = model.Currency
-            //    .Select(a => (AccountCurrency) Enum.Parse(typeof(AccountCurrency), a)).ToList();
 
             //var bankDetail = new BankDetails
             //{
@@ -70,8 +78,71 @@ namespace SSMO.Controllers
             this.dbContext.SaveChanges();
 
             return RedirectToAction("Index", "Home");
+        }
 
+        [HttpGet]
+        [Authorize]
+        public IActionResult EditSupplier(EditSupplierViewModel model)
+        {
+            if (model.SupplierName != null)
+            {
+                string userId = this.User.UserId();
+
+                var listMyCompany = mycompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
+
+                if (!listMyCompany.Contains(userId))
+                {
+                    return BadRequest();
+                }
+            }
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            var supplierNames = supplierService.GetSupplierNames();
+            model.SupplierNames = supplierNames;
+            model.SupplierForEdit = supplierService.GetSupplierForEdit(model.SupplierName); 
+            return View(model);
         }
+
+        [HttpPost]
+        [Authorize]
+        public IActionResult EditSupplier(string supplierName, EditSupplierViewModel model)
+        {
+            if (model.SupplierName != null)
+            {
+                string userId = this.User.UserId();
+
+                var listMyCompany = mycompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
+
+                if (!listMyCompany.Contains(userId))
+                {
+                    return BadRequest();
+                }
+            }
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            var supplierEdit = supplierService.EditSupplier
+                (model.SupplierName, model.SupplierForEdit.VAT, model.SupplierForEdit.Eik, model.SupplierForEdit.RepresentativePerson,
+                model.SupplierForEdit.SupplierAddress.Country, model.SupplierForEdit.SupplierAddress.City, model.SupplierForEdit.SupplierAddress.Street, 
+                model.SupplierForEdit.Email,model.SupplierForEdit.FSCSertificate);
+
+            if (supplierEdit == false)
+            {
+                return View(model);
+            }
+
+            return RedirectToAction("Index", "Home");
+        }
+
     }
-        }
+ }
   

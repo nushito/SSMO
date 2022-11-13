@@ -8,8 +8,7 @@
 }
 
  <form enctype="multipart/form-data" method="post" >
-
-    
+         
         @if(checkNumber == 0)
         {
               <div class="row col-md-4">
@@ -17,10 +16,8 @@
         <input id="number" asp-for="OrderConfirmationNumber" type="number" class="form-control"/>
         <span asp-validation-for="OrderConfirmationNumber" class="small text-danger"></span>
     </div>
-        }
-    
-   
-      <div class="row col-md-4">
+        }       
+     <div class="row col-md-4">
         <label asp-for="CustomerPoNumber"></label>
         <input asp-for="CustomerPoNumber" class="form-control"/>
         <span asp-validation-for="CustomerPoNumber" class="small text-danger"></span>
@@ -37,13 +34,12 @@
     </div>
     <div class="form-group row col-md-4">
         <label asp-for="LoadingPlace"></label>
-        <input id="loadingplace" asp-for="LoadingPlace" type="text" class="form-control" placeholder="Loading place" />
-       
+        <input id="loadingplace" asp-for="LoadingPlace" type="text" class="form-control" placeholder="Loading place" />       
     </div>
-        <div class="form-group row col-md-4">
+
+    <div class="form-group row col-md-4">
         <label asp-for="DeliveryAddress"></label>
-        <input id="deliveryaddress" asp-for="DeliveryAddress" type="text" class="form-control" placeholder="Delivery address" />
-       
+        <input id="deliveryaddress" asp-for="DeliveryAddress" type="text" class="form-control" placeholder="Delivery address" />       
     </div>
 
     <div class="form-group col-md-4">
@@ -55,8 +51,8 @@
             }   
 
         </select>
-
     </div>
+
     <div class="row" id="customer-row">
         <div class="form-group col-md-4">
             <div class="form-group">
@@ -91,12 +87,12 @@
         <label asp-for="Origin"></label>
         <input asp-for="Origin" type="text" class="form-control" />
         <span asp-validation-for="Origin" class="small text-danger"></span>
-    </div>
+   @* </div>
     <div class="form-group col-sm-4">
       <input class="form-check-input" type="checkbox" asp-for="PaidAmountStatus">
       <label class="form-check-label" asp-for="PaidAmountStatus"> Paid</label> 
     </div>
-            
+            *@
     <div class="form-group row col-md-4">
         <td>
             <label asp-for="Vat"></label>
@@ -104,7 +100,7 @@
         </td>
        <td>
             <label asp-for="ProductsCount"></label>
-                <input type="number" asp-for="ProductsCount" class="form-control"/>
+            <input type="number" asp-for="ProductsCount" min="0" step="1" class="form-control"/>
 
        </td>
              <td><label asp-for="StatusId"></label>

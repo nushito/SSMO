@@ -3,7 +3,10 @@ using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
 using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Reports.PaymentsModels;
+using SSMO.Services.Products;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SSMO.Services.Documents.Invoice
@@ -12,23 +15,23 @@ namespace SSMO.Services.Documents.Invoice
     {
         private readonly ApplicationDbContext dbContext;
         private readonly IMapper mapper;
+        private readonly IProductService productService;
 
-        public InvoiceService(ApplicationDbContext dbContext, IMapper mapper)
+        public InvoiceService(ApplicationDbContext dbContext, IMapper mapper, IProductService productSevice)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
+            this.productService = productSevice;
         }
 
         public bool CheckFirstInvoice()
         {
-
             var invoiceCheck = dbContext.Documents.Where(a => a.DocumentType == Data.Enums.DocumentTypes.Invoice).Any();
             if (!invoiceCheck)
             {
                 return false;
             }
             return true;
-
         }
 
         public InvoicePrintViewModel CreateInvoice(
@@ -38,7 +41,10 @@ namespace SSMO.Services.Documents.Invoice
                 .Where(on => on.OrderConfirmationNumber == orderConfirmationNumber).FirstOrDefault();
 
             var supplierOdrerForThisInvoiceId = dbContext.SupplierOrders.Where(c => c.CustomerOrderId == customerOrder.Id)
-                .Select(i=>i.Id).FirstOrDefault();
+                .Select(i => i.Id).FirstOrDefault();
+
+            var productList = dbContext.Products.
+                Where(co => co.CustomerOrderId == customerOrder.Id).ToList();
 
             if (customerOrder == null)
             {
@@ -56,15 +62,19 @@ namespace SSMO.Services.Documents.Invoice
                 CustomerOrderId = customerOrder.Id,
                 Date = date,
                 PaidStatus = customerOrder.PaidAmountStatus,
-                Products = (System.Collections.Generic.ICollection<Product>)customerOrder.Products,
+                Products = productList,
                 SupplierOrderId = supplierOdrerForThisInvoiceId,
-                TruckNumber = truckNumber
-             };
+                TruckNumber = truckNumber,
+                Incoterms = customerOrder.DeliveryTerms,
+                CustomerId = customerOrder.CustomerId,
+                NetWeight = customerOrder.NetWeight,
+                GrossWeight = customerOrder.GrossWeight
+            };
 
             if (CheckFirstInvoice())
             {
                 var lastInvoiceNumber = dbContext.Documents.Where(n => n.DocumentType == Data.Enums.DocumentTypes.Invoice)
-                    .OrderBy(n=>n.DocumentNumber)
+                    .OrderBy(n => n.DocumentNumber)
                     .Select(n => n.DocumentNumber).LastOrDefault();
 
                 invoiceCreate.DocumentNumber = lastInvoiceNumber + 1;
@@ -79,8 +89,6 @@ namespace SSMO.Services.Documents.Invoice
             var customerId = dbContext.CustomerOrders.Where(i => i.Id == customerOrder.Id)
                 .Select(c => c.CustomerId).FirstOrDefault();
 
-            // var customer = .FirstOrDefault();
-
             var customerDetails = dbContext.Customers.Where(i => i.Id == customerId).Select(a => new CustomerForInvoicePrint
             {
                 Name = a.Name,
@@ -93,16 +101,14 @@ namespace SSMO.Services.Documents.Invoice
                     Country = a.ClientAddress.Country,
                     Street = a.ClientAddress.Street
                 }
-
-
             }).FirstOrDefault();
 
             invoiceForPrint.Customer = customerDetails;
+            invoiceForPrint.OrderConfirmationNumber = orderConfirmationNumber;
 
             var myCompany = dbContext.MyCompanies.Where(n => n.Name.ToLower() == myCompanyName.ToLower()).FirstOrDefault();
-
-            var addressCompany = dbContext.Addresses.Where(co=>co.Id == myCompany.AddressId).FirstOrDefault();
-
+            var addressCompany = dbContext.Addresses.Where(co => co.Id == myCompany.AddressId).FirstOrDefault();
+            invoiceCreate.MyCompanyId = myCompany.Id;
             invoiceForPrint.Seller = new MyCompanyForInvoicePrint
             {
                 Name = myCompany.Name,
@@ -115,15 +121,110 @@ namespace SSMO.Services.Documents.Invoice
                 RepresentativePerson = myCompany.RepresentativePerson,
                 VAT = myCompany.VAT
             };
+            invoiceForPrint.Products = this.mapper.Map<ICollection<ProductsForInvoiceModel>>(productList);
 
+            foreach (var product in invoiceForPrint.Products)
+            {
+                product.Description = productService.GetDescriptionName(product.DescriptionId);
+                product.Grade = productService.GetGradeName(product.GradeId);
+                product.Size = productService.GetSizeName(product.SizeId);
+              
+            }
+
+            invoiceForPrint.VatAmount = customerOrder.Amount * customerOrder.Vat / 100 ?? 0;
+
+            foreach (var product in productList)
+            {
+                product.OrderedQuantity = 0;
+                product.LoadedQuantityM3 = 0;
+            }
 
             dbContext.Documents.Add(invoiceCreate);
             dbContext.SaveChanges();
 
+            CreatePackingListForThisInvoice(invoiceCreate.Id);
+
             return invoiceForPrint;
         }
+
+        private void CreatePackingListForThisInvoice(int id)
+        {
+            var invoice = dbContext.Documents
+                .Where(i => i.Id == id)
+                .FirstOrDefault();
+            if (invoice == null) return;
+
+            var packingList = new Document
+            {
+                DocumentType = Data.Enums.DocumentTypes.PackingList,
+                DocumentNumber = invoice.DocumentNumber,
+                Date = invoice.Date,
+                CustomerId = invoice.CustomerId,
+                CustomerOrderId = invoice.CustomerOrderId,
+                Products = invoice.Products,
+                TruckNumber = invoice.TruckNumber,
+                Incoterms = invoice.Incoterms,
+                MyCompanyId = invoice.MyCompanyId,
+                NetWeight = invoice.NetWeight,
+                GrossWeight = invoice.GrossWeight,
+                SupplierOrderId = invoice.SupplierOrderId
+            };
+
+            dbContext.Documents.Add(packingList);
+            dbContext.SaveChanges();
+        }
+
+        public EditInvoicePaymentModel InvoiceForEditByNumber(int documentNumber)
+        {
+            return dbContext.Documents
+                .Where(i => i.DocumentNumber == documentNumber)
+                .Select(n => new EditInvoicePaymentModel
+                {
+                    DocumentNumber = n.DocumentNumber,
+                    Date = n.Date,
+                    PaidAvance = n.PaidAvance,
+                    Balance = n.Balance,
+                    DatePaidAmount = n.DatePaidAmount,
+                    PaidStatus = n.PaidStatus
+                }).FirstOrDefault();
+        }
+
+        public bool EditInvoicePayment
+            (int documentNumber, bool paidStatus, decimal paidAdvance, DateTime datePaidAmount)
+        {
+            if (documentNumber == 0)
+            {
+                return false;
+            }
+
+            var invoice = dbContext.Documents
+                .Where(i => i.DocumentNumber == documentNumber)
+                .FirstOrDefault();
+
+            invoice.PaidAvance = paidAdvance;
+            invoice.DatePaidAmount = datePaidAmount;
+            invoice.PaidStatus = paidStatus;
+            
+
+            invoice.Balance = invoice.TotalAmount - paidAdvance;
+
+            if (invoice.Balance > 0)
+            {
+                invoice.PaidStatus = false;
+            }
+            else
+            {
+                invoice.PaidStatus = true;
+            }
+
+            dbContext.SaveChanges();
+            return true;
+        }
+
+        public ICollection<int> GetInvoiceDocumentNumbers()
+        => dbContext.Documents
+            .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Invoice)
+            .Select(num => num.DocumentNumber)
+            .ToList();
     }
 }
-//SqlException: Invalid column name 'Amount'.
-//Invalid column name 'Number'.
-//Invalid column name 'SupplierOrderId'.

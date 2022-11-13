@@ -5,22 +5,21 @@
         <main role="main" class="pb-3">
             <div id="wrapper">
                 <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
                     <li>
-
-                        <div class="dropdown ">
+                        <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 My Documents
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CustomerOrderToInvoice">Invoice</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateProforma">Packing list</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="ChoosePackingListForPrint">Packing list</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateOrder">Debit Note</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateCreditNote">Credit Note</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="AddPurchase">Purchase</a>
                             </div>
                         </div>
                     </li>
+                   
                      <li class="nav-item active">
                         <a href="~/CustomerOrders/AddCustomerOrder" class="nav-link">
                             <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -33,6 +32,13 @@
                         <a href="~/SupplierOrders/AddSupplierConfirmation" class="nav-link">
                             <i class="fas fa-fw fa-tachometer-alt"></i>
                             <span>New Supplier Specification</span>
+                        </a>
+                    </li>
+                     
+                    <li class="nav-item active">
+                        <a href="~/ServiceOrders/AddServiceOrder" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                            <span>Transport Order</span>
                         </a>
                     </li>
 
@@ -56,29 +62,37 @@
                         </a>
                     </li>
 
-
-                    <li class="nav-item active">
-                        <a href="~/Customers/Add" class="nav-link">
-                            <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>Add Customer</span>
-                        </a>
+                     <li>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Customers
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" asp-area="" asp-controller="Customers" asp-action="Add">Add New Customer</a>
+                                  <a class="dropdown-item" asp-area="" asp-controller="Customers" asp-action="Edit">Edit Customer</a>
+                            </div>
+                        </div>
                     </li>
-
-                    <li class="nav-item active">
-                        <a href="~/Suppliers/AddSupplier" class="nav-link">
-                            <i class="fas fa-fw fa-tachometer-alt"></i>
-                            <span>Add Supplier</span>
-                        </a>
+                    <p></p>
+                     <li>
+                        <div class="dropdown">
+                            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Suppliers
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item" asp-area="" asp-controller="Suppliers" asp-action="AddSupplier">Add New Supplier</a>
+                                  <a class="dropdown-item" asp-area="" asp-controller="Suppliers" asp-action="EditSupplier">Edit Supplier</a>
+                            </div>
+                        </div>
                     </li>
 
                     <!-- Heading -->
                     <div class="sidebar-heading text-capitalize">
                         <br />
-                        <h2>Reports</h2>
+                        <h3>Reports</h3>
                         <br />
                     </div>
                      <li>
-
                         <div class="dropdown ">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                Payment Reports
@@ -86,18 +100,18 @@
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="InvoicePaymentReport">Invoice</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="PurchasePaymentReport">Purchase</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="CustomerOrderPaymentReport">Customer Order</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="SupplierOrderPaymentReport">Supplier Order</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="CustomerOrdersPaymentReport">Customer Order</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="SupplierOrdersPaymentReport">Supplier Order</a>
                             </div>
                         </div>
-                    </li>
+                     </li>
 
-                    <li class="nav-item active">
+                     <li class="nav-item active">
                         <a href="~/Reports/AllCustomerOrders" class="nav-link">
                             <i class="fas fa-fw fa-tachometer-alt"></i>
                             <span>Customer Orders Report</span>
                         </a>
-                    </li>
+                     </li>
 
                      <li class="nav-item active">
                         <a href="~/Reports/CustomerOrdersBySupplier" class="nav-link">

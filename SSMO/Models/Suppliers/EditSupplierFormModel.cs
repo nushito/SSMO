@@ -1,13 +1,10 @@
-﻿
-using System.ComponentModel.DataAnnotations;
-
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace SSMO.Models.Suppliers
 {
-    public class AddSupplierFormModel
+    public class EditSupplierFormModel
     {
-        public int Id { get; set; }
-        [Required]
+       
         public string Name { get; set; }
 
         [StringLength(9, MinimumLength = 9, ErrorMessage = "EIK number should be 9 symbols long.")]
@@ -19,11 +16,8 @@ namespace SSMO.Models.Suppliers
         [DataType(DataType.EmailAddress)]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Email { get; set; }
-        public string Address { get; set; }
-        public string City { get; set; }
-        public string Country { get; set; }
-
+        public EditSupplierAddressFormModel SupplierAddress { get; set; }
+        public string FSCSertificate { get; set; }
         public string RepresentativePerson { get; set; }
-     //   public ICollection<ProductSpecificationFormModel> ProductList { get; set; }
     }
 }

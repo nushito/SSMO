@@ -40,7 +40,8 @@ namespace SSMO.Data.Models
         public bool PaidAmountStatus { get; set; }
         public decimal Amount { get; set; }
         public decimal SubTotal { get; set; }
-
+        public decimal NetWeight { get; set; }
+        public decimal GrossWeight { get; set; }
         public string Origin { get; set; }
         public ICollection<Document> Documents { get; set; }
         public IEnumerable<SupplierOrder> SupplierOrder { get; set; }

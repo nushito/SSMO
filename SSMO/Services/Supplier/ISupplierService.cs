@@ -1,6 +1,7 @@
 ﻿
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SSMO.Data.Models;
+using SSMO.Models.Suppliers;
 using SSMO.Services.Supplier;
 using System;
 using System.Collections.Generic;
@@ -13,8 +14,15 @@ namespace SSMO.Services
     {
         public ICollection<AllSuppliers> GetSuppliers();
        
-        public IEnumerable<SupplierDetailsList> GetSuppliersNames(int id);
+        public IEnumerable<SupplierDetailsList> GetSuppliersIdAndNames(int id);
         //public List<SelectListItem> GetSuppliersByCustomerId(int id);
-       
+        public IEnumerable<string> GetSupplierNames();
+        public EditSupplierFormModel GetSupplierForEdit(string supplierName);
+
+        public bool EditSupplier(string supplierName, string vat, string eik, string representativePerson,
+            string country, string city, string street, string email, string fscCertificate);
+
+        public string GetSupplierFscCertificateByOrderNumber(string orderNumber);
+
     }
 }

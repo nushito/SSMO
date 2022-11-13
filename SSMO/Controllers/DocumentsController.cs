@@ -1,8 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SSMO.Infrastructure;
 using SSMO.Models.CustomerOrders;
+using SSMO.Models.Documents.Packing_List;
 using SSMO.Models.Documents.Purchase;
+using SSMO.Services;
 using SSMO.Services.CustomerOrderService;
+using SSMO.Services.Documents;
 using SSMO.Services.Documents.Invoice;
 using SSMO.Services.Documents.Purchase;
 using SSMO.Services.MyCompany;
@@ -18,25 +22,41 @@ namespace SSMO.Controllers
         private readonly ICustomerOrderService customerOrderService;
         private readonly IInvoiceService invoiceService;
         private readonly IMycompanyService mycompanyService;
-  
+        private readonly IDocumentService documentService;
+        private readonly ISupplierService supplierService;
+     
         public DocumentsController
             (ISupplierOrderService supplierOrderService, 
             IPurchaseService purchaseService, ICustomerOrderService customerOrderService,
-            IInvoiceService invoiceService, IMycompanyService mycompanyService)
+            IInvoiceService invoiceService, IMycompanyService mycompanyService, 
+            IDocumentService documentService, ISupplierService supplierService)
         {
             this.supplierOrderService = supplierOrderService;
             this.purchaseService = purchaseService;
             this.customerOrderService = customerOrderService;
             this.invoiceService = invoiceService;   
             this.mycompanyService = mycompanyService;
+            this.documentService = documentService;
+            this.supplierService = supplierService;
         }
 
 
         public IActionResult AddPurchase(SupplierOrderListModel model)
         {
+            if(model.SupplierName != null)
+            {
+                string userId = this.User.UserId();
+                var userIdMyCompany = mycompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
+
+                if (!userIdMyCompany.Contains(userId))
+                {
+                    return BadRequest();
+                }
+
+            }
             var suppliersList = this.supplierOrderService.GetSuppliers();
 
-            var supplierOrdersList = this.purchaseService.GetSupplierOrders(
+            var supplierOrdersList = this.purchaseService.GetSupplierOrdersForPurchase(
                 model.SupplierName, model.CurrentPage, SupplierOrderListModel.SupplierOrdersPerPage);
 
             model.SupplierOrderNumbers = supplierOrdersList;
@@ -48,10 +68,26 @@ namespace SSMO.Controllers
         [HttpGet]
         public IActionResult PurchaseDetails(string supplierOrderNumber)
         {
+            if(supplierOrderNumber != null)
+            {
+                string userId = this.User.UserId();
+                var userIdMyCompany = mycompanyService.GetUserIdMyCompanyBySupplierOrdreNum(supplierOrderNumber);
+
+                if (userIdMyCompany != userId)
+                {
+                    return BadRequest();
+                }
+            }
+
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
             return View(new PurchaseDetailsFormModel
             {
-                SupplierOrderNumber = supplierOrderNumber
-            });
+                SupplierOrderNumber = supplierOrderNumber,
+                SupplierFSCCertificate = supplierService.GetSupplierFscCertificateByOrderNumber(supplierOrderNumber)
+        });
         }
 
         [HttpPost]
@@ -59,7 +95,19 @@ namespace SSMO.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult PurchaseDetails(string supplierOrderNumber, PurchaseDetailsFormModel model)
         {
-            if(!ModelState.IsValid)
+            string userId = this.User.UserId();
+            string userIdMyCompany = mycompanyService.GetUserIdMyCompanyBySupplierOrdreNum(supplierOrderNumber);
+            if (userIdMyCompany != userId)
+            {
+                return BadRequest();
+            }
+
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+            if (!ModelState.IsValid)
             {
                 return View();
             }
@@ -73,13 +121,16 @@ namespace SSMO.Controllers
             {
                 ModelState.AddModelError("NetWeight", "Net Weight should be less than Gross Weight");
                 return View(model);
-            }   
+            }
 
             var purchase = purchaseService.CreatePurchaseAsPerSupplierOrder(
                 supplierOrderNumber, model.Number, model.Date,
                 model.PaidStatus, model.NetWeight,
-                model.GrossWeight, model.Duty, model.Factoring,model.CustomsExpenses, model.FiscalAgentExpenses,
-                model.ProcentComission, model.PurchaseTransportCost, model.BankExpenses, model.OtherExpenses, model.Vat, model.TruckNumber);
+                model.GrossWeight, model.Duty, model.Factoring,
+                model.CustomsExpenses, model.FiscalAgentExpenses,
+                model.ProcentComission, model.PurchaseTransportCost, 
+                model.BankExpenses, model.OtherExpenses, model.Vat, 
+                model.TruckNumber,model.FSCSertificate, model.FSCClaim);
 
             if (!purchase)
             {
@@ -92,16 +143,20 @@ namespace SSMO.Controllers
         [HttpGet]
         public IActionResult CustomerOrderToInvoice()
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+
+            }
             var customerOrdersList = customerOrderService.AllCustomerOrderNumbers();
             ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
 
-            var companiesNames = mycompanyService.GetCompany();
+            var companiesNames = mycompanyService.GetCompaniesNames();
 
             var collectionCustomerOrders = new CustomerOrderNumbersListView
             {
                 OrderConfirmationNumberList = customerOrdersList,
                 MyCompanyNames = companiesNames
-
             };
 
             return View(collectionCustomerOrders);
@@ -111,8 +166,21 @@ namespace SSMO.Controllers
         [Authorize]
         public IActionResult CustomerOrderToInvoice(CustomerOrderNumbersListView model)
         {
+            string userId = this.User.UserId();
+            string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(model.MyCompanyName);
+
+            if (userIdMyCompany != userId)
+            {
+                return BadRequest();
+            }
+
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             model.OrderConfirmationNumberList = customerOrderService.AllCustomerOrderNumbers();
-            model.MyCompanyNames = mycompanyService.GetCompany();
+            model.MyCompanyNames = mycompanyService.GetCompaniesNames();
             ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
 
             if (!ModelState.IsValid)
@@ -120,7 +188,7 @@ namespace SSMO.Controllers
                 new CustomerOrderNumbersListView
                 {
                     OrderConfirmationNumberList = customerOrderService.AllCustomerOrderNumbers(),
-                MyCompanyNames = mycompanyService.GetCompany()
+                MyCompanyNames = mycompanyService.GetCompaniesNames()
 
                  };
                 ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
@@ -141,9 +209,57 @@ namespace SSMO.Controllers
         public IActionResult CreateInvoice(
             int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int number, string mycompanyname, string truckNumber)
         {
+            string userId = this.User.UserId();
+            string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(mycompanyname);
+           
+            if (userIdMyCompany != userId)
+            {
+                return BadRequest();
+            }
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
             var invoiceForPrint = invoiceService.CreateInvoice(orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname,truckNumber);    
 
             return View(invoiceForPrint);
+        }
+        public IActionResult ChoosePackingListForPrint(ChoosePackingListFromInvoicesViewModel model)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            var invoiceCollectionNumbers = documentService.GetPackingList();
+            if(invoiceCollectionNumbers == null)
+            {
+                ModelState.AddModelError(string.Empty, "Missing");
+                return View(model);
+            }
+            model.PckingListNumbers = invoiceCollectionNumbers;
+            model.PackingListForPrint = documentService.PackingListForPrint(model.PackingListNumber);
+            return View(model);
+        }
+
+        public IActionResult PackingListForPrint(PackingListForPrintViewModel model, int invoiceNumber)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+            return View();
         }
 
     }

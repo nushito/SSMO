@@ -8,6 +8,7 @@ using SSMO.Models.MyCompany;
 using SSMO.Services;
 using SSMO.Services.MyCompany;
 using SSMO.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
 namespace SSMO.Controllers
 {
@@ -36,6 +37,11 @@ namespace SSMO.Controllers
         [HttpPost]
         public IActionResult Register(MyCompanyFormModel model)
         {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
             if (!ModelState.IsValid)
             {
                 return View();
@@ -72,7 +78,7 @@ namespace SSMO.Controllers
         {
             return View(new AddBankDetailsFormModel
             { 
-                CompanyNames = mycompany.GetCompany(),
+                CompanyNames = mycompany.GetCompaniesNames(),
                 Currency = icurrency.GetCurrency()
             }); 
         }
@@ -84,11 +90,18 @@ namespace SSMO.Controllers
             if (!ModelState.IsValid)
             {
                 bankmodel.Currency = this.icurrency.GetCurrency().ToList();
-                bankmodel.CompanyNames = this.mycompany.GetCompany();
+                bankmodel.CompanyNames = this.mycompany.GetCompaniesNames();
             }
                 
+            var userCompanyId = mycompany.GetUserIdMyCompanyByName(bankmodel.CompanyName);
+            string userId = this.User.UserId();
 
-                if (mycompany.GetCompany() == null)
+            if (userCompanyId != userId)
+            {
+                return BadRequest();
+            }
+
+                if (mycompany.GetCompaniesNames() == null)
             {
                 return RedirectToAction("Register", "MyCompany");
             }

@@ -1,0 +1,21 @@
+﻿@model EditCustomerOrderPaymentModel
+
+@{
+    ViewBag.Title = "Edit Customer Order Payment Details";
+}
+<div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+    <form method="post">
+        <div class="form-group">
+            <label asp-for="PaidAvance">Paid Advance</label>
+            <input type="text" class="form-control" asp-for="PaidAvance">
+            <span asp-validation-for="PaidAvance" class="small text-danger"></span>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" asp-for="PaidStatus">
+            <label class="form-check-label" asp-for="PaidStatus"> Pyment Status </label>
+            <span asp-validation-for="PaidStatus" class="small text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Submit</button>
+    </form>
+</div>

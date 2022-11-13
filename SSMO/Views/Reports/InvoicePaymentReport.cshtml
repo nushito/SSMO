@@ -1,4 +1,7 @@
-﻿@model CustomerOrdersPaymentsReportsViewModel
+﻿@model CustomerInvoicePaymentsReportsViewModel
+@{
+    ViewBag.Title = "Invoices Payment Report";
+}
 
 <form method="get">
     <div class="row">
@@ -10,7 +13,6 @@
                 {
                     <option value="@customerName">@customerName</option>
                 }
-
             </select>
         </div>
     </div>
@@ -27,14 +29,14 @@
         previouspage = 1;
     }
 
-    var maxpage = Math.Ceiling((double)Model.TotalCustomerOrders / CustomerOrdersPaymentsReportsViewModel.CustomerOrdersPerPage);
+    var maxpage = Math.Ceiling((double)Model.TotalCustomerInvoices / CustomerInvoicePaymentsReportsViewModel.CustomerInvoicesPerPage);
 }
 
 <div class="row mb-5">
     <div class="col-md-6">
         <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
            asp-controller="Reports"
-           asp-action="CustomerOrderDetailsForEdit"
+           asp-action="InvoicePaymentReport"
            asp-route-currentPage="@previouspage"
            asp-route-customerName="@Model.CustomerName"><<</a>
     </div>
@@ -47,15 +49,15 @@
     <div class="col-md-6">
         <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
            asp-controller="Reports"
-           asp-action="CustomerOrderDetailsForEdit"
+           asp-action="InvoicePaymentReport"
            asp-route-currentPage="@(Model.CurrentPage + 1)"
            asp-route-customerName="@Model.CustomerName">>></a>
     </div>
 </div>
-<table class="table">
+<table class="table">   
     <thead>
         <tr>
-            <th">
+                <th>
                 Invoice Number
                 </th>
                 <th>
@@ -89,14 +91,13 @@
             {
             <th>Not Paid</th>
             }
-            <th> @order.PaidAdvance</th>
+            <th> @order.PaidAvance</th>
             <th> @order.DatePaidAmount</th>
             <th> @order.Balance</th>
-            <a asp-controller="Reports" asp-action="InvoicePaymentEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
+           <th><a asp-controller="Reports" asp-action="EditInvoicePayment" asp-route-documentNumber="@order.DocumentNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
         </tr>
         }
     </tbody>
-
 </table>
 
 

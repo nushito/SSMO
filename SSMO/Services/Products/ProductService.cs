@@ -53,13 +53,14 @@ namespace SSMO.Services.Products
 
             product.TotalSheets = product.Pallets * product.SheetsPerPallet;
             product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
-            product.Amount = Math.Round(product.Price * product.OrderedQuantity, 4);
+          //  product.LoadedQuantityM3 = Math.Round(sum * product.TotalSheets, 4);
+            product.Amount = Math.Round(product.Price * product.LoadedQuantityM3, 4);
             _dbContext.Products.Add(product);
             _dbContext.SaveChanges();
 
+          
             var order = _dbContext.CustomerOrders.Where(a => a.Id == customerorderId).FirstOrDefault();
-            order.Products.Add(product);
-
+           
             order.Amount += product.Amount;
             _dbContext.SaveChanges();
         }
@@ -174,10 +175,9 @@ namespace SSMO.Services.Products
             }
 
             product.TotalSheets = product.Pallets * product.SheetsPerPallet;
-            product.LoadedQuantityM3 = Math.Round(sum * product.TotalSheets, 4);
-
-            product.PurchaseAmount = Math.Round(product.PurchasePrice * product.LoadedQuantityM3, 4);
-            product.Amount = Math.Round(product.Price * product.LoadedQuantityM3, 4);
+            product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
+            product.PurchaseAmount = Math.Round(product.PurchasePrice * product.OrderedQuantity, 4);
+            product.Amount = Math.Round(product.Price * product.OrderedQuantity, 4);
 
             var spOrder = _dbContext.SupplierOrders.Where(i => i.Id == supplierOrderId).FirstOrDefault();
 
@@ -198,24 +198,9 @@ namespace SSMO.Services.Products
 
             foreach (var item in products)
             {
-                var descriptionName = _dbContext.Descriptions
-               .Where(a => a.Id == item.DescriptionId)
-               .Select(a => a.Name)
-               .FirstOrDefault();
-
-                var gradeName = _dbContext.Grades
-               .Where(a => a.Id == item.GradeId)
-               .Select(a => a.Name)
-               .FirstOrDefault();
-
-                var sizeName = _dbContext.Sizes
-                     .Where(a => a.Id == item.SizeId)
-               .Select(a => a.Name)
-               .FirstOrDefault();
-
-                item.Description = descriptionName;
-                item.Grade = gradeName;
-                item.Size = sizeName;
+                item.Description = GetDescriptionName(item.DescriptionId);
+                item.Grade = GetGradeName(item.GradeId);
+                item.Size = GetSizeName(item.SizeId);
             }
 
             return products;
@@ -232,26 +217,10 @@ namespace SSMO.Services.Products
           
             foreach (var item in products)
             {
-                var descriptionName = _dbContext.Descriptions
-               .Where(a => a.Id == item.DescriptionId)
-               .Select(a => a.Name)
-               .FirstOrDefault();
-
-                var gradeName = _dbContext.Grades
-               .Where(a => a.Id == item.GradeId)
-               .Select(a => a.Name)
-               .FirstOrDefault();
-
-                var sizeName = _dbContext.Sizes
-                     .Where(a => a.Id == item.SizeId)
-               .Select(a => a.Name)
-               .FirstOrDefault();
-
-                item.Description = descriptionName;
-                item.Grade = gradeName;
-                item.Size = sizeName;
-                    
-        }
+                item.Description = GetDescriptionName(item.DescriptionId);
+                item.Grade = GetGradeName(item.GradeId);
+                item.Size = GetSizeName(item.SizeId);
+            }
 
             return products;
 
@@ -261,6 +230,33 @@ namespace SSMO.Services.Products
         {
             var fscCert = _dbContext.MyCompanies.Select(f => f.FSCSertificate).ToList();
             return fscCert;
+        }
+
+        public string GetDescriptionName(int id)
+        {
+            var name = _dbContext.Descriptions
+               .Where(a => a.Id == id)
+               .Select(a => a.Name)
+               .FirstOrDefault();
+            return name;
+        }
+
+        public string GetGradeName(int id)
+        {
+            var name = _dbContext.Grades
+                .Where(a => a.Id == id)
+                .Select(a => a.Name)
+                .FirstOrDefault();
+            return name;
+        }
+
+        public string GetSizeName(int id)
+        {
+            var name = _dbContext.Sizes
+                .Where(a => a.Id == id)
+                .Select(a => a.Name)
+                .FirstOrDefault();
+            return name;
         }
     }
 }

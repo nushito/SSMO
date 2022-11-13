@@ -71,6 +71,7 @@ namespace SSMO
             services.AddTransient<ISupplierOrderService, SupplierOrderService>();
             services.AddTransient<IPurchaseService, PurchaseService>();
             services.AddTransient<IInvoiceService, InvoiceService>();
+            services.AddScoped<HttpContextUserIdExtension>();
 
             services.AddMvc(options =>
             {
@@ -86,6 +87,7 @@ namespace SSMO
                 options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
             });
 
+            services.AddHttpContextAccessor();
 
         }
 

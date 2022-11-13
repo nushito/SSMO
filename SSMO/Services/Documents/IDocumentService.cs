@@ -1,4 +1,5 @@
 ﻿using SSMO.Data.Models;
+using SSMO.Models.Documents.Packing_List;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,9 @@ namespace SSMO.Services.Documents
        
         public ICollection<int> GetInvoices();
 
-     
+        public ICollection<int> GetPackingList();
+
+        public PackingListForPrintViewModel PackingListForPrint(int packingListNumber);
 
     }
 }
