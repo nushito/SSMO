@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Infrastructure;
 using SSMO.Models.Products;
@@ -7,6 +8,7 @@ using SSMO.Models.Reports;
 using SSMO.Models.Reports.CustomerOrderReportForEdit;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
+using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using SSMO.Services;
 using SSMO.Services.Customer;
 using SSMO.Services.CustomerOrderService;
@@ -57,7 +59,6 @@ namespace SSMO.Controllers
 			this.supplierOrderService = supplierOrderService;
 		}
 
-
 		public IActionResult AllCustomerOrders(CustomerOrderReportAll model)
 		{
 			//TODO When All are selected page is empty
@@ -94,7 +95,6 @@ namespace SSMO.Controllers
 		[HttpGet]
 		public IActionResult CustomerOrderEdit(int id)
 		{
-
 			if (!ModelState.IsValid)
 			{
 				new CustomerOrderForEdit
@@ -107,7 +107,6 @@ namespace SSMO.Controllers
 				};
 			}
 
-
 			var customerOrderForEdit = reportService.CustomerOrderDetailsForEdit(id);
 			customerOrderForEdit.Suppliers = supplierService.GetSuppliers();
 			customerOrderForEdit.Currencies = currency.AllCurrency();
@@ -119,7 +118,6 @@ namespace SSMO.Controllers
 				item.Descriptions = productService.GetDescriptions();
 				item.Grades = productService.GetGrades();
 				item.Sizes = productService.GetSizes();
-
 			}
 
 			return View(customerOrderForEdit);
@@ -196,7 +194,7 @@ namespace SSMO.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public IActionResult CustomerOrdersBySupplier(string supplierId, CustomerBySupplierOrdersViewModel model)
+		public IActionResult CustomerOrdersBySupplier(CustomerBySupplierOrdersViewModel model,IFormCollection fc)
 		{
 			if (!User.Identity.IsAuthenticated)
 			{
@@ -211,9 +209,10 @@ namespace SSMO.Controllers
 				};
 			};
 
-		   // var supplierId = fc["Supplier"];
+		    var supplierId = fc["SupplierId"];
 			ViewData["SelectedSupplier"] = supplierId;
 			var ordersList = reportService.GetCustomerOrdersBySupplier(model.CustomerId, supplierId);
+
 			var finalListOrders = new CustomerBySupplierOrdersViewModel
 			{
 				Customers = customersList,
@@ -222,8 +221,9 @@ namespace SSMO.Controllers
 			};
 			return View(finalListOrders);
 		}
+		
 		[HttpGet]
-		public JsonResult GetSupplier(string id)
+		public ActionResult GetSupplier(string id)
 		{
 			if(id == null)
 			{
@@ -234,7 +234,108 @@ namespace SSMO.Controllers
 			return Json(selectedSuppliers);
 
 		}
+		public IActionResult AllSupplierOrders(SupplierOrdersReportAll model)
+        {
+            if (!ModelState.IsValid)
+            {
+				return View(model);
+            }
 
+			if (model.SupplierName != null)
+			{
+				string userId = this.User.UserId();
+
+				var listMyCompany = myCompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
+
+				if (!listMyCompany.Contains(userId))
+				{
+					return BadRequest();
+				}
+			}
+
+			var suppliers = supplierOrderService.GetSuppliers();
+			model.SupplierNames = suppliers;
+
+			var supplierOrdersCollection = reportService.AllSupplierOrders
+				(model.SupplierName, model.CurrentPage, SupplierOrdersReportAll.SupplierOrdersPerPage);
+
+			model.SupplierOrderCollection = supplierOrdersCollection;
+			model.TotalSupplierOrders = supplierOrdersCollection.Count();
+			return View(model);
+        }
+		public IActionResult SupplierOrderDetails(int id)
+        {
+			return View();
+        }
+        [HttpGet]
+		public IActionResult SupplierOrderEdit(int id)
+        {
+			if (!ModelState.IsValid)
+			{
+				new SupplierOrderForEditModel
+				{
+					Currencies = currency.AllCurrency(),
+					MyCompanies = myCompanyService.GetAllCompanies(),
+					Products = new List<ProductsForEditSupplierOrder>(),
+					Statuses = statusService.GetAllStatus()
+				};
+			}
+			var suppplierOrderForEdit = reportService.SupplierOrderForEditDetails(id);
+			suppplierOrderForEdit.Currencies = currency.AllCurrency();
+			suppplierOrderForEdit.MyCompanies = myCompanyService.GetAllCompanies();
+			suppplierOrderForEdit.Statuses = statusService.GetAllStatus();
+			suppplierOrderForEdit.Products = (List<ProductsForEditSupplierOrder>)productService.ProductsDetailsPerSupplierOrder(id);
+			suppplierOrderForEdit.CustomerOrderNumber = customerOrderService.CustomerOrderNumber(id);
+
+			foreach (var item in suppplierOrderForEdit.Products)
+			{
+				item.Descriptions = productService.GetDescriptions();
+				item.Grades = productService.GetGrades();
+				item.Sizes = productService.GetSizes();
+			}
+
+			return View(suppplierOrderForEdit);
+		}
+        [HttpPost]
+		public IActionResult SupplierOrderEdit(SupplierOrderForEditModel model, int id)
+        {
+			string userId = this.User.UserId();
+			string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(model.MyCompanyId);
+
+			if (userIdMyCompany != userId)
+			{
+				return BadRequest();
+			}
+
+			if (!User.Identity.IsAuthenticated)
+			{
+				return BadRequest();
+			}
+
+			if (!ModelState.IsValid)
+			{
+				new SupplierOrderForEditModel
+				{
+					Currencies = currency.AllCurrency(),
+					MyCompanies = myCompanyService.GetAllCompanies(),
+					Products = new List<ProductsForEditSupplierOrder>(),
+					Statuses = statusService.GetAllStatus()
+				};
+			}
+
+			var orderForEdit = reportService.EditSupplierOrder
+				(id, model.Number, model.Date, model.MyCompanyId,
+				model.DeliveryTerms, model.LoadingAddress, model.DeliveryAddress, model.GrossWeight, model.NetWeight,
+				model.CurrencyId, model.StatusId, model.CustomerOrderNumber, model.FSCClaim, model.FSCSertificate, model.PaidAvance, 
+				model.PaidStatus, model.VAT, model.Products);
+			
+		   if(orderForEdit == false)
+            {
+				return BadRequest();
+            }
+
+			return RedirectToAction("Index", "Home");
+		}
 		public IActionResult InvoicePaymentReport(CustomerInvoicePaymentsReportsViewModel model)
 		{
 			if(model.CustomerName != null)
@@ -369,7 +470,6 @@ namespace SSMO.Controllers
 			}
 			if (!ModelState.IsValid) return View();
 			//TODO When All are selected page is empty
-
 			var customerNames = customerService.GetCustomerNames();
 
 			var customerOrdersPaymentCollection = reportService.CustomerOrdersPaymentDetails(
@@ -446,7 +546,7 @@ namespace SSMO.Controllers
 		}
         [HttpGet]
         [Authorize]
-		public IActionResult EditSupplierOrder(string supplierOrderNumber)
+		public IActionResult EditSupplierOrderPayment(string supplierOrderNumber)
         {
 			if (!ModelState.IsValid)
 			{
@@ -458,7 +558,7 @@ namespace SSMO.Controllers
         }
         [HttpPost]
         [Authorize]
-		public IActionResult EditSupplierOrder(string supplierOrderNumber, EditSupplierOrderPaymentModel model)
+		public IActionResult EditSupplierOrderPayment(string supplierOrderNumber, EditSupplierOrderPaymentModel model)
         {
 			if (!User.Identity.IsAuthenticated)
 			{

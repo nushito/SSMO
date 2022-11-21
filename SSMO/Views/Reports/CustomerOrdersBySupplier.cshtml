@@ -1,8 +1,8 @@
 ﻿@model CustomerBySupplierOrdersViewModel
 
-<form method="get">
-    <div class="container">
-    <div class="row">
+<form asp-controller = "Reports" asp-action="CustomerOrdersBySupplier">
+   <div class="container">
+      <div class="row">
         <div class="col- col-md-2"> 
                 <label asp-for="CustomerId">Select Customer</label>
                 <select asp-for="CustomerId" class="form-control" id="CustomerId">
@@ -15,18 +15,17 @@
                 </select>                                      
         </div>
         <div class="col-">           
-                 <label class="control-label">Select Supplier</label>
-                 <select class="form-control" id="Supplier" name="Supplier" asp-items="@(new SelectList(string.Empty, "SupplierId", "SupplierName"))"></select>                 
+                 <label class="control-label"> Select Supplier</label>
+                 <select class="form-control" id="Supplier" name="SupplierId" asp-items="@(new SelectList(string.Empty, "SupplierId", "SupplierName"))"></select>               
         </div>
     </div>
     <div class="row">    
         <button type="submit" class="btn btn-primary mt-3"> Submit </button>  
     </div>
-    
-</div>
+  </div>
 </form>
-<form method="get">
-    <table id="products">
+<form >
+    <table>
     <tr>
         @if (Model.ProductList != null)
         {
@@ -70,7 +69,7 @@
                         //    $("#Supplier").append('<option value="' + supplier.SupplirId + '">' + supplier.SupplierName + '</option>');
                         //    // here we are adding option for Supplier
                         //});
-                    },
+                   },
                     error: function(ex) {
                         alert('Failed to retrieve supplier.' + ex);
                     }
@@ -101,17 +100,13 @@
                         id: $("#CustomerId").val()
                     },
                     success: function(selectedSuppliers) {
-
                         $.each(selectedSuppliers, function(i, supplier) {
-                            // $("#Supplier").append('<option value="' + supplier.SupplirId + '">' + supplier.SupplierName + '</option>');
-                            // var valSupplier = @ViewData["SelectedSupplier"];
-                            // console.log(row);
                             for (var i = 0; i < selectedSuppliers.length; i++)
                             {
                                 $("#Supplier").append('<option value="' + selectedSuppliers[i].supplierId + '">' + selectedSuppliers[i].supplierName + '</option>');
                             };
-
                             console.log(Supplier);
+
                             if (@ViewData["SelectedSupplier"] != 0) {
                                 $("#Supplier").val(@ViewData["SelectedSupplier"]);
                             }

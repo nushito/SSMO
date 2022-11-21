@@ -12,8 +12,10 @@ namespace SSMO.Models.ServiceOrders
         public string DeliveryAddress { get; set; }
         public string TruckNumber { get; set; }
         public decimal AmountAfterVat { get; set; }
+        public int SupplierId { get; set; }
         public string SupplierName { get; set; }
         public IEnumerable<string> SupplierNames { get; set; }
+        public int InvoiceDocumentNumberId { get; set; }
         public int InvoiceDocumentNumber { get; set; }
         public string PurchaseNumber { get; set; }
         public IEnumerable<int> InvoiceDocumentNumbers { get; set; }

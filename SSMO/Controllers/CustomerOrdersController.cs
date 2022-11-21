@@ -218,7 +218,6 @@ namespace SSMO.Controllers
             return RedirectToAction("PrintCustomerOrder");
         }
 
-
         public IActionResult PrintCustomerOrder()
         {
             return RedirectToAction("Index", "Home");

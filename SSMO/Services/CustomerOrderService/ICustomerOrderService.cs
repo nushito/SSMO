@@ -45,6 +45,8 @@ namespace SSMO.Services.CustomerOrderService
         public ICollection<int> AllCustomerOrderNumbers();
 
         public EditCustomerOrderPaymentModel GetCustomerOrderPaymentForEdit(int orderConfirmationNumber);
-        bool EditCustomerOrdersPayment(int orderConfirmationNumber, bool paidStatus, decimal paidAdvance);
+        public bool EditCustomerOrdersPayment(int orderConfirmationNumber, bool paidStatus, decimal paidAdvance);
+        public int CustomerOrderNumber(int supplierOrderId);
+        
     }
 }

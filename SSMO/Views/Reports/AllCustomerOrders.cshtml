@@ -10,7 +10,6 @@
                 {
                     <option value="@customerName">@customerName</option>
                 }
-
             </select>
         </div>
     </div>
@@ -57,10 +56,13 @@
 <div class="container">
    <div class="row">
         <div class="col">
-            OC Number
+          OC Number
+        </div>
+        <div class="col">
+         Customer PO Number
         </div>
          <div class="col">
-            Date
+          Date
         </div>
          <div class="col">
           Loading Address
@@ -68,8 +70,8 @@
          <div class="col">
           Delivery Address
         </div>
-     <div class="col">
-         Order Status
+        <div class="col">
+          Order Status
         </div>
         </div>
 <hr />
@@ -82,6 +84,9 @@
         <div class="col">
             @order.OrderConfirmationNumber
         </div>
+          <div class="col">
+            @order.CustomerPoNumber
+        </div>
          <div class="col">
             @order.Date
         </div>
@@ -93,14 +98,10 @@
         </div>
      <div class="col">
            @order.StatusName
-        </div>
-  
+    </div>
     <a asp-controller="Reports" asp-action="CustomerOrderDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
-
     <a asp-controller="Reports" asp-action="CustomerOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
-
     <a asp-controller="Reports" asp-action="Delete" asp-route-modelid="@order.Id" class="btn btn-outline-info">Delete</a>
-
     </div>
     <hr />
 }

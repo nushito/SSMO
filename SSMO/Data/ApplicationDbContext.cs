@@ -213,6 +213,11 @@ namespace SSMO.Data
                 .HasPrecision(18, 5);
 
             builder.Entity<Product>()
+                .Property(a => a.QuantityM3)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);               
+
+            builder.Entity<Product>()
                 .Property(a => a.Amount)
                 .HasColumnType("decimal")
                 .HasPrecision(18, 5);

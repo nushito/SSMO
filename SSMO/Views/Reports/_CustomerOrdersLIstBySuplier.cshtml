@@ -1,32 +1,63 @@
 ﻿@model IEnumerable<CustomerOrderListViewBySupplier>
 
 <div class="container">
-    @foreach(var item in Model)
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                OC Number
+                </th>
+                <th>
+                    Date
+                </th>
+                <th>
+                    Customer PO number
+                </th>
+                <th>
+                   Loading Address
+                </th>
+                <th>
+                    Delivery Address
+                </th>
+                <th>
+                  Order Status 
+                </th>
+                <th>
+                  Payment Status 
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+             @foreach(var item in Model)
     {
-        <div class="row">
-            <div class="col">
+        <tr>
+            <th>
                 @item.OrderConfirmationNumber
-            </div>
-            <div class="col">
+            </th>
+            <th >
                 @item.Date
-            </div>
-            <div class="col">
+            </th>
+            <th >
                 @item.CustomerPoNumber
-            </div>
-            <div class="col">
+            </th>
+            <th>
                 @item.LoadingPlace
-            </div>
-            <div class="col">
+            </th>
+            <th>
                 @item.DeliveryAddress
-            </div>
-            <div class="col">
+            </th>
+            <th>
                 @item.StatusName
-            </div>
-             <div class="col">
+            </th>
+             <th>
                 @item.PaidAmountStatus
-            </div>
-        </div>
-        <hr />
+            </th>
+        </tr>
+      
     }
+        </tbody>
+
+    </table>
+   
 </div>
 

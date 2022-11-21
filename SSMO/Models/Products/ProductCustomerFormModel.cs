@@ -24,6 +24,9 @@ namespace SSMO.Models.Products
         public decimal OrderedQuantity { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
+        public decimal QuantityM3 { get; set; }
+
+        [Range(0.0, 9999999999999.99999)]
         public decimal Price { get; set; }
 
         [Range(0.0, 9999999999999.99999)]

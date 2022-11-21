@@ -16,11 +16,12 @@ namespace SSMO.Controllers
         [HttpGet]
         public IActionResult AddServiceOrder()
         {
-
-            return View(new ServiceOrderFormModel
+            var serviceOrderModel = new ServiceOrderFormModel
             {
                 SupplierNames = supplierService.GetSupplierNames()
-            }); ;
+            };
+
+            return View(serviceOrderModel); ;
         }
         [HttpPost]
         [Authorize]
@@ -29,7 +30,7 @@ namespace SSMO.Controllers
             return View();
         }
 
-        public JsonResult GetPurchaseDocumentNumbers(string name)
+        public ActionResult GetPurchaseDocumentNumbers(string name)
         {
 
             return Json( name);

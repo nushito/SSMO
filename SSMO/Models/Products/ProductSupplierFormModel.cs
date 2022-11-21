@@ -22,9 +22,9 @@ namespace SSMO.Models.Products
         public int SupplierOrderId { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal PurchasePrice { get; set; }
-
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
+        public decimal QuantityM3  { get; set; }
 
 
     }

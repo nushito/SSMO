@@ -20,12 +20,12 @@ namespace SSMO.Services.SupplierOrders
         {
             this.dbContext = dbContext;
             this.mapper = mapper.ConfigurationProvider;
-            
         }
 
         public int CreateSupplierOrder(int myCompanyId, int supplierId, DateTime Date, 
             string number, int customerOrderNumber, int statusId, int currencyId, string fscClaim, int vat,
-            DateTime datePaidAmount, decimal paidAvance, bool paidStatus,string loadingAddress, string deliveryAddress)
+            DateTime datePaidAmount, decimal paidAvance, bool paidStatus,
+            string loadingAddress, string deliveryAddress, string deliveryTerms)
         {
             var customerOrder = dbContext.CustomerOrders
                 .Where(a => a.OrderConfirmationNumber == customerOrderNumber)
@@ -49,7 +49,8 @@ namespace SSMO.Services.SupplierOrders
                 PaidAvance = paidAvance,               
                 PaidStatus = paidStatus,
                 LoadingAddress = loadingAddress,
-                DeliveryAddress = deliveryAddress
+                DeliveryAddress = deliveryAddress,
+                DeliveryTerms = deliveryTerms
             };
 
            if(datePaidAmount.ToString() != null)
@@ -132,9 +133,9 @@ namespace SSMO.Services.SupplierOrders
         public void TotalAmountAndQuantitySum(int supplierOrderId)
         {
            var spOrder = dbContext.SupplierOrders.Find(supplierOrderId);
-           spOrder.TotalAmount = spOrder.Amount + (spOrder.Amount * spOrder.VAT / 100)??0;
+           spOrder.TotalAmount = spOrder.Amount + (spOrder.Amount*spOrder.VAT/100)??0;
            spOrder.Balance = spOrder.TotalAmount - spOrder.PaidAvance;
-            spOrder.TotalQuantity = spOrder.Products.Sum(a => a.LoadedQuantityM3);
+            spOrder.TotalQuantity = spOrder.Products.Sum(a => a.OrderedQuantity);
            dbContext.SaveChanges();    
           
         }

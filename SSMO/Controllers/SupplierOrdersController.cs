@@ -113,8 +113,8 @@ namespace SSMO.Controllers
             var supplierOrderId = supplierOrderService.CreateSupplierOrder
                                   (model.MyCompanyId, model.SupplierId,model.Date,
                                    model.Number,model.CustomerOrderNumber, model.StatusId, 
-                                   model.CurrencyId, model.FscClaim, model.VAT??0, model.DatePaidAmount, 
-                                   model.PaidAvance, model.PaidStatus, model.LoadingAddress, model.DeliveryAddress);
+                                   model.CurrencyId, model.FscClaim, model.VAT??0, model.DatePaidAmount,
+                                   model.PaidAvance, model.PaidStatus, model.LoadingAddress, model.DeliveryAddress, model.DeliveryTerms);
 
            return RedirectToAction("EditProductAsPerSupplier", new {customerOrderId = customerorderId, supplierOrderId = supplierOrderId} );
         }
@@ -166,7 +166,8 @@ namespace SSMO.Controllers
                     Grades = productService.GetGrades(),
                     Sizes = productService.GetSizes(),
                     CustomerOrderId = customerorderId,
-                    SupplierOrderId =  supplierOrderId
+                    SupplierOrderId =  supplierOrderId,
+                    QuantityM3 = product.QuantityM3
 
               };
 
@@ -210,7 +211,7 @@ namespace SSMO.Controllers
             {
               var check =  productService.EditProduct(product.Id, customerorderId, supplierOrderId,product.Description, product.Grade, 
                            product.Size, product.FSCClaim, product.FSCSertificate, product.Pallets, product.SheetsPerPallet,
-                           product.PurchasePrice);
+                           product.PurchasePrice,product.QuantityM3);
 
                 if(!check )
                 {

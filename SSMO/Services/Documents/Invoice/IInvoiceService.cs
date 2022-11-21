@@ -8,7 +8,8 @@ namespace SSMO.Services.Documents.Invoice
     public interface IInvoiceService
     {
         public InvoicePrintViewModel CreateInvoice(
-            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int Number, string myCompanyName, string truckNumber);
+            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN,
+            int Number, string myCompanyName, string truckNumber, decimal deliveryCost);
         public bool CheckFirstInvoice();
         public EditInvoicePaymentModel InvoiceForEditByNumber(int documentNumber);
 

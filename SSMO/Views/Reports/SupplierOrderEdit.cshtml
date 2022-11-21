@@ -1,37 +1,62 @@
-﻿@model CustomerOrderForEdit
+﻿@model SupplierOrderForEditModel
 @using SSMO.Services.Products
 @inject IProductService service;
 @{
-    ViewBag.Title = "Edit Customer Order";
+    ViewBag.Title = "Edit Supplier Order";
 }
+
 <form method="post">
     <div class="row col-md-4">
-        <label asp-for="CustomerPoNumber"></label>
-        <input asp-for="CustomerPoNumber" class="form-control" />
-        <span asp-validation-for="CustomerPoNumber" class="small text-danger"></span>
+        <label asp-for="Number"></label>
+        <input asp-for="Number" class="form-control" />
+        <span asp-validation-for="Number" class="small text-danger"></span>
     </div>
     <div class="row col-md-4">
         <label asp-for="Date"></label>
         <input id="date" asp-for="Date" value="@Model.Date" name="Date" type="date" id="datepicker" class="form-control" />
         <span asp-validation-for="Date" class="small text-danger"></span>
     </div>
-    <div class="form-group row col-md-4">
+    <div class="row col-md-4">
+        <label asp-for="CustomerOrderNumber"></label>
+        <input id="CustomerOrderNumber" asp-for="CustomerOrderNumber" class="form-control"/>
+        <span asp-validation-for="CustomerOrderNumber" class="small text-danger"></span>
+    </div>
+    <div class="row col-md-4">
         <label asp-for="DeliveryTerms"></label>
         <input id="deliveryterms" asp-for="DeliveryTerms" type="text" class="form-control" placeholder="Delivery Terms" />
         <span asp-validation-for="DeliveryTerms" class="small text-danger"></span>
     </div>
-    <div class="form-group row col-md-4">
-        <label asp-for="LoadingPlace"></label>
-        <input id="loadingplace" asp-for="LoadingPlace" type="text" class="form-control" placeholder="Loading place" />
-
+    <div class="row col-md-4">
+        <label asp-for="LoadingAddress"></label>
+        <input id="loadingplace" asp-for="LoadingAddress" type="text" class="form-control" placeholder="Loading place" />
+        <span asp-validation-for="LoadingAddress" class="small text-danger"></span>
     </div>
-    <div class="form-group row col-md-4">
+    <div class="row col-md-4">
         <label asp-for="DeliveryAddress"></label>
         <input id="deliveryaddress" asp-for="DeliveryAddress" type="text" class="form-control" placeholder="Delivery address" />
-
+        <span asp-validation-for="DeliveryAddress" class="small text-danger"></span>
     </div>
-
-    <div class="form-group col-md-4">
+    <div class="row col-md-4">
+        <label asp-for="NetWeight"></label>
+        <input id="netweight" asp-for="NetWeight" type="text" class="form-control" />
+        <span asp-validation-for="NetWeight" class="small text-danger"></span>
+    </div>
+     <div class="row col-md-4">
+        <label asp-for="GrossWeight"></label>
+        <input id="grossweight" asp-for="GrossWeight" type="text" class="form-control" />
+        <span asp-validation-for="GrossWeight" class="small text-danger"></span>
+    </div>
+     <div class="row col-md-4">
+        <label asp-for="FSCClaim"></label>
+        <input id="fscClaim" asp-for="FSCClaim" type="text" class="form-control" />
+        <span asp-validation-for="FSCClaim" class="small text-danger"></span>
+    </div>
+      <div class="row col-md-4">
+        <label asp-for="FSCSertificate"></label>
+        <input id="fscCertificate" asp-for="FSCSertificate" type="text" class="form-control" />
+        <span asp-validation-for="FSCSertificate" class="small text-danger"></span>
+    </div>
+    <div class="row col-md-4"> 
         <label asp-for="CurrencyId"></label>
         <select id="currency" asp-for="CurrencyId" class="form-control">
             @foreach (var item in Model.Currencies)
@@ -40,12 +65,11 @@
             }
 
         </select>
-
     </div>
-        <div class="form-group col-md-4">
+         <div class="row col-md-4">
             <div class="form-group">
                 <label asp-for="MyCompanyId"></label>
-                <select asp-for="MyCompanyId" class="form-control">
+                <select id="mycompany" asp-for="MyCompanyId" class="form-control">
                     @foreach (var company in Model.MyCompanies)
                     {
                         <option value="@company.Id">@company.Name</option>
@@ -56,30 +80,22 @@
 
         </div>
 
-    <div class="form-group-sm col-md-4">
-        <label asp-for="Origin"></label>
-        <input asp-for="Origin" type="text" class="form-control" />
-        <span asp-validation-for="Origin" class="small text-danger"></span>
+    <div class="row col-md-4">
+        <label asp-for="PaidAvance"></label>
+        <input asp-for="PaidAvance" type="number" min="0.0000" step="0.00001" class="form-control" />
+        <span asp-validation-for="PaidAvance" class="small text-danger"></span>
     </div>
-    <div class="form-group-sm col-md-4">
-        <label asp-for="PaidAdvance"></label>
-        <input asp-for="PaidAdvance" type="number" min="0.0000" step="0.00001" class="form-control" />
-        <span asp-validation-for="PaidAdvance" class="small text-danger"></span>
+   <div class="row col-md-4">  
+       <label class="form-check-label" asp-for="PaidStatus">Paid</label>
+        <input class="form-check-input" type="checkbox" asp-for="PaidStatus">
+        <span asp-validation-for="PaidStatus" class="small text-danger"></span>
     </div>
-    <div class="form-group col-sm-4">
-        <input class="form-check-input" type="checkbox" asp-for="PaidAmountStatus">
-        <label class="form-check-label" asp-for="PaidAmountStatus">
-            Paid
-        </label>
+     <div class="row col-md-4">
+            <label asp-for="VAT"></label>
+            <input asp-for="VAT" min="0" step="1" class="form-control" type="number" />
+            <span asp-validation-for="VAT" class="small text-danger"></span>
     </div>
-
-    <div class="form-group row col-md-4">
-       
-            <label asp-for="Vat"></label>
-            <input asp-for="Vat" min="0" step="1" class="form-control" type="number" />
-       </div>
-  
-    <div class="form-group row col-md-4">
+   <div class="row col-md-4">
             <label asp-for="StatusId"></label>
             <select asp-for="StatusId" class="form-control">
                 @foreach (var status in Model.Statuses)
@@ -88,13 +104,11 @@
                 }
                 <span asp-validation-for="StatusId" class="small text-danger"></span>
             </select>
-
     </div>
-    <h6>Products</h6>
-    <hr />
-    <div>
+     <div class="container">  
         <table>
-            <thead class="thead-light">
+              <p>Products</p>
+            <thead>
                 <tr>
                     <td>Description</td>
                     <td>Size</td>
@@ -104,16 +118,16 @@
                     <td>Pallets Number</td>
                     <td>Sheets/pallet</td>
                     <td>Quantity m3</td>
-                    <td>Price</td>
+                    <td>Purchase >Price</td>
                 </tr>
             </thead>
-          <tbody>
-              @for (int i = 0; i < Model.Products.Count; i++)
-                 {
+            <tbody>
+                 @for (int i = 0; i < Model.Products.Count; i++)
+            {
                   <tr>
                         <td class="col-sm-1">
                             <div class="editor-field">
-                               <select asp-for="@Model.Products[i].Description">
+                                <select asp-for="@Model.Products[i].Description">
                                     <option value="">All</option>
                                     @foreach (var type in service.GetDescriptions())
                                     {
@@ -125,7 +139,7 @@
                         <br>
                         <td class="col-sm-1">
                             <div class="editor-field">
-                               <select id="Size" asp-for="@Model.Products[i].Size">
+                                <select id="Size" asp-for="@Model.Products[i].Size">
                                     <option value="">All</option>
                                     @foreach (var size in service.GetSizes())
                                     {
@@ -149,13 +163,13 @@
                         <br>
                         <td class="col-sm-1">
                             <div class="editor-field">
-                            <input asp-for="@Model.Products[i].FSCClaim" class="text-box single-line" placeholder="FSC Claim" aria-label="FSC Claim" value="@Model.Products[i].FSCClaim" >
+                             <input asp-for="@Model.Products[i].FSCClaim" class="text-box single-line" placeholder="FSC Claim" aria-label="FSC Claim" value="@Model.Products[i].FSCClaim" >
                             </div>
                         </td>
                         <br>
                         <td class="col-sm-1">
                             <div class="editor-field">
-                               <input asp-for="@Model.Products[i].FSCSertificate" class="text-box single-line" placeholder="FSC Certificate" aria-label="FSC Certificate" value="@Model.Products[i].FSCSertificate">
+                                <input asp-for="@Model.Products[i].FSCSertificate" class="text-box single-line" placeholder="FSC Certificate" aria-label="FSC Certificate" value="@Model.Products[i].FSCSertificate">
                             </div>
                         </td>
                         <br>
@@ -167,29 +181,25 @@
                         <br>
                         <td class="col-sm-1">
                             <div class="editor-field">
-                               <input asp-for="@Model.Products[i].SheetsPerPallet" class="text-box single-line" aria-label="Sheets/Pallets" value="@Model.Products[i].SheetsPerPallet" required="required">
+                                <input asp-for="@Model.Products[i].SheetsPerPallet" class="text-box single-line" aria-label="Sheets/Pallets" value="@Model.Products[i].SheetsPerPallet" required="required">
                             </div>
                         </td>
-
-                        <br>
-                         <td class="col-sm-1">
-                            <div class="editor-field">
-                               <input asp-for="@Model.Products[i].QuantityM3" class="text-box single-line" aria-label="QuantityM3" value="@Model.Products[i].QuantityM3">
-                            </div>
-                        </td>
-
                         <br>
                         <td class="col-sm-1">
                             <div class="editor-field">
-                                <input asp-for="@Model.Products[i].Price" type="number" min="0.0000" step="0.0001" class="text-box single-line" aria-label="Sell Price" value="@Model.Products[i].Price" required="required">
+                                <input asp-for="@Model.Products[i].QuantityM3" class="text-box single-line" aria-label="QuantityM3" value="@Model.Products[i].QuantityM3" required="required">
+                            </div>
+                        </td>
+                        <br>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                <input asp-for="@Model.Products[i].PurchasePrice" type="number" min="0.0000" step="0.0001" class="text-box single-line" aria-label="Sell Price" value="@Model.Products[i].PurchasePrice" required="required">
                             </div>
                         </td>
                     </tr>
-             }
-          </tbody>   
-        
+               }
+            </tbody>
         </table>
-      
      </div>
     @* <input type="hidden" name="customerorderid" value="@model.id" />*@
     <input type="submit" value="Save" class="btn btn-primary mt-3" />

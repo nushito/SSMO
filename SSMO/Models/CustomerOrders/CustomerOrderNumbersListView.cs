@@ -13,6 +13,7 @@ namespace SSMO.Models.CustomerOrders
         public IEnumerable<string> MyCompanyNames { get; set; }
         public int? Number { get; set; }
         public string TruckNumber { get; set; }
+        public decimal DeliveryCost { get; set; }
         public IEnumerable<int> OrderConfirmationNumberList { get; set; }
     }
 }

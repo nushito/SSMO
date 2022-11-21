@@ -5,6 +5,7 @@ using AutoMapper;
 using SSMO.Data;
 using SSMO.Models.MyCompany;
 using SSMO.Infrastructure;
+using SSMO.Models.Reports;
 
 namespace SSMO.Services.MyCompany
 {
@@ -23,12 +24,12 @@ namespace SSMO.Services.MyCompany
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public ICollection<MyCompanyFormModel> GetAllCompanies()
+        public ICollection<MyCompaniesForReportViewModel> GetAllCompanies()
         {
             var loggedUserId = _httpContextAccessor.ContextAccessUserId();
             var listDbCompanies = dbContext.MyCompanies
                 .Where(idvalue=>idvalue.UserId == loggedUserId).ToList();
-            var allCompanies = mapper.Map<ICollection<MyCompanyFormModel>>(listDbCompanies);
+            var allCompanies = mapper.Map<ICollection<MyCompaniesForReportViewModel>>(listDbCompanies);
 
             return allCompanies;
         }

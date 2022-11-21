@@ -12,7 +12,7 @@
         <table id="clientTable" class="table table-bordered">
             <thead class="thead-light">
                 <tr>
-                 <td>Description</td>
+                <td>Description</td>
                 <td>Size</td>
                 <td>Grade</td>
                 <td>FSC claim</td>
@@ -94,6 +94,11 @@
                                 </div>
                             </td>
 
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+                                      <input asp-for="@Model[i].QuantityM3" class="text-box single-line" value="">
+                                </div>
+                            </td>
                            
                             <td class="col-sm-1">
                                 <div class="editor-field">

@@ -27,6 +27,7 @@ namespace SSMO.Data.Models
         [Range(0.0, 9999999999999.99999)]
         public decimal LoadedQuantityM3 { get; set; }
         public decimal QuantityM2 { get; set; }
+        public decimal? QuantityM3 { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
         public int TotalSheets { get; set; }
@@ -43,7 +44,6 @@ namespace SSMO.Data.Models
         public string FSCSertificate { get; set; }
         public int CustomerOrderId { get; set; }
         public CustomerOrder CustomerOrder { get; set; }
-
         public int? SupplierOrderId { get; set; }
         public SupplierOrder SupplierOrder { get; set; }
         public int? DocumentId { get; set; }

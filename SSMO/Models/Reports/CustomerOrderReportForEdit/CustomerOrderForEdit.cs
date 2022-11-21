@@ -23,12 +23,10 @@ namespace SSMO.Models.Reports.CustomerOrderReportForEdit
         public string DeliveryAddress { get; set; }
         public int MyCompanyId { get; set; }
         public string MyCompanyName { get; set; }
-        public IEnumerable<MyCompanyFormModel> MyCompanies { get; set; }
+        public IEnumerable<MyCompaniesForReportViewModel> MyCompanies { get; set; }
         public int StatusId { get; set; }
-        public StatusModel Status { get; set; }
         public IEnumerable<StatusModel> Statuses { get; set; }
         public int CurrencyId { get; set; }
-        public string Currency { get; set; }
         public IEnumerable<GetCurrencyModel> Currencies { get; set; }
         public List<ProductCustomerFormModel> Products { get; set; }
         public string FscClaim { get; set; }

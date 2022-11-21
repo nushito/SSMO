@@ -136,7 +136,6 @@ namespace SSMO.Controllers
             {
                 return View();
             }
-
             return RedirectToAction("Index", "Home");
         }
 
@@ -202,12 +201,14 @@ namespace SSMO.Controllers
                     currencyExchangeRateUsdToBGN = model.CurrencyExchangeRateUsdToBGN,
                     number = model.Number,
                     mycompanyname = model.MyCompanyName,
-                    truckNumber = model.TruckNumber
+                    truckNumber = model.TruckNumber,
+                    deliveryCost = model.DeliveryCost
                 });
         }
 
         public IActionResult CreateInvoice(
-            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int number, string mycompanyname, string truckNumber)
+            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, 
+            int number, string mycompanyname, string truckNumber, decimal deliveryCost)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(mycompanyname);
@@ -225,7 +226,8 @@ namespace SSMO.Controllers
                 return View();
             }
 
-            var invoiceForPrint = invoiceService.CreateInvoice(orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname,truckNumber);    
+            var invoiceForPrint = invoiceService.CreateInvoice
+                (orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname,truckNumber,deliveryCost);    
 
             return View(invoiceForPrint);
         }

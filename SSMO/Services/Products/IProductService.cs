@@ -1,4 +1,5 @@
 ﻿using SSMO.Models.Products;
+using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,14 +26,15 @@ namespace SSMO.Services.Products
             int supplierOrderId,
             string description, string grade,
             string size, string fscClaim, string fscCertificate,
-            int pallets, int sheetsPerPallet, decimal purchasePrice);
+            int pallets, int sheetsPerPallet, decimal purchasePrice, decimal quantityM3);
         public ICollection<ProductCustomerFormModel> DetailsPerCustomerOrder(int id);
-
+        public ICollection<ProductsForEditSupplierOrder> ProductsDetailsPerSupplierOrder(int supplierOrderId);
         public ICollection<string> GetFascCertMyCompany();
 
         public string GetDescriptionName(int id);
         public string GetGradeName(int id);
         public string GetSizeName(int id);
+        public decimal CalculateDeliveryCostOfTheProductInCo(decimal quantity, decimal totalQuantity, decimal deliveryCost);
 
     }
 }

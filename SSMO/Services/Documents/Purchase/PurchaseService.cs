@@ -75,6 +75,7 @@ namespace SSMO.Services.Documents.Purchase
 
             foreach (var product in productList)
             {
+                //TODO why quantity = 0, check supplierorder
                 product.LoadedQuantityM3 = product.OrderedQuantity;
                 product.CostPrice = (product.Amount + (expenses / supplierOrder.TotalQuantity * product.LoadedQuantityM3)) / product.LoadedQuantityM3;
                 purchase.Products.Add(product);

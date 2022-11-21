@@ -1,6 +1,7 @@
 ﻿using SSMO.Models.Customers;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
+using SSMO.Models.Reports;
 using SSMO.Services.Curruncies;
 using SSMO.Services.Supplier;
 using System;
@@ -32,7 +33,7 @@ namespace SSMO.Models.CustomerOrders
         public IEnumerable<AddCustomerFormModel> Customers { get; set; }
         public int MyCompanyId { get; set; }
         public string MyCompanyName { get; set; }
-        public IEnumerable<MyCompanyFormModel> MyCompanies { get; set; }
+        public IEnumerable<MyCompaniesForReportViewModel> MyCompanies { get; set; }
         public int StatusId { get; set; }
         public StatusModel Status { get; set; } 
         public IEnumerable<StatusModel> Statuses { get; set; }

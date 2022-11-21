@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
 using SSMO.Models.Products;
+using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +40,7 @@ namespace SSMO.Services.Products
                 Pallets = model.Pallets,
                 SheetsPerPallet = model.SheetsPerPallet,
                 CustomerOrderId = customerorderId,
-
+                QuantityM3 = model.QuantityM3
             };
 
             var dimensionArray = size.Name.Split('/').ToArray();
@@ -50,11 +51,17 @@ namespace SSMO.Services.Products
             {
                 sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 4);
             }
-
             product.TotalSheets = product.Pallets * product.SheetsPerPallet;
-            product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
-          //  product.LoadedQuantityM3 = Math.Round(sum * product.TotalSheets, 4);
-            product.Amount = Math.Round(product.Price * product.LoadedQuantityM3, 4);
+
+            if(model.QuantityM3 != 0)
+            {
+                product.OrderedQuantity = model.QuantityM3;
+            }
+            else
+            {
+                product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
+            }
+            product.Amount = Math.Round(product.Price * product.OrderedQuantity, 4);
             _dbContext.Products.Add(product);
             _dbContext.SaveChanges();
 
@@ -141,7 +148,7 @@ namespace SSMO.Services.Products
             int supplierOrderId,
            string description, string grade,
             string size, string fscClaim, string fscCertificate,
-            int pallets, int sheetsPerPallet, decimal purchasePrice)
+            int pallets, int sheetsPerPallet, decimal purchasePrice, decimal quantityM3)
         {
 
 
@@ -175,7 +182,15 @@ namespace SSMO.Services.Products
             }
 
             product.TotalSheets = product.Pallets * product.SheetsPerPallet;
-            product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
+            if(quantityM3 != 0)
+            {
+                product.OrderedQuantity = quantityM3;
+            }
+            else
+            {
+                product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
+            }
+           
             product.PurchaseAmount = Math.Round(product.PurchasePrice * product.OrderedQuantity, 4);
             product.Amount = Math.Round(product.Price * product.OrderedQuantity, 4);
 
@@ -204,9 +219,7 @@ namespace SSMO.Services.Products
             }
 
             return products;
-
         }
-
 
         public ICollection<ProductCustomerFormModel> DetailsPerCustomerOrder(int customerId)
         {
@@ -257,6 +270,34 @@ namespace SSMO.Services.Products
                 .Select(a => a.Name)
                 .FirstOrDefault();
             return name;
+        }
+
+        public decimal CalculateDeliveryCostOfTheProductInCo(decimal quantity, decimal totalQuantity, decimal deliveryCost)
+        {
+            var cost = deliveryCost / totalQuantity * quantity;
+           return cost;
+        }
+
+        public ICollection<ProductsForEditSupplierOrder> ProductsDetailsPerSupplierOrder(int supplierOrderId)
+        {
+            var customerOrderId = _dbContext.SupplierOrders
+                .Where(num => num.Id == supplierOrderId)
+                .Select(id => id.CustomerOrderId)
+                .ToList();
+
+            var products = _dbContext.Products
+                 .Where(a => customerOrderId.Contains(a.CustomerOrderId))
+                 .ProjectTo<ProductsForEditSupplierOrder>(mapper)
+                 .ToList();
+
+            foreach (var item in products)
+            {
+                item.Description = GetDescriptionName(item.DescriptionId);
+                item.Grade = GetGradeName(item.GradeId);
+                item.Size = GetSizeName(item.SizeId);
+            }
+
+            return products;
         }
     }
 }

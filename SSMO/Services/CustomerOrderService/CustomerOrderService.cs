@@ -195,5 +195,20 @@ namespace SSMO.Services.CustomerOrderService
 
             return true;
         }
+
+        public int CustomerOrderNumber(int supplierOrderId)
+        {
+            var customerOrderId = dbContext.SupplierOrders
+                .Where(id => id.Id == supplierOrderId)
+                .Select(cnum => cnum.CustomerOrderId)
+                .FirstOrDefault();
+
+            var customerOrdeNum = dbContext.CustomerOrders
+                .Where(id => id.Id == customerOrderId)
+                .Select(num => num.OrderConfirmationNumber)
+                .FirstOrDefault();
+
+            return customerOrdeNum;
+        }
     }
 }

@@ -35,7 +35,8 @@ namespace SSMO.Services.Documents.Invoice
         }
 
         public InvoicePrintViewModel CreateInvoice(
-            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, int number, string myCompanyName, string truckNumber)
+            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, 
+            int number, string myCompanyName, string truckNumber, decimal deliveryCost)
         {
             var customerOrder = dbContext.CustomerOrders
                 .Where(on => on.OrderConfirmationNumber == orderConfirmationNumber).FirstOrDefault();
@@ -45,6 +46,12 @@ namespace SSMO.Services.Documents.Invoice
 
             var productList = dbContext.Products.
                 Where(co => co.CustomerOrderId == customerOrder.Id).ToList();
+           
+            foreach (var product in productList)
+            {
+                product.DeliveryTrasnportCost = productService.CalculateDeliveryCostOfTheProductInCo
+                    (product.LoadedQuantityM3, customerOrder.TotalQuantity, deliveryCost);
+            }
 
             if (customerOrder == null)
             {
