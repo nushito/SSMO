@@ -1,0 +1,192 @@
+﻿@model ProductAvailabilityViewModel
+@{
+    ViewBag.Title = "Products on Stock";
+}
+
+<form method="get">
+    <h5>Products on stock</h5>
+    <hr />
+    <div class="form-group row">
+        <div class="form-group col-md-5">
+            <div class="form-group">
+                <label asp-for="DescriptionId" class="col-form-label">Description</label>
+                <select asp-for="@Model.DescriptionId">
+                    <option value="">All</option>
+                    @foreach (var description in Model.Descriptions)
+                    {
+                        <option value="@description.Id">@description.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group col-md-2">
+            <div class="form-group">
+                <label asp-for="SizeId" class="col-form-label">Size</label>
+                <select  asp-for="@Model.SizeId">
+                    <option value="">All</option>
+                    @foreach (var size in Model.Sizes)
+                    {
+                        <option value="@size.Id">@size.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group col-md-2">
+            <div class="form-group">
+                <label asp-for="GradeId" class="col-form-label">Grade</label>
+                <select asp-for="@Model.GradeId">
+                    <option value="">All</option>
+                    @foreach (var grade in Model.Grades)
+                    {
+                        <option value="@grade.Id">@grade.Name</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+    <br>
+    <div>
+        <input type="submit" class="btn btn-info" value="Search" />
+    </div>
+    <hr />
+</form>
+@{
+    var previouspage = Model.CurrentPage - 1;
+    if (previouspage < 1)
+    {
+        previouspage = 1;
+    }
+
+    var maxpage = Math.Ceiling((double)Model.TotalProducts / ProductAvailabilityViewModel.ProductsPerPage);
+}
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
+           asp-controller="Reports"
+           asp-action="ProductsOnStock"
+           asp-route-currentPage="@previouspage"
+           asp-route-descriptionId="@Model.DescriptionId"
+           asp-route-gradeId="@Model.GradeId"
+           asp-route-sizeId="@Model.SizeId"><<</a>
+    </div>
+
+    @{
+        var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
+        !Model.ProductsDetails.Any();
+    }
+
+    <div class="col-md-6">
+        <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
+           asp-controller="Reports"
+           asp-action="ProductsOnStock"
+           asp-route-currentPage="@previouspage"
+           asp-route-descriptionId="@Model.DescriptionId"
+           asp-route-gradeId="@Model.GradeId"
+           asp-route-sizeId="@Model.SizeId">>></a>
+    </div>
+</div>
+
+<table class="table table-bordered">
+        <thead>
+            <tr>
+                <th scope="col">
+                    Customer Order Number
+                </th>
+                <th scope="col">
+                    Date
+                </th>
+                <th scope="col">
+                    Customer
+                </th>
+                <th scope="col">
+                    Purchase Number
+                </th>
+                <th scope="col">
+                    Date
+                </th>
+                <th scope="col">
+                    Supplier
+                </th>
+                <th scope="col">
+                    Location
+                </th>
+                <th scope="col">
+                    LoadedQuantity
+                </th>
+                <th scope="col">
+                    Number of pallets
+                </th>
+                <th scope="col">
+                    Sheets/pallet
+                </th>
+                <th scope="col">
+                    FSC Claim
+                </th>
+                <th scope="col">
+                    FSC Certificate
+                </th>
+                <th scope="col">
+                    Purchase Price
+                </th>
+                <th scope="col">
+                    Cost Price
+                </th>
+                <th scope="col">
+                    Sell Price
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model.ProductsDetails)
+            {
+                <tr>
+                    <td>
+                        @product.CustomerOrderNumber
+                    </td>
+                    <td>
+                        @product.OrderDate
+                    </td>
+                    <td>
+                        @product.CustomerName
+                    </td>
+                    <td>
+                        @product.PurchaseNumber
+                    </td>
+                    <td>
+                        @product.PurchaseDate
+                    </td>
+                    <td>
+                        @product.SupplierName
+                    </td>
+                    <td>
+                        @product.DeliveryAddress
+                    </td>
+                    <td>
+                        @product.LoadedQuantity
+                    </td>
+                    <td>
+                        @product.Pallets
+                    </td>
+                    <td>
+                        @product.SheetsPerPallet
+                    </td>
+                    <td>
+                        @product.FSCClaim
+                    </td>
+                    <td>
+                        @product.FSCSertificate
+                    </td>
+                    <td>
+                        @product.PurchasePrice
+                    </td>
+                    <td>
+                        @product.CostPrice
+                    </td>
+                    <td>
+                        @product.Price
+                    </td>
+                </tr>
+            }
+        </tbody>
+</table>

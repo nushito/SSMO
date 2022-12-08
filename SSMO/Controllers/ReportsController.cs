@@ -7,6 +7,7 @@ using SSMO.Models.Products;
 using SSMO.Models.Reports;
 using SSMO.Models.Reports.CustomerOrderReportForEdit;
 using SSMO.Models.Reports.PaymentsModels;
+using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using SSMO.Services;
@@ -87,7 +88,7 @@ namespace SSMO.Controllers
 
 		public IActionResult CustomerOrderDetails(int id)
 		{
-			var order = reportService.Details(id);
+			var order = reportService.CustomerOrderDetails(id);
 
 			return View(order);
 		}
@@ -265,7 +266,8 @@ namespace SSMO.Controllers
         }
 		public IActionResult SupplierOrderDetails(int id)
         {
-			return View();
+			var supplierOrderDetails = reportService.SupplierOrderDetail(id);
+			return View(supplierOrderDetails);
         }
         [HttpGet]
 		public IActionResult SupplierOrderEdit(int id)
@@ -574,6 +576,31 @@ namespace SSMO.Controllers
 
 			return View();
         }
+
+		public IActionResult ProductsOnStock(ProductAvailabilityViewModel model) 
+		{
+			if (!ModelState.IsValid)
+			{
+				return View(model);
+			}
+
+			if (myCompanyService.GetAllCompanies().Count() == 0) return BadRequest();
+			var descriptions = productService.DescriptionIdAndNameList();
+			var grades = productService.GradeIdAndNameList();
+			var sizes = productService.SizeIdAndNameList();
+
+			model.Descriptions = descriptions;
+			model.Grades = grades;
+			model.Sizes = sizes;
+
+			var productCollection = productService.ProductsOnStock
+				(model.DescriptionId, model.GradeId, model.SizeId, model.CurrentPage, ProductAvailabilityViewModel.ProductsPerPage);
+
+			model.ProductsDetails = productCollection;
+			model.TotalProducts   = productCollection.Count();	
+
+			return View(model);
+		}
 
 	}
 }

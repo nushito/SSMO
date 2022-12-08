@@ -36,15 +36,16 @@ namespace SSMO.Services.Documents
         {
             return dbContext.Documents
                 .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Invoice)
+                .OrderByDescending(n=>n.DocumentNumber)
                 .Select(num => num.DocumentNumber)
                 .ToList();
         }
 
         public ICollection<int> GetPackingList()
         {
-            //TODO change invoice with packing
             return dbContext.Documents
-                .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Invoice)
+                .Where(type => type.DocumentType == Data.Enums.DocumentTypes.PackingList)
+                .OrderByDescending(n=>n.DocumentNumber)
                 .Select(num => num.DocumentNumber)
                 .ToList();
         }
@@ -54,14 +55,14 @@ namespace SSMO.Services.Documents
             if (packingListNumber == 0) return null;
             //TODO change invoice with packing after testing
             var packingList = dbContext.Documents
-                .Where(num => num.DocumentNumber == packingListNumber && num.DocumentType == Data.Enums.DocumentTypes.Invoice)
+                .Where(num => num.DocumentNumber == packingListNumber && num.DocumentType == Data.Enums.DocumentTypes.PackingList)
                 .FirstOrDefault();
 
             var products = dbContext.Products
                 .Where(co => co.CustomerOrderId == packingList.CustomerOrderId)
                 .ToList();
 
-            var packinglist = new PackingListForPrintViewModel
+            var packing = new PackingListForPrintViewModel
             {
                 DocumentType = Data.Enums.DocumentTypes.PackingList.ToString(),
                 Date = packingList.Date,
@@ -84,7 +85,7 @@ namespace SSMO.Services.Documents
                .Where(id => id.Id == myCompany.AddressId)
                .FirstOrDefault();
 
-            packinglist.MyCompanyForPl = new MyCompanyForPackingPrint
+            packing.MyCompanyForPl = new MyCompanyForPackingPrint
             {
                 Name = myCompany.Name,
                 EIK = myCompany.Eik,
@@ -98,7 +99,7 @@ namespace SSMO.Services.Documents
             foreach (var item in products)
             {
 
-                packinglist.Products.Add(new ProductsForPackingListPrint
+                packing.Products.Add(new ProductsForPackingListPrint
                 {
                     DescriptionName = dbContext.Descriptions.Where(i => i.Id == item.DescriptionId).Select(n => n.Name).FirstOrDefault(),
                     GradeName = dbContext.Descriptions.Where(i => i.Id == item.GradeId).Select(n => n.Name).FirstOrDefault(),
@@ -107,19 +108,19 @@ namespace SSMO.Services.Documents
                     FSCSertificate = item.FSCSertificate,
                     Pallets = item.Pallets,
                     SheetsPerPallet = item.SheetsPerPallet,
-                    OrderedQuantity = item.LoadedQuantityM3
+                    OrderedQuantity = item.OrderedQuantity
                 }); 
             }
 
             var customer = dbContext.Customers
-                .Where(id => id.Id == packinglist.CustomerId)
+                .Where(id => id.Id == packing.CustomerId)
                 .FirstOrDefault();
 
             var customerAddress = dbContext.Addresses
                 .Where(id => id.Id == customer.AddressId)
                 .FirstOrDefault();
 
-            packinglist.Customer = new CustomerForPackingListPrint
+            packing.Customer = new CustomerForPackingListPrint
             {
                 Name = customer.Name,
                 EIK = customer.EIK,
@@ -133,7 +134,7 @@ namespace SSMO.Services.Documents
                 }
             };
 
-            return packinglist;
+            return packing;
         }
     }
 }

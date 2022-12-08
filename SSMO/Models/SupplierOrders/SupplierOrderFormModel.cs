@@ -4,7 +4,7 @@ using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Models.Reports;
 using SSMO.Services.Curruncies;
-using SSMO.Services.Supplier;
+using SSMO.Services.Suppliers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

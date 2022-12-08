@@ -32,7 +32,7 @@ namespace SSMO.Services.CustomerOrderService
 
         public int CreateOrder(string num, DateTime date, int customerId, int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,int currency,string origin, 
-            bool paidStatus, int vat)
+            bool paidStatus, int vat, int statusId  )
         {
            
             var fscClaim = dbContext.MyCompanies
@@ -43,10 +43,7 @@ namespace SSMO.Services.CustomerOrderService
                .Where(a => a.Id == company)
                .Select(a => a.FSCSertificate).FirstOrDefault();
 
-            var status = dbContext.Statuses.Where(a => a.Name == "Active").FirstOrDefault();
-
             var lastConfirmationNumber = dbContext.CustomerOrders.OrderBy(a=>a.OrderConfirmationNumber).Select(oc=>oc.OrderConfirmationNumber).LastOrDefault();
-
 
             var order = new SSMO.Data.Models.CustomerOrder
             {
@@ -61,7 +58,7 @@ namespace SSMO.Services.CustomerOrderService
                 FSCClaim = fscClaim,
                 FSCSertificate = fscCertificate,
                 CurrencyId = currency,
-                Status = status,
+                StatusId = statusId,
                 Origin = origin,
                 PaidAmountStatus = paidStatus,
                 Vat = vat
@@ -118,7 +115,7 @@ namespace SSMO.Services.CustomerOrderService
         public int CreateFirstOrder(int number, string num, DateTime date, 
             int customerId, int company, string deliveryTerms, string loadingAddress, 
             string deliveryAddress, int currency, string origin, bool paidStatus, 
-           int vat)
+           int vat, int statusId)
         {
             var fscClaim = dbContext.MyCompanies
                  .Where(a => a.Id == company)
@@ -127,8 +124,6 @@ namespace SSMO.Services.CustomerOrderService
             var fscCertificate = dbContext.MyCompanies
                .Where(a => a.Id == company)
                .Select(a => a.FSCSertificate).FirstOrDefault();
-
-            var status = dbContext.Statuses.Where(a => a.Name == "Active").FirstOrDefault();
 
             var order = new SSMO.Data.Models.CustomerOrder
             {
@@ -143,7 +138,7 @@ namespace SSMO.Services.CustomerOrderService
                 FSCClaim = fscClaim,
                 FSCSertificate = fscCertificate,
                 CurrencyId = currency,
-                Status = status,
+                StatusId = statusId,
                 Origin = origin,
                 PaidAmountStatus = paidStatus,
                 Vat = vat

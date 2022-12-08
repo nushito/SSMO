@@ -1,4 +1,4 @@
-﻿namespace SSMO.Services.Supplier
+﻿namespace SSMO.Services.Suppliers
 {
     public class SupplierDetailsList
     {

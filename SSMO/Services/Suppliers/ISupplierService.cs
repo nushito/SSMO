@@ -1,17 +1,16 @@
 ﻿
-using Microsoft.AspNetCore.Mvc.Rendering;
-using SSMO.Data.Models;
 using SSMO.Models.Suppliers;
-using SSMO.Services.Supplier;
-using System;
+using SSMO.Services.Suppliers;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace SSMO.Services
 {
     public interface ISupplierService
     {
+        public bool AddNewSupplier
+            (string name, string vat,string eik, string email, string city, 
+            string street, string country,string manager, string fscCertificate);
         public ICollection<AllSuppliers> GetSuppliers();
        
         public IEnumerable<SupplierDetailsList> GetSuppliersIdAndNames(int id);

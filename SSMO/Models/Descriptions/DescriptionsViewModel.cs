@@ -5,6 +5,7 @@ namespace SSMO.Models.Descriptions
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string BgName { get; set; }
 
     }
 }

@@ -6,6 +6,7 @@ using SSMO.Data;
 using SSMO.Models.MyCompany;
 using SSMO.Infrastructure;
 using SSMO.Models.Reports;
+using SSMO.Data.Models;
 
 namespace SSMO.Services.MyCompany
 {
@@ -111,6 +112,37 @@ namespace SSMO.Services.MyCompany
             return listMycompaniesUserId;
         }
 
+        public bool RegisterMyCompany(
+             string name, string eik, string vat, string fsc, string userId, string city, string addres, string country, string representativePerson,
+            string bgName, string bgCity, string bgAddress, string bgCountry, string bgRepresentative)
+        {
+            if (userId == null) return false;
 
+            var company = new Data.Models.MyCompany
+            {
+                Name = name,
+                BgName = bgName,
+                Eik = eik,
+                VAT = vat,
+                Address = new Address
+                {
+                    City = city,
+                    Country = country,
+                    Street = addres,
+                    BgCity = bgCity,
+                    Bgcountry = bgCountry,
+                    BgStreet = bgAddress
+                },
+                RepresentativePerson = representativePerson,
+                BgRepresentativePerson = bgRepresentative,
+                FSCSertificate = fsc,
+                UserId = userId
+            };
+
+            dbContext.MyCompanies.Add(company);
+            dbContext.SaveChanges();
+
+            return true;
+        }
     }
 }

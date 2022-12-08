@@ -226,6 +226,15 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("BgCity")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BgStreet")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Bgcountry")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("City")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -313,6 +322,12 @@ namespace SSMO.Data.Migrations
 
                     b.Property<int>("AddressId")
                         .HasColumnType("int");
+
+                    b.Property<string>("BgCustomerName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BgCustomerRepresentativePerson")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("EIK")
                         .IsRequired()
@@ -448,6 +463,9 @@ namespace SSMO.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("BgName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -617,6 +635,12 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("AddressId")
                         .HasColumnType("int");
 
+                    b.Property<string>("BgName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BgRepresentativePerson")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Eik")
                         .IsRequired()
                         .HasMaxLength(9)
@@ -726,6 +750,9 @@ namespace SSMO.Data.Migrations
                     b.Property<decimal>("PurchaseAmount")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
+
+                    b.Property<int?>("PurchaseDocumentId")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("PurchasePrice")
                         .HasPrecision(18, 4)

@@ -16,6 +16,10 @@ namespace SSMO.Services.Customer
         public EditCustomerFormModel GetCustomerForEdit
             (string customerName);
         public bool EditCustomer(string customerName,string vat, string eik, string representativePerson,
-            string country, string city, string street, string email, string phoneNumber);
+            string country, string city, string street, string email, string phoneNumber, 
+            string bgName, string bgStreet, string bgCity, string bgCountry, string bgRepresentativePerson);
+        public bool CreateCustomer(string customerName, string vat, string eik, string representativePerson,
+            string country, string city, string street, string email, string phoneNumber, string bgName,
+            string bgStreet, string bgCity, string bgCountry, string bgRepresentativePerson);
     }
 }

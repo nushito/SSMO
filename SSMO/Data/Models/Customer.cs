@@ -9,11 +9,11 @@ namespace SSMO.Data.Models
     {
         public Customer()
         {
-            
             Orders = new HashSet<CustomerOrder>();
         }
        
         public int Id { get; init; }
+        public string BgCustomerName { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
@@ -22,6 +22,7 @@ namespace SSMO.Data.Models
         [Required]
         [StringLength(11, ErrorMessage ="Your VAT is invalid")]
         public string VAT { get; set; }
+        public string BgCustomerRepresentativePerson { get; set; }
         public string RepresentativePerson { get; set; }
         public int AddressId { get; set; }
         [Required]
@@ -30,7 +31,6 @@ namespace SSMO.Data.Models
         [DataType(DataType.EmailAddress)]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Email { get; set; }
-
         public string PhoneNumber { get; set; }
         public ICollection<CustomerOrder> Orders { get; set; }
         public ICollection<Document> Invoices { get; set; }

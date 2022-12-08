@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +22,9 @@ using SSMO.Services.SupplierOrders;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using SSMO.Services.Documents.Purchase;
 using SSMO.Services.Documents.Invoice;
+using System.Collections.Generic;
+using System.Globalization;
+using iTextSharp.text;
 
 namespace SSMO
 {
@@ -56,6 +59,19 @@ namespace SSMO
             services.AddControllersWithViews(options =>
             {
                 options.Filters.Add<AutoValidateAntiforgeryTokenAttribute>();
+            });
+
+            services.AddLocalization(opt => { opt.ResourcesPath = "Resources"; });
+            services.Configure<RequestLocalizationOptions>(options =>
+            {
+                List<CultureInfo> suportedCulture = new List<CultureInfo>
+                {
+                    new CultureInfo("en-US"),
+                    new CultureInfo("bg-BG")
+                 };
+                options.DefaultRequestCulture = new RequestCulture("en-US");
+                options.SupportedCultures = suportedCulture;
+                options.SupportedUICultures = suportedCulture;
             });
 
             services.AddTransient<ISupplierService, SupplierService>();

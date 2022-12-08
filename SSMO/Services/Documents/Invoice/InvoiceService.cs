@@ -41,8 +41,9 @@ namespace SSMO.Services.Documents.Invoice
             var customerOrder = dbContext.CustomerOrders
                 .Where(on => on.OrderConfirmationNumber == orderConfirmationNumber).FirstOrDefault();
 
-            var supplierOdrerForThisInvoiceId = dbContext.SupplierOrders.Where(c => c.CustomerOrderId == customerOrder.Id)
-                .Select(i => i.Id).FirstOrDefault();
+            var supplierOdrerForThisInvoice = dbContext.SupplierOrders
+                .Where(c => c.CustomerOrderId == customerOrder.Id)
+                .FirstOrDefault();
 
             var productList = dbContext.Products.
                 Where(co => co.CustomerOrderId == customerOrder.Id).ToList();
@@ -70,7 +71,7 @@ namespace SSMO.Services.Documents.Invoice
                 Date = date,
                 PaidStatus = customerOrder.PaidAmountStatus,
                 Products = productList,
-                SupplierOrderId = supplierOdrerForThisInvoiceId,
+                SupplierOrderId = supplierOdrerForThisInvoice.Id,
                 TruckNumber = truckNumber,
                 Incoterms = customerOrder.DeliveryTerms,
                 CustomerId = customerOrder.CustomerId,
@@ -140,17 +141,20 @@ namespace SSMO.Services.Documents.Invoice
 
             invoiceForPrint.VatAmount = customerOrder.Amount * customerOrder.Vat / 100 ?? 0;
 
-            foreach (var product in productList)
-            {
-                product.OrderedQuantity = 0;
-                product.LoadedQuantityM3 = 0;
-            }
+            supplierOdrerForThisInvoice.StatusId = 1;
+            customerOrder.StatusId = 1;
 
             dbContext.Documents.Add(invoiceCreate);
-            dbContext.SaveChanges();
+          
+            foreach (var product in productList)
+            {
+                productService.ClearProductQuantityWhenDealIsFinished(product.Id);
+                product.DocumentId = invoiceCreate.Id;
+            }
 
             CreatePackingListForThisInvoice(invoiceCreate.Id);
 
+            dbContext.SaveChanges();
             return invoiceForPrint;
         }
 
@@ -159,6 +163,7 @@ namespace SSMO.Services.Documents.Invoice
             var invoice = dbContext.Documents
                 .Where(i => i.Id == id)
                 .FirstOrDefault();
+
             if (invoice == null) return;
 
             var packingList = new Document
@@ -233,5 +238,68 @@ namespace SSMO.Services.Documents.Invoice
             .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Invoice)
             .Select(num => num.DocumentNumber)
             .ToList();
+
+        public BgInvoiceViewModel CreateBgInvoice(int documentNumber)
+        {
+            var invoice = dbContext.Documents
+                .Where(i => i.DocumentNumber == documentNumber)
+                .FirstOrDefault();
+
+            if (invoice == null) return null;
+
+            var mycompanyId = invoice.MyCompanyId;
+            var mycompany = dbContext.MyCompanies
+                .Where(i => i.Id == mycompanyId)
+                .FirstOrDefault();
+            var mycompanyAddress = dbContext.Addresses
+                .Where(id => id.Id == mycompany.AddressId)
+                .FirstOrDefault();
+          
+
+
+            var customerId = invoice.CustomerId;
+            var customer = dbContext.Customers
+                .Where(c => c.Id == customerId)
+                .FirstOrDefault();
+            var customerAdress = dbContext.Addresses.
+                Where(id => id.Id == customer.AddressId)
+                .FirstOrDefault();
+
+            var products = dbContext.Products
+                .Where(i => i.DocumentId == documentNumber);
+                
+            var bgProducts = mapper.ProjectTo<BGProductsForBGInvoiceViewModel>(products).ToList();
+
+            var bgInvoice = new BgInvoiceViewModel
+            {
+                BgCustomer = new BGCustomerForInvoicePrint
+                {
+                    BgName = customer.BgCustomerName,
+                    BgRepresentativePerson = customer.BgCustomerRepresentativePerson,
+                    EIK = customer.EIK,
+                    VAT = customer.VAT,
+                    ClientAddress = new BGAddressCustomerForInvoicePrint
+                    {
+                        BgCity = customerAdress.BgCity,
+                        BgCountry = customerAdress.Bgcountry,
+                        BgStreet = customerAdress.BgStreet
+                    },
+
+                },
+                BgMyCompany = new BGMyCompanyInvoicePrintViewModel
+                {
+                    BgName = mycompany.BgName,
+                    BgRepresentativePerson = mycompany.BgRepresentativePerson,
+                    EIK = mycompany.Eik,
+                    VAT = mycompany.VAT,
+                    BgCity = mycompanyAddress.BgCity,
+                    BgCountry = mycompanyAddress.Bgcountry,
+                    BgStreet = mycompanyAddress.BgStreet
+                },
+                BgProducts = bgProducts                
+            };
+
+           return bgInvoice;
+        }
     }
 }

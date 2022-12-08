@@ -10,11 +10,11 @@ namespace SSMO.Models.Reports.SupplierOrderReportForEdit
         public string LoadingAddress { get; set; }
         public string DeliveryAddress { get; set; }
         public string DeliveryTerms { get; set; }
+        public int StatusId { get; set; }
+        public string StatusName { get; set; }
         public string MyCompanyName { get; set; }
        // public int SupplierId { get; set; }
         public string SupplierName { get; set; }
-        public int StatusId { get; set; }
-        public string StatusName { get; set; }
         public int CustomerOrderId { get; set; }
         public int CustomerOrderConfirmationNumber { get; set; }
         public string CustomerName { get; set; }

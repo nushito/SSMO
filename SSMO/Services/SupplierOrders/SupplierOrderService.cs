@@ -135,7 +135,7 @@ namespace SSMO.Services.SupplierOrders
            var spOrder = dbContext.SupplierOrders.Find(supplierOrderId);
            spOrder.TotalAmount = spOrder.Amount + (spOrder.Amount*spOrder.VAT/100)??0;
            spOrder.Balance = spOrder.TotalAmount - spOrder.PaidAvance;
-            spOrder.TotalQuantity = spOrder.Products.Sum(a => a.OrderedQuantity);
+           spOrder.TotalQuantity = spOrder.Products.Sum(a => a.OrderedQuantity);
            dbContext.SaveChanges();    
           
         }

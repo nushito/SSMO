@@ -130,7 +130,7 @@ namespace SSMO.Controllers
                                  customermodel.CurrencyId,
                                  customermodel.Origin,
                                  customermodel.PaidAmountStatus,
-                                  customermodel.Vat ?? 0);
+                                  customermodel.Vat ?? 0, customermodel.StatusId);
                 ViewBag.NumberExist = 0;
             }
             else
@@ -146,7 +146,7 @@ namespace SSMO.Controllers
                                  customermodel.CurrencyId,
                                  customermodel.Origin,
                                  customermodel.PaidAmountStatus,
-                                 customermodel.Vat ?? 0);
+                                 customermodel.Vat ?? 0, customermodel.StatusId);
                 ViewBag.NumberExist = 1;
             }
 

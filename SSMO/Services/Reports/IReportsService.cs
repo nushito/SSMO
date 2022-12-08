@@ -13,7 +13,8 @@ namespace SSMO.Services.Reports
         IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders(string name, int currentpage, int customerOrdersPerPage);
 
         IEnumerable<SupplierOrderDetailsModel> AllSupplierOrders(string name, int currentpage, int supplierOrdersPerPage);
-        CustomerOrderDetailsModel Details(int id);
+        SupplierOrderDetailsModel SupplierOrderDetail(int id);
+        CustomerOrderDetailsModel CustomerOrderDetails(int id);
         bool EditCustomerOrder(int id,string number,
                 System.DateTime date,
                 int myCompanyId,

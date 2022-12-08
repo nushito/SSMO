@@ -72,15 +72,7 @@ namespace SSMO.Services.Documents.Purchase
                        purchase.ProcentComission * amount / 100 + purchase.PurchaseTransportCost + purchase.BankExpenses + purchase.OtherExpenses;
 
             var productList = dbContext.Products.Where(s => s.SupplierOrderId == supplierOrder.Id).ToList();
-
-            foreach (var product in productList)
-            {
-                //TODO why quantity = 0, check supplierorder
-                product.LoadedQuantityM3 = product.OrderedQuantity;
-                product.CostPrice = (product.Amount + (expenses / supplierOrder.TotalQuantity * product.LoadedQuantityM3)) / product.LoadedQuantityM3;
-                purchase.Products.Add(product);
-            }
-
+           
             if (purchase == null)
             {
                 return false;
@@ -96,11 +88,18 @@ namespace SSMO.Services.Documents.Purchase
             }
 
             dbContext.Documents.Add(purchase);
+          
+            foreach (var product in productList)
+            {
+                //TODO why quantity = 0, check supplierorder
+                product.LoadedQuantityM3 = product.OrderedQuantity;
+                product.CostPrice = (product.Amount + (expenses / supplierOrder.TotalQuantity * product.LoadedQuantityM3)) / product.LoadedQuantityM3;
+                product.PurchaseDocumentId = purchase.Id;
+                purchase.Products.Add(product);
+            }
             dbContext.SaveChanges();
-
             return true;
         }
-
         public bool EditPurchasePayment
             (string number, bool paidStatus, decimal paidAvance, DateTime datePaidAmount)
         {
@@ -128,7 +127,6 @@ namespace SSMO.Services.Documents.Purchase
 
             return true;
         }
-
         public EditPurchasePaymentDetails GetPurchaseForPaymentEdit(string number)
         {
             var purchase = dbContext.Documents
@@ -139,7 +137,6 @@ namespace SSMO.Services.Documents.Purchase
 
             return purchaseForEdit;
         }
-
         public IEnumerable<PurchaseModelAsPerSpec> GetSupplierOrdersForPurchase(string supplierName
             , int currentpage, int supplierOrdersPerPage)
         {

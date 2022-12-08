@@ -33,7 +33,7 @@ namespace SSMO.Controllers
                 return View(model);
             }
 
-            _productservice.AddDescription(model.Name);
+            _productservice.AddDescription(model.Name, model.BgName);
        
 
             return RedirectToAction("Index","Home"); 

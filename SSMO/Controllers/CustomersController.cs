@@ -37,26 +37,11 @@ namespace SSMO.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
+            var isCustomerCreated = customerService.CreateCustomer
+                (model.Name, model.VAT, model.EIK, model.RepresentativePerson, model.Country, model.City, model.Street, model.Email, model.PhoneNumber,
+                model.BgCustomerName, model.BgStreet, model.BgCity, model.BgCountry, model.BgRepresentativePerson);
 
-            var customer = new Customer
-            {
-                ClientAddress = new Address
-                {
-                    Country = model.Country,
-                    City = model.City,
-                    Street = model.Street
-                },
-                Email = model.Email,
-                Name = model.Name,
-                VAT = model.VAT,
-                EIK = model.EIK,
-                RepresentativePerson = model.RepresentativePerson,
-
-                // PhoneNumber = model
-            };
-
-            this.dbContext.Customers.Add(customer);
-            this.dbContext.SaveChanges();
+            if(!isCustomerCreated) return View();
 
             return RedirectToAction("Index", "Home");
         }
@@ -114,7 +99,9 @@ namespace SSMO.Controllers
             var editCustomer = customerService.EditCustomer
                 (customerName, model.CustomerForEdit.VAT, model.CustomerForEdit.EIK, model.CustomerForEdit.RepresentativePerson,
                 model.CustomerForEdit.CustomerAddress.Country, model.CustomerForEdit.CustomerAddress.City, 
-                model.CustomerForEdit.CustomerAddress.Street, model.CustomerForEdit.Email, model.CustomerForEdit.PhoneNumber);
+                model.CustomerForEdit.CustomerAddress.Street, model.CustomerForEdit.Email, model.CustomerForEdit.PhoneNumber,
+                model.CustomerForEdit.BgName, model.CustomerForEdit.CustomerAddress.BgStreet, model.CustomerForEdit.CustomerAddress.BgCity,
+                model.CustomerForEdit.CustomerAddress.BgCountry, model.CustomerForEdit.BgRepresentativePerson);
            
             if (editCustomer == false)
             {

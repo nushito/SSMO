@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SSMO.Services.Supplier
+namespace SSMO.Services.Suppliers
 {
     public class AllSuppliers
     {

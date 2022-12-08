@@ -26,7 +26,6 @@ namespace SSMO.Controllers
             this.icurrency = icurrency;
             this.bankService = bankService;
             this.mycompany = mycompany;
-
         }
         public IActionResult Register()
         {
@@ -49,31 +48,15 @@ namespace SSMO.Controllers
 
             string userId = this.User.UserId();//this.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            var company = new MyCompany
-            {
-                Id = model.Id,
-                Name = model.Name,
-                Eik = model.EIK,
-                VAT = model.VAT,
+            var isCompanyRegistered = mycompany.RegisterMyCompany(
+                model.Name, model.EIK, model.VAT, model.FSCSertificate, userId, model.City, model.Street, model.Country, model.RepresentativePerson, model.BgName,
+                model.BgCity, model.BgStreet, model.BgCountry, model.RepresentativePerson);
 
-                Address = new Address
-                {
-                    City = model.City,
-                    Country = model.Country,
-                    Street = model.Street
-                },
-                RepresentativePerson = model.RepresentativePerson,
-               // FSCClaim = model.FSCClaim,
-                FSCSertificate = model.FSCSertificate,
-                UserId = userId
-           };
-
-            
-            dbContext.MyCompanies.Add(company);
-            dbContext.SaveChanges();
-
-            return RedirectToAction("Index","Home");
+            if (!isCompanyRegistered) return View();
+           
+            return RedirectToAction("Index", "Home"); 
         }
+       
         public IActionResult AddBank()       
         {
             return View(new AddBankDetailsFormModel
@@ -116,9 +99,11 @@ namespace SSMO.Controllers
                 bankmodel.CompanyName,
                 bankmodel.CompanyId
                 );
-                     
-            return RedirectToAction("Index","Home");
+
+            return RedirectToAction("Index", "Home");
         }
+
+       //TODO Edit Mycompany
        
 
     }

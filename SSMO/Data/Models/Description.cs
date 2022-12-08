@@ -9,7 +9,7 @@ namespace SSMO.Data.Models
     {
         public int Id { get; init; }
         public string Name { get; set; }
-
+        public string BgName { get; set; }
         public IEnumerable<Product> Products { get; set; }
     }
 }

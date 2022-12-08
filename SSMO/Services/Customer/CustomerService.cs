@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
+using SSMO.Data.Models;
 
 namespace SSMO.Services.Customer
 {
@@ -19,6 +20,40 @@ namespace SSMO.Services.Customer
             this.mapper = mapper;
         }
 
+        public bool CreateCustomer
+            (string customerName, string vat, string eik, string representativePerson, 
+            string country, string city, string street, string email, string phoneNumber, 
+            string bgName, string bgStreet, string bgCity, string bgCountry, string bgRepresentativePerson)
+        {
+            if (customerName == null) return false;
+
+            var customer = new Data.Models.Customer
+            {
+                ClientAddress = new Address
+                {
+                    Country = country,
+                    City = city,
+                    Street = street,
+                    BgCity = bgCity,
+                    BgStreet = bgStreet,
+                    Bgcountry = bgCountry
+                },
+                Email = email,
+                Name = customerName,
+                VAT = vat,
+                EIK = eik,
+                RepresentativePerson =representativePerson,
+                BgCustomerName = bgName,
+                BgCustomerRepresentativePerson=bgRepresentativePerson,
+                PhoneNumber = phoneNumber
+            };
+
+            this.dbContext.Customers.Add(customer);
+            this.dbContext.SaveChanges();
+
+            return true;
+        }
+
         public IEnumerable<AddCustomerFormModel> CustomersData()
         {
             var listCustomers = dbContext.Customers.ToList();
@@ -29,16 +64,20 @@ namespace SSMO.Services.Customer
 
         public bool EditCustomer
             (string customerName, string vat, string eik, string representativePerson,
-            string country, string city, string street, string email, string phoneNumber)
+            string country, string city, string street, string email, string phoneNumber,
+            string bgName, string bgStreet, string bgCity, string bgCountry, string bgRepresentativePerson)
         {
             var customer = dbContext.Customers
                 .Where(a => a.Name.ToLower() == customerName.ToLower())
                 .FirstOrDefault();
             if (customer == null) return false;
+
             customer.Name = customerName;
             customer.VAT = vat;
             customer.EIK = eik;
             customer.RepresentativePerson = representativePerson;
+            customer.BgCustomerName = bgName;
+            customer.BgCustomerRepresentativePerson = bgRepresentativePerson;
 
             var address = dbContext.Addresses
                 .Where(c => c.Id == customer.AddressId)
@@ -47,6 +86,9 @@ namespace SSMO.Services.Customer
             address.Country = country;
             address.City = city;
             address.Street = street;
+            address.BgCity = bgCity;
+            address.Bgcountry = bgCountry;
+            address.BgStreet = bgStreet;
 
             customer.Email = email;
             customer.PhoneNumber = phoneNumber;

@@ -16,5 +16,8 @@ namespace SSMO.Services.MyCompany
         public string GetUserIdMyCompanyBySupplierOrdreNum(string supplierOrder);
         public List<string> MyCompaniesNamePerCustomer(string name);
         public List<string> MyCompaniesNamePerSupplier(string name);
+        public bool RegisterMyCompany(
+            string name, string eik, string vat, string fsc,string userId, string city, string addres, string country, string representativePerson,
+            string bgName, string bgCity, string bgAddress, string bgCountry, string bgRepresentative);
     }
 }

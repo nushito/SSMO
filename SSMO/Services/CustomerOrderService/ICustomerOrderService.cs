@@ -12,14 +12,14 @@ namespace SSMO.Services.CustomerOrderService
             int company, string deliveryTerms, 
             string loadingAddress, string deliveryAddress,
             int currency,string origin, bool paidStatus, 
-            int vat);
+            int vat, int statusId);
 
         public int CreateFirstOrder
             (int number, string num, DateTime date, int customer,
             int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,
             int currency, string origin, bool paidStatus,
-            int vat);
+            int vat, int statusId);
 
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id);
         public SSMO.Data.Models.CustomerOrder OrderPerNumber(int number);

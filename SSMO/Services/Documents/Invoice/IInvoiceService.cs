@@ -15,5 +15,7 @@ namespace SSMO.Services.Documents.Invoice
 
         public bool EditInvoicePayment(int documentNumber, bool paidStatus, decimal paidAdvance, DateTime datePaidAmount);
         public ICollection<int> GetInvoiceDocumentNumbers();
+
+        public BgInvoiceViewModel CreateBgInvoice(int documentNumber);    
     }
 }

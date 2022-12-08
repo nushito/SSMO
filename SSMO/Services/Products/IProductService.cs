@@ -1,4 +1,5 @@
 ﻿using SSMO.Models.Products;
+using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace SSMO.Services.Products
     {
         public void CreateProduct(ProductCustomerFormModel model, int customerorderId);
         public bool DescriptionExist(string name);
-        public void AddDescription(string name);
+        public void AddDescription(string name, string bgName);
         public void AddGrade(string name);
         public bool GradeExist(string name);
         public void AddSize(string name);
@@ -35,6 +36,14 @@ namespace SSMO.Services.Products
         public string GetGradeName(int id);
         public string GetSizeName(int id);
         public decimal CalculateDeliveryCostOfTheProductInCo(decimal quantity, decimal totalQuantity, decimal deliveryCost);
+
+        public void ClearProductQuantityWhenDealIsFinished(int productId);
+        public IEnumerable<ProductAvailabilityDetailsViewModel> ProductsOnStock
+            (int descriptionId, int gradeId, int sizeId, int currentPage, int productsPerPage);
+
+        public ICollection<DescriptionForProductSearchModel> DescriptionIdAndNameList();
+        public ICollection<SizeForProductSearchModel> SizeIdAndNameList();
+        public ICollection<GradeForProductSearchModel> GradeIdAndNameList();
 
     }
 }

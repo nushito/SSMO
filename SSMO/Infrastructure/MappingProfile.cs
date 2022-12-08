@@ -46,6 +46,7 @@ namespace SSMO.Infrastructure
                   .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.OrderedQuantity))
                 .ForMember(a => a.Price, b => b.MapFrom(a => a.Price));
             this.CreateMap<Product, ProductsForEditSupplierOrder>();
+            this.CreateMap<Product, BGProductsForBGInvoiceViewModel>();
 
           
 

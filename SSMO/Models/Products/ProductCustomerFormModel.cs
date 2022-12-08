@@ -34,7 +34,6 @@ namespace SSMO.Models.Products
        
         [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
-
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
        

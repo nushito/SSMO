@@ -24,7 +24,6 @@
             SeedSizes(services);
             SeedStatus(services);
           //  SeedAdministrator(services);
-
             return app;
         }
 
@@ -86,18 +85,18 @@
             data.Descriptions.AddRange(
                 new[]
                 {
-                    new Description {Name = "Birch Film Faced Plywood"},
-                    new Description {Name = "Birch Plywood"},
-                    new Description {Name = "Poplar Film Faced Plywood"},
-                    new Description {Name = "Poplar Plywood"},
-                    new Description {Name = "Pine Film Faced Plywood"},
-                    new Description {Name = "Pine Plywood"},
-                    new Description {Name = "Twin Film Faced Plywood"},
-                    new Description {Name = "Twin Film Faced Plywood/Birch & Pine"},
-                    new Description {Name = "Twin Film Faced Plywood/Poplar & Pine"},
-                    new Description {Name = "Combi Film Faced Plywood"},
-                    new Description {Name = "Combi Film Faced Plywood/Birch & Pine"},
-                    new Description {Name = "Combi Film Faced Plywood/Poplar & Pine"}
+                    new Description {Name = "Birch Film Faced Plywood", BgName = "Брезов водоустойчив шперплат"},
+                    new Description {Name = "Birch Plywood", BgName = "Брезов шперплат"},
+                    new Description {Name = "Poplar Film Faced Plywood", BgName = "Тополов водоустойчив шперплат"},
+                    new Description {Name = "Poplar Plywood", BgName = "Тополов шперплат"},
+                    new Description {Name = "Pine Film Faced Plywood", BgName = "Иглолистен водоустойчив шперплат"},
+                    new Description {Name = "Pine Plywood", BgName = "Иглолистен шперплат"},
+                    new Description {Name = "Twin Film Faced Plywood", BgName = "Туин водоустойчив шперплат"},
+                    new Description {Name = "Twin Film Faced Plywood/Birch & Pine", BgName = "Туин водоустойчив шперплат/Брезов и Иглолистно"},
+                    new Description {Name = "Twin Film Faced Plywood/Poplar & Pine", BgName = "Туин водоустойчив шперплат/Топола и Иглолистно"},
+                    new Description {Name = "Combi Film Faced Plywood", BgName = "Комби водоустойчив шперплат"},
+                    new Description {Name = "Combi Film Faced Plywood/Birch & Pine", BgName = "Комби водоустойчив шперплат/Бреза и Иглолистно"},
+                    new Description {Name = "Combi Film Faced Plywood/Poplar & Pine", BgName = "Комби водоустойчив шперплат/Топола и Иглолистно"}
                 }
                 );
 

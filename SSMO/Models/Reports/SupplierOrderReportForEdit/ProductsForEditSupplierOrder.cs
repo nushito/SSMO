@@ -12,7 +12,6 @@ namespace SSMO.Models.Reports.SupplierOrderReportForEdit
         public string Size { get; set; }
         public IEnumerable<string> Sizes { get; set; }
         public int GradeId { get; set; }
-       
         public string Grade { get; set; }
         public IEnumerable<string> Grades { get; set; }
         public string FSCClaim { get; set; }

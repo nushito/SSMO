@@ -34,10 +34,19 @@ namespace SSMO.Controllers
 
         [HttpPost]
         [Authorize]
-        public IActionResult AddSupplier(
-          AddSupplierModel model
-            )
+        public IActionResult AddSupplier(AddSupplierModel model)
         {
+            if (model.Name != null)
+            {
+                string userId = this.User.UserId();
+
+                var listMyCompany = mycompanyService.MyCompaniesNamePerSupplier(model.Name);
+
+                if (!listMyCompany.Contains(userId))
+                {
+                    return BadRequest();
+                }
+            }
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
@@ -47,35 +56,12 @@ namespace SSMO.Controllers
             {
                 return View();
             }
-            var supplier = new Supplier
-            { 
-                Name = model.Name,
-                VAT = model.VAT,
-                Eik = model.Eik,
-                Email = model.Email,
-                Address = new Address
-                {
-                    City = model.City,
-                    Street = model.SupplierAddress,
-                    Country = model.Country
-                },
-                RepresentativePerson = model.RepresentativePerson,
-                FSCSertificate = model.FSCSertificate
-            };
 
-            //var bankDetail = new BankDetails
-            //{
-            //    BankName = model.BankName,
-            //    Iban = model.Iban,
-            //    Address = model.BankAddress,
-            //    Swift = model.Swift,
-            //    Currency = new InvoiceAndStockModels.Currency { AccountCurrency = (AccountCurrency)Enum.Parse(typeof(AccountCurrency), model.Currency) }  //(AccountCurrency)Enum.Parse(typeof(AccountCurrency),model.Currency)              
-            //};
-
-            //supplier.BankDetails.Add(bankDetail);
-
-            this.dbContext.Suppliers.Add(supplier);
-            this.dbContext.SaveChanges();
+            var supplier = supplierService.AddNewSupplier
+                (model.Name, model.VAT, model.Eik, model.Email, model.City, model.SupplierAddress, 
+                model.Country, model.RepresentativePerson, model.FSCSertificate);
+           
+            if (supplier == false) return View(model);
 
             return RedirectToAction("Index", "Home");
         }

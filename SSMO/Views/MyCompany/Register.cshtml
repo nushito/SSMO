@@ -44,7 +44,7 @@
             </div>*@
              <div class="form-group">
                 <label asp-for="FSCSertificate">FSC Certificate code</label>
-                <input type="text" class="form-control" asp-for="FSCSertificate" placeholder=">FSC Certificate code">
+                <input type="text" class="form-control" asp-for="FSCSertificate" placeholder="FSC Certificate code">
                 <span asp-validation-for="FSCSertificate" class="small text-danger"></span>
             </div>
             <div class="form-group">
@@ -53,6 +53,34 @@
                 <span asp-validation-for="RepresentativePerson" class="small text-danger"></span>
             </div>
 
+            <h5>БГ Данни</h5>
+            <hr/>
+            <div class="form-group">
+                <label asp-for="BgName">Фирма</label>
+                <input class="form-control" asp-for="BgName" placeholder="Име">
+                <span asp-validation-for="BgName" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BgCountry">Държава</label>
+                <input type="text" class="form-control" asp-for="BgCountry" placeholder="Държава">
+                <span asp-validation-for="BgCountry" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BgCity">Град</label>
+                <input type="text" class="form-control" asp-for="BgCity" placeholder="Град">
+                <span asp-validation-for="BgCity" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BgStreet">Адрес</label>
+                <input type="text" class="form-control" asp-for="BgStreet" placeholder="Улица">
+                <span asp-validation-for="BgStreet" class="small text-danger"></span>
+            </div>
+             <div class="form-group">
+                <label asp-for="BgRepresentativePerson">Управител</label>
+                <input type="text" class="form-control" asp-for="BgRepresentativePerson" placeholder="Управител">
+                <span asp-validation-for="BgRepresentativePerson" class="small text-danger"></span>
+            </div>
+            <hr />
             <button type="submit" class="btn btn-primary">Submit</button>
           
         </form>

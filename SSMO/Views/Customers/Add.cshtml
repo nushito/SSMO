@@ -1,7 +1,8 @@
 ﻿@model AddCustomerFormModel
 
-
-
+@{
+    ViewBag.Title = "Add New Customer";
+}
 <form method="post">
     <h5 class="text-center">Add New Customer</h5>
     <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
@@ -81,6 +82,34 @@
         <input asp-for="PhoneNumber" class="form-control" placeholder="Telephone Number" aria-describedby="addon-wrapping" />
         <span asp-validation-for="PhoneNumber" class="small text-danger"></span>
     </div>
+     <h5>БГ Данни</h5>
+            <hr/>
+            <div class="form-group">
+                <label asp-for="BgCustomerName">Фирма</label>
+                <input class="form-control" asp-for="BgCustomerName" placeholder="Име">
+                <span asp-validation-for="BgCustomerName" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BgCountry">Държава</label>
+                <input type="text" class="form-control" asp-for="BgCountry" placeholder="Държава">
+                <span asp-validation-for="BgCountry" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BgCity">Град</label>
+                <input type="text" class="form-control" asp-for="BgCity" placeholder="Град">
+                <span asp-validation-for="BgCity" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="BgStreet">Адрес</label>
+                <input type="text" class="form-control" asp-for="BgStreet" placeholder="Улица">
+                <span asp-validation-for="BgStreet" class="small text-danger"></span>
+            </div>
+             <div class="form-group">
+                <label asp-for="BgRepresentativePerson">Управител</label>
+                <input type="text" class="form-control" asp-for="BgRepresentativePerson" placeholder="Управител">
+                <span asp-validation-for="BgRepresentativePerson" class="small text-danger"></span>
+            </div>
+            <hr />
 
     <button type="submit" class="btn btn-primary mt-3">Submit</button>
 </form>

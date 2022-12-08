@@ -114,7 +114,8 @@ namespace SSMO.Controllers
                                   (model.MyCompanyId, model.SupplierId,model.Date,
                                    model.Number,model.CustomerOrderNumber, model.StatusId, 
                                    model.CurrencyId, model.FscClaim, model.VAT??0, model.DatePaidAmount,
-                                   model.PaidAvance, model.PaidStatus, model.LoadingAddress, model.DeliveryAddress, model.DeliveryTerms);
+                                   model.PaidAvance, model.PaidStatus, model.LoadingAddress, model.DeliveryAddress, 
+                                   model.DeliveryTerms);
 
            return RedirectToAction("EditProductAsPerSupplier", new {customerOrderId = customerorderId, supplierOrderId = supplierOrderId} );
         }

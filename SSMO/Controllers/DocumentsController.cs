@@ -231,6 +231,21 @@ namespace SSMO.Controllers
 
             return View(invoiceForPrint);
         }
+       
+        //TODO Bank Details on the invoice
+        public IActionResult BgInvoice(int documentNumber)
+        {
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            return View();
+        }
         public IActionResult ChoosePackingListForPrint(ChoosePackingListFromInvoicesViewModel model)
         {
             if (!User.Identity.IsAuthenticated)

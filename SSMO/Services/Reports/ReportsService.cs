@@ -134,10 +134,10 @@ namespace SSMO.Services.Reports
 
             return purchasePaymentList;
         }
-        public CustomerOrderDetailsModel Details(int id)
+        public CustomerOrderDetailsModel CustomerOrderDetails(int id)
         {
             var findorder = dbcontext.CustomerOrders.Where(a => a.Id == id);
-            var order = findorder.ProjectTo<CustomerOrderDetailsModel>(mapper).FirstOrDefault();
+            CustomerOrderDetailsModel order = findorder.ProjectTo<CustomerOrderDetailsModel>(mapper).FirstOrDefault();
             var supplierOrderDetail = dbcontext.SupplierOrders
                 .Where(o => o.CustomerOrderId == id)
                 .Select(a => new
@@ -452,6 +452,54 @@ namespace SSMO.Services.Reports
 
             dbcontext.SaveChanges();
             return true;
+        }
+
+        public SupplierOrderDetailsModel SupplierOrderDetail(int id)
+        {
+            var supplierOrder = dbcontext.SupplierOrders.Where(o => o.Id == id);
+
+            if (supplierOrder == null) return null;
+
+            SupplierOrderDetailsModel supplierOrderDetail = supplierOrder.ProjectTo<SupplierOrderDetailsModel>(mapper).FirstOrDefault();
+
+            var myCompanyId = supplierOrder.
+              Select(id => id.MyCompanyId).
+              FirstOrDefault();
+
+            var myCompanyName = dbcontext.MyCompanies
+                .Where(id => id.Id == myCompanyId)
+                .Select(n => n.Name)
+                .FirstOrDefault();
+
+            supplierOrderDetail.MyCompanyName = myCompanyName;
+
+            var supplierId = supplierOrder.Select(id => id.SupplierId).FirstOrDefault();
+            supplierOrderDetail.SupplierName = dbcontext.Suppliers
+                .Where(i => i.Id == supplierId)
+                .Select(n=>n.Name)
+                .FirstOrDefault();
+
+            var customerId = dbcontext.CustomerOrders
+                .Where(i => i.Id == supplierOrderDetail.CustomerOrderId)
+                .Select(c => c.CustomerId)
+                .FirstOrDefault();
+
+            supplierOrderDetail.CustomerName = dbcontext.Customers
+                 .Where(i => i.Id == customerId)
+                 .Select(n => n.Name)
+                 .FirstOrDefault();
+
+            supplierOrderDetail.StatusName = dbcontext.Statuses
+                .Where(i => i.Id == supplierOrderDetail.StatusId)
+                .Select(n => n.Name)
+                .FirstOrDefault();
+
+            supplierOrderDetail.CustomerOrderConfirmationNumber = dbcontext.CustomerOrders
+                .Where(id => id.Id == supplierOrderDetail.CustomerOrderId)
+                .Select(num => num.OrderConfirmationNumber)
+                .FirstOrDefault();
+
+            return supplierOrderDetail;
         }
     }
 }

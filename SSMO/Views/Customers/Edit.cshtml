@@ -97,6 +97,34 @@
         <input asp-for="CustomerForEdit.PhoneNumber" class="form-control" placeholder="Telephone Number" aria-describedby="addon-wrapping" />
         <span asp-validation-for="CustomerForEdit.PhoneNumber" class="small text-danger"></span>
     </div>
+     <h5>БГ Данни</h5>
+            <hr/>
+            <div class="form-group">
+                <label asp-for="CustomerForEdit.BgName">Фирма</label>
+                <input class="form-control" asp-for="CustomerForEdit.BgName" placeholder="Име">
+                <span asp-validation-for="CustomerForEdit.BgName" class="small text-danger"></span>
+            </div>
+             <div class="form-group">
+                <label asp-for="CustomerForEdit.BgRepresentativePerson">Управител</label>
+                <input type="text" class="form-control" asp-for="CustomerForEdit.BgRepresentativePerson" placeholder="Управител">
+                <span asp-validation-for="CustomerForEdit.BgRepresentativePerson" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustomerForEdit.CustomerAddress.BgCountry">Държава</label>
+                <input type="text" class="form-control" asp-for="CustomerForEdit.CustomerAddress.BgCountry" placeholder="Държава">
+                <span asp-validation-for="CustomerForEdit.CustomerAddress.BgCountry" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustomerForEdit.CustomerAddress.BgCity">Град</label>
+                <input type="text" class="form-control" asp-for="CustomerForEdit.CustomerAddress.BgCity" placeholder="Град">
+                <span asp-validation-for="CustomerForEdit.CustomerAddress.BgCity" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CustomerForEdit.CustomerAddress.Street">Адрес</label>
+                <input type="text" class="form-control" asp-for="CustomerForEdit.CustomerAddress.Street" placeholder="Улица">
+                <span asp-validation-for="CustomerForEdit.CustomerAddress.Street" class="small text-danger"></span>
+            </div>
+            <hr />
 
     <button type="submit" class="btn btn-primary mt-3">Submit</button>
 </form>

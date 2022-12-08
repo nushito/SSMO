@@ -10,6 +10,7 @@ namespace SSMO.Data.Enums
         DebitNote,
         PackingList,
         Payment,
-        Shipping
+        Shipping,
+        BGInvoice
     }
 }

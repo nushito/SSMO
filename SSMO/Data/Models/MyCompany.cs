@@ -11,13 +11,11 @@ namespace SSMO.Data.Models
     {
         public MyCompany()
         {
-           
             BankDetails = new HashSet<BankDetails>();
-          
             Orders = new HashSet<CustomerOrder>();
-
         }
-        public int Id { get; init; } 
+        public int Id { get; init; }
+        public string BgName { get; set; }
         [Required]
         public string Name { get; set; }
         [Required]
@@ -29,6 +27,7 @@ namespace SSMO.Data.Models
         public int AddressId { get; set; }
         [Required]
         public Address Address { get; set; }
+        public string BgRepresentativePerson { get; set; }
         [Required]
         public string RepresentativePerson { get; set; }
         public string UserId { get; set; }

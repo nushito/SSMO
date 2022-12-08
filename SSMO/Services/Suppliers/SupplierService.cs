@@ -1,16 +1,12 @@
-﻿
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
 using SSMO.Data;
 using SSMO.Data.Models;
 using SSMO.Models.Suppliers;
-using SSMO.Services.Supplier;
+using SSMO.Services.Suppliers;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace SSMO.Services
 {
@@ -22,6 +18,45 @@ namespace SSMO.Services
         {
             this.dbContext = dbContext;
             this.mapper = mapper;       
+        }
+
+        public bool AddNewSupplier
+            (string name, string vat, string eik, string email, string city, 
+            string street, string country, string manager, string fscCertificate)
+        {
+            var newSupplier = new SSMO.Data.Models.Supplier
+            {
+                Name = name,
+                VAT = vat,
+                Eik = eik,
+                Email = email,
+                Address = new Address
+                {
+                    City = city,
+                    Street = street,
+                    Country = country
+                },
+                RepresentativePerson = manager,
+                FSCSertificate = fscCertificate
+            };
+
+            //var bankDetail = new BankDetails
+            //{
+            //    BankName = model.BankName,
+            //    Iban = model.Iban,
+            //    Address = model.BankAddress,
+            //    Swift = model.Swift,
+            //    Currency = new InvoiceAndStockModels.Currency { AccountCurrency = (AccountCurrency)Enum.Parse(typeof(AccountCurrency), model.Currency) }  //(AccountCurrency)Enum.Parse(typeof(AccountCurrency),model.Currency)              
+            //};
+
+            //supplier.BankDetails.Add(bankDetail);
+
+            if (newSupplier == null) return false;
+
+            this.dbContext.Suppliers.Add(newSupplier);
+            this.dbContext.SaveChanges();
+
+            return true;
         }
 
         public bool EditSupplier
