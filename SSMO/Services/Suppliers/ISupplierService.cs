@@ -22,6 +22,7 @@ namespace SSMO.Services
             string country, string city, string street, string email, string fscCertificate);
 
         public string GetSupplierFscCertificateByOrderNumber(string orderNumber);
-
+        public string GetSupplierFscCertificateByOrderId(int orderId);
+        public string SupplierNameById(int id);
     }
 }

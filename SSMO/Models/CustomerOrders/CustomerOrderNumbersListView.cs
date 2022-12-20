@@ -14,6 +14,8 @@ namespace SSMO.Models.CustomerOrders
         public int? Number { get; set; }
         public string TruckNumber { get; set; }
         public decimal DeliveryCost { get; set; }
+        public decimal GrossWeight { get; set; }
+        public decimal NetWeight { get; set; }
         public IEnumerable<int> OrderConfirmationNumberList { get; set; }
     }
 }

@@ -1,0 +1,119 @@
+﻿@model InvoicesViewModel
+@{
+    ViewBag.Title = "All Invoices";
+}
+
+<form method="get">
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="MyCompanyName"></label>
+            <select asp-for="MyCompanyName" class="form-control">
+            <option value="">All</option>
+                @foreach (var name in Model.MyCompanyNames)
+                {
+                    <option value="@name">@name</option>
+                }
+            </select>
+        </div>
+    </div>
+    <div class="row">
+<input type="submit" class="btn btn-info" value="Search"/></div>
+<br />
+</form>
+
+@{
+    var previouspage = Model.CurrentPage - 1;
+    if(previouspage < 1)
+    {
+        previouspage = 1;
+    }
+
+    var maxpage = Math.Ceiling((double)Model.TotalInvoices / InvoicesViewModel.InvoicesPerPage);
+}
+
+<div class="row mb-5">
+    <div class="col-md-6">
+        <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
+           asp-controller="Reports"
+           asp-action="AllInvoices"
+           asp-route-currentPage="@previouspage"
+           asp-route-customerName="@Model.MyCompanyName"
+          ><<</a>
+    </div>
+    
+    @{
+        var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
+                                     !Model.InvoiceCollection.Any();
+    }
+
+    <div class="col-md-6">
+        <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
+           asp-controller="Reports"
+           asp-action="AllInvoices"
+           asp-route-currentPage="@(Model.CurrentPage + 1)"
+           asp-route-customerName="@Model.MyCompanyName"
+           >>></a>
+    </div>
+</div>
+
+<div class="container">
+   <div class="row">
+        <div class="col">
+          Invoice Number
+        </div>
+        <div class="col">
+         Date
+        </div>
+         <div class="col">
+         Customer
+        </div>
+        <div class="col">
+         Customer OC No
+        </div>
+         <div class="col">
+         Delivery Terms
+        </div>
+         <div class="col">
+         Invoice Amount
+        </div>
+        <div class="col">
+          Supplier
+        </div>
+        </div>
+<hr />
+<br />
+</div>
+<div class="container">
+@foreach(var order in Model.InvoiceCollection)
+{
+    <div class="row">
+        <div class="col">
+            @order.DocumentNumber
+        </div>
+          <div class="col">
+            @order.Date
+        </div>
+         <div class="col">
+            @order.CustomerName
+        </div>
+         <div class="col">
+           @order.OrderConfirmationNumber
+        </div>
+         <div class="col">
+           @order.DeliveryTerms
+        </div>
+     <div class="col">
+           @order.TotalAmount
+    </div>
+     <div class="col">
+           @order.TotalAmount
+    </div>
+       <div class="col">
+           @order.SupplierName
+    </div>
+    <a asp-controller="Reports" asp-action="InvoiceDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>  
+    <a asp-controller="Reports" asp-action="EditInvoice" asp-route-id="@order.Id" class="btn btn-info mr-1">Edit</a>  
+    </div>
+    <hr />
+}
+</div>

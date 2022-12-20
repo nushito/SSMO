@@ -1,4 +1,4 @@
-﻿@model InvoicePrintViewModel
+﻿@model BgInvoiceViewModel
 @{
     ViewBag.Title = "Фактура";
     var i = 0;
@@ -24,47 +24,36 @@
         <div class="col-md-12">
           <div class="text-center">
             <i class="fab fa-mdb fa-4x ms-0" style="color:#5d9fc5 ;"></i>
-            <p class="pt-0">@Model.Date.Date.ToShortDateString()</p>
+            <p class="pt-0">@Model.Date.ToShortDateString()</p>
           </div>
-
         </div>
 
         <div class="row">
           <div class="col-xl-8">
             <ul class="list-unstyled">
-              <li class="text-muted">To: <span style="color:#5d9fc5 ;">@Model.Customer.Name</span></li>
-              <li class="text-muted">@Model.Customer.EIK</li>
-               <li class="text-muted">@Model.Customer.VAT</li>
-               <li class="text-muted">@Model.Customer.ClientAddress.Country</li>
-                <li class="text-muted">@Model.Customer.ClientAddress.City</li>
-               <li class="text-muted">@Model.Customer.ClientAddress.Street</li>
-                <li class="text-muted">@Model.Customer.RepresentativePerson</li>
+              <li class="text-muted">To: <span style="color:#5d9fc5 ;">@Model.BgCustomer.BgName</span></li>
+              <li class="text-muted">@Model.BgCustomer.EIK</li>
+               <li class="text-muted">@Model.BgCustomer.VAT</li>
+               <li class="text-muted">@Model.BgCustomer.ClientAddress.BgCountry</li>
+                <li class="text-muted">@Model.BgCustomer.ClientAddress.BgCity</li>
+               <li class="text-muted">@Model.BgCustomer.ClientAddress.BgStreet</li>
+                <li class="text-muted">@Model.BgCustomer.BgRepresentativePerson</li>
             </ul>
           </div>
           <div class="col-xl-4">
-            <p class="text-muted">@Model.Seller.Name</p>
+            <p class="text-muted">@Model.BgMyCompany.BgName</p>
             <ul class="list-unstyled">
-              <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.Seller.EIK</span></li>
-              <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.Seller.VAT </span></li>
-               <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.Seller.Street </span></li>
-                <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.Seller.City </span></li>
-                 <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.Seller.Country </span></li>
+              <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.BgMyCompany.EIK</span></li>
+              <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.BgMyCompany.VAT </span></li>
+               <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.BgMyCompany.BgStreet </span></li>
+                <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.BgMyCompany.BgCity </span></li>
+                 <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.BgMyCompany.BgCountry </span></li>
               @*<li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="me-1 fw-bold">FSC:</span>
                   <span class="badge bg-warning text-black fw-bold">@Model.Seller.FSCClaim @Model.Seller.FSCSertificate</span></li>*@
             </ul>
           </div>
         </div>
-        <div class="row">
-             <div class="col-xl-8">
-            <ul class="list-unstyled">
-              <li class="text-muted">O/C No: <span style="color:#5d9fc5 ;">@Model.OrderConfirmationNumber</span></li>
-              <li class="text-muted">Delivery Terms: <span style="color:#5d9fc5 ;">@Model.Incoterms</span></li>
-              <li class="text-muted">Truck Number: <span style="color:#5d9fc5 ;">@Model.TruckNumber</span></li>
-            </ul>
-          </div>
-        </div>
-
-
+    
         <div class="row my-2 mx-1 justify-content-center">
           <table class="table table-striped table-borderless">
             <thead style="background-color:#84B0CA ;" class="text-white">
@@ -81,12 +70,12 @@
               </tr>
             </thead>
             <tbody>
-                @foreach (var product in @Model.Products)
+                @foreach (var product in @Model.BgProducts)
                             {  
                                 i += 1;                                
                                 <tr>
                                     <td>@i</td>
-                                    <td>@product.Description</td>
+                                    <td>@product.BgDescription</td>
                                     <td>@product.Grade</td>
                                     <td>@product.Size</td>
                                     <td>@product.FSCClaim</td>
@@ -104,12 +93,25 @@
           <div class="col-xl-3">
             <ul class="list-unstyled">
               <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
-              <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
+              <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.Vat: </span>@Model.VatAmount.ToString("N2")</li>            
             <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.TotalAmount.ToString("N2")</span></li>
           </ul>
           </div>
         </div>
         <hr>
+         <table class="table-borderless">
+            <tr>
+                @foreach (var bank in Model.CompanyBankDetails)
+                {
+                  <td class="border-right-2 m-2">
+                        Currency:@bank.Currency<br>
+                        Bank:@bank.BankName<br>
+                        IBAN:@bank.Iban<br>
+                        SWIFT:@bank.Swift
+                    </td>
+                }
+            </tr>
+        </table>
       
       </div>
     </div>

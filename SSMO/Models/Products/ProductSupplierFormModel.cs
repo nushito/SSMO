@@ -16,8 +16,9 @@ namespace SSMO.Models.Products
         [Required]
         public string Grade { get; set; }
         public IEnumerable<string> Grades { get; set; }
-        public string FSCClaim { get; set; }
-        public string FSCSertificate { get; set; }
+        public string PurchaseFscClaim { get; set; }
+        public string PurchaseFscCertificate { get; set; }
+        public string SupplierFscCertNumber { get; set; }
         public int CustomerOrderId { get; set; }
         public int SupplierOrderId { get; set; }
         [Range(0.0, 9999999999999.99999)]

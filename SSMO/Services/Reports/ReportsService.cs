@@ -4,10 +4,14 @@ using SSMO.Data;
 using SSMO.Data.Models;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.CustomerOrderReportForEdit;
+using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
+using SSMO.Services.Suppliers;
+using SSMO.Services.CustomerOrderService;
 using SSMO.Services.Documents.Invoice;
+using SSMO.Services.MyCompany;
 using SSMO.Services.Products;
 using SSMO.Services.SupplierOrders;
 using System;
@@ -24,24 +28,33 @@ namespace SSMO.Services.Reports
         private readonly IProductService productService;
         private readonly IInvoiceService invoiceService;
         private readonly ISupplierOrderService supplierOrderService;
+        private readonly IMycompanyService myCompanyService;
+        private readonly ICustomerOrderService customerOrderService;
+        private readonly ISupplierService supplierService;
 
         public ReportsService
-            (ApplicationDbContext context, IConfigurationProvider mapper, 
+            (ApplicationDbContext context, IConfigurationProvider mapper,
             IProductService productService, IInvoiceService invoiceService,
-            ISupplierOrderService supplierOrderService)
+            ISupplierOrderService supplierOrderService, IMycompanyService mycompanyService,
+            ICustomerOrderService customerOrderService, ISupplierService supplierService)
         {
             dbcontext = context;
             this.mapper = mapper;//.ConfigurationProvider;
             this.productService = productService;
             this.invoiceService = invoiceService;
             this.supplierOrderService = supplierOrderService;
+            this.myCompanyService = mycompanyService;
+            this.customerOrderService = customerOrderService;
+            this.supplierService = supplierService;
         }
         public IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders
             (string customerName, int currentpage, int customerOrdersPerPage)
         {
+
             if (String.IsNullOrEmpty(customerName))
             {
-                return new List<CustomerOrderDetailsModel>();
+                var query = dbcontext.CustomerOrders.ProjectTo<CustomerOrderDetailsModel>(this.mapper).ToList();
+                return query.Skip((currentpage - 1) * customerOrdersPerPage).Take(customerOrdersPerPage);
             }
 
             var customerId = dbcontext.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
@@ -49,7 +62,7 @@ namespace SSMO.Services.Reports
                                 .FirstOrDefault();
 
             var queryOrders = dbcontext.CustomerOrders
-                    .Where(a => a.CustomerId == customerId);
+                     .Where(a => a.CustomerId == customerId);
 
             // var totalOrders = queryOrders.Count();  
 
@@ -211,7 +224,7 @@ namespace SSMO.Services.Reports
                     productsPerCorder.ElementAt(i).SheetsPerPallet = products.ElementAt(i).SheetsPerPallet;
 
                     var sizeName = dbcontext.Sizes
-                        .Where(a => a.Id == sizeId).Select(n=>n.Name).FirstOrDefault();
+                        .Where(a => a.Id == sizeId).Select(n => n.Name).FirstOrDefault();
                     var dimensionArray = sizeName.Split('/').ToArray();
                     var countArray = dimensionArray.Count();
                     decimal sum = 1M;
@@ -237,7 +250,7 @@ namespace SSMO.Services.Reports
 
                     order.Amount += productsPerCorder.ElementAt(i).Amount;
                 }
-                order.TotalAmount = order.Amount + (order.Amount*order.Vat/100) ?? 0;
+                order.TotalAmount = order.Amount + (order.Amount * order.Vat / 100) ?? 0;
                 order.Balance = order.TotalAmount - paidAdvance;
             }
 
@@ -252,7 +265,7 @@ namespace SSMO.Services.Reports
         }
         public IEnumerable<CustomerOrderListViewBySupplier> GetCustomerOrdersBySupplier(int customerId, string supplierId)
         {
-            if(supplierId == null)
+            if (supplierId == null)
             {
                 return Enumerable.Empty<CustomerOrderListViewBySupplier>();
             }
@@ -315,7 +328,7 @@ namespace SSMO.Services.Reports
             var queryOrders = dbcontext.SupplierOrders
                     .Where(a => a.SupplierId == supplierId);
 
-         //   var customerOrdersNumber = queryOrders.Select(num => num.CustomerOrderId);
+            //   var customerOrdersNumber = queryOrders.Select(num => num.CustomerOrderId);
 
             // var totalOrders = queryOrders.Count();  
 
@@ -342,7 +355,7 @@ namespace SSMO.Services.Reports
             if (supplierOrderId == 0) return null;
 
             var supplierOrderForEdit = new SupplierOrderForEditModel
-            { 
+            {
                 Number = supplierOrder.Number,
                 Amount = supplierOrder.Amount,
                 CurrencyId = supplierOrder.CurrencyId,
@@ -351,7 +364,7 @@ namespace SSMO.Services.Reports
                 DatePaidAmount = supplierOrder.DatePaidAmount,
                 DeliveryAddress = supplierOrder.DeliveryAddress,
                 LoadingAddress = supplierOrder.LoadingAddress,
-                DeliveryTerms = supplierOrder.DeliveryTerms,    
+                DeliveryTerms = supplierOrder.DeliveryTerms,
                 FSCClaim = supplierOrder.FSCClaim,
                 FSCSertificate = supplierOrder.FSCSertificate,
                 GrossWeight = supplierOrder.GrossWeight,
@@ -364,12 +377,12 @@ namespace SSMO.Services.Reports
             return supplierOrderForEdit;
         }
 
-        
+
         public bool EditSupplierOrder
-            (int supplierOrderId, string supplierOrderNumber, 
-            DateTime date, int myCompanyId, string deliveryTerms, 
-            string loadingPlace, string deliveryAddress, 
-            decimal grossWeight, decimal netWeight, int currencyId, 
+            (int supplierOrderId, string supplierOrderNumber,
+            DateTime date, int myCompanyId, string deliveryTerms,
+            string loadingPlace, string deliveryAddress,
+            decimal grossWeight, decimal netWeight, int currencyId,
             int status, int customerOrderNumber, string fscClaim, string fscCertificate,
             decimal paidAdvance, bool paidStatus, int? vat, List<ProductsForEditSupplierOrder> products)
         {
@@ -381,7 +394,7 @@ namespace SSMO.Services.Reports
 
             var customerOrderId = dbcontext.CustomerOrders
                 .Where(num => num.OrderConfirmationNumber == customerOrderNumber)
-                .Select(id=>id.Id)
+                .Select(id => id.Id)
                 .FirstOrDefault();
 
             if (supplierOrder == null) return false;
@@ -402,7 +415,7 @@ namespace SSMO.Services.Reports
             supplierOrder.PaidStatus = paidStatus;
             supplierOrder.Amount = 0;
 
-           
+
 
             var productsPerCorder = dbcontext.Products.Where(co => co.CustomerOrderId == customerOrderId).ToList();
 
@@ -476,7 +489,7 @@ namespace SSMO.Services.Reports
             var supplierId = supplierOrder.Select(id => id.SupplierId).FirstOrDefault();
             supplierOrderDetail.SupplierName = dbcontext.Suppliers
                 .Where(i => i.Id == supplierId)
-                .Select(n=>n.Name)
+                .Select(n => n.Name)
                 .FirstOrDefault();
 
             var customerId = dbcontext.CustomerOrders
@@ -500,6 +513,46 @@ namespace SSMO.Services.Reports
                 .FirstOrDefault();
 
             return supplierOrderDetail;
+        }
+
+        public IEnumerable<InvoiceCollectionViewModel> InvoiceCollection(string myCompanyName, int currentpage, int invoicesPerPage)
+        {
+            if (myCompanyName == null) return null;
+
+            var companyId = myCompanyService.GetMyCompanyId(myCompanyName);
+
+            var invoices = dbcontext.Documents
+                .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Invoice)
+                .Where(m => m.MyCompanyId == companyId)
+                .ToList();
+            var invoiceDetailsCollection = new List<InvoiceCollectionViewModel>();
+
+            foreach (var invoice in invoices)
+            {
+                var customerOrderNumber = customerOrderService.CustomerOrderNumberById(invoice.CustomerOrderId);
+                var customerName = dbcontext.Customers
+                    .Where(i => i.Id == invoice.CustomerId)
+                    .Select(n => n.Name)
+                    .FirstOrDefault();
+
+                var supplierName = supplierService.SupplierNameById(invoice.SupplierOrderId);
+
+                invoiceDetailsCollection.Add(new InvoiceCollectionViewModel
+                { 
+                    Id = invoice.Id,
+                    CustomerId = invoice.CustomerId,
+                    DocumentNumber = invoice.DocumentNumber,
+                    Date = invoice.Date,
+                    TotalAmount = invoice.TotalAmount,
+                    SupplierOrderId = invoice.SupplierOrderId,
+                    DeliveryTerms = invoice.Incoterms,
+                    OrderConfirmationNumber = customerOrderNumber,
+                    CustomerOrderId = invoice.CustomerOrderId,
+                    CustomerName = customerName,
+                    SupplierName = supplierName
+                });
+            }
+            return invoiceDetailsCollection;
         }
     }
 }

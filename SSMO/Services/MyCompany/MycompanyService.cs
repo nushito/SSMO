@@ -144,5 +144,22 @@ namespace SSMO.Services.MyCompany
 
             return true;
         }
+
+        public ICollection<string> GetCompaniesUserId()
+        {
+            var loggedUserId = _httpContextAccessor.ContextAccessUserId();
+            return dbContext.MyCompanies
+                     .Where(userId => userId.UserId == loggedUserId)
+                     .Select(x => x.UserId)
+                     .ToList();
+        }
+
+        public int GetMyCompanyId(string name)
+        {
+            return dbContext.MyCompanies
+                .Where(n=>n.Name.ToLower() == name.ToLower())
+                .Select(id=>id.Id)
+                .FirstOrDefault();
+        }
     }
 }

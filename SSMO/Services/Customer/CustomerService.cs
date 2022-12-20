@@ -141,7 +141,7 @@ namespace SSMO.Services.Customer
                 Name = a.Name
             }).ToList();
 
-            return customers; ;
+            return customers; 
         }
 
 

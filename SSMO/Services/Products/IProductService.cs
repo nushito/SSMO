@@ -26,7 +26,7 @@ namespace SSMO.Services.Products
         public bool EditProduct(int id, int customerorderId,
             int supplierOrderId,
             string description, string grade,
-            string size, string fscClaim, string fscCertificate,
+            string size, string purchaseFscCert, string purchaseFscClaim,
             int pallets, int sheetsPerPallet, decimal purchasePrice, decimal quantityM3);
         public ICollection<ProductCustomerFormModel> DetailsPerCustomerOrder(int id);
         public ICollection<ProductsForEditSupplierOrder> ProductsDetailsPerSupplierOrder(int supplierOrderId);

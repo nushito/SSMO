@@ -26,7 +26,7 @@ namespace SSMO.Controllers
             this.supplierService = supplierService;
         }
 
-        [Authorize]
+        [HttpGet]
              public IActionResult AddSupplier()
         {
             return View();
@@ -40,7 +40,7 @@ namespace SSMO.Controllers
             {
                 string userId = this.User.UserId();
 
-                var listMyCompany = mycompanyService.MyCompaniesNamePerSupplier(model.Name);
+                var listMyCompany = mycompanyService.GetCompaniesUserId();
 
                 if (!listMyCompany.Contains(userId))
                 {

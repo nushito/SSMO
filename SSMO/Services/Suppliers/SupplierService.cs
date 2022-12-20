@@ -129,6 +129,27 @@ namespace SSMO.Services
             return supplierFsc;
         }
 
+        public string GetSupplierFscCertificateByOrderId(int orderId)
+        {
+            var supplierId = dbContext.SupplierOrders
+                .Where(i => i.Id == orderId)
+                .Select(s => s.SupplierId)
+                .FirstOrDefault();
+
+            var supplierFsc = dbContext.Suppliers
+                .Where(id => id.Id == supplierId)
+                .Select(fs => fs.FSCSertificate)
+                .FirstOrDefault();
+
+            if (supplierFsc == null)
+            {
+                return null;
+            }
+
+            return supplierFsc;
+
+        }
+
         public IEnumerable<string> GetSupplierNames()
         {
             return dbContext
@@ -186,6 +207,19 @@ namespace SSMO.Services
            var distinctSupplierDetailsList = supplierDetailList.GroupBy(a=>a.SupplierId).Select(a=>a.First()).ToList();   
            
             return distinctSupplierDetailsList;
+        }
+
+        public string SupplierNameById(int id)
+        {
+            var supplierId = dbContext.SupplierOrders
+                .Where(i => i.Id == id)
+                .Select(s => s.SupplierId)
+                .FirstOrDefault();
+
+            return dbContext.Suppliers
+                  .Where(i => i.Id == supplierId)
+                  .Select(n => n.Name)
+                  .FirstOrDefault();
         }
     }
 }

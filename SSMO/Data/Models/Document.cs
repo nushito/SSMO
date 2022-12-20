@@ -17,7 +17,7 @@ namespace SSMO.Data.Models
         public DocumentTypes DocumentType { get; set; }
         [DisplayName("Invoice Number")]
         public int DocumentNumber { get; set; }
-        [DisplayName("Supplier Invoice Number")]
+        [DisplayName("Purchase Invoice Number")]
         public string Number { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
@@ -30,7 +30,7 @@ namespace SSMO.Data.Models
         public Supplier Supplier { get; set; }
         public int SupplierOrderId { get; set; }
         public SupplierOrder SupplierOrder { get; set; }
-        public int? MyCompanyId { get; set; }
+        public int MyCompanyId { get; set; }
         public MyCompany MyCompany { get; set; }
         [Required]
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]

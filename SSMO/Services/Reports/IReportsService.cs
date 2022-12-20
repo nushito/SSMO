@@ -1,5 +1,6 @@
 ﻿using SSMO.Models.Products;
 using SSMO.Models.Reports.CustomerOrderReportForEdit;
+using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
@@ -45,6 +46,7 @@ namespace SSMO.Services.Reports
               decimal paidAdvance, bool paidStatus, int? vat,
               List<ProductsForEditSupplierOrder> products);
 
+        public IEnumerable<InvoiceCollectionViewModel> InvoiceCollection(string myCompanyName, int currentpage, int invoicesPerPage);
 
     }
 }

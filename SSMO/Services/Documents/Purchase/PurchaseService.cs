@@ -88,7 +88,8 @@ namespace SSMO.Services.Documents.Purchase
             }
 
             dbContext.Documents.Add(purchase);
-          
+            dbContext.SaveChanges();
+
             foreach (var product in productList)
             {
                 //TODO why quantity = 0, check supplierorder

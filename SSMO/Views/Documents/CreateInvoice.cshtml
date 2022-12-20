@@ -16,7 +16,11 @@
               class="fas fa-print text-primary"></i> Print</a>
           <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark"><i
               class="far fa-file-pdf text-danger"></i> Export</a>
-               <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" asp-controller="Documents" asp-route-documentNumber="@Model.DocumentNumber"><i
+               <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" 
+               asp-controller="Documents" 
+               asp-action="BgInvoice"
+               asp-route-documentNumber="@Model.DocumentNumber"
+               asp-route-currencyExchangeRateUsdToBGN = "@Model.CurrencyExchangeRateUsdToBGN"><i
               class="far fa-file-pdf text-danger"></i> BG</a>
         </div>
         <hr>
@@ -62,6 +66,8 @@
               <li class="text-muted">O/C No: <span style="color:#5d9fc5 ;">@Model.OrderConfirmationNumber</span></li>
               <li class="text-muted">Delivery Terms: <span style="color:#5d9fc5 ;">@Model.Incoterms</span></li>
               <li class="text-muted">Truck Number: <span style="color:#5d9fc5 ;">@Model.TruckNumber</span></li>
+              <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;">@Model.NetWeight kg</span></li>
+               <li class="text-muted">Gross Weight: <span style="color:#5d9fc5 ;">@Model.GrossWeight kg</span></li>
             </ul>
           </div>
         </div>
@@ -112,7 +118,20 @@
           </div>
         </div>
         <hr>
-      
+        <table class="table-borderless">
+            <tr>
+                @foreach (var bank in Model.CompanyBankDetails)
+                {
+                    <td class="border-right-2 m-2">
+                        Currency:@bank.Currency<br>
+                        Bank:@bank.BankName<br>
+                        IBAN:@bank.Iban<br>
+                        SWIFT:@bank.Swift
+                    </td>
+                }
+            </tr>
+        </table>
+       
       </div>
     </div>
   </div>

@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSMO.Data;
 
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221214151447_FscPurchase")]
+    partial class FscPurchase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -548,7 +550,7 @@ namespace SSMO.Data.Migrations
                     b.Property<string>("Incoterms")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("MyCompanyId")
+                    b.Property<int?>("MyCompanyId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("NetWeight")
@@ -1171,8 +1173,7 @@ namespace SSMO.Data.Migrations
                     b.HasOne("SSMO.Data.Models.MyCompany", "MyCompany")
                         .WithMany("Documents")
                         .HasForeignKey("MyCompanyId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SSMO.Data.Models.Supplier", "Supplier")
                         .WithMany("Documents")

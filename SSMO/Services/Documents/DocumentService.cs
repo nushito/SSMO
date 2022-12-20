@@ -75,6 +75,7 @@ namespace SSMO.Services.Documents
                 NetWeight = packingList.NetWeight,
                 GrossWeight = packingList.GrossWeight,
                 TruckNumber = packingList.TruckNumber,
+                Products = new List<ProductsForPackingListPrint>()
             };
 
             var myCompany = dbContext.MyCompanies

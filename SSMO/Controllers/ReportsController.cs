@@ -6,6 +6,7 @@ using SSMO.Infrastructure;
 using SSMO.Models.Products;
 using SSMO.Models.Reports;
 using SSMO.Models.Reports.CustomerOrderReportForEdit;
+using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
@@ -34,22 +35,20 @@ namespace SSMO.Controllers
 		private readonly IMycompanyService myCompanyService;
 		private readonly IProductService productService;
 		private readonly ICustomerOrderService customerOrderService;
-		private readonly IMapper mapper;
 		private readonly IStatusService statusService;
 		private readonly IInvoiceService invoiceService;
 		private readonly IPurchaseService purchaseService;
 		private readonly ISupplierOrderService supplierOrderService;
-
+		
 		public ReportsController(IReportsService service,
 		   ICustomerService customerService, ISupplierService supplierService,
 		   ICurrency currency, IMycompanyService mycompanyService, IProductService productService,
-		   ICustomerOrderService customerOrderService, IStatusService statusService, IMapper mapper, IInvoiceService invoiceService,
-			IPurchaseService purchaseService, ISupplierOrderService supplierOrderService)
+		   ICustomerOrderService customerOrderService, IStatusService statusService,IInvoiceService invoiceService,
+		   IPurchaseService purchaseService, ISupplierOrderService supplierOrderService)
 		{
 			this.reportService = service;
 			this.customerService = customerService;
 			this.supplierService = supplierService;
-			this.mapper = mapper;
 			this.statusService = statusService;
 			this.currency = currency;
 			this.myCompanyService = mycompanyService;
@@ -183,14 +182,14 @@ namespace SSMO.Controllers
 		{
 			var customersList = customerService.GetCustomerNamesAndId();
 
-			CustomerBySupplierOrdersViewModel cascade = new()
+			CustomerBySupplierOrdersViewModel cascadeCustomerOrders = new()
 			{
 				Customers = customersList,
 			};
 			
 			ViewData["Selectedsupplier"] = 0;
-			cascade.ProductList = null;
-			return View(cascade);
+			cascadeCustomerOrders.ProductList = null;
+			return View(cascadeCustomerOrders);
 		}
 
 		[HttpPost]
@@ -224,7 +223,7 @@ namespace SSMO.Controllers
 		}
 		
 		[HttpGet]
-		public ActionResult GetSupplier(string id)
+		public IActionResult GetSupplier(string id)
 		{
 			if(id == null)
 			{
@@ -570,13 +569,13 @@ namespace SSMO.Controllers
 			{
 				return BadRequest();
 			}
-
 			var isSupplierOrderPaymentEdit = supplierOrderService.EditSupplierOrderPayment
 				(supplierOrderNumber, model.PaidAvance, model.DatePaidAmount, model.PaidStatus);
 
+			if(!isSupplierOrderPaymentEdit) return BadRequest();	
+
 			return View();
         }
-
 		public IActionResult ProductsOnStock(ProductAvailabilityViewModel model) 
 		{
 			if (!ModelState.IsValid)
@@ -585,6 +584,7 @@ namespace SSMO.Controllers
 			}
 
 			if (myCompanyService.GetAllCompanies().Count() == 0) return BadRequest();
+
 			var descriptions = productService.DescriptionIdAndNameList();
 			var grades = productService.GradeIdAndNameList();
 			var sizes = productService.SizeIdAndNameList();
@@ -602,5 +602,31 @@ namespace SSMO.Controllers
 			return View(model);
 		}
 
+		public IActionResult AllInvoices(InvoicesViewModel model)
+        {
+			string userId = this.User.UserId();
+			var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+            if (!mycompaniesUserId.Contains(userId))
+            {
+				return BadRequest();
+            }
+			var myCompanyNames = myCompanyService.GetCompaniesNames();
+			model.MyCompanyNames = myCompanyNames;
+
+			var invoiceCollection = reportService.InvoiceCollection(model.MyCompanyName, model.CurrentPage, InvoicesViewModel.InvoicesPerPage);
+			model.InvoiceCollection = invoiceCollection;
+
+			return View(model);
+        }
+
+		public IActionResult InvoiceDetails(int id)
+        {
+			return View();
+        }
+
+		public IActionResult EditInvoice(int id)
+        {
+			return View();
+        }
 	}
 }

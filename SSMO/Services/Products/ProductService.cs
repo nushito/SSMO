@@ -148,7 +148,7 @@ namespace SSMO.Services.Products
         public bool EditProduct(int id, int customerorderId,
             int supplierOrderId,
            string description, string grade,
-            string size, string fscClaim, string fscCertificate,
+            string size, string purchaseFscCert, string purchaseFscClaim,
             int pallets, int sheetsPerPallet, decimal purchasePrice, decimal quantityM3)
         {
 
@@ -166,8 +166,8 @@ namespace SSMO.Services.Products
             product.DescriptionId = descriptionEdit;
             product.GradeId = gradeEdit;
             product.SizeId = sizeEdit;
-            product.FSCClaim = fscClaim;
-            product.FSCSertificate = fscCertificate;
+            product.PurchaseFscClaim = purchaseFscClaim;
+            product.PurchaseFscCertificate = purchaseFscCert;
             product.Pallets = pallets;
             product.SheetsPerPallet = sheetsPerPallet;
             product.PurchasePrice = purchasePrice;
@@ -317,21 +317,32 @@ namespace SSMO.Services.Products
             (int descriptionId, int gradeId, int sizeId, int currentPage, int productsPerPage)
         {
             var products = dbContext.Products
-               .Where(d => d.LoadedQuantityM3 != 0)
-               .ToList();
+               .Where(d => d.LoadedQuantityM3 != 0);
+               
 
             if (descriptionId != 0 && gradeId != 0 && sizeId != 0)
             {
                 products = products
-                         .Where(d => d.DescriptionId == descriptionId && d.GradeId == gradeId && d.SizeId == sizeId)
-                         .ToList();
+                         .Where(d => d.DescriptionId == descriptionId);
+            }
+
+            if (gradeId != 0)
+            {
+                products = products
+                         .Where(d => d.GradeId == gradeId);
+            }
+
+            if ( sizeId != 0)
+            {
+                products = products
+                         .Where(d => d.SizeId == sizeId);
 
             }
 
             var productsOnStok = new List<ProductAvailabilityDetailsViewModel>();
             string supplierOrderDeliveryAddress = null;
 
-            foreach (var product in products)
+            foreach (var product in products.ToList())
             {
                 var statusId = dbContext.Statuses
                     .Where(n=>n.Name == "Active")

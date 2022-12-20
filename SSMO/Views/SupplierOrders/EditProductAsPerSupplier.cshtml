@@ -1,9 +1,11 @@
 ﻿@model List<ProductSupplierFormModel>
+@using SSMO.Services
 @using SSMO.Services.Products
 @inject IProductService service;
-
+ 
 @{
     ViewBag.Title = "Edit Product List";
+    
 }
 
     <form method="post">    
@@ -15,10 +17,10 @@
                 <td>Description</td>
                 <td>Size</td>
                 <td>Grade</td>
-                <td>FSC claim</td>
-                <td>FSC certificate</td>
-                 <td>Pallets</td>
-               <td>Sheets/pallet</td>
+                <td>Supplier FSC claim</td>
+                <td>Supplier FSC certificate</td>             
+                <td>Pallets</td>
+                <td>Sheets/pallet</td>
                 <td>Quantity m3</td>
               <td>Purchase Price</td>
                 </tr>
@@ -28,11 +30,8 @@
              @for (int i = 0; i < Model.Count(); i++)
                 {
                     <div>
-                    
                      <input type="hidden" asp-for="@Model[i].Id">
                     </div>
-                  
-
                      <tr>
                             <td class="col-sm-1">
                                 <div class="editor-field">
@@ -67,21 +66,21 @@
                                     </select>
                                 </div>
                             </td>
-
                                <td class="col-sm-1">
                                 <div class="editor-field">
-                               
-                                    <input asp-for="@Model[i].FSCClaim"  class="text-box single-line"   required="required">
+                                    <input asp-for="@Model[i].PurchaseFscClaim"  class="text-box single-line"   required="required">
                                 </div>
                             </td>
                              <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <input asp-for="@Model[i].FSCSertificate" class="text-box single-line"   required="required">
+                                    <select asp-for="@Model[i].PurchaseFscCertificate">
+                                        <option value="">-</option>
+                                        <option value="@Model[i].SupplierFscCertNumber">@Model[i].SupplierFscCertNumber</option>
+                                    </select>
                                 </div>
                             </td>
                              <td class="col-sm-1">
                                 <div class="editor-field">
-
                                     <input asp-for="@Model[i].Pallets" class="text-box single-line"  required="required">
                                 </div>
                             </td>
@@ -100,7 +99,6 @@
                            
                             <td class="col-sm-1">
                                 <div class="editor-field">
-
                                     <input asp-for="@Model[i].PurchasePrice" type="number" min="0.0000" step="0.0001" class="text-box single-line"   required="required">
                                 </div>
                             </td>

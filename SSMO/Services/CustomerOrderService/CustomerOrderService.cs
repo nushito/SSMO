@@ -26,7 +26,6 @@ namespace SSMO.Services.CustomerOrderService
             {
                 return true;
             }
-
             return false;
         }
 
@@ -152,7 +151,10 @@ namespace SSMO.Services.CustomerOrderService
 
         public ICollection<int> AllCustomerOrderNumbers()
         {
-            return dbContext.CustomerOrders.Select(a => a.OrderConfirmationNumber).ToList();
+            return dbContext.CustomerOrders
+                .OrderByDescending(n=>n.OrderConfirmationNumber)
+                .Select(a => a.OrderConfirmationNumber)
+                .ToList();
         }
 
         public EditCustomerOrderPaymentModel GetCustomerOrderPaymentForEdit(int orderConfirmationNumber)
@@ -204,6 +206,14 @@ namespace SSMO.Services.CustomerOrderService
                 .FirstOrDefault();
 
             return customerOrdeNum;
+        }
+
+        public int CustomerOrderNumberById(int id)
+        {
+           return dbContext.CustomerOrders
+                .Where(i=>i.Id == id)
+                .Select(n=>n.OrderConfirmationNumber)
+                .FirstOrDefault();
         }
     }
 }

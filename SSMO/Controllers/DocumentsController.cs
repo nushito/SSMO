@@ -40,7 +40,6 @@ namespace SSMO.Controllers
             this.supplierService = supplierService;
         }
 
-
         public IActionResult AddPurchase(SupplierOrderListModel model)
         {
             if(model.SupplierName != null)
@@ -202,13 +201,15 @@ namespace SSMO.Controllers
                     number = model.Number,
                     mycompanyname = model.MyCompanyName,
                     truckNumber = model.TruckNumber,
-                    deliveryCost = model.DeliveryCost
+                    deliveryCost = model.DeliveryCost,
+                    grossWeight = model.GrossWeight,
+                    netWeight = model.NetWeight
                 });
         }
 
         public IActionResult CreateInvoice(
             int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, 
-            int number, string mycompanyname, string truckNumber, decimal deliveryCost)
+            int number, string mycompanyname, string truckNumber, decimal deliveryCost, decimal grossWeight, decimal netWeight)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(mycompanyname);
@@ -227,13 +228,14 @@ namespace SSMO.Controllers
             }
 
             var invoiceForPrint = invoiceService.CreateInvoice
-                (orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname,truckNumber,deliveryCost);    
+                (orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname,truckNumber,deliveryCost,
+                grossWeight, netWeight);    
 
             return View(invoiceForPrint);
         }
        
         //TODO Bank Details on the invoice
-        public IActionResult BgInvoice(int documentNumber)
+        public IActionResult BgInvoice(int documentNumber, decimal currencyExchangeRateUsdToBGN)
         {
             if (!User.Identity.IsAuthenticated)
             {
@@ -243,8 +245,11 @@ namespace SSMO.Controllers
             {
                 return View();
             }
+            //TODO Fix amount with currencyexchange
+            var bgInvoice = invoiceService.CreateBgInvoice(documentNumber, currencyExchangeRateUsdToBGN);
+            if (bgInvoice == null) return View();
 
-            return View();
+            return View(bgInvoice);
         }
         public IActionResult ChoosePackingListForPrint(ChoosePackingListFromInvoicesViewModel model)
         {

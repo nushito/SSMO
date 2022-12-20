@@ -35,8 +35,8 @@ namespace SSMO.Controllers
            IMycompanyService myCompanyService,
            ICustomerService customerService,
            IProductService productService, IMapper mapper,
- ApplicationDbContext dbContext, 
- ICustomerOrderService cusomerOrderService,  IStatusService statusService,
+ ApplicationDbContext dbContext,
+ ICustomerOrderService cusomerOrderService, IStatusService statusService,
             ISupplierOrderService supplierOrderService)
         {
             this.supplierService = supplierService;
@@ -61,7 +61,7 @@ namespace SSMO.Controllers
             {
                 Currencies = currency.AllCurrency(),
                 MyCompanies = myCompanyService.GetAllCompanies(),
-                Suppliers = supplierService.GetSuppliers(),              
+                Suppliers = supplierService.GetSuppliers(),
                 Statuses = statusService.GetAllStatus(),
                 CustomerOrders = cusomerOrderService.AllCustomerOrderNumbers()
             });
@@ -101,9 +101,9 @@ namespace SSMO.Controllers
             if (!supplierService.GetSuppliers().Any())
             {
                 return RedirectToAction("AddSupplier", "SuppliersController");
-                    };
-          
-            if (!cusomerOrderService.CheckOrderNumberExist(model.CustomerOrderNumber))   
+            };
+
+            if (!cusomerOrderService.CheckOrderNumberExist(model.CustomerOrderNumber))
             {
                 return BadRequest();
             };
@@ -111,13 +111,13 @@ namespace SSMO.Controllers
             var thisCustomerOrder = cusomerOrderService.OrderPerNumber(model.CustomerOrderNumber);
             var customerorderId = thisCustomerOrder.Id;
             var supplierOrderId = supplierOrderService.CreateSupplierOrder
-                                  (model.MyCompanyId, model.SupplierId,model.Date,
-                                   model.Number,model.CustomerOrderNumber, model.StatusId, 
-                                   model.CurrencyId, model.FscClaim, model.VAT??0, model.DatePaidAmount,
-                                   model.PaidAvance, model.PaidStatus, model.LoadingAddress, model.DeliveryAddress, 
+                                  (model.MyCompanyId, model.SupplierId, model.Date,
+                                   model.Number, model.CustomerOrderNumber, model.StatusId,
+                                   model.CurrencyId, model.FscClaim, model.VAT ?? 0, model.DatePaidAmount,
+                                   model.PaidAvance, model.PaidStatus, model.LoadingAddress, model.DeliveryAddress,
                                    model.DeliveryTerms);
 
-           return RedirectToAction("EditProductAsPerSupplier", new {customerOrderId = customerorderId, supplierOrderId = supplierOrderId} );
+            return RedirectToAction("EditProductAsPerSupplier", new { customerOrderId = customerorderId, supplierOrderId = supplierOrderId });
         }
 
         [HttpGet]
@@ -147,35 +147,36 @@ namespace SSMO.Controllers
             }
 
             var listProducts = new List<ProductSupplierFormModel>();
+            var supplierFscCert = supplierService.GetSupplierFscCertificateByOrderId(supplierOrderId);
 
             foreach (var product in corder)
             {
-              var productSupp =  new ProductSupplierFormModel
-              {
-                    Id = product.Id,  
-                    Description = product.Description,  
+                var productSupp = new ProductSupplierFormModel
+                {
+                    Id = product.Id,
+                    Description = product.Description,
                     Grade = product.Grade,
                     Size = product.Size,
                     DescriptionId = product.DescriptionId,
                     GradeId = product.GradeId,
                     SizeId = product.SizeId,
-                    FSCClaim = product.FSCClaim,    
-                    FSCSertificate = product.FSCSertificate,
+                    PurchaseFscCertificate = product.PurchaseFscCertificate,
+                    PurchaseFscClaim = product.PurchaseFscClaim,
+                    SupplierFscCertNumber = supplierFscCert,
                     Pallets = product.Pallets,
                     SheetsPerPallet = product.Pallets,
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),
                     Sizes = productService.GetSizes(),
                     CustomerOrderId = customerorderId,
-                    SupplierOrderId =  supplierOrderId,
+                    SupplierOrderId = supplierOrderId,
                     QuantityM3 = product.QuantityM3
-
-              };
+                };
 
                 listProducts.Add(productSupp);
             };
 
-            return View(listProducts);  
+            return View(listProducts);
         }
 
         [HttpPost]
@@ -208,13 +209,17 @@ namespace SSMO.Controllers
                 return RedirectToAction("AddCustomerOrder", "CustomerOrdersController", customerorderId);
             }
 
+            var supplierFscCert = supplierService.GetSupplierFscCertificateByOrderId(supplierOrderId);
+
             foreach (var product in productmodel)
             {
-              var check =  productService.EditProduct(product.Id, customerorderId, supplierOrderId,product.Description, product.Grade, 
-                           product.Size, product.FSCClaim, product.FSCSertificate, product.Pallets, product.SheetsPerPallet,
-                           product.PurchasePrice,product.QuantityM3);
+                product.SupplierFscCertNumber = supplierFscCert;
+                var check = productService.EditProduct(product.Id, customerorderId, supplierOrderId, product.Description, product.Grade,
+                             product.Size, product.PurchaseFscCertificate, product.PurchaseFscClaim,
+                             product.Pallets, product.SheetsPerPallet,
+                             product.PurchasePrice, product.QuantityM3);
 
-                if(!check )
+                if (!check)
                 {
                     return BadRequest();
                 }

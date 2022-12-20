@@ -23,7 +23,6 @@ namespace SSMO.Services.Documents.Invoice
             this.mapper = mapper;
             this.productService = productSevice;
         }
-
         public bool CheckFirstInvoice()
         {
             var invoiceCheck = dbContext.Documents.Where(a => a.DocumentType == Data.Enums.DocumentTypes.Invoice).Any();
@@ -35,8 +34,8 @@ namespace SSMO.Services.Documents.Invoice
         }
 
         public InvoicePrintViewModel CreateInvoice(
-            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, 
-            int number, string myCompanyName, string truckNumber, decimal deliveryCost)
+            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN,
+            int number, string myCompanyName, string truckNumber, decimal deliveryCost, decimal grossWeight, decimal netWeight)
         {
             var customerOrder = dbContext.CustomerOrders
                 .Where(on => on.OrderConfirmationNumber == orderConfirmationNumber).FirstOrDefault();
@@ -47,7 +46,7 @@ namespace SSMO.Services.Documents.Invoice
 
             var productList = dbContext.Products.
                 Where(co => co.CustomerOrderId == customerOrder.Id).ToList();
-           
+
             foreach (var product in productList)
             {
                 product.DeliveryTrasnportCost = productService.CalculateDeliveryCostOfTheProductInCo
@@ -75,8 +74,9 @@ namespace SSMO.Services.Documents.Invoice
                 TruckNumber = truckNumber,
                 Incoterms = customerOrder.DeliveryTerms,
                 CustomerId = customerOrder.CustomerId,
-                NetWeight = customerOrder.NetWeight,
-                GrossWeight = customerOrder.GrossWeight
+                NetWeight = netWeight,
+                GrossWeight = grossWeight,
+                FSCSertificate = customerOrder.FSCSertificate
             };
 
             if (CheckFirstInvoice())
@@ -93,6 +93,8 @@ namespace SSMO.Services.Documents.Invoice
             }
 
             var invoiceForPrint = this.mapper.Map<InvoicePrintViewModel>(invoiceCreate);
+            
+            invoiceForPrint.CompanyBankDetails = new List<InvoiceBankDetailsViewModel>();
 
             var customerId = dbContext.CustomerOrders.Where(i => i.Id == customerOrder.Id)
                 .Select(c => c.CustomerId).FirstOrDefault();
@@ -114,8 +116,33 @@ namespace SSMO.Services.Documents.Invoice
             invoiceForPrint.Customer = customerDetails;
             invoiceForPrint.OrderConfirmationNumber = orderConfirmationNumber;
 
-            var myCompany = dbContext.MyCompanies.Where(n => n.Name.ToLower() == myCompanyName.ToLower()).FirstOrDefault();
-            var addressCompany = dbContext.Addresses.Where(co => co.Id == myCompany.AddressId).FirstOrDefault();
+            var myCompany = dbContext.MyCompanies
+                .Where(n => n.Name.ToLower() == myCompanyName.ToLower())
+                .FirstOrDefault();
+            var bankList = dbContext.BankDetails
+                .Where(c => c.CompanyId == myCompany.Id)
+                .ToList();
+
+            foreach (var bank in bankList)
+            {
+                var currency = dbContext.Currencys
+                    .Where(i => i.Id == bank.CurrencyId)
+                    .Select(n => n.Name)
+                    .FirstOrDefault();
+
+                invoiceForPrint.CompanyBankDetails.Add(new InvoiceBankDetailsViewModel
+                {
+                    BankName = bank.BankName,
+                    Currency = currency,
+                    CurrencyId = bank.CurrencyId,
+                    Iban = bank.Iban,
+                    Swift = bank.Swift,
+                });
+            }
+
+            var addressCompany = dbContext.Addresses
+                .Where(co => co.Id == myCompany.AddressId)
+                .FirstOrDefault();
             invoiceCreate.MyCompanyId = myCompany.Id;
             invoiceForPrint.Seller = new MyCompanyForInvoicePrint
             {
@@ -136,7 +163,7 @@ namespace SSMO.Services.Documents.Invoice
                 product.Description = productService.GetDescriptionName(product.DescriptionId);
                 product.Grade = productService.GetGradeName(product.GradeId);
                 product.Size = productService.GetSizeName(product.SizeId);
-              
+
             }
 
             invoiceForPrint.VatAmount = customerOrder.Amount * customerOrder.Vat / 100 ?? 0;
@@ -145,16 +172,18 @@ namespace SSMO.Services.Documents.Invoice
             customerOrder.StatusId = 1;
 
             dbContext.Documents.Add(invoiceCreate);
-          
+            dbContext.SaveChanges();
+
             foreach (var product in productList)
             {
                 productService.ClearProductQuantityWhenDealIsFinished(product.Id);
                 product.DocumentId = invoiceCreate.Id;
             }
 
+            dbContext.SaveChanges();
+
             CreatePackingListForThisInvoice(invoiceCreate.Id);
 
-            dbContext.SaveChanges();
             return invoiceForPrint;
         }
 
@@ -216,7 +245,7 @@ namespace SSMO.Services.Documents.Invoice
             invoice.PaidAvance = paidAdvance;
             invoice.DatePaidAmount = datePaidAmount;
             invoice.PaidStatus = paidStatus;
-            
+
 
             invoice.Balance = invoice.TotalAmount - paidAdvance;
 
@@ -239,7 +268,7 @@ namespace SSMO.Services.Documents.Invoice
             .Select(num => num.DocumentNumber)
             .ToList();
 
-        public BgInvoiceViewModel CreateBgInvoice(int documentNumber)
+        public BgInvoiceViewModel CreateBgInvoice(int documentNumber, decimal currencyExchangeRateUsdToBGN)
         {
             var invoice = dbContext.Documents
                 .Where(i => i.DocumentNumber == documentNumber)
@@ -254,8 +283,6 @@ namespace SSMO.Services.Documents.Invoice
             var mycompanyAddress = dbContext.Addresses
                 .Where(id => id.Id == mycompany.AddressId)
                 .FirstOrDefault();
-          
-
 
             var customerId = invoice.CustomerId;
             var customer = dbContext.Customers
@@ -266,12 +293,18 @@ namespace SSMO.Services.Documents.Invoice
                 .FirstOrDefault();
 
             var products = dbContext.Products
-                .Where(i => i.DocumentId == documentNumber);
-                
+                .Where(i => i.DocumentId == invoice.Id);
+
             var bgProducts = mapper.ProjectTo<BGProductsForBGInvoiceViewModel>(products).ToList();
 
             var bgInvoice = new BgInvoiceViewModel
             {
+                DocumentNumber = documentNumber,
+                Date = invoice.Date,
+                Amount = invoice.Amount * currencyExchangeRateUsdToBGN,
+                Vat = invoice.Vat,
+                VatAmount = invoice.Amount * currencyExchangeRateUsdToBGN * invoice.Vat / 100 ?? 0,
+                TotalAmount = invoice.TotalAmount * currencyExchangeRateUsdToBGN,
                 BgCustomer = new BGCustomerForInvoicePrint
                 {
                     BgName = customer.BgCustomerName,
@@ -284,7 +317,6 @@ namespace SSMO.Services.Documents.Invoice
                         BgCountry = customerAdress.Bgcountry,
                         BgStreet = customerAdress.BgStreet
                     },
-
                 },
                 BgMyCompany = new BGMyCompanyInvoicePrintViewModel
                 {
@@ -295,11 +327,50 @@ namespace SSMO.Services.Documents.Invoice
                     BgCity = mycompanyAddress.BgCity,
                     BgCountry = mycompanyAddress.Bgcountry,
                     BgStreet = mycompanyAddress.BgStreet
-                },
-                BgProducts = bgProducts                
+                }
             };
+            bgInvoice.CompanyBankDetails = new List<InvoiceBankDetailsViewModel>();
 
-           return bgInvoice;
+            var bankList = dbContext.BankDetails
+                .Where(c => c.CompanyId == mycompanyId)
+                .ToList();
+
+            foreach (var bank in bankList)
+            {
+                var currency = dbContext.Currencys
+                    .Where(i => i.Id == bank.CurrencyId)
+                    .Select(n => n.Name)
+                    .FirstOrDefault();
+
+                bgInvoice.CompanyBankDetails.Add(new InvoiceBankDetailsViewModel
+                {
+                    BankName = bank.BankName,
+                    Currency = currency,
+                    CurrencyId = bank.CurrencyId,
+                    Iban = bank.Iban,
+                    Swift = bank.Swift,
+                });
+            }
+
+            foreach (var product in bgProducts)
+            {
+                product.BgDescription = dbContext.Descriptions
+                    .Where(i => i.Id == product.DescriptionId)
+                    .Select(bgN => bgN.BgName)
+                    .FirstOrDefault();
+
+                product.Grade = dbContext.Grades
+                    .Where(i => i.Id == product.GradeId)
+                    .Select(bgN => bgN.Name)
+                    .FirstOrDefault();
+
+                product.Size = dbContext.Sizes
+                    .Where(i => i.Id == product.SizeId)
+                    .Select(bgN => bgN.Name)
+                    .FirstOrDefault();
+            }
+            bgInvoice.BgProducts = bgProducts;
+            return bgInvoice;
         }
     }
 }

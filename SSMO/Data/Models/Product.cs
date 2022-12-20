@@ -42,6 +42,8 @@ namespace SSMO.Data.Models
         public decimal PurchaseAmount { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
+        public string PurchaseFscClaim { get; set; }
+        public string PurchaseFscCertificate { get; set; }
         public int CustomerOrderId { get; set; }
         public CustomerOrder CustomerOrder { get; set; }
         public int? SupplierOrderId { get; set; }
