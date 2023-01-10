@@ -134,7 +134,6 @@ namespace SSMO.Services.Products
         {
             return dbContext.Descriptions.Select(a => a.Name).ToList();
         }
-
         public IEnumerable<string> GetSizes()
         {
             return dbContext.Sizes.Select(a => a.Name).ToList();
@@ -306,10 +305,12 @@ namespace SSMO.Services.Products
             var product = dbContext.Products
                 .Where(id => id.Id == productId)
                 .FirstOrDefault();
+
             if (product != null)
             {
                 product.LoadedQuantityM3 = 0;
             }
+
             dbContext.SaveChanges();
         }
 
@@ -356,7 +357,7 @@ namespace SSMO.Services.Products
                 if(order == null) return new List<ProductAvailabilityDetailsViewModel>();
 
                 var purchase = dbContext.Documents
-                    .Where(p=>p.Id == product.DocumentId)
+                    .Where(p=>p.Id == product.PurchaseDocumentId)
                     .FirstOrDefault();
 
                 if (purchase != null)
@@ -414,7 +415,6 @@ namespace SSMO.Services.Products
                     Name = n.Name
                 }).ToList();
         }
-
         public ICollection<SizeForProductSearchModel> SizeIdAndNameList()
         {
             return dbContext.Sizes
@@ -433,6 +433,17 @@ namespace SSMO.Services.Products
                     Id = n.Id,
                     Name = n.Name
                 }).ToList();
+        }
+
+        public void ReleaseProductExcludedFromInvoice(int productId)
+        {
+            var product = dbContext.Products
+                .Where(i => i.Id == productId)
+                .FirstOrDefault();
+
+            product.LoadedQuantityM3 = product.OrderedQuantity;
+            product.DocumentId = null;
+            dbContext.SaveChanges();
         }
     }
 }

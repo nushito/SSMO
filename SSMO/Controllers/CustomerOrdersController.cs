@@ -155,8 +155,6 @@ namespace SSMO.Controllers
             return RedirectToAction("AddOrderProducts", new { CustomerOrderId = customerorderId });
         }
 
-
-
         public IActionResult AddOrderProducts()
         {
 

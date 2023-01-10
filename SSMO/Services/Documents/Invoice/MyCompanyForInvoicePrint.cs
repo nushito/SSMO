@@ -14,7 +14,6 @@ namespace SSMO.Services.Documents.Invoice
         [Required]
         [StringLength(11, MinimumLength = 11, ErrorMessage = "VAT number should be 11 symbols long.")]
         public string VAT { get; set; }
-
         [Required]
         public string Country { get; set; }
         [Required]

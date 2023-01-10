@@ -59,6 +59,7 @@ namespace SSMO.Data.Models
         public int? Vat { get; set; }
         public decimal Amount { get; set; }
         public decimal TotalAmount { get; set; }
-        public  ICollection<Product> Products { get; set; }
+        public ICollection<Product> Products { get; set; }
+        public ICollection<Product> PurchaseProducts { get; set; }
     }
 }

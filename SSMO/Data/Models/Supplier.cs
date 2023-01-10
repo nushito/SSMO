@@ -18,11 +18,8 @@ namespace SSMO.Data.Models
         [Required]
         public string Name { get; set; }
         [Required]
-        [StringLength(9,ErrorMessage ="Your EIK is not valid")]
         public string Eik { get; set; }
         [Required]
-        [StringLength(11, ErrorMessage = "Your EIK is not valid")]
-
         public string VAT { get; set; }
 
         [DataType(DataType.EmailAddress)]

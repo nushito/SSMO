@@ -10,11 +10,7 @@ namespace SSMO.Models.Customers
         [Display(Name = "Customer")]
         public string Name { get; set; }
         public string BgCustomerName { get; set; }
-        [Required]
-        [StringLength(11)]
         public string VAT { get; set; }
-        [Required]
-        [StringLength(11)]
         public string EIK { get; set; }
         [Display(Name ="Representative person")]
         public string RepresentativePerson { get; set; }

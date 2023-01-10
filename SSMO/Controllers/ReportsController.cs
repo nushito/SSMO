@@ -6,7 +6,7 @@ using SSMO.Infrastructure;
 using SSMO.Models.Products;
 using SSMO.Models.Reports;
 using SSMO.Models.Reports.CustomerOrderReportForEdit;
-using SSMO.Models.Reports.Invoice;
+using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
@@ -23,6 +23,7 @@ using SSMO.Services.Status;
 using SSMO.Services.SupplierOrders;
 using System.Collections.Generic;
 using System.Linq;
+using SSMO.Models.Reports.Invoice;
 
 namespace SSMO.Controllers
 {
@@ -232,7 +233,6 @@ namespace SSMO.Controllers
 			var customerId = int.Parse(id.ToString());
 			var selectedSuppliers = supplierService.GetSuppliersIdAndNames(customerId);
 			return Json(selectedSuppliers);
-
 		}
 		public IActionResult AllSupplierOrders(SupplierOrdersReportAll model)
         {
@@ -268,6 +268,7 @@ namespace SSMO.Controllers
 			var supplierOrderDetails = reportService.SupplierOrderDetail(id);
 			return View(supplierOrderDetails);
         }
+
         [HttpGet]
 		public IActionResult SupplierOrderEdit(int id)
         {
@@ -297,6 +298,7 @@ namespace SSMO.Controllers
 
 			return View(suppplierOrderForEdit);
 		}
+
         [HttpPost]
 		public IActionResult SupplierOrderEdit(SupplierOrderForEditModel model, int id)
         {
@@ -610,23 +612,55 @@ namespace SSMO.Controllers
             {
 				return BadRequest();
             }
+
 			var myCompanyNames = myCompanyService.GetCompaniesNames();
 			model.MyCompanyNames = myCompanyNames;
 
 			var invoiceCollection = reportService.InvoiceCollection(model.MyCompanyName, model.CurrentPage, InvoicesViewModel.InvoicesPerPage);
 			model.InvoiceCollection = invoiceCollection;
-
+			model.TotalInvoices = invoiceCollection.Count();
+			
 			return View(model);
         }
 
-		public IActionResult InvoiceDetails(int id)
-        {
-			return View();
-        }
-
+        [HttpGet]
 		public IActionResult EditInvoice(int id)
         {
-			return View();
-        }
+			string userId = this.User.UserId();
+			var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+			if (!mycompaniesUserId.Contains(userId))
+			{
+				return BadRequest();
+			}
+
+			var invoiceToEdit = invoiceService.ViewEditInvoice(id);
+			return View(invoiceToEdit);
+		}
+
+		[HttpPost]
+		public IActionResult EditInvoice(int id, EditInvoiceViewModel model)
+		{
+			//TODO Can i make this global
+			string userId = this.User.UserId();
+			var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+			if (!mycompaniesUserId.Contains(userId))
+			{
+				return BadRequest();
+			}
+			var checkEditableInvoice = invoiceService.EditInvoice
+				(id, model.CurrencyExchangeRate, model.Date, model.GrossWeight, model.NetWeight,
+				model.DeliveryCost, model.OrderConfirmationNumber, model.TruckNumber);
+
+			if(!checkEditableInvoice) return BadRequest();
+
+            return RedirectToAction("InvoiceDetails", new { Id = id });
+		}
+
+		public IActionResult InvoiceDetails(int id)
+		{
+			var invoiceDetails = reportService.InvoiceDetails(id);
+			return View(invoiceDetails);
+		}
+
 	}
 }

@@ -234,7 +234,6 @@ namespace SSMO.Controllers
             return View(invoiceForPrint);
         }
        
-        //TODO Bank Details on the invoice
         public IActionResult BgInvoice(int documentNumber, decimal currencyExchangeRateUsdToBGN)
         {
             if (!User.Identity.IsAuthenticated)

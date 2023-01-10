@@ -517,17 +517,18 @@ namespace SSMO.Services.Reports
 
         public IEnumerable<InvoiceCollectionViewModel> InvoiceCollection(string myCompanyName, int currentpage, int invoicesPerPage)
         {
-            if (myCompanyName == null) return null;
+            if (myCompanyName == null) return new List<InvoiceCollectionViewModel>();
 
             var companyId = myCompanyService.GetMyCompanyId(myCompanyName);
 
             var invoices = dbcontext.Documents
                 .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Invoice)
-                .Where(m => m.MyCompanyId == companyId)
-                .ToList();
-            var invoiceDetailsCollection = new List<InvoiceCollectionViewModel>();
+                .Where(m => m.MyCompanyId == companyId);
+               // .ToList();
 
-            foreach (var invoice in invoices)
+            var invoiceDetailsCollection = invoices.ProjectTo<InvoiceCollectionViewModel>(this.mapper).ToList(); 
+
+            foreach (var invoice in invoiceDetailsCollection)
             {
                 var customerOrderNumber = customerOrderService.CustomerOrderNumberById(invoice.CustomerOrderId);
                 var customerName = dbcontext.Customers
@@ -536,23 +537,83 @@ namespace SSMO.Services.Reports
                     .FirstOrDefault();
 
                 var supplierName = supplierService.SupplierNameById(invoice.SupplierOrderId);
-
-                invoiceDetailsCollection.Add(new InvoiceCollectionViewModel
-                { 
-                    Id = invoice.Id,
-                    CustomerId = invoice.CustomerId,
-                    DocumentNumber = invoice.DocumentNumber,
-                    Date = invoice.Date,
-                    TotalAmount = invoice.TotalAmount,
-                    SupplierOrderId = invoice.SupplierOrderId,
-                    DeliveryTerms = invoice.Incoterms,
-                    OrderConfirmationNumber = customerOrderNumber,
-                    CustomerOrderId = invoice.CustomerOrderId,
-                    CustomerName = customerName,
-                    SupplierName = supplierName
-                });
+                invoice.SupplierName = supplierName;
+                invoice.OrderConfirmationNumber = customerOrderNumber;
+                invoice.CustomerName = customerName;    
             }
-            return invoiceDetailsCollection;
+
+            var invoiceCollection = invoiceDetailsCollection.Skip((currentpage - 1) * invoicesPerPage).Take(invoicesPerPage);
+
+            return invoiceCollection;
+        }
+
+        public InvoiceDetailsViewModel InvoiceDetails(int id)
+        {
+            var invoice = dbcontext.Documents
+                .Where(i => i.Id == id);
+
+            var invoiceDetails = invoice.ProjectTo<InvoiceDetailsViewModel>(mapper).FirstOrDefault();
+
+            if (invoice == null) return null;
+
+            var products = dbcontext.Products
+                .Where(inv => inv.DocumentId == id);
+
+            var productsDetails = products.ProjectTo<InvoiceProductsDetailsViewModel>(mapper).ToList();
+
+            foreach (var product in productsDetails)
+            {
+                product.Description = productService.GetDescriptionName(product.DescriptionId);
+                product.Size = productService.GetSizeName(product.SizeId);
+                product.Grade = productService.GetGradeName(product.GradeId);
+            }
+
+            invoiceDetails.Products = productsDetails;
+
+            var seller = dbcontext.MyCompanies
+                .Where(i => i.Id == invoiceDetails.MyCompanyId);
+
+            if (seller == null) return null;
+
+            invoiceDetails.Seller = seller.ProjectTo<MyCompanyInvoiceDetailsModel>(mapper).FirstOrDefault();
+
+            var sellerAddress = dbcontext.Addresses
+                .Where(i => i.Id == invoiceDetails.Seller.AddressId)
+                .FirstOrDefault();
+            invoiceDetails.Seller.Street = sellerAddress.Street;
+            invoiceDetails.Seller.City = sellerAddress.City;
+            invoiceDetails.Seller.Country = sellerAddress.Country;
+
+            var bankDetails = dbcontext.BankDetails
+                .Where(i => i.CompanyId == invoiceDetails.MyCompanyId);
+
+            var invoiceBankDetails = bankDetails.ProjectTo<InvoiceBankDetailsModel>(mapper).ToList();
+
+            foreach (var bankDetail in invoiceBankDetails)
+            {
+               bankDetail.CurrencyName = dbcontext.Currencys
+                    .Where(i => i.Id == bankDetail.CurrencyId)
+                    .Select(n => n.Name)
+                    .FirstOrDefault();
+            }
+
+            invoiceDetails.CompanyBankDetails = invoiceBankDetails;
+
+            var customer = dbcontext.Customers
+                .Where(i => i.Id == invoiceDetails.CustomerId);
+            if (customer == null) return null;
+
+            invoiceDetails.Customer = customer.ProjectTo<InvoiceCustomerDetailsModel>(mapper).FirstOrDefault();
+
+            var customerAddress = dbcontext.Addresses
+                .Where(i => i.Id == invoiceDetails.Customer.AddressId)
+                .FirstOrDefault();
+
+            invoiceDetails.Customer.Street = customerAddress.Street;
+            invoiceDetails.Customer.City = customerAddress.City;
+            invoiceDetails.Customer.Country = customerAddress.Country;
+                
+            return invoiceDetails;  
         }
     }
 }

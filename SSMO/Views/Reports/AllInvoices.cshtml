@@ -28,7 +28,7 @@
         previouspage = 1;
     }
 
-    var maxpage = Math.Ceiling((double)Model.TotalInvoices / InvoicesViewModel.InvoicesPerPage);
+    var maxpage = Math.Ceiling((double)Model.TotalInvoices/InvoicesViewModel.InvoicesPerPage);
 }
 
 <div class="row mb-5">
@@ -56,64 +56,60 @@
     </div>
 </div>
 
-<div class="container">
-   <div class="row">
-        <div class="col">
-          Invoice Number
-        </div>
-        <div class="col">
-         Date
-        </div>
-         <div class="col">
-         Customer
-        </div>
-        <div class="col">
-         Customer OC No
-        </div>
-         <div class="col">
-         Delivery Terms
-        </div>
-         <div class="col">
-         Invoice Amount
-        </div>
-        <div class="col">
-          Supplier
-        </div>
-        </div>
-<hr />
-<br />
-</div>
-<div class="container">
-@foreach(var order in Model.InvoiceCollection)
-{
-    <div class="row">
-        <div class="col">
-            @order.DocumentNumber
-        </div>
-          <div class="col">
-            @order.Date
-        </div>
-         <div class="col">
-            @order.CustomerName
-        </div>
-         <div class="col">
-           @order.OrderConfirmationNumber
-        </div>
-         <div class="col">
-           @order.DeliveryTerms
-        </div>
-     <div class="col">
-           @order.TotalAmount
-    </div>
-     <div class="col">
-           @order.TotalAmount
-    </div>
-       <div class="col">
-           @order.SupplierName
-    </div>
-    <a asp-controller="Reports" asp-action="InvoiceDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>  
-    <a asp-controller="Reports" asp-action="EditInvoice" asp-route-id="@order.Id" class="btn btn-info mr-1">Edit</a>  
-    </div>
-    <hr />
-}
-</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Invoice Number
+            </th>
+            <th>
+                Date
+            </th>
+            <th>
+                Customer
+            </th>
+            <th>
+                Customer OC No
+            </th>
+            <th>
+                Delivery Terms
+            </th>
+            <th>
+                Invoice Amount
+            </th>
+            <th>
+                Supplier
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var order in Model.InvoiceCollection)
+        {
+            <tr>
+                <th>
+                    @order.DocumentNumber
+                </th>
+                <th>
+                    @order.Date
+                </th>
+                <th>
+                    @order.CustomerName
+                </th>
+                <th>
+                    @order.OrderConfirmationNumber
+                </th>
+                <th>
+                    @order.Incoterms
+                </th>
+                <th>
+                    @order.TotalAmount
+                </th>
+                <th>
+                    @order.SupplierName
+                </th>
+                <th><a asp-controller="Reports" asp-action="InvoiceDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a></th>
+                <th> <a asp-controller="Reports" asp-action="EditInvoice" asp-route-id="@order.Id" class="btn btn-info mr-1">Edit</a> </th>
+            </tr>
+        }
+    </tbody>
+</table>

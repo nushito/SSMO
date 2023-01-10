@@ -49,8 +49,9 @@ namespace SSMO.Data.Models
         public int? SupplierOrderId { get; set; }
         public SupplierOrder SupplierOrder { get; set; }
         public int? DocumentId { get; set; }
-        public int? PurchaseDocumentId { get; set; }
         public Document Document { get; set; }
+        public int? PurchaseDocumentId { get; set; }
+        public Document PurchaseDocument { get; set; }
 
         [Column(TypeName = "decimal(18,4)")]
         public decimal? PurchaseTransportCost { get; set; }

@@ -228,6 +228,18 @@ namespace SSMO.Data
                 .HasForeignKey(s => s.SupplierOrderId)
                 .IsRequired(false);
 
+            builder.Entity<Product>()
+                .HasOne(d=>d.Document)
+                .WithMany(a=>a.Products)
+                .HasForeignKey(a=>a.DocumentId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            builder.Entity<Product>()
+               .HasOne(d => d.PurchaseDocument)
+               .WithMany(a => a.PurchaseProducts)
+               .HasForeignKey(a => a.PurchaseDocumentId)
+               .OnDelete(DeleteBehavior.ClientSetNull);
+
             builder.Entity<Document>()
                 .HasOne(i => i.MyCompany)
                 .WithMany(a => a.Documents)
@@ -332,7 +344,7 @@ namespace SSMO.Data
                .WithMany(d => d.Documents)
                .HasForeignKey(s => s.SupplierId)
                .OnDelete(DeleteBehavior.Restrict);
-
+          
             builder.Entity<Supplier>()
                 .HasOne(a => a.Address)
                 .WithMany(a => a.Suppliers)

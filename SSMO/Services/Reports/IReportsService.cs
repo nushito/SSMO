@@ -48,5 +48,7 @@ namespace SSMO.Services.Reports
 
         public IEnumerable<InvoiceCollectionViewModel> InvoiceCollection(string myCompanyName, int currentpage, int invoicesPerPage);
 
+        public InvoiceDetailsViewModel InvoiceDetails(int id);
+
     }
 }

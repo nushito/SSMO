@@ -8,7 +8,7 @@ namespace SSMO.Models.Reports.Invoice
         public int DocumentNumber { get; set; }
         public DateTime Date { get; set; }
         public decimal TotalAmount { get; set; }
-        public string DeliveryTerms { get; set; }
+        public string Incoterms { get; set; }
         public int SupplierOrderId { get; set; }
         public string SupplierName { get; set; }
         public int? CustomerId { get; set; }

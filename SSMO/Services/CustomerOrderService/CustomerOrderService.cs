@@ -99,7 +99,6 @@ namespace SSMO.Services.CustomerOrderService
             return dbContext.CustomerOrders.Where(a => a.OrderConfirmationNumber == number).FirstOrDefault();
         }
 
-
         public bool AnyCustomerOrderExist()
         {
             var anyCustomerOrders = dbContext.CustomerOrders.Any();

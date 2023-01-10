@@ -96,7 +96,7 @@ namespace SSMO.Services.Documents.Purchase
                 product.LoadedQuantityM3 = product.OrderedQuantity;
                 product.CostPrice = (product.Amount + (expenses / supplierOrder.TotalQuantity * product.LoadedQuantityM3)) / product.LoadedQuantityM3;
                 product.PurchaseDocumentId = purchase.Id;
-                purchase.Products.Add(product);
+                purchase.PurchaseProducts.Add(product);
             }
             dbContext.SaveChanges();
             return true;
@@ -133,7 +133,6 @@ namespace SSMO.Services.Documents.Purchase
             var purchase = dbContext.Documents
                 .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Purchase && type.Number.ToLower() == number.ToLower());
 
-
             var purchaseForEdit = purchase.ProjectTo<EditPurchasePaymentDetails>(mapper).FirstOrDefault();
 
             return purchaseForEdit;
@@ -145,7 +144,6 @@ namespace SSMO.Services.Documents.Purchase
             {
                 return new List<PurchaseModelAsPerSpec>();
             }
-
 
             var supplierId = dbContext.Suppliers.Where(a => a.Name.ToLower() == supplierName.ToLower())
                 .Select(a => a.Id).FirstOrDefault();

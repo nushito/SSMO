@@ -8,6 +8,7 @@ using SSMO.Models.Documents.Packing_List;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Models.Reports;
+using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using SSMO.Models.Suppliers;
@@ -24,14 +25,16 @@ namespace SSMO.Infrastructure
         {
             this.CreateMap<Customer, AddCustomerFormModel>();
             this.CreateMap<Customer, EditCustomerFormModel>();
+            this.CreateMap<Customer, InvoiceCustomerDetailsModel>();
 
             this.CreateMap<MyCompany, MyCompanyFormModel>();
             this.CreateMap<MyCompany, MyCompaniesForReportViewModel>();
+            this.CreateMap<MyCompany, MyCompanyInvoiceDetailsModel>();
 
             this.CreateMap<CustomerOrder, CustomerOrderViewModel>();
             this.CreateMap<CustomerOrder, CustomerOrderDetailsModel>();
             this.CreateMap<CustomerOrder, CustomerOrderDetailsPaymentModel>();
-            this.CreateMap<CustomerOrder, EditCustomerOrderPaymentModel>();
+            this.CreateMap<CustomerOrder, EditCustomerOrderPaymentModel>();           
 
             this.CreateMap<Product, ProductCustomerFormModel>()
                 .ForMember(a=>a.OrderedQuantity, b=>b.MapFrom(a=>a.OrderedQuantity))
@@ -47,8 +50,8 @@ namespace SSMO.Infrastructure
                 .ForMember(a => a.Price, b => b.MapFrom(a => a.Price));
             this.CreateMap<Product, ProductsForEditSupplierOrder>();
             this.CreateMap<Product, BGProductsForBGInvoiceViewModel>();
-
-          
+            this.CreateMap<Product, InvoiceProductsDetailsViewModel>();
+            this.CreateMap<Product, InvoiceProductsDetailsViewModel>();          
 
             this.CreateMap<Status, StatusModel>();
 
@@ -59,17 +62,20 @@ namespace SSMO.Infrastructure
             this.CreateMap<SupplierOrder, SupplierOrderDetailsModel>()
                 .ForMember(a => a.SupplierOrderNumber, b => b.MapFrom(a => a.Number));
 
-
             this.CreateMap<Document, InvoicePrintViewModel>();
             this.CreateMap<Document, EditInvoicePaymentModel>();
             this.CreateMap<Document, SupplierInvoicePaymentDetailsModel>();
             this.CreateMap<Document, CustomerInvoicePaymentDetailsModel>();
+            this.CreateMap<Document, InvoiceCollectionViewModel>();
+            this.CreateMap<Document, InvoiceDetailsViewModel>();
+
            
             this.CreateMap<Address, CustomerForEditAddressFormModel>();
             this.CreateMap<Address, EditSupplierAddressFormModel>();
 
             this.CreateMap<Supplier, EditSupplierFormModel>();
-           
+
+            this.CreateMap<BankDetails, InvoiceBankDetailsModel>();
            
         }
     }

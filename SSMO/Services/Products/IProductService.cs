@@ -20,9 +20,7 @@ namespace SSMO.Services.Products
         public IEnumerable<string> GetDescriptions();
         public IEnumerable<string> GetSizes();
         public IEnumerable<string> GetGrades();
-
         public IEnumerable<ProductSupplierDetails> Details(int customerId);
-
         public bool EditProduct(int id, int customerorderId,
             int supplierOrderId,
             string description, string grade,
@@ -31,16 +29,15 @@ namespace SSMO.Services.Products
         public ICollection<ProductCustomerFormModel> DetailsPerCustomerOrder(int id);
         public ICollection<ProductsForEditSupplierOrder> ProductsDetailsPerSupplierOrder(int supplierOrderId);
         public ICollection<string> GetFascCertMyCompany();
-
         public string GetDescriptionName(int id);
         public string GetGradeName(int id);
         public string GetSizeName(int id);
         public decimal CalculateDeliveryCostOfTheProductInCo(decimal quantity, decimal totalQuantity, decimal deliveryCost);
 
         public void ClearProductQuantityWhenDealIsFinished(int productId);
+        public void ReleaseProductExcludedFromInvoice(int productId);
         public IEnumerable<ProductAvailabilityDetailsViewModel> ProductsOnStock
             (int descriptionId, int gradeId, int sizeId, int currentPage, int productsPerPage);
-
         public ICollection<DescriptionForProductSearchModel> DescriptionIdAndNameList();
         public ICollection<SizeForProductSearchModel> SizeIdAndNameList();
         public ICollection<GradeForProductSearchModel> GradeIdAndNameList();
