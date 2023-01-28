@@ -13,6 +13,7 @@ namespace SSMO.Models.Documents.Packing_List
         public string GradeName { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
+        public string Unit { get; set; }
         public int CustomerOrderId { get; set; }
 
         [Range(0.0, 9999999999999.99999)]

@@ -14,14 +14,8 @@
         <div class="col-xl-3 float-end">
           <a class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark"><i
               class="fas fa-print text-primary"></i> Print</a>
-          <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark"><i
-              class="far fa-file-pdf text-danger"></i> Export</a>
-               <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" 
-               asp-controller="Documents" 
-               asp-action="BgInvoice"
-               asp-route-documentNumber="@Model.DocumentNumber"
-               asp-route-currencyExchangeRateUsdToBGN = "@Model.CurrencyExchangeRateUsdToBGN"><i
-              class="far fa-file-pdf text-danger"></i> BG</a>
+          <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" ><i
+              class="far fa-file-pdf text-danger"></i> Export</a>              
         </div>
         <hr>
       </div>
@@ -83,6 +77,7 @@
                                 <th scope="col">Size</th>
                                 <th scope="col">FSC Claim</th>
                                 <th scope="col">FSC Certificate</th>
+                                <th scope="col">Unit</th>
                                 <th scope="col">Qty</th>
                                 <th scope="col">Unit Price</th>
                                 <th scope="col">Amount</th>
@@ -99,6 +94,7 @@
                                     <td>@product.Size</td>
                                     <td>@product.FSCClaim</td>
                                     <td>@product.FSCSertificate</td>
+                                    <td>@product.Unit</td>
                                     <td>@product.OrderedQuantity</td>
                                     <td>@product.Price</td>
                                     <td>@product.Amount.ToString("N2")</td>

@@ -41,12 +41,17 @@
     </div>
 
     <div class="row col-md-4">
-        <label asp-for="Date">Date of the Invoice</label>
-        <input asp-for="Date" type="date" class="form-control" id="datepicker" >
+        <label asp-for="Date" >Date of the Invoice</label>
+        <input itemid="date" asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
+        <span asp-validation-for="Date" class="small text-danger"></span>
     </div>
      <div class="row col-md-4">
         <label asp-for="TruckNumber">Truck Number</label>
         <input asp-for="TruckNumber" type="text" class="form-control">
+    </div>
+     <div class="row col-md-4">
+        <label asp-for="Swb">Swb</label>
+        <input asp-for="Swb" type="text" class="form-control">
     </div>
        <div class="row col-md-4">
         <label asp-for="DeliveryCost">Delivery Cost</label>

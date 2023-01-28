@@ -8,11 +8,13 @@ namespace SSMO.Models.CustomerOrders
     {
         public int OrderConfirmationNumber { get; set; }
         public DateTime Date { get; set; }
+        public string Currency { get; set; }
         public decimal CurrencyExchangeRateUsdToBGN { get; set; }
         public string MyCompanyName { get; set; }
         public IEnumerable<string> MyCompanyNames { get; set; }
         public int? Number { get; set; }
         public string TruckNumber { get; set; }
+        public string Swb { get; set; }
         public decimal DeliveryCost { get; set; }
         public decimal GrossWeight { get; set; }
         public decimal NetWeight { get; set; }

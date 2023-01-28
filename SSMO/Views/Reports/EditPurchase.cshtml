@@ -1,0 +1,103 @@
+﻿@model EditPurchaseViewModel
+@{
+    ViewBag.Title = "Edit Purchase";
+}
+<form method="post">
+    <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="SupplierOrderId"></label>
+        <select asp-for="SupplierOrderId" class="form-control">
+            <option value="@Model.SupplierOrderId"></option>
+            @foreach (var order in Model.SupplierOrders)
+            {
+                <option value="@order.Id">@order.Number</option>
+            }
+        </select>
+    </div>
+    <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="Number">Number Invoice</label>
+        <input asp-for="Number" type="text" class="form-control" >
+        <span asp-validation-for="Number" class="small text-danger"></span>
+    </div>
+    <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="Date">Date</label>
+        <input asp-for="Date" type="date" class="form-control" >
+        <span asp-validation-for="Date" class="small text-danger"></span>
+    </div>   
+     <div class="form-group offset-3 mb-2 col-md-3">  
+       <label class="form-check-label" asp-for="Vat"> VAT </label>    
+       <input class="form-control" min="0" step="1" type="number" asp-for="Vat">
+    </div>
+      <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="TruckNumber">Truck Number</label>
+        <input asp-for="TruckNumber" type="text" class="form-control" >
+        <span asp-validation-for="TruckNumber" class="small text-danger"></span>
+    </div>
+     <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="Swb">SWB</label>
+        <input asp-for="Swb" type="text" class="form-control" >
+        <span asp-validation-for="Swb" class="small text-danger"></span>
+    </div>
+    <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="NetWeight">Net Weight</label>
+        <input asp-for="NetWeight"min="0.0000" step="0.0001" type="number" class="form-control" >
+        <span asp-validation-for="NetWeight" class="small text-danger"></span>
+    </div>
+
+     <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="GrossWeight">Gross Weight</label>
+        <input asp-for="GrossWeight" min="0.0000" step="0.0001" type="number" class="form-control" >
+        <span asp-validation-for="GrossWeight" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="Duty">Duty</label>
+        <input asp-for="Duty" min="0.0000" step="0.0001" type="number" class="form-control" >
+        <span asp-validation-for="Duty" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="Factoring">Factoring %</label>
+        <input asp-for="Factoring" min="0.0000" step="0.0001" type="number" class="form-control" >
+        <span asp-validation-for="Factoring" class="small text-danger"></span>
+    </div>
+
+    <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="CustomsExpenses">Customs Expenses</label>
+        <input asp-for="CustomsExpenses" min="0.0000" step="0.0001" type="number" class="form-control" >
+        <span asp-validation-for="CustomsExpenses" class="small text-danger"></span>
+    </div>
+
+        <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="FiscalAgentExpenses">Fiscal Agent Expenses</label>
+        <input asp-for="FiscalAgentExpenses" min="0.0000" step="0.0001" type="number" class="form-control" >
+        <span asp-validation-for="FiscalAgentExpenses" class="small text-danger"></span>
+    </div>
+
+     <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="ProcentComission">Comission %</label>
+        <input asp-for="ProcentComission" min="0.0000" step="0.0001" type="number" class="form-control" >
+        <span asp-validation-for="ProcentComission" class="small text-danger"></span>
+    </div>
+
+     <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="PurchaseTransportCost">Transport Cost</label>
+        <input asp-for="PurchaseTransportCost" min="0.0000" step="0.0001" type="number" class="form-control" >
+        <span asp-validation-for="PurchaseTransportCost" class="small text-danger"></span>
+    </div>
+
+     <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="BankExpenses">Bank Expenses</label>
+        <input asp-for="BankExpenses" min="0.0000" step="0.0001" type="number" class="form-control" >
+        <span asp-validation-for="BankExpenses" class="small text-danger"></span>
+    </div>
+
+     <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="OtherExpenses">Other Expenses </label>
+        <input asp-for="OtherExpenses" min="0.0000" step="0.0001" type="number" class="form-control" >
+        <span asp-validation-for="OtherExpenses" class="small text-danger"></span>
+    </div>
+
+        <input type="submit" class="btn btn-primary text-center" value="Save">
+        <br />
+
+</form>

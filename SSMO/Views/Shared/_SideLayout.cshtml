@@ -13,6 +13,7 @@
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CustomerOrderToInvoice">Invoice</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="ChoosePackingListForPrint">Packing list</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="ChooseBgInvoice"> Bg Invoice</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateOrder">Debit Note</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="CreateCreditNote">Credit Note</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Documents" asp-action="AddPurchase">Purchase</a>
@@ -62,7 +63,7 @@
                         </a>
                     </li>
 
-                     <li>
+                    <li class="nav-item active mb-1">
                         <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Customers
@@ -73,8 +74,8 @@
                             </div>
                         </div>
                     </li>
-                    <p></p>
-                     <li>
+                
+                         <li class="nav-item active">
                         <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Suppliers
@@ -124,6 +125,12 @@
                         <a href="~/Reports/CustomerOrdersBySupplier" class="nav-link">
                             <i class="fas fa-fw fa-tachometer-alt"></i>
                             <span>Customer Orders by Supplier</span>
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a href="~/Reports/AllPurchases" class="nav-link">
+                            <i class="fas fa-fw fa-tachometer-alt"></i>
+                           <span>Purchase Invoices Reports</span>
                         </a>
                     </li>
 

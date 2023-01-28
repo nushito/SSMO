@@ -1,4 +1,5 @@
-﻿using SSMO.Models.Products;
+﻿using SSMO.Models.Documents.Purchase;
+using SSMO.Models.Products;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Services.Documents.Purchase;
 using System;
@@ -18,13 +19,13 @@ namespace SSMO.Services.SupplierOrders
                 string loadingAddress, string deliveryAddress, string deliveryTerms);
         void TotalAmountAndQuantitySum(int supplierOrderId);
 
-        public IEnumerable<string> GetSuppliers();
-
         public IEnumerable<SupplierOrdersPaymentDetailsModel> GetSupplierOrders(string supplierName);
 
         public EditSupplierOrderPaymentModel GetSupplierOrderForEdit(string supplierOrderNumber);
 
         public bool EditSupplierOrderPayment(string supplierOrderNumber, decimal paidAdvance, DateTime date, bool paidStatus);
+
+        public ICollection<SupplierOrdersListForPurchaseEditModel> GetSupplierOrdersNumbers();
 
     }
 }

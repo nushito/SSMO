@@ -29,6 +29,7 @@ namespace SSMO.Models.Documents.Purchase
         public decimal Factoring { get; set; }
         public decimal FiscalAgentExpenses { get; set; }
         public string TruckNumber { get; set; }
+        public string Swb { get; set; }
         public int Vat { get; set; }
         public decimal ProcentComission { get; set; }
         public decimal OtherExpenses { get; set; }

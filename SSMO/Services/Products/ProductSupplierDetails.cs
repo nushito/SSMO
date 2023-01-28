@@ -16,10 +16,10 @@ namespace SSMO.Services.Products
         public IEnumerable<string> Grades { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
+        public string Unit { get; set; }
         public string PurchaseFscClaim { get; set; }
         public string PurchaseFscCertificate { get; set; }
         public decimal Price { get; set; }
-
         public decimal PurchasePrice { get; set; }
         public decimal QuantityM3 { get; set; }
         public int Pallets { get; set; }

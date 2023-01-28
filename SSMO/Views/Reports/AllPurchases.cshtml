@@ -1,0 +1,158 @@
+﻿@model PurchaseInvoisecBySupplierModel
+
+@{
+    ViewBag.Title = "Purchase Invoices";
+}
+
+<form class="get">
+    <div class="row">
+        <div class="col-3">
+             <label asp-for="Supplier">Select Supplier</label>
+             <select asp-for="Supplier" class="form-control">
+             <option value="">All</option>
+                @foreach (var supplier in Model.Suppliers)
+                {
+                <option value="@supplier">@supplier</option>
+                }
+             </select>
+        </div>
+         <div class="col-3">
+             <label asp-for="StartDate">Start Date</label>
+             <input itemid="date" asp-for="StartDate" name="Date" type="date" id="datepicker" class="form-control"/> 
+             <span asp-validation-for="StartDate" class="small text-danger"></span>
+        </div>
+         <div class="col-3">
+             <label asp-for="EndDate" >End Date</label>
+              <input itemid="date" asp-for="EndDate" name="Date" type="date" id="datepicker" class="form-control"/> 
+             <span asp-validation-for="EndDate" class="small text-danger"></span>
+        </div>
+    </div>
+    <hr />
+    <div class="row">
+         <input type="submit" class="btn btn-info" value="Search"/>
+    </div>   
+<br />
+</form>
+<hr />
+
+@{
+    var previousPage = Model.CurrentPage - 1;
+
+    if (previousPage < 1)
+    {
+        previousPage = 1;
+    }
+
+    var maxPage = Math.Ceiling((decimal)Model.TotalPurchaseInvoices / PurchaseInvoisecBySupplierModel.PurchaseInvoicesPerPage);
+}
+<div class="row mb-5">
+    <div class="col-md-6">
+        <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
+        asp-controller="Reports"
+        asp-action="AllPurchase"
+        asp-route-currentPage="previousPage"
+        asp-route-supplierName="@Model.Supplier"
+        asp-route-startDate="@Model.StartDate"
+        asp-route-endDate ="@Model.EndDate"><<</a>
+    </div>
+    @{
+        var shouldButtonBeDisabled = Model.CurrentPage == maxPage || !Model.InvoiceCollection.Any();
+    }
+    <div class="col-md-6">
+        <a class="btn btn-primary @(shouldButtonBeDisabled ? "disable" : string.Empty)"
+        asp-controller="Reports"
+        asp-action="AllPurchase"
+        asp-route-currentPage="@Model.CurrentPage+1"
+        asp-route-supplierName="@Model.Supplier"
+        asp-route-startDate="@Model.StartDate"
+        asp-route-endDate ="@Model.EndDate">>></a>
+    </div>
+</div>
+<hr />
+
+<div class="table-responsive">
+    <table class="table">
+    <thead>
+        <tr>
+            <th>
+                Supplier Name
+            </th>
+            <th>
+                Invoice No
+            </th>
+            <th>
+                Date
+            </th>
+             <th>
+                Amount
+            </th>
+            <th>
+                Delivery Terms
+            </th>
+            <th>
+                Truck/Container No
+            </th>           
+            <th>
+                Supplier Order No
+            </th>
+            <th>
+                Customer Name
+            </th>
+            <th>
+                Customer OC
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+            @foreach (var item in Model.InvoiceCollection)
+            {
+                <tr>
+                    <td>
+                        @item.SupplierName
+                    </td>
+                    <td>
+                        @item.Number
+                    </td>
+                    <td>
+                        @item.Date
+                    </td>
+                    <td>
+                        @item.TotalAmount
+                    </td>
+                    <td>
+                        @item.Incoterms
+                    </td>
+                    <td>
+                        @item.TruckNumber
+                    </td>
+                    <td>
+                        @item.SupplierOrderNumber
+                    </td>
+                    <td>
+                        @item.CustomerName
+                    </td>
+                    <td>
+                        @item.OrderConfirmationNumber
+                    </td>
+                    <td>
+                        <a asp-controller="Reports" asp-action="PurchaseDetails" asp-route-id="@item.Id" class="btn btn-info mr-1">Details</a>
+                    </td>
+                    <td> 
+                        <a asp-controller="Reports" asp-action="EditPurchase" asp-route-id="@item.Id" class="btn btn-outline-info mr-1">Edit</a>
+                    </td>                 
+                       
+                </tr>
+            }
+    </tbody>
+</table>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("#datepicker").datepicker();
+    });
+</script>
+
+@section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+}

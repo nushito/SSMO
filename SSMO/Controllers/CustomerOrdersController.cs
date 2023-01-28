@@ -52,7 +52,6 @@ namespace SSMO.Controllers
             this.statusService = statusService;
         }
 
-
         [HttpGet]
         [Authorize]
         public IActionResult AddCustomerOrder()
@@ -67,7 +66,8 @@ namespace SSMO.Controllers
                 ViewBag.NumberExist = 1;
 
             }
-            return View(
+            return View
+            (
                 new CustomerOrderViewModel
                 {
                     Currencies = currency.AllCurrency(),
@@ -78,7 +78,7 @@ namespace SSMO.Controllers
                     Statuses = statusService.GetAllStatus()
                 }
 
-                );
+            );
         }
 
 
@@ -167,8 +167,8 @@ namespace SSMO.Controllers
                 {
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),
-                    Sizes = productService.GetSizes()
-
+                    Sizes = productService.GetSizes(),
+                    Units = productService.GetUnits()
                 };
                 products.Add(product);
             }
@@ -193,8 +193,8 @@ namespace SSMO.Controllers
                     {
                         Descriptions = productService.GetDescriptions(),
                         Grades = productService.GetGrades(),
-                        Sizes = productService.GetSizes()
-
+                        Sizes = productService.GetSizes(),
+                        Units = productService.GetUnits()
                     };
                     products.Add(product);
                 }
@@ -220,7 +220,6 @@ namespace SSMO.Controllers
         {
             return RedirectToAction("Index", "Home");
         }
-
 
     }
 }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Data;
+using SSMO.Data.Enums;
 using SSMO.Infrastructure;
 using SSMO.Models.Products;
 using SSMO.Models.SupplierOrders;
@@ -12,6 +13,7 @@ using SSMO.Services.MyCompany;
 using SSMO.Services.Products;
 using SSMO.Services.Status;
 using SSMO.Services.SupplierOrders;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -124,6 +126,11 @@ namespace SSMO.Controllers
         public IActionResult EditProductAsPerSupplier(
             int customerorderId, int supplierOrderId)
         {
+            string userId = this.User.UserId();
+            var myCompaniesUserId = myCompanyService.GetCompaniesUserId();
+
+            if(!myCompaniesUserId.Contains(userId)) return BadRequest();
+
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
@@ -135,7 +142,8 @@ namespace SSMO.Controllers
                 {
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),
-                    Sizes = productService.GetSizes()
+                    Sizes = productService.GetSizes(),
+                    Units = productService.GetUnits()
                 };
             }
 
@@ -164,13 +172,14 @@ namespace SSMO.Controllers
                     PurchaseFscClaim = product.PurchaseFscClaim,
                     SupplierFscCertNumber = supplierFscCert,
                     Pallets = product.Pallets,
-                    SheetsPerPallet = product.Pallets,
+                    SheetsPerPallet = product.SheetsPerPallet,
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),
                     Sizes = productService.GetSizes(),
                     CustomerOrderId = customerorderId,
                     SupplierOrderId = supplierOrderId,
-                    QuantityM3 = product.QuantityM3
+                    QuantityM3 = product.QuantityM3,
+                    Unit = product.Unit
                 };
 
                 listProducts.Add(productSupp);
@@ -195,7 +204,8 @@ namespace SSMO.Controllers
                 {
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),
-                    Sizes = productService.GetSizes()
+                    Sizes = productService.GetSizes(),
+                    Units= productService.GetUnits()
                 };
             }
 
@@ -217,7 +227,7 @@ namespace SSMO.Controllers
                 var check = productService.EditProduct(product.Id, customerorderId, supplierOrderId, product.Description, product.Grade,
                              product.Size, product.PurchaseFscCertificate, product.PurchaseFscClaim,
                              product.Pallets, product.SheetsPerPallet,
-                             product.PurchasePrice, product.QuantityM3);
+                             product.PurchasePrice, product.QuantityM3, product.Unit);
 
                 if (!check)
                 {

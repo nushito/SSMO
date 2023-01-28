@@ -14,7 +14,7 @@ namespace SSMO.Models.Documents.Packing_List
         public string FSCSertificate { get; set; }
         public int? MyCompanyId { get; set; }
         public decimal NetWeight { get; set; }
-        public decimal GrossWeight { get; set; }
+        public decimal GrossWeight { get; set; }        
         public string TruckNumber { get; set; }
         public MyCompanyForPackingPrint MyCompanyForPl { get; set; }
         public ICollection<ProductsForPackingListPrint> Products { get; set; }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using SSMO.Data;
+using SSMO.Data.Enums;
 using SSMO.Data.Models;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.ProductsStock;
@@ -21,7 +22,6 @@ namespace SSMO.Services.Products
             this.dbContext = dbContext;
             this.mapper = mapper.ConfigurationProvider;
         }
-
         public void CreateProduct(ProductCustomerFormModel model, int customerorderId)
         {
             var description = dbContext.Descriptions.Where(a => a.Name == model.Description).FirstOrDefault();
@@ -41,7 +41,8 @@ namespace SSMO.Services.Products
                 Pallets = model.Pallets,
                 SheetsPerPallet = model.SheetsPerPallet,
                 CustomerOrderId = customerorderId,
-                QuantityM3 = model.QuantityM3
+                QuantityM3 = model.QuantityM3,
+                Unit = Enum.Parse<Unit>(model.Unit)
             };
 
             var dimensionArray = size.Name.Split('/').ToArray();
@@ -148,7 +149,7 @@ namespace SSMO.Services.Products
             int supplierOrderId,
            string description, string grade,
             string size, string purchaseFscCert, string purchaseFscClaim,
-            int pallets, int sheetsPerPallet, decimal purchasePrice, decimal quantityM3)
+            int pallets, int sheetsPerPallet, decimal purchasePrice, decimal quantityM3, string unit)
         {
 
 
@@ -171,6 +172,7 @@ namespace SSMO.Services.Products
             product.SheetsPerPallet = sheetsPerPallet;
             product.PurchasePrice = purchasePrice;
             product.SupplierOrderId = supplierOrderId;
+            product.Unit = Enum.Parse<Unit>(unit);
 
             var dimensionArray = size.Split('/').ToArray();
             var countArray = dimensionArray.Count();
@@ -234,9 +236,7 @@ namespace SSMO.Services.Products
                 item.Grade = GetGradeName(item.GradeId);
                 item.Size = GetSizeName(item.SizeId);
             }
-
             return products;
-
         }
 
         public ICollection<string> GetFascCertMyCompany()
@@ -294,10 +294,9 @@ namespace SSMO.Services.Products
             {
                 item.Description = GetDescriptionName(item.DescriptionId);
                 item.Grade = GetGradeName(item.GradeId);
-                item.Size = GetSizeName(item.SizeId);
+                item.Size = GetSizeName(item.SizeId);              
             }
-
-            return products;
+            return products;       
         }
 
         public void ClearProductQuantityWhenDealIsFinished(int productId)
@@ -315,7 +314,7 @@ namespace SSMO.Services.Products
         }
 
         public IEnumerable<ProductAvailabilityDetailsViewModel> ProductsOnStock
-            (int descriptionId, int gradeId, int sizeId, int currentPage, int productsPerPage)
+            (int? descriptionId, int? gradeId, int? sizeId, int currentPage, int productsPerPage)
         {
             var products = dbContext.Products
                .Where(d => d.LoadedQuantityM3 != 0);
@@ -394,9 +393,10 @@ namespace SSMO.Services.Products
                     SheetsPerPallet = product.SheetsPerPallet,
                     OrderDate = order.Date,
                     PurchaseDate = purchase.Date,
-                    PurchaseNumber = purchase.Number,
+                    PurchaseNumber = purchase.PurchaseNumber,
                     Price = product.Price,
-                    SupplierName = supplierName
+                    SupplierName = supplierName,
+                    Unit = product.Unit.ToString()
                 };
                 productsOnStok.Add(availableProduct);
             }
@@ -444,6 +444,28 @@ namespace SSMO.Services.Products
             product.LoadedQuantityM3 = product.OrderedQuantity;
             product.DocumentId = null;
             dbContext.SaveChanges();
+        }
+
+        public void ResetToNullLoadingQuantityIfPurchaseIsChanged(int productId)
+        {
+            var product = dbContext.Products
+                .Where(i => i.Id == productId) .FirstOrDefault();
+
+            product.LoadedQuantityM3 = 0;    
+            product.PurchaseDocumentId = null;
+        }
+
+        public void NewLoadingQuantityToEditPurchase(int productId, int purchaseId)
+        {
+            var product = dbContext.Products
+                .Where(i => i.Id == productId).FirstOrDefault();
+
+            product.LoadedQuantityM3 = product.OrderedQuantity;
+            
+        }
+        public ICollection<string> GetUnits()
+        {
+           return Enum.GetNames(typeof(Unit));           
         }
     }
 }

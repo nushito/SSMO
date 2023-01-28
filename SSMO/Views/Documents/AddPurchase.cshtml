@@ -52,30 +52,37 @@
            asp-controller="Documents"
            asp-action="AddPurchase"
            asp-route-currentPage="@(Model.CurrentPage + 1)"
-           asp-route-supplierName="@Model.SupplierName"
+           asp-route-supplierName="@Model.SupplierName"          
            >>></a>
     </div>
 </div>
 
-
-<div class="container">
-@foreach(var order in Model.SupplierOrderNumbers)
-{
-    <div class="row">
-        <div class="col">
+<table class="table-bordered">
+    <thead>
+        <tr>
+            <th>
+                Supplier Order No
+            </th>
+            <th>
+                Date
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var order in Model.SupplierOrderNumbers)
+    {
+    <tr>
+       <td >
             @order.SupplierOrderNumber
-       </div>
-       <div class="col">
+       </td>
+       <td class="col">
             @order.Date
-       </div>
-  
-    <a asp-controller="Documents" asp-action="PurchaseDetails" asp-route-supplierOrderNumber="@order.SupplierOrderNumber" class="btn btn-outline-info btn-sm">Add Purchase Details</a>
-
- 
-
-    </div>
-    <hr />
-}
-</div>
-
-
+       </td>  
+       <td><a asp-controller="Documents" asp-action="PurchaseDetails" 
+       asp-route-supplierOrderNumber="@order.SupplierOrderNumber" 
+       class="btn btn-outline-info btn-sm">Add Purchase Details</a>
+       </td>
+    </tr>
+    }
+    </tbody>
+</table>

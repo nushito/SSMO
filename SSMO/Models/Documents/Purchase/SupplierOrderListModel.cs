@@ -10,7 +10,7 @@ namespace SSMO.Models.Documents.Purchase
         public int TotalSupplierOrders { get; set; }
         public string SupplierName { get; set; }
         public int SupplierOrderId { get; set; }
-        public IEnumerable<string> SupplierNames { get; set; }
+        public ICollection<string> SupplierNames { get; set; }
         public IEnumerable<PurchaseModelAsPerSpec> SupplierOrderNumbers { get; set; }
         
     }

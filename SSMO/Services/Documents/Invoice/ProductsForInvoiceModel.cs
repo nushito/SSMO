@@ -15,6 +15,7 @@ namespace SSMO.Services.Documents.Invoice
         [Required]
         public string Grade { get; set; }
         public IEnumerable<string> Grades { get; set; }
+        public string Unit { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
         public int CustomerOrderId { get; set; }

@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Infrastructure;
 using SSMO.Models.CustomerOrders;
+using SSMO.Models.Documents.BgInvoice;
 using SSMO.Models.Documents.Packing_List;
 using SSMO.Models.Documents.Purchase;
 using SSMO.Services;
@@ -12,6 +13,15 @@ using SSMO.Services.Documents.Purchase;
 using SSMO.Services.MyCompany;
 using SSMO.Services.SupplierOrders;
 using System;
+using System.IO;
+using IronPdf;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Components.RenderTree;
+using SSMO.Models.Documents.Invoice;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Hosting;
 
 namespace SSMO.Controllers
 {
@@ -24,25 +34,27 @@ namespace SSMO.Controllers
         private readonly IMycompanyService mycompanyService;
         private readonly IDocumentService documentService;
         private readonly ISupplierService supplierService;
-     
+        private readonly IHostingEnvironment _hostingEnv;
+
         public DocumentsController
-            (ISupplierOrderService supplierOrderService, 
+            (ISupplierOrderService supplierOrderService,
             IPurchaseService purchaseService, ICustomerOrderService customerOrderService,
-            IInvoiceService invoiceService, IMycompanyService mycompanyService, 
-            IDocumentService documentService, ISupplierService supplierService)
+            IInvoiceService invoiceService, IMycompanyService mycompanyService,
+            IDocumentService documentService, ISupplierService supplierService, IHostingEnvironment hosting)
         {
             this.supplierOrderService = supplierOrderService;
             this.purchaseService = purchaseService;
             this.customerOrderService = customerOrderService;
-            this.invoiceService = invoiceService;   
+            this.invoiceService = invoiceService;
             this.mycompanyService = mycompanyService;
             this.documentService = documentService;
             this.supplierService = supplierService;
+            hosting = _hostingEnv;
         }
 
         public IActionResult AddPurchase(SupplierOrderListModel model)
         {
-            if(model.SupplierName != null)
+            if (model.SupplierName != null)
             {
                 string userId = this.User.UserId();
                 var userIdMyCompany = mycompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
@@ -53,21 +65,21 @@ namespace SSMO.Controllers
                 }
 
             }
-            var suppliersList = this.supplierOrderService.GetSuppliers();
+            var suppliersList = this.supplierService.GetSupplierNames();
 
             var supplierOrdersList = this.purchaseService.GetSupplierOrdersForPurchase(
                 model.SupplierName, model.CurrentPage, SupplierOrderListModel.SupplierOrdersPerPage);
 
             model.SupplierOrderNumbers = supplierOrdersList;
-            model.SupplierNames = suppliersList;
+            model.SupplierNames = (System.Collections.Generic.ICollection<string>)suppliersList;
 
-            return View(model);  
+            return View(model);
         }
 
         [HttpGet]
         public IActionResult PurchaseDetails(string supplierOrderNumber)
         {
-            if(supplierOrderNumber != null)
+            if (supplierOrderNumber != null)
             {
                 string userId = this.User.UserId();
                 var userIdMyCompany = mycompanyService.GetUserIdMyCompanyBySupplierOrdreNum(supplierOrderNumber);
@@ -86,7 +98,7 @@ namespace SSMO.Controllers
             {
                 SupplierOrderNumber = supplierOrderNumber,
                 SupplierFSCCertificate = supplierService.GetSupplierFscCertificateByOrderNumber(supplierOrderNumber)
-        });
+            });
         }
 
         [HttpPost]
@@ -116,7 +128,7 @@ namespace SSMO.Controllers
                 return BadRequest();
             }
 
-            if(model.GrossWeight < model.NetWeight)
+            if (model.GrossWeight < model.NetWeight)
             {
                 ModelState.AddModelError("NetWeight", "Net Weight should be less than Gross Weight");
                 return View(model);
@@ -127,9 +139,9 @@ namespace SSMO.Controllers
                 model.PaidStatus, model.NetWeight,
                 model.GrossWeight, model.Duty, model.Factoring,
                 model.CustomsExpenses, model.FiscalAgentExpenses,
-                model.ProcentComission, model.PurchaseTransportCost, 
-                model.BankExpenses, model.OtherExpenses, model.Vat, 
-                model.TruckNumber,model.FSCSertificate, model.FSCClaim);
+                model.ProcentComission, model.PurchaseTransportCost,
+                model.BankExpenses, model.OtherExpenses, model.Vat,
+                model.TruckNumber, model.FSCSertificate, model.FSCClaim, model.Swb);
 
             if (!purchase)
             {
@@ -186,9 +198,9 @@ namespace SSMO.Controllers
                 new CustomerOrderNumbersListView
                 {
                     OrderConfirmationNumberList = customerOrderService.AllCustomerOrderNumbers(),
-                MyCompanyNames = mycompanyService.GetCompaniesNames()
+                    MyCompanyNames = mycompanyService.GetCompaniesNames()
 
-                 };
+                };
                 ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
             }
 
@@ -197,23 +209,22 @@ namespace SSMO.Controllers
                 {
                     orderConfirmationNumber = model.OrderConfirmationNumber,
                     date = model.Date,
-                    currencyExchangeRateUsdToBGN = model.CurrencyExchangeRateUsdToBGN,
                     number = model.Number,
+                    currencyExchangeRateUsdToBGN = model.CurrencyExchangeRateUsdToBGN,
                     mycompanyname = model.MyCompanyName,
                     truckNumber = model.TruckNumber,
                     deliveryCost = model.DeliveryCost,
-                    grossWeight = model.GrossWeight,
-                    netWeight = model.NetWeight
+                    swb = model.Swb
                 });
         }
 
         public IActionResult CreateInvoice(
-            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN, 
-            int number, string mycompanyname, string truckNumber, decimal deliveryCost, decimal grossWeight, decimal netWeight)
+            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN,
+          int number, string mycompanyname, string truckNumber, decimal deliveryCost, string swb)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(mycompanyname);
-           
+
             if (userIdMyCompany != userId)
             {
                 return BadRequest();
@@ -228,13 +239,43 @@ namespace SSMO.Controllers
             }
 
             var invoiceForPrint = invoiceService.CreateInvoice
-                (orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname,truckNumber,deliveryCost,
-                grossWeight, netWeight);    
+                (orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname, truckNumber, deliveryCost, swb);
+         
+            if (invoiceForPrint == null)
+            {
+                return View();
+            }
 
             return View(invoiceForPrint);
         }
-       
-        public IActionResult BgInvoice(int documentNumber, decimal currencyExchangeRateUsdToBGN)
+        public IActionResult ChooseBgInvoice(BgInvoiceForPrintChooseModel model)
+        {
+            string userId = this.User.UserId();
+            var companiesCollect = mycompanyService.GetCompaniesUserId();
+
+            if (!companiesCollect.Contains(userId))
+            { return BadRequest(); }
+
+            if (!User.Identity.IsAuthenticated)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+            var documentNumbers = documentService.GetBgInvoices();
+
+            if (documentNumbers == null)
+            {
+                ModelState.AddModelError(string.Empty, "Missing");
+                return View(model);
+            }
+            model.DocumentNumbers = documentNumbers;
+            return View(model);
+        }
+        public IActionResult BgInvoice(int documentNumber)
         {
             if (!User.Identity.IsAuthenticated)
             {
@@ -245,17 +286,20 @@ namespace SSMO.Controllers
                 return View();
             }
             //TODO Fix amount with currencyexchange
-            var bgInvoice = invoiceService.CreateBgInvoice(documentNumber, currencyExchangeRateUsdToBGN);
+            var bgInvoice = invoiceService.CreateBgInvoiceForPrint(documentNumber);
             if (bgInvoice == null) return View();
 
             return View(bgInvoice);
         }
         public IActionResult ChoosePackingListForPrint(ChoosePackingListFromInvoicesViewModel model)
         {
+            string userId = this.User.UserId();
+            var companiesCollect = mycompanyService.GetCompaniesUserId();
+            if (!companiesCollect.Contains(userId)) { return BadRequest(); }
+
             if (!User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
-
             }
 
             if (!ModelState.IsValid)
@@ -264,7 +308,7 @@ namespace SSMO.Controllers
             }
 
             var invoiceCollectionNumbers = documentService.GetPackingList();
-            if(invoiceCollectionNumbers == null)
+            if (invoiceCollectionNumbers == null)
             {
                 ModelState.AddModelError(string.Empty, "Missing");
                 return View(model);
@@ -274,14 +318,6 @@ namespace SSMO.Controllers
             return View(model);
         }
 
-        public IActionResult PackingListForPrint(PackingListForPrintViewModel model, int invoiceNumber)
-        {
-            if (!ModelState.IsValid)
-            {
-                return View();
-            }
-            return View();
-        }
-
+       
     }
 }

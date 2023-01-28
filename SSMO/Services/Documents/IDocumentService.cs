@@ -12,7 +12,7 @@ namespace SSMO.Services.Documents
        // public int GetLastNumInvoice();
         public string GetLastNumOrder();
        
-        public ICollection<int> GetInvoices();
+        public ICollection<int> GetBgInvoices();
 
         public ICollection<int> GetPackingList();
 

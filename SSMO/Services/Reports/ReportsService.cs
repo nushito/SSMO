@@ -18,6 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SSMO.Models.Reports.Purchase;
+using SSMO.Data.Enums;
 
 namespace SSMO.Services.Reports
 {
@@ -213,7 +215,9 @@ namespace SSMO.Services.Reports
             {
                 for (int i = 0; i < products.Count; i++)
                 {
-                    var descriptionId = dbcontext.Descriptions.Where(n => n.Name == products[i].Description).Select(i => i.Id).FirstOrDefault();
+                    var descriptionId = dbcontext.Descriptions
+                        .Where(n => n.Name == products[i].Description)
+                        .Select(i => i.Id).FirstOrDefault();
                     productsPerCorder.ElementAt(i).DescriptionId = descriptionId;
                     var gradeId = dbcontext.Grades.Where(n => n.Name == products[i].Grade).Select(i => i.Id).FirstOrDefault();
                     productsPerCorder.ElementAt(i).GradeId = gradeId;
@@ -222,6 +226,7 @@ namespace SSMO.Services.Reports
                     productsPerCorder.ElementAt(i).Price = products.ElementAt(i).Price;
                     productsPerCorder.ElementAt(i).Pallets = products.ElementAt(i).Pallets;
                     productsPerCorder.ElementAt(i).SheetsPerPallet = products.ElementAt(i).SheetsPerPallet;
+                    productsPerCorder.ElementAt(i).Unit = Enum.Parse<Unit>(products.ElementAt(i).Unit.ToString());
 
                     var sizeName = dbcontext.Sizes
                         .Where(a => a.Id == sizeId).Select(n => n.Name).FirstOrDefault();
@@ -250,7 +255,9 @@ namespace SSMO.Services.Reports
 
                     order.Amount += productsPerCorder.ElementAt(i).Amount;
                 }
-                order.TotalAmount = order.Amount + (order.Amount * order.Vat / 100) ?? 0;
+
+                order.SubTotal = order.Amount * order.Vat / 100 ?? 0;
+                order.TotalAmount = order.Amount + order.SubTotal;
                 order.Balance = order.TotalAmount - paidAdvance;
             }
 
@@ -259,10 +266,6 @@ namespace SSMO.Services.Reports
             return true;
         }
 
-        public void EditProductFromOrder(ProductCustomerFormModel productModel)
-        {
-
-        }
         public IEnumerable<CustomerOrderListViewBySupplier> GetCustomerOrdersBySupplier(int customerId, string supplierId)
         {
             if (supplierId == null)
@@ -377,7 +380,6 @@ namespace SSMO.Services.Reports
             return supplierOrderForEdit;
         }
 
-
         public bool EditSupplierOrder
             (int supplierOrderId, string supplierOrderNumber,
             DateTime date, int myCompanyId, string deliveryTerms,
@@ -432,6 +434,7 @@ namespace SSMO.Services.Reports
                     productsPerCorder.ElementAt(i).PurchasePrice = products.ElementAt(i).PurchasePrice;
                     productsPerCorder.ElementAt(i).Pallets = products.ElementAt(i).Pallets;
                     productsPerCorder.ElementAt(i).SheetsPerPallet = products.ElementAt(i).SheetsPerPallet;
+                    productsPerCorder.ElementAt(i).Unit = Enum.Parse<Unit>(products.ElementAt(i).Unit);
 
                     var sizeName = dbcontext.Sizes
                         .Where(a => a.Id == sizeId).Select(n => n.Name).FirstOrDefault();
@@ -524,9 +527,9 @@ namespace SSMO.Services.Reports
             var invoices = dbcontext.Documents
                 .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Invoice)
                 .Where(m => m.MyCompanyId == companyId);
-               // .ToList();
+            // .ToList();
 
-            var invoiceDetailsCollection = invoices.ProjectTo<InvoiceCollectionViewModel>(this.mapper).ToList(); 
+            var invoiceDetailsCollection = invoices.ProjectTo<InvoiceCollectionViewModel>(this.mapper).ToList();
 
             foreach (var invoice in invoiceDetailsCollection)
             {
@@ -539,7 +542,7 @@ namespace SSMO.Services.Reports
                 var supplierName = supplierService.SupplierNameById(invoice.SupplierOrderId);
                 invoice.SupplierName = supplierName;
                 invoice.OrderConfirmationNumber = customerOrderNumber;
-                invoice.CustomerName = customerName;    
+                invoice.CustomerName = customerName;
             }
 
             var invoiceCollection = invoiceDetailsCollection.Skip((currentpage - 1) * invoicesPerPage).Take(invoicesPerPage);
@@ -591,10 +594,10 @@ namespace SSMO.Services.Reports
 
             foreach (var bankDetail in invoiceBankDetails)
             {
-               bankDetail.CurrencyName = dbcontext.Currencys
-                    .Where(i => i.Id == bankDetail.CurrencyId)
-                    .Select(n => n.Name)
-                    .FirstOrDefault();
+                bankDetail.CurrencyName = dbcontext.Currencys
+                     .Where(i => i.Id == bankDetail.CurrencyId)
+                     .Select(n => n.Name)
+                     .FirstOrDefault();
             }
 
             invoiceDetails.CompanyBankDetails = invoiceBankDetails;
@@ -612,8 +615,77 @@ namespace SSMO.Services.Reports
             invoiceDetails.Customer.Street = customerAddress.Street;
             invoiceDetails.Customer.City = customerAddress.City;
             invoiceDetails.Customer.Country = customerAddress.Country;
-                
-            return invoiceDetails;  
+
+            return invoiceDetails;
         }
+
+        ICollection<PurchaseInvoicesViewModel> IReportsService.PurchaseInvoices
+            (string supplierName, DateTime startDate, DateTime endDate, int invoiceperPage, int currentpage)
+        {
+            var purchaseDocuments = dbcontext.Documents
+                .Where(d => d.DocumentType == Data.Enums.DocumentTypes.Purchase);
+
+            if (supplierName != null)
+            {
+                var supplierId = dbcontext.Suppliers
+                .Where(n => n.Name.ToLower() == supplierName.ToLower())
+                .Select(i => i.Id)
+                .FirstOrDefault();
+
+                 purchaseDocuments = purchaseDocuments
+                    .Where(s => s.SupplierId == supplierId);
+            }
+            var start = startDate.Date.ToShortDateString();
+            var end = endDate.Date.ToShortDateString();
+
+            //TODO Why in the view dates are 1/1/0001 
+            if (start != "1/1/0001" && end != "1/1/0001")
+            {
+                purchaseDocuments = purchaseDocuments
+                    .Where(d => d.Date.CompareTo(startDate) > 0 && d.Date.CompareTo(endDate) < 0)
+                    .OrderByDescending(d => d.Date);
+            }
+
+            var purchaseInvoices = new List<PurchaseInvoicesViewModel>();
+
+            foreach (var invoice in purchaseDocuments.ToList())
+            {
+                var customerId = dbcontext.CustomerOrders
+                     .Where(n => n.Id == invoice.CustomerOrderId)
+                     .Select(n => n.CustomerId)
+                     .FirstOrDefault();
+                var purchaseInvoice = new PurchaseInvoicesViewModel
+                {
+                    Id = invoice.Id,
+                    CustomerName = dbcontext.Customers
+                   .Where(i => i.Id == customerId)
+                   .Select(n => n.Name)
+                   .FirstOrDefault(),
+                    OrderConfirmationNumber = dbcontext.CustomerOrders
+                     .Where(i => i.Id == invoice.CustomerOrderId)
+                     .Select(o => o.OrderConfirmationNumber)
+                     .FirstOrDefault(),
+                    Date = invoice.Date,
+                    GrossWeight = invoice.GrossWeight,
+                    Incoterms = invoice.Incoterms,
+                    Number = invoice.PurchaseNumber,
+                    NetWeight = invoice.NetWeight,
+                    TruckNumber = invoice.TruckNumber,
+                    Swb = invoice.Swb,
+                    TotalAmount = invoice.TotalAmount,
+                    SupplierName = dbcontext.Suppliers
+                    .Where(i => i.Id == invoice.SupplierId)
+                    .Select(n => n.Name).FirstOrDefault(),
+                    SupplierOrderNumber = dbcontext.SupplierOrders
+                    .Where(i => i.Id == invoice.SupplierOrderId)
+                    .Select(n => n.Number).FirstOrDefault()
+                };
+
+                purchaseInvoices.Add(purchaseInvoice);
+            }
+            return purchaseInvoices;
+        }
+
+
     }
 }

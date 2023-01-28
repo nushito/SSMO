@@ -18,7 +18,8 @@
                 <td>Size</td>
                 <td>Grade</td>
                 <td>Supplier FSC claim</td>
-                <td>Supplier FSC certificate</td>             
+                <td>Supplier FSC certificate</td>  
+                <td>Unit</td>
                 <td>Pallets</td>
                 <td>Sheets/pallet</td>
                 <td>Quantity m3</td>
@@ -77,6 +78,16 @@
                                         <option value="">-</option>
                                         <option value="@Model[i].SupplierFscCertNumber">@Model[i].SupplierFscCertNumber</option>
                                     </select>
+                                </div>
+                            </td>
+                                <td class="col-sm-1">
+                                    <div class="editor-field">                                        
+                                        <select asp-for="@Model[i].Unit">
+                                    @foreach (var unit in service.GetUnits())
+                                    {
+                                                <option value="@unit">@unit</option>
+                                    }
+                                        </select>
                                 </div>
                             </td>
                              <td class="col-sm-1">

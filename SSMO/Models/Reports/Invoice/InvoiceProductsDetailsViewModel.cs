@@ -12,6 +12,7 @@ namespace SSMO.Models.Reports.Invoice
         public string Grade { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
+        public string Unit { get; set; }
         public int DocumentId { get; set; }
         public decimal OrderedQuantity { get; set; }
         public decimal Price { get; set; }

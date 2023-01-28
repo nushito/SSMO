@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace SSMO.Data.Migrations
 {
-    public partial class InitDatabase : Migration
+    public partial class Init : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -13,8 +13,11 @@ namespace SSMO.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    BgStreet = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Street = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BgCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Bgcountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Country = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -41,7 +44,8 @@ namespace SSMO.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BgName = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -93,9 +97,11 @@ namespace SSMO.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    BgCustomerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EIK = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
-                    VAT = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    EIK = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VAT = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    BgCustomerRepresentativePerson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RepresentativePerson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressId = table.Column<int>(type: "int", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -118,10 +124,12 @@ namespace SSMO.Data.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    BgName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Eik = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
                     VAT = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
                     AddressId = table.Column<int>(type: "int", nullable: false),
+                    BgRepresentativePerson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RepresentativePerson = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FSCClaim = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -135,7 +143,7 @@ namespace SSMO.Data.Migrations
                         column: x => x.AddressId,
                         principalTable: "Addresses",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,14 +164,16 @@ namespace SSMO.Data.Migrations
                     FSCSertificate = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     CurrencyId = table.Column<int>(type: "int", nullable: false),
-                    TotalQuantity = table.Column<decimal>(type: "decimal", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal", nullable: false),
+                    TotalQuantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     Vat = table.Column<int>(type: "int", nullable: true),
-                    PaidAvance = table.Column<decimal>(type: "decimal", nullable: false),
-                    Balance = table.Column<decimal>(type: "decimal", nullable: false),
+                    PaidAvance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     PaidAmountStatus = table.Column<bool>(type: "bit", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal", nullable: false),
-                    SubTotal = table.Column<decimal>(type: "decimal", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    SubTotal = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    NetWeight = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
+                    GrossWeight = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
                     Origin = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -202,8 +212,8 @@ namespace SSMO.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Eik = table.Column<string>(type: "nvarchar(9)", maxLength: 9, nullable: false),
-                    VAT = table.Column<string>(type: "nvarchar(11)", maxLength: 11, nullable: false),
+                    Eik = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    VAT = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BankDetailId = table.Column<int>(type: "int", nullable: true),
                     AddressId = table.Column<int>(type: "int", nullable: false),
@@ -230,7 +240,7 @@ namespace SSMO.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CurrencyId = table.Column<int>(type: "int", nullable: false),
                     BankName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Iban = table.Column<string>(type: "nvarchar(13)", maxLength: 13, nullable: true),
+                    Iban = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Swift = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CompanyId = table.Column<int>(type: "int", nullable: false),
@@ -250,7 +260,7 @@ namespace SSMO.Data.Migrations
                         column: x => x.CompanyId,
                         principalTable: "MyCompanies",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_BankDetails_Suppliers_SupplierId",
                         column: x => x.SupplierId,
@@ -272,16 +282,22 @@ namespace SSMO.Data.Migrations
                     MyCompanyId = table.Column<int>(type: "int", nullable: false),
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     CurrencyId = table.Column<int>(type: "int", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal", nullable: false),
-                    PaidAvance = table.Column<decimal>(type: "decimal", nullable: false),
-                    Balance = table.Column<decimal>(type: "decimal", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    PaidAvance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     DatePaidAmount = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PaidStatus = table.Column<bool>(type: "bit", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    DeliveryTerms = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     FSCClaim = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FSCSertificate = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     VAT = table.Column<int>(type: "int", nullable: true),
-                    TotalQuantity = table.Column<decimal>(type: "decimal", nullable: false)
+                    VatAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    NetWeight = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
+                    GrossWeight = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
+                    LoadingAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeliveryAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TotalQuantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -315,7 +331,7 @@ namespace SSMO.Data.Migrations
                         column: x => x.SupplierId,
                         principalTable: "Suppliers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -326,38 +342,49 @@ namespace SSMO.Data.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DocumentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DocumentNumber = table.Column<int>(type: "int", nullable: false),
-                    Number = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PurchaseNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FSCClaim = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FSCSertificate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CustomerId = table.Column<int>(type: "int", nullable: true),
                     CustomerOrderId = table.Column<int>(type: "int", nullable: false),
+                    SupplierId = table.Column<int>(type: "int", nullable: true),
                     SupplierOrderId = table.Column<int>(type: "int", nullable: false),
+                    MyCompanyId = table.Column<int>(type: "int", nullable: false),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Incoterms = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NetWeight = table.Column<decimal>(type: "decimal", nullable: false),
                     GrossWeight = table.Column<decimal>(type: "decimal", nullable: false),
                     TruckNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Swb = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PurchaseTransportCost = table.Column<decimal>(type: "decimal", nullable: false),
-                    DeliveryTrasnportCost = table.Column<decimal>(type: "decimal", nullable: false),
-                    BankExpenses = table.Column<decimal>(type: "decimal", nullable: false),
-                    Duty = table.Column<decimal>(type: "decimal", nullable: false),
-                    CustomsExpenses = table.Column<decimal>(type: "decimal", nullable: false),
-                    Factoring = table.Column<decimal>(type: "decimal", nullable: false),
+                    PurchaseTransportCost = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    DeliveryTrasnportCost = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    BankExpenses = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    Duty = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    CustomsExpenses = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    Factoring = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     FiscalAgentExpenses = table.Column<decimal>(type: "decimal", nullable: false),
-                    ProcentComission = table.Column<decimal>(type: "decimal", nullable: false),
-                    OtherExpenses = table.Column<decimal>(type: "decimal", nullable: false),
-                    PaidAvance = table.Column<decimal>(type: "decimal", nullable: false),
-                    Balance = table.Column<decimal>(type: "decimal", nullable: false),
+                    ProcentComission = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    OtherExpenses = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    PaidAvance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    CurrencyId = table.Column<int>(type: "int", nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     DatePaidAmount = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PaidStatus = table.Column<bool>(type: "bit", nullable: false),
-                    CurrencyExchangeRateUsdToBGN = table.Column<decimal>(type: "decimal", nullable: false),
+                    CurrencyExchangeRateUsdToBGN = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     Vat = table.Column<int>(type: "int", nullable: true),
-                    Amount = table.Column<decimal>(type: "decimal", nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal", nullable: false)
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    VatAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Documents", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Documents_Currencys_CurrencyId",
+                        column: x => x.CurrencyId,
+                        principalTable: "Currencys",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_Documents_CustomerOrders_CustomerOrderId",
                         column: x => x.CustomerOrderId,
@@ -365,9 +392,27 @@ namespace SSMO.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_Documents_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Documents_MyCompanies_MyCompanyId",
+                        column: x => x.MyCompanyId,
+                        principalTable: "MyCompanies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Documents_SupplierOrders_SupplierOrderId",
                         column: x => x.SupplierOrderId,
                         principalTable: "SupplierOrders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Documents_Suppliers_SupplierId",
+                        column: x => x.SupplierId,
+                        principalTable: "Suppliers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -381,22 +426,27 @@ namespace SSMO.Data.Migrations
                     DescriptionId = table.Column<int>(type: "int", nullable: false),
                     SizeId = table.Column<int>(type: "int", nullable: false),
                     GradeId = table.Column<int>(type: "int", nullable: false),
-                    OrderedQuantity = table.Column<decimal>(type: "decimal", nullable: false),
-                    LoadedQuantityM3 = table.Column<decimal>(type: "decimal", nullable: false),
-                    QuantityM2 = table.Column<decimal>(type: "decimal", nullable: false),
+                    OrderedQuantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    LoadedQuantityM3 = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    QuantityM2 = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    QuantityM3 = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: true),
+                    Unit = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Pallets = table.Column<int>(type: "int", nullable: false),
                     SheetsPerPallet = table.Column<int>(type: "int", nullable: false),
                     TotalSheets = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     CostPrice = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     PurchaseAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     FSCClaim = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FSCSertificate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PurchaseFscClaim = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PurchaseFscCertificate = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CustomerOrderId = table.Column<int>(type: "int", nullable: false),
                     SupplierOrderId = table.Column<int>(type: "int", nullable: true),
                     DocumentId = table.Column<int>(type: "int", nullable: true),
+                    PurchaseDocumentId = table.Column<int>(type: "int", nullable: true),
                     PurchaseTransportCost = table.Column<decimal>(type: "decimal(18,4)", nullable: true),
                     DeliveryTrasnportCost = table.Column<decimal>(type: "decimal(18,4)", nullable: true),
                     BankExpenses = table.Column<decimal>(type: "decimal(18,4)", nullable: true),
@@ -416,7 +466,7 @@ namespace SSMO.Data.Migrations
                         column: x => x.CustomerOrderId,
                         principalTable: "CustomerOrders",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Products_Descriptions_DescriptionId",
                         column: x => x.DescriptionId,
@@ -430,17 +480,23 @@ namespace SSMO.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_Products_Documents_PurchaseDocumentId",
+                        column: x => x.PurchaseDocumentId,
+                        principalTable: "Documents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Products_Grades_GradeId",
                         column: x => x.GradeId,
                         principalTable: "Grades",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Products_Sizes_SizeId",
                         column: x => x.SizeId,
                         principalTable: "Sizes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Products_SupplierOrders_SupplierOrderId",
                         column: x => x.SupplierOrderId,
@@ -462,9 +518,13 @@ namespace SSMO.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TransportCompany = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Cost = table.Column<decimal>(type: "decimal", nullable: false),
+                    Cost = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     Vat = table.Column<int>(type: "int", nullable: false),
                     Paid = table.Column<bool>(type: "bit", nullable: false),
+                    LoadingAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeliveryAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TruckNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AmountAfterVat = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     CustomerOrderId = table.Column<int>(type: "int", nullable: false),
                     SupplierOrderId = table.Column<int>(type: "int", nullable: false),
                     DocumentId = table.Column<int>(type: "int", nullable: false)
@@ -477,19 +537,19 @@ namespace SSMO.Data.Migrations
                         column: x => x.CustomerOrderId,
                         principalTable: "CustomerOrders",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ServiceOrders_Documents_DocumentId",
                         column: x => x.DocumentId,
                         principalTable: "Documents",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ServiceOrders_SupplierOrders_SupplierOrderId",
                         column: x => x.SupplierOrderId,
                         principalTable: "SupplierOrders",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -540,9 +600,29 @@ namespace SSMO.Data.Migrations
                 column: "AddressId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Documents_CurrencyId",
+                table: "Documents",
+                column: "CurrencyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_CustomerId",
+                table: "Documents",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Documents_CustomerOrderId",
                 table: "Documents",
                 column: "CustomerOrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_MyCompanyId",
+                table: "Documents",
+                column: "MyCompanyId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Documents_SupplierId",
+                table: "Documents",
+                column: "SupplierId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Documents_SupplierOrderId",
@@ -573,6 +653,11 @@ namespace SSMO.Data.Migrations
                 name: "IX_Products_GradeId",
                 table: "Products",
                 column: "GradeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_PurchaseDocumentId",
+                table: "Products",
+                column: "PurchaseDocumentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_SizeId",

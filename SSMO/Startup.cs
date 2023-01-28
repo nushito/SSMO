@@ -25,6 +25,7 @@ using SSMO.Services.Documents.Invoice;
 using System.Collections.Generic;
 using System.Globalization;
 using iTextSharp.text;
+using SSMO.Services.PDF;
 
 namespace SSMO
 {
@@ -87,6 +88,8 @@ namespace SSMO
             services.AddTransient<ISupplierOrderService, SupplierOrderService>();
             services.AddTransient<IPurchaseService, PurchaseService>();
             services.AddTransient<IInvoiceService, InvoiceService>();
+            services.AddScoped<IViewRenderService, ViewRenderService>();
+            services.AddScoped<IHtmlToPdfConverter, HtmlToPdfConverter>();
             services.AddScoped<HttpContextUserIdExtension>();
 
             services.AddMvc(options =>

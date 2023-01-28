@@ -26,16 +26,10 @@ namespace SSMO.Services.Documents
             return n;
         }
 
-        //public ICollection<int> GetInvoicesNumbers(string customer)
-        //{
-        //    return dbContext.Invoices.Where(x => x.Client.Name == customer)
-        //        .Select(a=>a.Number).ToList();
-        //}
-
-        public ICollection<int> GetInvoices()
+        public ICollection<int> GetBgInvoices()
         {
             return dbContext.Documents
-                .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Invoice)
+                .Where(type => type.DocumentType == Data.Enums.DocumentTypes.BGInvoice)
                 .OrderByDescending(n=>n.DocumentNumber)
                 .Select(num => num.DocumentNumber)
                 .ToList();
@@ -53,7 +47,7 @@ namespace SSMO.Services.Documents
         public PackingListForPrintViewModel PackingListForPrint(int packingListNumber)
         {
             if (packingListNumber == 0) return null;
-            //TODO change invoice with packing after testing
+            
             var packingList = dbContext.Documents
                 .Where(num => num.DocumentNumber == packingListNumber && num.DocumentType == Data.Enums.DocumentTypes.PackingList)
                 .FirstOrDefault();
@@ -74,7 +68,7 @@ namespace SSMO.Services.Documents
                 MyCompanyId = packingList.MyCompanyId,
                 NetWeight = packingList.NetWeight,
                 GrossWeight = packingList.GrossWeight,
-                TruckNumber = packingList.TruckNumber,
+                TruckNumber = packingList.TruckNumber,               
                 Products = new List<ProductsForPackingListPrint>()
             };
 
@@ -102,20 +96,25 @@ namespace SSMO.Services.Documents
 
                 packing.Products.Add(new ProductsForPackingListPrint
                 {
-                    DescriptionName = dbContext.Descriptions.Where(i => i.Id == item.DescriptionId).Select(n => n.Name).FirstOrDefault(),
-                    GradeName = dbContext.Descriptions.Where(i => i.Id == item.GradeId).Select(n => n.Name).FirstOrDefault(),
-                    SizeName = dbContext.Descriptions.Where(i => i.Id == item.SizeId).Select(n => n.Name).FirstOrDefault(),
+                    DescriptionName = dbContext.Descriptions
+                    .Where(i => i.Id == item.DescriptionId).Select(n => n.Name).FirstOrDefault(),
+                    GradeName = dbContext.Grades
+                    .Where(i => i.Id == item.GradeId).Select(n => n.Name).FirstOrDefault(),
+                    SizeName = dbContext.Sizes
+                    .Where(i => i.Id == item.SizeId).Select(n => n.Name).FirstOrDefault(),
                     FSCClaim = item.FSCClaim,
                     FSCSertificate = item.FSCSertificate,
                     Pallets = item.Pallets,
                     SheetsPerPallet = item.SheetsPerPallet,
-                    OrderedQuantity = item.OrderedQuantity
+                    OrderedQuantity = item.OrderedQuantity,
+                    Unit = item.Unit.ToString()
                 }); 
             }
 
             var customer = dbContext.Customers
                 .Where(id => id.Id == packing.CustomerId)
                 .FirstOrDefault();
+            packing.CustomerId = customer.Id;
 
             var customerAddress = dbContext.Addresses
                 .Where(id => id.Id == customer.AddressId)
@@ -137,5 +136,6 @@ namespace SSMO.Services.Documents
 
             return packing;
         }
+
     }
 }

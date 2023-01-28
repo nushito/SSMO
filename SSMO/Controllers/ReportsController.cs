@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Infrastructure;
@@ -24,10 +23,26 @@ using SSMO.Services.SupplierOrders;
 using System.Collections.Generic;
 using System.Linq;
 using SSMO.Models.Reports.Invoice;
+using SSMO.Models.Reports.Purchase;
+using SSMO.Models.Documents.Purchase;
+using SSMO.Services.PDF;
+using System.Threading.Tasks;
+using System;
+using iTextSharp.text;
+using iTextSharp.tool.xml;
+using System.IO;
+using iTextSharp.text.pdf;
+using iTextSharp.tool.xml.pipeline.html;
+using iTextSharp.tool.xml.html;
+using iTextSharp.tool.xml.css;
+using iTextSharp.tool.xml.pipeline.css;
+using iTextSharp.tool.xml.pipeline.end;
+using System.Xml;
+using iTextSharp.tool.xml.parser;
 
 namespace SSMO.Controllers
 {
-	public class ReportsController : Controller
+    public class ReportsController : Controller
 	{
 		private readonly IReportsService reportService;
 		private readonly ICustomerService customerService;
@@ -40,12 +55,15 @@ namespace SSMO.Controllers
 		private readonly IInvoiceService invoiceService;
 		private readonly IPurchaseService purchaseService;
 		private readonly ISupplierOrderService supplierOrderService;
-		
+		private readonly IViewRenderService viewRenderService;
+		private readonly IHtmlToPdfConverter htmlToPdfConverter;
+				
 		public ReportsController(IReportsService service,
 		   ICustomerService customerService, ISupplierService supplierService,
 		   ICurrency currency, IMycompanyService mycompanyService, IProductService productService,
 		   ICustomerOrderService customerOrderService, IStatusService statusService,IInvoiceService invoiceService,
-		   IPurchaseService purchaseService, ISupplierOrderService supplierOrderService)
+		   IPurchaseService purchaseService, ISupplierOrderService supplierOrderService, 
+		   IViewRenderService viewRenderService, IHtmlToPdfConverter htmlToPdfConverter)
 		{
 			this.reportService = service;
 			this.customerService = customerService;
@@ -57,9 +75,10 @@ namespace SSMO.Controllers
 			this.customerOrderService = customerOrderService;
 			this.invoiceService = invoiceService;
 			this.purchaseService = purchaseService;
-			this.supplierOrderService = supplierOrderService;
+			this.supplierOrderService = supplierOrderService;	
+			this.viewRenderService = viewRenderService;	
+			this.htmlToPdfConverter = htmlToPdfConverter;
 		}
-
 		public IActionResult AllCustomerOrders(CustomerOrderReportAll model)
 		{
 			//TODO When All are selected page is empty
@@ -85,7 +104,6 @@ namespace SSMO.Controllers
 			model.CustomerNames = customerNames;
 			return View(model);
 		}
-
 		public IActionResult CustomerOrderDetails(int id)
 		{
 			var order = reportService.CustomerOrderDetails(id);
@@ -119,8 +137,8 @@ namespace SSMO.Controllers
 				item.Descriptions = productService.GetDescriptions();
 				item.Grades = productService.GetGrades();
 				item.Sizes = productService.GetSizes();
+				item.Units = productService.GetUnits();
 			}
-
 			return View(customerOrderForEdit);
 		}
 
@@ -185,8 +203,8 @@ namespace SSMO.Controllers
 
 			CustomerBySupplierOrdersViewModel cascadeCustomerOrders = new()
 			{
-				Customers = customersList,
-			};
+				Customers = customersList                
+            };
 			
 			ViewData["Selectedsupplier"] = 0;
 			cascadeCustomerOrders.ProductList = null;
@@ -215,10 +233,10 @@ namespace SSMO.Controllers
 			var ordersList = reportService.GetCustomerOrdersBySupplier(model.CustomerId, supplierId);
 
 			var finalListOrders = new CustomerBySupplierOrdersViewModel
-			{
+			{   
 				Customers = customersList,
 				CustomerId = int.Parse(model.CustomerId.ToString()),
-				ProductList = ordersList
+				ProductList = ordersList,				
 			};
 			return View(finalListOrders);
 		}
@@ -253,8 +271,7 @@ namespace SSMO.Controllers
 				}
 			}
 
-			var suppliers = supplierOrderService.GetSuppliers();
-			model.SupplierNames = suppliers;
+			model.SupplierNames = supplierService.GetSupplierNames();
 
 			var supplierOrdersCollection = reportService.AllSupplierOrders
 				(model.SupplierName, model.CurrentPage, SupplierOrdersReportAll.SupplierOrdersPerPage);
@@ -294,6 +311,7 @@ namespace SSMO.Controllers
 				item.Descriptions = productService.GetDescriptions();
 				item.Grades = productService.GetGrades();
 				item.Sizes = productService.GetSizes();
+				item.Units = productService.GetUnits();	
 			}
 
 			return View(suppplierOrderForEdit);
@@ -659,8 +677,135 @@ namespace SSMO.Controllers
 		public IActionResult InvoiceDetails(int id)
 		{
 			var invoiceDetails = reportService.InvoiceDetails(id);
-			return View(invoiceDetails);
+            ClientService.AddClient(invoiceDetails);
+
+           // return RedirectToAction("ExportInvoiceToPdf", new { Model = invoiceDetails })
+				return View(invoiceDetails);
 		}
+
+		public IActionResult AllPurchases(PurchaseInvoisecBySupplierModel model)
+		{   
+			var userId = this.User.UserId();
+			var myuserId = myCompanyService.GetCompaniesUserId(); 
+			if (!myuserId.Contains(userId)) { return BadRequest(); }
+
+			if(!ModelState.IsValid) { return BadRequest(); }
+
+			model.Suppliers = supplierService.GetSupplierNames();
+
+			model.InvoiceCollection = reportService.PurchaseInvoices
+				(model.Supplier, model.StartDate.Date, model.EndDate.Date, model.CurrentPage,
+				PurchaseInvoisecBySupplierModel.PurchaseInvoicesPerPage);
+
+			model.TotalPurchaseInvoices = model.InvoiceCollection.Count();
+
+            return View(model);
+		}
+		public IActionResult PurchaseInvoiceDetails(int id)
+		{
+            var userId = this.User.UserId();
+            var myuserId = myCompanyService.GetCompaniesUserId();
+            if (!myuserId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid) { return BadRequest(); }
+			//TODO change model and finish the action
+			var purchaseForEdit = purchaseService.PurchaseDetailsForEdit(id);
+
+            return View(purchaseForEdit);
+		}
+
+		[HttpGet]
+		public IActionResult EditPurchase(int id)
+		{
+            var userId = this.User.UserId();
+            var myuserId = myCompanyService.GetCompaniesUserId();
+            if (!myuserId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid) { return BadRequest(); }
+            var purchaseForEdit = purchaseService.PurchaseDetailsForEdit(id);
+
+            return View(purchaseForEdit);
+            
+		}
+
+		[HttpPost]
+		public  IActionResult EditPurchase(EditPurchaseViewModel model, int id)
+		{
+            var userId = this.User.UserId();
+            var myUserId = myCompanyService.GetCompaniesUserId();
+
+            if (!myUserId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid) { return BadRequest(); }
+
+			var purchaseForEdit = purchaseService.EditPurchaseInvoice(id, model.Number, model.Date, model.SupplierOrderId, model.Vat,
+				model.NetWeight, model.GrossWeight, model.TruckNumber, model.Swb, model.PurchaseTransportCost, model.BankExpenses, model.Duty,
+				model.CustomsExpenses, model.Factoring, model.FiscalAgentExpenses, model.ProcentComission, model.OtherExpenses);
+
+			if(purchaseForEdit == false) { return BadRequest(); }
+
+            return RedirectToAction("AllPurchases");
+		}
+
+        [HttpGet]
+        public async Task<IActionResult> ExportInvoiceToPdf()
+        {
+           // InvoiceDetailsViewModel invoice = ClientService.GetClient();
+			await Export();
+            return View();
+       }
+  //     [HttpPost]
+  //      public ActionResult ExportInvoiceToPdf(InvoiceDetailsViewModel model)
+  //      { 
+		//	var pdfModel = ClientService.GetClient();
+		//	var stringForPrint = this.viewRenderService.RenderToStringAsync("~/Views/Reports/ExportInvoiceToPdf.cshtml", pdfModel);
+			
+		//	IronPdf.Installation.TempFolderPath = $@"C:\IronPdf\irontemp/";
+		//	IronPdf.Installation.LinuxAndDockerDependenciesAutoConfig = true;
+		//	//  var html = this.RenderViewAsync("ExportInvoiceToPdf", pdfModel);			
+		//	var ironPdfRender = new IronPdf.ChromePdfRenderer();
+		//	using var pdfDoc = ironPdfRender.RenderHtmlAsPdf(stringForPrint.Result);
+
+		//	return File(pdfDoc.Stream.ToArray(), "application/pdf");
+
+		//	//  var stringWriter = new StringWriter();
+		//	//  using var renderer = Renderer.RenderHtmlAsPdf("");           
+		//}
+
+
+        public async Task<string> Export()
+		{
+           System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+           var pdfModel = ClientService.GetClient();
+			var filename = "PdfExport" + DateTime.Now.ToString("ddMMyyyy");
+            var stringForPrint = await this.viewRenderService.RenderToStringAsync("~/Views/Reports/ExportInvoiceToPdf.cshtml", pdfModel);
+			Document document = new Document();
+			XMLWorkerFontProvider fontProvider= new XMLWorkerFontProvider(XMLWorkerFontProvider.DONTLOOKFORFONTS);
+			var path = Directory.GetCurrentDirectory() + filename + ".pdf";
+			PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(path,FileMode.Create));
+
+			//foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()+"/"+"wwwroot/fonts"))
+			//{
+			//	FontFactory.FontImp.Register(file);
+			//}
+
+			document.Open();
+
+			using(var strReader = new StringReader(stringForPrint))
+			{ 
+				HtmlPipelineContext htmlcontext = new HtmlPipelineContext(null);
+				htmlcontext.SetTagFactory(Tags.GetHtmlTagProcessorFactory());
+				ICSSResolver cSSResolver = XMLWorkerHelper.GetInstance().GetDefaultCssResolver(false);
+				//cSSResolver.AddCssFile(Directory.GetCurrentDirectory() + "/wwwroot/css/site.css", true);
+				IPipeline pipeline = new CssResolverPipeline(cSSResolver, new HtmlPipeline(htmlcontext, new PdfWriterPipeline(document,writer)));
+				var worker = new XMLWorker(pipeline, true);
+				var xmlParse = new XMLParser(true, worker);
+				xmlParse.Parse(strReader);
+				xmlParse.Flush();
+            }
+            document.Close();
+			return path;
+        }
 
 	}
 }

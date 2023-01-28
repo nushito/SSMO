@@ -1,0 +1,152 @@
+﻿@model PurchaseInvoiceDetailsViewModel
+@{
+    ViewBag.Title = "Purchase details";
+}
+
+<dl class="row">
+     <dt class="col-sm-3">
+        Invoice No:
+    </dt>
+    <dd class="col-sm-5">
+        @Model.Number
+    </dd>
+</dl>
+<dl class="row">
+     <dt class="col-sm-3">
+       Date:
+    </dt>
+    <dd class="col-sm-5">
+        @Model.Date
+    </dd>
+</dl>
+<dl class="row">
+     <dt class="col-sm-3">
+       Amount:
+    </dt>
+    <dd class="col-sm-5">
+        @Model.TotalAmount
+    </dd>
+</dl>
+<dl class="row">
+     <dt class="col-sm-3">
+        Order No:
+    </dt>
+    <dd class="col-sm-5">
+        @Model.SupplierOrderNumber
+    </dd>
+</dl>
+<dl class="row">
+     <dt class="col-sm-3">
+        Delivery Terms:
+    </dt>
+    <dd class="col-sm-5">
+        @Model.Incoterms
+    </dd>
+</dl>
+<dl class="row">
+     <dt class="col-sm-3">
+       Truck No:
+    </dt>
+    <dd class="col-sm-5">
+        @Model.TruckNumber
+    </dd>
+</dl>
+<dl class="row">
+     <dt class="col-sm-3">
+       SWB:
+    </dt>
+    <dd class="col-sm-5">
+        @Model.Swb
+    </dd>
+</dl>
+<dl class="row">
+     <dt class="col-sm-3">
+       Net Weight:
+    </dt>
+    <dd class="col-sm-5">
+        @Model.NetWeight
+    </dd>
+</dl>
+<dl class="row">
+     <dt class="col-sm-3">
+       Gross Weight:
+    </dt>
+    <dd class="col-sm-5">
+        @Model.GrossWeight
+    </dd>
+</dl> 
+<dl class="row">Products</dl>
+<table class="table-info">
+    <thead>
+        <tr>
+            <th>
+                Description
+            </th>
+            <th>
+                Grade
+            </th>
+            <th>
+                Size
+            </th>
+            <th>
+                FSC Certificate
+            </th>
+            <th>
+                FSC Claim
+            </th>
+            <th>
+                Unit
+            </th>
+            <th>
+                Quantity
+            </th>
+            <th>
+                Pallets
+            </th>
+            <th>
+                Sheets/pallet
+            </th>
+            <th>
+                Price
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var product in Model.Products)
+        {
+            <tr>
+                <td>
+                    @product.Description
+                </td>
+                <td>
+                    @product.Grade
+                </td>
+                <td>
+                    @product.Size
+                </td>
+                <td>
+                    @product.FscCertificate
+                </td>
+                <td>
+                    @product.FscClaim
+                </td>
+                <td>
+                    @product.Unit
+                </td>
+                <td>
+                    @product.Quantity
+                </td>
+                <td>
+                    @product.Pallet
+                </td>
+                <td>
+                    @product.SheetsPerPallet
+                </td>
+                <td>
+                    @product.PurchasePrice
+                </td>
+            </tr>
+
+        }
+    </tbody>
+</table>

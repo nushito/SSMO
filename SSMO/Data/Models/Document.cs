@@ -18,7 +18,7 @@ namespace SSMO.Data.Models
         [DisplayName("Invoice Number")]
         public int DocumentNumber { get; set; }
         [DisplayName("Purchase Invoice Number")]
-        public string Number { get; set; }
+        public string PurchaseNumber { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
         public int? CustomerId { get; set; }
@@ -50,6 +50,8 @@ namespace SSMO.Data.Models
         public decimal ProcentComission { get; set; }
         public decimal OtherExpenses { get; set; }
         public decimal PaidAvance { get; set; }
+        public int CurrencyId { get; set; }
+        public Currency Currency { get; set; }
         public decimal Balance { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime DatePaidAmount { get; set; }
@@ -58,6 +60,7 @@ namespace SSMO.Data.Models
         public ServiceOrder ServiceOrder { get; set; }
         public int? Vat { get; set; }
         public decimal Amount { get; set; }
+        public decimal? VatAmount { get; set; }
         public decimal TotalAmount { get; set; }
         public ICollection<Product> Products { get; set; }
         public ICollection<Product> PurchaseProducts { get; set; }

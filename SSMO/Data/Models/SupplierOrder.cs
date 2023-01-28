@@ -37,6 +37,7 @@ namespace SSMO.Data.Models
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
         public int? VAT { get; set; }
+        public decimal? VatAmount { get; set; }
         public decimal NetWeight { get; set; }
         public decimal GrossWeight { get; set; }
         public string LoadingAddress { get; set; }

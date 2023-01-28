@@ -20,12 +20,13 @@ namespace SSMO.Services.Products
         public IEnumerable<string> GetDescriptions();
         public IEnumerable<string> GetSizes();
         public IEnumerable<string> GetGrades();
+        public ICollection<string> GetUnits();
         public IEnumerable<ProductSupplierDetails> Details(int customerId);
         public bool EditProduct(int id, int customerorderId,
             int supplierOrderId,
             string description, string grade,
             string size, string purchaseFscCert, string purchaseFscClaim,
-            int pallets, int sheetsPerPallet, decimal purchasePrice, decimal quantityM3);
+            int pallets, int sheetsPerPallet, decimal purchasePrice, decimal quantityM3, string unit);
         public ICollection<ProductCustomerFormModel> DetailsPerCustomerOrder(int id);
         public ICollection<ProductsForEditSupplierOrder> ProductsDetailsPerSupplierOrder(int supplierOrderId);
         public ICollection<string> GetFascCertMyCompany();
@@ -37,10 +38,12 @@ namespace SSMO.Services.Products
         public void ClearProductQuantityWhenDealIsFinished(int productId);
         public void ReleaseProductExcludedFromInvoice(int productId);
         public IEnumerable<ProductAvailabilityDetailsViewModel> ProductsOnStock
-            (int descriptionId, int gradeId, int sizeId, int currentPage, int productsPerPage);
+            (int? descriptionId, int? gradeId, int? sizeId, int currentPage, int productsPerPage);
         public ICollection<DescriptionForProductSearchModel> DescriptionIdAndNameList();
         public ICollection<SizeForProductSearchModel> SizeIdAndNameList();
         public ICollection<GradeForProductSearchModel> GradeIdAndNameList();
+        public void ResetToNullLoadingQuantityIfPurchaseIsChanged(int productId);
+        public void NewLoadingQuantityToEditPurchase(int productId, int purchaseId);
 
     }
 }

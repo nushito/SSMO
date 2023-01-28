@@ -25,6 +25,7 @@ namespace SSMO.Models.Documents.Invoice
         public string TruckNumber { get; set; }
         public string Swb { get; set; }
         public bool PaidStatus { get; set; }
+        public string Currency { get; set; }
         public decimal CurrencyExchangeRateUsdToBGN { get; set; }
       //  public ServiceOrder ServiceOrder { get; set; }
         public decimal Amount { get; set; }

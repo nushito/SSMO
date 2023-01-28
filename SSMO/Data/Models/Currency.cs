@@ -11,5 +11,6 @@ namespace SSMO.Data.Models
         public IEnumerable<BankDetails> BankDetails { get; set; } = new List<BankDetails>();
         public IEnumerable<CustomerOrder> CustomerOrders { get; set; }
         public IEnumerable<SupplierOrder> SupplierOrders { get; set; }
+        public ICollection<Document> Documents { get; set; }
     }
 }

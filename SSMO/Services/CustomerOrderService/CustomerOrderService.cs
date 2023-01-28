@@ -72,7 +72,9 @@ namespace SSMO.Services.CustomerOrderService
         {
             var thisorder = OrderPerIndex(customerorderId);
 
-            thisorder.TotalAmount = (decimal)(thisorder.Amount + thisorder.Vat);
+            thisorder.SubTotal = thisorder.Amount * thisorder.Vat / 100 ?? 0;
+
+            thisorder.TotalAmount = (decimal)(thisorder.Amount + thisorder.SubTotal);
 
             if(thisorder.PaidAmountStatus == false)
             {

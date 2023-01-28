@@ -22,7 +22,7 @@
         <input asp-for="CustomerPoNumber" class="form-control"/>
         <span asp-validation-for="CustomerPoNumber" class="small text-danger"></span>
     </div>
-    <div class="row col-md-4">
+    <div class="row row col-md-4">
         <label asp-for="Date"></label>
         <input itemid="date" asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
         <span asp-validation-for="Date" class="small text-danger"></span>
@@ -42,8 +42,8 @@
         <input id="deliveryaddress" asp-for="DeliveryAddress" type="text" class="form-control" placeholder="Delivery address" />       
     </div>
 
-    <div class="form-group col-md-4">
-        <label asp-for="CurrencyId"></label>
+    <div class="form-group row col-md-4">
+        <label asp-for="Currency"></label>
         <select id="currency" asp-for="CurrencyId" class="form-control">
             @foreach (var item in Model.Currencies )
             {
@@ -53,7 +53,7 @@
         </select>
     </div>
 
-    <div class="row" id="customer-row">
+    <div class="form-group row col-md-4">
         <div class="form-group col-md-4">
             <div class="form-group">
                 <label asp-for="CustomerId"></label>

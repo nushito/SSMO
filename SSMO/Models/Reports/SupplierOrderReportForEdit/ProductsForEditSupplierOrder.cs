@@ -13,6 +13,8 @@ namespace SSMO.Models.Reports.SupplierOrderReportForEdit
         public IEnumerable<string> Sizes { get; set; }
         public int GradeId { get; set; }
         public string Grade { get; set; }
+        public string Unit { get; set; }
+        public ICollection<string> Units { get; set; }
         public IEnumerable<string> Grades { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }

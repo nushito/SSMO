@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Models.Documents.Purchase;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Services.Documents.Purchase;
@@ -125,15 +126,22 @@ namespace SSMO.Services.SupplierOrders
             return supplierOrdersCollection;    
         }
 
-        public IEnumerable<string> GetSuppliers()
+        public ICollection<SupplierOrdersListForPurchaseEditModel> GetSupplierOrdersNumbers()
         {
-            return dbContext.Suppliers.Select(a=>a.Name).ToList();
+            return dbContext.SupplierOrders
+                .Select(n=>new SupplierOrdersListForPurchaseEditModel
+                {
+                    Id = n.Id,
+                    Number = n.Number
+                })
+                .ToList();
         }
 
         public void TotalAmountAndQuantitySum(int supplierOrderId)
         {
            var spOrder = dbContext.SupplierOrders.Find(supplierOrderId);
-           spOrder.TotalAmount = spOrder.Amount + (spOrder.Amount*spOrder.VAT/100)??0;
+           spOrder.VatAmount = spOrder.Amount * spOrder.VAT / 100;
+           spOrder.TotalAmount = (decimal)(spOrder.Amount + spOrder.VatAmount);
            spOrder.Balance = spOrder.TotalAmount - spOrder.PaidAvance;
            spOrder.TotalQuantity = spOrder.Products.Sum(a => a.OrderedQuantity);
            dbContext.SaveChanges();    

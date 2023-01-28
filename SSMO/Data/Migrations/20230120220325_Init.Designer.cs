@@ -10,8 +10,8 @@ using SSMO.Data;
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20221206153515_BgText")]
-    partial class BgText
+    [Migration("20230120220325_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -333,8 +333,7 @@ namespace SSMO.Data.Migrations
 
                     b.Property<string>("EIK")
                         .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -351,8 +350,7 @@ namespace SSMO.Data.Migrations
 
                     b.Property<string>("VAT")
                         .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -466,6 +464,9 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("BgName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -482,8 +483,8 @@ namespace SSMO.Data.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<decimal>("Amount")
-                        .HasPrecision(18, 5)
-                        .HasColumnType("decimal(18,5)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("Balance")
                         .HasPrecision(18, 5)
@@ -496,6 +497,9 @@ namespace SSMO.Data.Migrations
                     b.Property<decimal>("CurrencyExchangeRateUsdToBGN")
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
+
+                    b.Property<int>("CurrencyId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("CustomerId")
                         .HasColumnType("int");
@@ -547,14 +551,11 @@ namespace SSMO.Data.Migrations
                     b.Property<string>("Incoterms")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MyCompanyId")
+                    b.Property<int>("MyCompanyId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("NetWeight")
                         .HasColumnType("decimal");
-
-                    b.Property<string>("Number")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("OtherExpenses")
                         .HasPrecision(18, 5)
@@ -571,6 +572,9 @@ namespace SSMO.Data.Migrations
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
 
+                    b.Property<string>("PurchaseNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("PurchaseTransportCost")
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
@@ -585,8 +589,8 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("TotalAmount")
-                        .HasPrecision(18, 5)
-                        .HasColumnType("decimal(18,5)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("TruckNumber")
                         .HasColumnType("nvarchar(max)");
@@ -594,7 +598,13 @@ namespace SSMO.Data.Migrations
                     b.Property<int?>("Vat")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("VatAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CurrencyId");
 
                     b.HasIndex("CustomerId");
 
@@ -753,6 +763,12 @@ namespace SSMO.Data.Migrations
                     b.Property<int?>("PurchaseDocumentId")
                         .HasColumnType("int");
 
+                    b.Property<string>("PurchaseFscCertificate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PurchaseFscClaim")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("PurchasePrice")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
@@ -783,6 +799,10 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("TotalSheets")
                         .HasColumnType("int");
 
+                    b.Property<string>("Unit")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerOrderId");
@@ -792,6 +812,8 @@ namespace SSMO.Data.Migrations
                     b.HasIndex("DocumentId");
 
                     b.HasIndex("GradeId");
+
+                    b.HasIndex("PurchaseDocumentId");
 
                     b.HasIndex("SizeId");
 
@@ -901,8 +923,7 @@ namespace SSMO.Data.Migrations
 
                     b.Property<string>("Eik")
                         .IsRequired()
-                        .HasMaxLength(9)
-                        .HasColumnType("nvarchar(9)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
@@ -922,8 +943,7 @@ namespace SSMO.Data.Migrations
 
                     b.Property<string>("VAT")
                         .IsRequired()
-                        .HasMaxLength(11)
-                        .HasColumnType("nvarchar(11)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1004,8 +1024,8 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
-                        .HasPrecision(18, 4)
-                        .HasColumnType("decimal(18,4)");
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<decimal>("TotalQuantity")
                         .HasPrecision(18, 5)
@@ -1013,6 +1033,10 @@ namespace SSMO.Data.Migrations
 
                     b.Property<int?>("VAT")
                         .HasColumnType("int");
+
+                    b.Property<decimal?>("VatAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -1151,6 +1175,12 @@ namespace SSMO.Data.Migrations
 
             modelBuilder.Entity("SSMO.Data.Models.Document", b =>
                 {
+                    b.HasOne("SSMO.Data.Models.Currency", "Currency")
+                        .WithMany("Documents")
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("SSMO.Data.Models.Customer", "Customer")
                         .WithMany("Invoices")
                         .HasForeignKey("CustomerId");
@@ -1164,7 +1194,8 @@ namespace SSMO.Data.Migrations
                     b.HasOne("SSMO.Data.Models.MyCompany", "MyCompany")
                         .WithMany("Documents")
                         .HasForeignKey("MyCompanyId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.HasOne("SSMO.Data.Models.Supplier", "Supplier")
                         .WithMany("Documents")
@@ -1176,6 +1207,8 @@ namespace SSMO.Data.Migrations
                         .HasForeignKey("SupplierOrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Currency");
 
                     b.Navigation("Customer");
 
@@ -1223,6 +1256,10 @@ namespace SSMO.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("SSMO.Data.Models.Document", "PurchaseDocument")
+                        .WithMany("PurchaseProducts")
+                        .HasForeignKey("PurchaseDocumentId");
+
                     b.HasOne("SSMO.Data.Models.Size", "Size")
                         .WithMany("Products")
                         .HasForeignKey("SizeId")
@@ -1244,6 +1281,8 @@ namespace SSMO.Data.Migrations
                     b.Navigation("Document");
 
                     b.Navigation("Grade");
+
+                    b.Navigation("PurchaseDocument");
 
                     b.Navigation("Size");
 
@@ -1352,6 +1391,8 @@ namespace SSMO.Data.Migrations
 
                     b.Navigation("CustomerOrders");
 
+                    b.Navigation("Documents");
+
                     b.Navigation("SupplierOrders");
                 });
 
@@ -1379,6 +1420,8 @@ namespace SSMO.Data.Migrations
             modelBuilder.Entity("SSMO.Data.Models.Document", b =>
                 {
                     b.Navigation("Products");
+
+                    b.Navigation("PurchaseProducts");
 
                     b.Navigation("ServiceOrder");
                 });

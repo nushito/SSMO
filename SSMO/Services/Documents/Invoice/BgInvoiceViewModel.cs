@@ -14,7 +14,7 @@ namespace SSMO.Services.Documents.Invoice
         public decimal TotalAmount { get; set; }
         public BGMyCompanyInvoicePrintViewModel BgMyCompany { get; set; }
         public BGCustomerForInvoicePrint BgCustomer { get; set; }
-        public IEnumerable<BGProductsForBGInvoiceViewModel> BgProducts { get; set; }
+        public ICollection<BGProductsForBGInvoiceViewModel> BgProducts { get; set; }
         public ICollection<InvoiceBankDetailsViewModel> CompanyBankDetails { get; set; }
     }
 }

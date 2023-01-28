@@ -28,6 +28,7 @@ namespace SSMO.Data.Models
         public decimal LoadedQuantityM3 { get; set; }
         public decimal QuantityM2 { get; set; }
         public decimal? QuantityM3 { get; set; }
+        public Unit Unit { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
         public int TotalSheets { get; set; }

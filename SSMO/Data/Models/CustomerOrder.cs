@@ -22,10 +22,8 @@ namespace SSMO.Data.Models
         public int CustomerId { get; set; }
         public int MyCompanyId { get; set; }
         public MyCompany MyCompany { get; set; }
-        public Customer Customer { get; set; }
-  
+        public Customer Customer { get; set; }  
         public string FSCClaim { get; set; }
-     
         public string FSCSertificate { get; set; }
         public int StatusId { get; set; }
         public Status Status { get; set; }

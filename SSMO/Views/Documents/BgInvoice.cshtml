@@ -48,8 +48,7 @@
                <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.BgMyCompany.BgStreet </span></li>
                 <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.BgMyCompany.BgCity </span></li>
                  <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.BgMyCompany.BgCountry </span></li>
-              @*<li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="me-1 fw-bold">FSC:</span>
-                  <span class="badge bg-warning text-black fw-bold">@Model.Seller.FSCClaim @Model.Seller.FSCSertificate</span></li>*@
+             
             </ul>
           </div>
         </div>
@@ -64,6 +63,7 @@
                                 <th scope="col">Размер</th>
                                 <th scope="col">FSC Claim</th>
                                 <th scope="col">FSC Certificate</th>
+                                <th scope="col">M.e</th>
                                 <th scope="col">Количество</th>
                                 <th scope="col">Ед.Цена</th>
                                 <th scope="col">Стойност</th>
@@ -80,6 +80,7 @@
                                     <td>@product.Size</td>
                                     <td>@product.FSCClaim</td>
                                     <td>@product.FSCSertificate</td>
+                                    <td>@product.Unit</td>
                                     <td>@product.OrderedQuantity</td>
                                     <td>@product.Price</td>
                                     <td>@product.Amount.ToString("N2")</td>
@@ -103,7 +104,7 @@
             <tr>
                 @foreach (var bank in Model.CompanyBankDetails)
                 {
-                  <td class="border-right-2 m-2">
+                  <td class="border-right-5 mr-5">
                         Currency:@bank.Currency<br>
                         Bank:@bank.BankName<br>
                         IBAN:@bank.Iban<br>

@@ -36,7 +36,7 @@
         <select id="currency" asp-for="CurrencyId" class="form-control">
             @foreach (var item in Model.Currencies)
             {
-                <option value="@item.Id">@item.Name</option>
+                    <option value="@item.Id">@item.Name</option>
             }
 
         </select>
@@ -46,10 +46,10 @@
             <div class="form-group">
                 <label asp-for="MyCompanyId"></label>
                 <select asp-for="MyCompanyId" class="form-control">
-                    @foreach (var company in Model.MyCompanies)
-                    {
-                        <option value="@company.Id">@company.Name</option>
-                    }
+                @foreach (var company in Model.MyCompanies)
+                {
+                            <option value="@company.Id">@company.Name</option>
+                }
                     <span asp-validation-for="MyCompanyId" class="small text-danger"></span>
                 </select>
             </div>
@@ -74,18 +74,18 @@
     </div>
 
     <div class="form-group row col-md-4">
-       
+
             <label asp-for="Vat"></label>
             <input asp-for="Vat" min="0" step="1" class="form-control" type="number" />
        </div>
-  
+
     <div class="form-group row col-md-4">
             <label asp-for="StatusId"></label>
             <select asp-for="StatusId" class="form-control">
-                @foreach (var status in Model.Statuses)
-                {
-                    <option value="@status.Id">@status.Name</option>
-                }
+            @foreach (var status in Model.Statuses)
+            {
+                        <option value="@status.Id">@status.Name</option>
+            }
                 <span asp-validation-for="StatusId" class="small text-danger"></span>
             </select>
 
@@ -101,6 +101,7 @@
                     <td>Grade</td>
                     <td>FSC claim</td>
                     <td>FSC certificate</td>
+                    <td>Unit</td>
                     <td>Pallets Number</td>
                     <td>Sheets/pallet</td>
                     <td>Quantity m3</td>
@@ -108,93 +109,104 @@
                 </tr>
             </thead>
           <tbody>
-              @for (int i = 0; i < Model.Products.Count; i++)
-                 {
-                  <tr>
-                        <td class="col-sm-1">
-                            <div class="editor-field">
-                               <select asp-for="@Model.Products[i].Description">
-                                    <option value="">All</option>
+                @for (int i = 0; i < Model.Products.Count; i++)
+                {
+                      <tr>
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+                                   <select asp-for="@Model.Products[i].Description">
+                                        <option value="">All</option>
                                     @foreach (var type in service.GetDescriptions())
                                     {
-                                        <option value="@type">@type</option>
+                                                <option value="@type">@type</option>
                                     }
-                                </select>
-                            </div>
-                        </td>
-                        <br>
-                        <td class="col-sm-1">
-                            <div class="editor-field">
-                               <select id="Size" asp-for="@Model.Products[i].Size">
-                                    <option value="">All</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <br>
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+                                   <select id="Size" asp-for="@Model.Products[i].Size">
+                                        <option value="">All</option>
                                     @foreach (var size in service.GetSizes())
                                     {
-                                        <option value="@size">@size</option>
+                                                <option value="@size">@size</option>
                                     }
-                                </select>
-                            </div>
-                        </td>
-                        <br>
-                        <td class="col-sm-1">
-                            <div class="editor-field">
-                                <select asp-for="@Model.Products[i].Grade">
-                                    <option value="">All</option>
+                                    </select>
+                                </div>
+                            </td>
+                            <br>
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+                                    <select asp-for="@Model.Products[i].Grade">
+                                        <option value="">All</option>
                                     @foreach (var grade in service.GetGrades())
                                     {
-                                        <option value="@grade">@grade</option>
+                                                <option value="@grade">@grade</option>
                                     }
-                                </select>
-                            </div>
-                        </td>
-                        <br>
-                        <td class="col-sm-1">
-                            <div class="editor-field">
-                            <input asp-for="@Model.Products[i].FSCClaim" class="text-box single-line" placeholder="FSC Claim" aria-label="FSC Claim" value="@Model.Products[i].FSCClaim" >
-                            </div>
-                        </td>
-                        <br>
-                        <td class="col-sm-1">
-                            <div class="editor-field">
-                               <input asp-for="@Model.Products[i].FSCSertificate" class="text-box single-line" placeholder="FSC Certificate" aria-label="FSC Certificate" value="@Model.Products[i].FSCSertificate">
-                            </div>
-                        </td>
-                        <br>
-                        <td class="col-sm-1">
-                            <div class="editor-field">
-                                <input asp-for="@Model.Products[i].Pallets" class="text-box single-line" value="@Model.Products[i].Pallets" aria-label="Pallets" required="required">
-                            </div>
-                        </td>
-                        <br>
-                        <td class="col-sm-1">
-                            <div class="editor-field">
-                               <input asp-for="@Model.Products[i].SheetsPerPallet" class="text-box single-line" aria-label="Sheets/Pallets" value="@Model.Products[i].SheetsPerPallet" required="required">
-                            </div>
-                        </td>
+                                    </select>
+                                </div>
+                            </td>
+                            <br>
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+                                <input asp-for="@Model.Products[i].FSCClaim" class="text-box single-line" placeholder="FSC Claim" aria-label="FSC Claim" value="@Model.Products[i].FSCClaim" >
+                                </div>
+                            </td>
+                            <br>
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+                                   <input asp-for="@Model.Products[i].FSCSertificate" class="text-box single-line" placeholder="FSC Certificate" aria-label="FSC Certificate" value="@Model.Products[i].FSCSertificate">
+                                </div>
+                            </td>
+                            <br>
+                            <td class="col-sm-1">
+                                 <div class="editor-field">
+                                 <select asp-for="@Model.Products[i].Unit">
+                                    @foreach (var unit in service.GetUnits())
+                                    {
+                                      <option value="@unit">@unit</option>
+                                    }
+                                  </select>
+                                        </div>
+                                    </td>
+                                    <br>
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+                                    <input asp-for="@Model.Products[i].Pallets" class="text-box single-line" value="@Model.Products[i].Pallets" aria-label="Pallets" required="required">
+                                </div>
+                            </td>
+                            <br>
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+                                   <input asp-for="@Model.Products[i].SheetsPerPallet" class="text-box single-line" aria-label="Sheets/Pallets" value="@Model.Products[i].SheetsPerPallet" required="required">
+                                </div>
+                            </td>
 
-                        <br>
-                         <td class="col-sm-1">
-                            <div class="editor-field">
-                               <input asp-for="@Model.Products[i].QuantityM3" class="text-box single-line" aria-label="QuantityM3" value="@Model.Products[i].QuantityM3">
-                            </div>
-                        </td>
+                            <br>
+                             <td class="col-sm-1">
+                                <div class="editor-field">
+                                   <input asp-for="@Model.Products[i].QuantityM3" class="text-box single-line" aria-label="QuantityM3" value="@Model.Products[i].QuantityM3">
+                                </div>
+                            </td>
 
-                        <br>
-                        <td class="col-sm-1">
-                            <div class="editor-field">
-                                <input asp-for="@Model.Products[i].Price" type="number" min="0.0000" step="0.0001" class="text-box single-line" aria-label="Sell Price" value="@Model.Products[i].Price" required="required">
-                            </div>
-                        </td>
-                    </tr>
-             }
+                            <br>
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+                                    <input asp-for="@Model.Products[i].Price" type="number" min="0.0000" step="0.0001" class="text-box single-line" aria-label="Sell Price" value="@Model.Products[i].Price" required="required">
+                                </div>
+                            </td>
+                        </tr>
+                }
           </tbody>   
-        
+
         </table>
-      
+
      </div>
     @* <input type="hidden" name="customerorderid" value="@model.id" />*@
     <input type="submit" value="Save" class="btn btn-primary mt-3" />
 </form>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+        <partial name="_ValidationScriptsPartial" />
 }
