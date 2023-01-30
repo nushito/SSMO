@@ -89,7 +89,6 @@ namespace SSMO
             services.AddTransient<IPurchaseService, PurchaseService>();
             services.AddTransient<IInvoiceService, InvoiceService>();
             services.AddScoped<IViewRenderService, ViewRenderService>();
-            services.AddScoped<IHtmlToPdfConverter, HtmlToPdfConverter>();
             services.AddScoped<HttpContextUserIdExtension>();
 
             services.AddMvc(options =>

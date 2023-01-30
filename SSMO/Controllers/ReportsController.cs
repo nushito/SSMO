@@ -39,6 +39,8 @@ using iTextSharp.tool.xml.pipeline.css;
 using iTextSharp.tool.xml.pipeline.end;
 using System.Xml;
 using iTextSharp.tool.xml.parser;
+using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace SSMO.Controllers
 {
@@ -56,14 +58,14 @@ namespace SSMO.Controllers
 		private readonly IPurchaseService purchaseService;
 		private readonly ISupplierOrderService supplierOrderService;
 		private readonly IViewRenderService viewRenderService;
-		private readonly IHtmlToPdfConverter htmlToPdfConverter;
+		
 				
 		public ReportsController(IReportsService service,
 		   ICustomerService customerService, ISupplierService supplierService,
 		   ICurrency currency, IMycompanyService mycompanyService, IProductService productService,
 		   ICustomerOrderService customerOrderService, IStatusService statusService,IInvoiceService invoiceService,
 		   IPurchaseService purchaseService, ISupplierOrderService supplierOrderService, 
-		   IViewRenderService viewRenderService, IHtmlToPdfConverter htmlToPdfConverter)
+		   IViewRenderService viewRenderService)
 		{
 			this.reportService = service;
 			this.customerService = customerService;
@@ -76,8 +78,7 @@ namespace SSMO.Controllers
 			this.invoiceService = invoiceService;
 			this.purchaseService = purchaseService;
 			this.supplierOrderService = supplierOrderService;	
-			this.viewRenderService = viewRenderService;	
-			this.htmlToPdfConverter = htmlToPdfConverter;
+			this.viewRenderService = viewRenderService;				
 		}
 		public IActionResult AllCustomerOrders(CustomerOrderReportAll model)
 		{
@@ -750,48 +751,29 @@ namespace SSMO.Controllers
         [HttpGet]
         public async Task<IActionResult> ExportInvoiceToPdf()
         {
-           // InvoiceDetailsViewModel invoice = ClientService.GetClient();
+           InvoiceDetailsViewModel invoice = ClientService.GetClient();
 			await Export();
-            return View();
-       }
-  //     [HttpPost]
-  //      public ActionResult ExportInvoiceToPdf(InvoiceDetailsViewModel model)
-  //      { 
-		//	var pdfModel = ClientService.GetClient();
-		//	var stringForPrint = this.viewRenderService.RenderToStringAsync("~/Views/Reports/ExportInvoiceToPdf.cshtml", pdfModel);
-			
-		//	IronPdf.Installation.TempFolderPath = $@"C:\IronPdf\irontemp/";
-		//	IronPdf.Installation.LinuxAndDockerDependenciesAutoConfig = true;
-		//	//  var html = this.RenderViewAsync("ExportInvoiceToPdf", pdfModel);			
-		//	var ironPdfRender = new IronPdf.ChromePdfRenderer();
-		//	using var pdfDoc = ironPdfRender.RenderHtmlAsPdf(stringForPrint.Result);
-
-		//	return File(pdfDoc.Stream.ToArray(), "application/pdf");
-
-		//	//  var stringWriter = new StringWriter();
-		//	//  using var renderer = Renderer.RenderHtmlAsPdf("");           
-		//}
-
-
+            return View(invoice);
+       } 
         public async Task<string> Export()
 		{
            System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
            var pdfModel = ClientService.GetClient();
-			var filename = "PdfExport" + DateTime.Now.ToString("ddMMyyyy");
-            var stringForPrint = await this.viewRenderService.RenderToStringAsync("~/Views/Reports/ExportInvoiceToPdf.cshtml", pdfModel);
-			Document document = new Document();
+			var filename = "doc"+ pdfModel.DocumentNumber +"_" + DateTime.Now.ToString("ddMMyyyy");
+            var stringForPrint = await viewRenderService.RenderToStringAsync("~/Views/Reports/ExportInvoiceToPdf.cshtml", pdfModel);
+            Document document = new Document();
 			XMLWorkerFontProvider fontProvider= new XMLWorkerFontProvider(XMLWorkerFontProvider.DONTLOOKFORFONTS);
 			var path = Directory.GetCurrentDirectory() + filename + ".pdf";
 			PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(path,FileMode.Create));
-
 			//foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()+"/"+"wwwroot/fonts"))
 			//{
 			//	FontFactory.FontImp.Register(file);
 			//}
 
 			document.Open();
+            document.Add(new Chunk(""));
 
-			using(var strReader = new StringReader(stringForPrint))
+            using (var strReader = new StringReader(stringForPrint))
 			{ 
 				HtmlPipelineContext htmlcontext = new HtmlPipelineContext(null);
 				htmlcontext.SetTagFactory(Tags.GetHtmlTagProcessorFactory());
@@ -806,6 +788,128 @@ namespace SSMO.Controllers
             document.Close();
 			return path;
         }
+
+		public FileResult ExportToExcel()
+		{
+			InvoiceDetailsViewModel invoice = ClientService.GetClient();
+
+			using (var excelDocument = new XLWorkbook())
+			{
+				IXLWorksheet worksheet = excelDocument.Worksheets.Add("Invoice");
+				worksheet.Cell(1, 1).Value = "Invoice No";
+				worksheet.Cell(1, 2).Value = invoice.DocumentNumber;
+				worksheet.Cell(2, 1).Value = "Date";
+				worksheet.Cell(2, 2).Value = invoice.Date;
+
+                worksheet.Cell(4, 1).Value = "Customer";
+                worksheet.Cell(4, 2).Value = invoice.Customer.Name;
+                worksheet.Cell(4, 7).Value = "Seller";
+                worksheet.Cell(4, 8).Value = invoice.Seller.Name;
+
+                worksheet.Cell(5, 1).Value = "EIK";
+                worksheet.Cell(5, 2).Value = invoice.Customer.EIK;
+                worksheet.Cell(5, 7).Value = "EIK";
+                worksheet.Cell(5, 8).Value = invoice.Seller.EIK;
+
+                worksheet.Cell(6, 1).Value = "VAT";
+                worksheet.Cell(6, 2).Value = invoice.Customer.VAT;
+                worksheet.Cell(6, 7).Value = "VAT";
+                worksheet.Cell(6, 8).Value = invoice.Seller.VAT;
+
+                worksheet.Cell(7, 1).Value = "Address";
+                worksheet.Cell(7, 2).Value = invoice.Customer.Country;
+                worksheet.Cell(7, 3).Value = invoice.Customer.City;
+                worksheet.Cell(7, 4).Value = invoice.Customer.Street;
+                worksheet.Cell(7, 7).Value = "Address";
+                worksheet.Cell(7, 8).Value = invoice.Seller.Country;
+                worksheet.Cell(7, 9).Value = invoice.Seller.City;
+                worksheet.Cell(7, 10).Value = invoice.Seller.Street;
+
+                worksheet.Cell(9, 1).Value = "Order confirmation No"; 
+				worksheet.Cell(9, 2).Value = invoice.OrderConfirmationNumber;
+
+				worksheet.Cell(10, 1).Value = "Delivery Terms";
+                worksheet.Cell(10, 2).Value = invoice.Incoterms;
+
+                worksheet.Cell(11, 1).Value = "Truck No";
+                worksheet.Cell(11, 2).Value = invoice.TruckNumber;
+
+                worksheet.Cell(12, 1).Value = "Net Weight:";
+                worksheet.Cell(12, 2).Value = invoice.NetWeight;
+                worksheet.Cell(12, 3).Value = "Gross Weight:";
+                worksheet.Cell(12, 4).Value = invoice.GrossWeight;
+
+                worksheet.Cell(14, 1).Value = "No";
+                worksheet.Cell(14, 2).Value = "Description";
+                worksheet.Cell(14, 3).Value = "Grade";
+                worksheet.Cell(14, 4).Value = "Size";
+                worksheet.Cell(14, 5).Value = "FSC Claim";
+                worksheet.Cell(14, 6).Value = "FSC Certificate";
+                worksheet.Cell(14, 7).Value = "Unit";
+                worksheet.Cell(14, 8).Value = "Quantity";
+                worksheet.Cell(14, 9).Value = "Unit Price";
+                worksheet.Cell(14, 10).Value = "Amount";
+
+				IXLRange range = worksheet.Range(worksheet.Cell(14,1).Address, worksheet.Cell(14,10).Address);
+				range.Style.Fill.SetBackgroundColor(XLColor.TurquoiseGreen);
+
+				int row = 15;
+				int i = 1;
+
+                foreach (var product in invoice.Products)
+				{
+					worksheet.Cell(row, 1).Value = i;
+                    worksheet.Cell(row, 2).Value = product.Description;
+                    worksheet.Cell(row, 3).Value = product.Grade;
+                    worksheet.Cell(row, 4).Value = product.Size;
+                    worksheet.Cell(row, 5).Value = product.FSCClaim;
+                    worksheet.Cell(row, 6).Value = product.FSCSertificate;
+                    worksheet.Cell(row, 7).Value = product.Unit;
+                    worksheet.Cell(row, 8).Value = product.OrderedQuantity;
+                    worksheet.Cell(row, 9).Value = product.Price;
+                    worksheet.Cell(row, 10).Value = product.Amount;
+
+                    row++;
+					i++;
+				}
+
+				row++;
+				worksheet.Cell(row, 1).Value = "Amount";
+                worksheet.Cell(row, 2).Value = invoice.Amount;
+				row++;
+                worksheet.Cell(row, 1).Value = "VAT %";
+                worksheet.Cell(row, 2).Value = invoice.VatAmount;
+			    row++;
+                worksheet.Cell(row, 1).Value = "Total Amount";
+                worksheet.Cell(row, 2).Value = invoice.TotalAmount;
+				row++;
+
+				foreach (var bank in invoice.CompanyBankDetails)
+				{
+					row++;
+                    worksheet.Cell(row, 1).Value = "Currency";
+                    worksheet.Cell(row, 2).Value = bank.CurrencyName;
+                    worksheet.Cell(row, 3).Value = "Bank";
+                    worksheet.Cell(row, 4).Value = bank.BankName;
+                    worksheet.Cell(row, 5).Value = "IBAN";
+                    worksheet.Cell(row, 6).Value = bank.Iban;
+                    worksheet.Cell(row, 7).Value = "Swift";
+                    worksheet.Cell(row, 8).Value = bank.Swift;
+                }
+
+                using (var stream = new MemoryStream())
+				{
+					excelDocument.SaveAs(stream);
+					var content = stream.ToArray();
+					string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+					var strDate = DateTime.Now.ToString("yyyyMMdd");
+					string filename = string.Format($"Invoice_{strDate}.xlsx");
+
+					return File(content, contentType, filename);
+				}
+			}
+		}
 
 	}
 }

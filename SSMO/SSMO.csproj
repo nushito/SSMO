@@ -20,7 +20,7 @@
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Axion.Conversion" Version="2.2.1" />
     <PackageReference Include="Beiyuan.WebSystem.UI" Version="3.1.0" />
-    <PackageReference Include="IronPdf" Version="2023.1.11416" />
+    <PackageReference Include="ClosedXML" Version="0.100.3" />
     <PackageReference Include="iTextSharp" Version="5.5.13.3" />
     <PackageReference Include="itextsharp.xmlworker" Version="5.5.13.3" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.17" />

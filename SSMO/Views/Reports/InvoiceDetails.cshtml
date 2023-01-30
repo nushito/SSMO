@@ -12,10 +12,10 @@
           <p style="color: #7e8d9f;font-size: 20px;">Invoice No: <strong>@Model.DocumentNumber</strong></p>
         </div>
         <div class="col-xl-3 float-end">
-          <a class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark"><i
-              class="fas fa-print text-primary"></i> Print</a>
+          <a class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportToExcel"><i
+              class="fas fa-print text-primary"></i> Excel</a>
           <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportInvoiceToPdf"><i
-              class="far fa-file-pdf text-danger"></i> Export</a>  
+              class="far fa-file-pdf text-danger"></i> PDF</a>  
                <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" 
                asp-controller="Documents" 
                asp-action="BgInvoice"
