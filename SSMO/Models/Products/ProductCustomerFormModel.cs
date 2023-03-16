@@ -23,10 +23,10 @@ namespace SSMO.Models.Products
         public int CustomerOrderId { get; set; }
      
         [Range(0.0, 9999999999999.99999)]
-        public decimal OrderedQuantity { get; set; }
+        public decimal Quantity { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
-        public decimal QuantityM3 { get; set; }
+        public decimal OrderedQuantity { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
         public decimal Price { get; set; }

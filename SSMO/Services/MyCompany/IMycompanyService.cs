@@ -22,5 +22,6 @@ namespace SSMO.Services.MyCompany
             string bgName, string bgCity, string bgAddress, string bgCountry, string bgRepresentative);
 
         public int GetMyCompanyId(string name);
+        public ICollection<string> MyCompaniesFscList();
     }
 }

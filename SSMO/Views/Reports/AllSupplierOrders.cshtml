@@ -36,12 +36,12 @@
            asp-controller="Reports"
            asp-action="AllSupplierOrders"
            asp-route-currentPage="@previouspage"
-           asp-route-customerName="@Model.SupplierName"><<</a>
+           asp-route-supplierName="@Model.SupplierName"><<</a>
     </div>
 
     @{
         var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
-        !Model.SupplierOrderCollection.Any();
+                             Model.SupplierOrderCollection == null;
     }
 
     <div class="col-md-6">
@@ -49,7 +49,7 @@
            asp-controller="Reports"
            asp-action="AllSupplierOrders"
            asp-route-currentPage="@(Model.CurrentPage + 1)"
-           asp-route-customerName="@Model.SupplierName">>></a>
+           asp-route-supplierName="@Model.SupplierName">>></a>
     </div>
 </div>
 
@@ -77,30 +77,33 @@
 </div>
 <hr />
 <div class="container">
-    @foreach (var order in Model.SupplierOrderCollection)
+    @if(Model.SupplierOrderCollection != null)
     {
-        <div class="row">
-            <div class="col">
-                @order.SupplierOrderNumber
-            </div>
-            <div class="col">
-                @order.Date
-            </div>
-            <div class="col">
-                @order.LoadingAddress
-            </div>
-            <div class="col">
-                @order.DeliveryAddress
-            </div>
-            <div class="col">
-                @order.StatusName
-            </div>
-            <div class="col">
-                @order.CustomerOrderConfirmationNumber
-            </div>
-            <a asp-controller="Reports" asp-action="SupplierOrderDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
-            <a asp-controller="Reports" asp-action="SupplierOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
-        </div>
-        <hr />
-    }
+        @foreach (var order in Model.SupplierOrderCollection)
+        {
+                <div class="row">
+                    <div class="col">
+                    @order.SupplierOrderNumber
+                    </div>
+                    <div class="col">
+                    @order.Date
+                    </div>
+                    <div class="col">
+                    @order.LoadingAddress
+                    </div>
+                    <div class="col">
+                    @order.DeliveryAddress
+                    </div>
+                    <div class="col">
+                    @order.StatusName
+                    </div>
+                    <div class="col">
+                    @order.CustomerOrderConfirmationNumber
+                    </div>
+                    <a asp-controller="Reports" asp-action="SupplierOrderDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
+                    <a asp-controller="Reports" asp-action="SupplierOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
+                </div>
+                <hr />
+        }
+    }    
 </div>

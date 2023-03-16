@@ -15,5 +15,9 @@ namespace SSMO.Models.Reports.Invoice
         public string CustomerName { get; set; }
         public int CustomerOrderId { get; set; }
         public int OrderConfirmationNumber { get; set; }
+        public int CreditToInvoiceNumber { get; set; }
+        public DateTime CreditToInvoiceDate { get; set; }
+        public int DebitToInvoiceNumber { get; set; }
+        public DateTime DebitToInvoiceDate { get; set; }
     }
 }

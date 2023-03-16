@@ -35,9 +35,10 @@ namespace SSMO.Services.Documents.Purchase
             decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses, 
             int vat, string truckNumber, string fscCertificate, string fscClaim, string swb)
         {
-            var supplierOrder = dbContext.SupplierOrders.FirstOrDefault(o => o.Number.ToLower() == supplierOrderNumber.ToLower());
+            var supplierOrder = dbContext.SupplierOrders.FirstOrDefault
+                (o => o.Number.ToLower() == supplierOrderNumber.ToLower());
             var amount = supplierOrder.Amount;
-            //var totalAmount = supplierOrder.TotalAmount;
+            
             var customerOrder = dbContext.CustomerOrders.Where(sp => sp.Id == supplierOrder.CustomerOrderId)
                                  .FirstOrDefault();
             customerOrder.NetWeight = netWeight;
@@ -98,7 +99,8 @@ namespace SSMO.Services.Documents.Purchase
             }
             else
             {
-                purchase.Balance = purchase.TotalAmount - purchase.PaidAvance;
+                purchase.PaidAvance = supplierOrder.PaidAvance;
+                purchase.Balance = supplierOrder.TotalAmount - supplierOrder.PaidAvance;
             }
 
             dbContext.Documents.Add(purchase);

@@ -9,6 +9,7 @@ using System.IO;
 using System.Threading.Tasks;
 using System;
 using Microsoft.AspNetCore.Routing;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace SSMO.Services.PDF
 {
@@ -54,7 +55,7 @@ namespace SSMO.Services.PDF
                     viewDictionary,
                     new TempDataDictionary(actionContext.HttpContext, tempDataProvider),
                     sw,
-                    new HtmlHelperOptions());
+                    new HtmlHelperOptions());                
 
                 await viewResult.View.RenderAsync(viewContext);
                 return sw.ToString();

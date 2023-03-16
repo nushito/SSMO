@@ -40,7 +40,7 @@
     
     @{
         var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
-                                     !Model.CustomerOrderCollection.Any();
+                                     Model.CustomerOrderCollection == null;
     }
 
     <div class="col-md-6">
@@ -78,32 +78,35 @@
 <br />
 </div>
 <div class="container">
-@foreach(var order in Model.CustomerOrderCollection)
-{
-    <div class="row">
-        <div class="col">
-            @order.OrderConfirmationNumber
-        </div>
-          <div class="col">
-            @order.CustomerPoNumber
-        </div>
-         <div class="col">
-            @order.Date
-        </div>
-         <div class="col">
-           @order.LoadingPlace
-        </div>
-         <div class="col">
-           @order.DeliveryAddress
-        </div>
-     <div class="col">
-           @order.StatusName
-    </div>
-    <a asp-controller="Reports" asp-action="CustomerOrderDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
-    <a asp-controller="Reports" asp-action="CustomerOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
-    </div>
-    <hr />
-}
+    @if(Model.CustomerOrderCollection != null)
+    {
+        @foreach (var order in Model.CustomerOrderCollection)
+        {
+            <div class="row">
+                <div class="col">
+                    @order.OrderConfirmationNumber
+                </div>
+                  <div class="col">
+                    @order.CustomerPoNumber
+                </div>
+                 <div class="col">
+                    @order.Date
+                </div>
+                 <div class="col">
+                    @order.LoadingPlace
+                </div>
+                 <div class="col">
+                    @order.DeliveryAddress
+                </div>
+             <div class="col">
+                    @order.StatusName
+            </div>
+            <a asp-controller="Reports" asp-action="CustomerOrderDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
+            <a asp-controller="Reports" asp-action="CustomerOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
+            </div>
+            <hr />
+        }
+    }   
 </div>
 
 

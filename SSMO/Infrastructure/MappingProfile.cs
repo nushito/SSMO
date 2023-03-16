@@ -10,6 +10,7 @@ using SSMO.Models.Products;
 using SSMO.Models.Reports;
 using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
+using SSMO.Models.Reports.Purchase;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using SSMO.Models.Suppliers;
 using SSMO.Services.Documents.Invoice;
@@ -46,12 +47,15 @@ namespace SSMO.Infrastructure
             this.CreateMap<Product, ProductSupplierDetails>();
             this.CreateMap<Product, ProductsForInvoiceModel>();
             this.CreateProjection<ProductCustomerFormModel, Product>()
-                  .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.OrderedQuantity))
+                .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.OrderedQuantity))
                 .ForMember(a => a.Price, b => b.MapFrom(a => a.Price));
             this.CreateMap<Product, ProductsForEditSupplierOrder>();
             this.CreateMap<Product, BGProductsForBGInvoiceViewModel>();
             this.CreateMap<Product, InvoiceProductsDetailsViewModel>();
-            this.CreateMap<Product, InvoiceProductsDetailsViewModel>();          
+            this.CreateMap<Product, InvoiceProductsDetailsViewModel>();
+            this.CreateMap<Product, EditProductForCreditAndDebitViewModel>();
+            this.CreateMap<Product, ProductsForCustomerOrderDetailsViewModel>();
+            this.CreateMap<Product, ProductsSupplierOrderDetailsViewModel>();
 
             this.CreateMap<Status, StatusModel>();
 
@@ -68,6 +72,7 @@ namespace SSMO.Infrastructure
             this.CreateMap<Document, CustomerInvoicePaymentDetailsModel>();
             this.CreateMap<Document, InvoiceCollectionViewModel>();
             this.CreateMap<Document, InvoiceDetailsViewModel>();
+            this.CreateMap<Document, PurchaseInvoicesViewModel>();
 
            
             this.CreateMap<Address, CustomerForEditAddressFormModel>();

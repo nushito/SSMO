@@ -114,6 +114,7 @@
 
             data.Grades.AddRange(new[]
             {
+                new Grade {Name = "None"},
                 new Grade{Name = "A"},
                 new Grade{Name = "B"},
                 new Grade {Name = "C"},
@@ -149,11 +150,12 @@
 
             data.Sizes.AddRange(new[]
             {
+                new Size {Name = "None"},
                 new Size {Name = "3/1250/2500"},
-                new Size {Name ="3/2500/1250"},
+                new Size {Name = "3/2500/1250"},
                 new Size {Name = "3/1220/2440"},
                 new Size {Name = "3/2440/1220"},
-                new Size {Name ="4/1250/2500"},
+                new Size {Name = "4/1250/2500"},
                 new Size {Name = "4/2500/1250"},
                 new Size {Name = "4/1220/2440"},
                 new Size {Name = "4/2440/1220"},

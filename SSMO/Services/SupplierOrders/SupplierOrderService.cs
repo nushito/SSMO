@@ -107,11 +107,12 @@ namespace SSMO.Services.SupplierOrders
             return supplierOrderForEdit;
         }
 
-        public IEnumerable<SupplierOrdersPaymentDetailsModel> GetSupplierOrders(string supplierName)
+        public SupplierOrderPaymentCollectionModel GetSupplierOrders
+            (string supplierName, int currentpage, int supplierOrdersPerPage)
         {
-            if(supplierName == null)
+            if(String.IsNullOrEmpty(supplierName))
             {
-                return null;
+                return new SupplierOrderPaymentCollectionModel();
             }
 
             var supplierId = dbContext.Suppliers
@@ -123,7 +124,14 @@ namespace SSMO.Services.SupplierOrders
                 .Where(sup=>sup.SupplierId == supplierId);
 
             var supplierOrdersCollection = supplierOrders.ProjectTo<SupplierOrdersPaymentDetailsModel>(mapper).ToList();
-            return supplierOrdersCollection;    
+
+            var supplierOrderPaymentCollection = new SupplierOrderPaymentCollectionModel
+            {
+                TotalSupplierOrders = supplierOrders.Count(),
+                SupplierOrderPaymentCollection = supplierOrdersCollection.Skip((currentpage - 1) * supplierOrdersPerPage).Take(supplierOrdersPerPage)
+            };
+
+            return supplierOrderPaymentCollection;    
         }
 
         public ICollection<SupplierOrdersListForPurchaseEditModel> GetSupplierOrdersNumbers()

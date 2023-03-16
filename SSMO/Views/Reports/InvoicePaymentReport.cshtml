@@ -43,7 +43,7 @@
 
     @{
         var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
-        !Model.CustomerPaymentCollection.Any();
+        Model.CustomerPaymentCollection == null;
     }
 
     <div class="col-md-6">
@@ -66,6 +66,9 @@
                 <th>
                     Payment Status
                 </th>
+                 <th>
+                    Amount
+                </th>
                 <th>
                     Advance Payment
                 </th>
@@ -78,25 +81,29 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var order in Model.CustomerPaymentCollection)
+        @if(Model.CustomerPaymentCollection != null)
         {
-        <tr>
-            <th> @order.DocumentNumber</th>
-            <th> @order.Date</th>
-            @if( @order.PaidStatus == true)
+            @foreach (var order in Model.CustomerPaymentCollection)
             {
-            <th>Paid</th>
-            }
-            else
-            {
-            <th>Not Paid</th>
-            }
-            <th> @order.PaidAvance</th>
-            <th> @order.DatePaidAmount</th>
-            <th> @order.Balance</th>
-           <th><a asp-controller="Reports" asp-action="EditInvoicePayment" asp-route-documentNumber="@order.DocumentNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
-        </tr>
-        }
+                <tr>
+                    <th> @order.DocumentNumber</th>
+                    <th> @order.Date</th>
+                    @if (@order.PaidStatus == true)
+                    {
+                        <th>Paid</th>
+                    }
+                    else
+                    {
+                        <th>Not Paid</th>
+                    }
+                    <th> @order.TotalAmount</th>
+                    <th> @order.PaidAvance</th>
+                    <th> @order.DatePaidAmount</th>
+                    <th> @order.Balance</th>
+                   <th><a asp-controller="Reports" asp-action="EditInvoicePayment" asp-route-documentNumber="@order.DocumentNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
+                </tr>
+            }   
+        }        
     </tbody>
 </table>
 

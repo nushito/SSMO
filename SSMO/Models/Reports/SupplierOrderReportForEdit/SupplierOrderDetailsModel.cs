@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace SSMO.Models.Reports.SupplierOrderReportForEdit
 {
@@ -19,5 +21,6 @@ namespace SSMO.Models.Reports.SupplierOrderReportForEdit
         public int CustomerOrderConfirmationNumber { get; set; }
         public string CustomerName { get; set; }
         public bool PaidStatus { get; set; }
+        public IEnumerable<ProductsSupplierOrderDetailsViewModel> Products { get; set; }
     }
 }

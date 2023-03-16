@@ -12,9 +12,8 @@ namespace SSMO.Services.Reports
 {
     public interface IReportsService
     {
-        IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders(string name, int currentpage, int customerOrdersPerPage);
-
-        IEnumerable<SupplierOrderDetailsModel> AllSupplierOrders(string name, int currentpage, int supplierOrdersPerPage);
+        CustomerOrdersQueryModel AllCustomerOrders(string name, int currentpage, int customerOrdersPerPage);
+        SupplierOrdersQueryModel AllSupplierOrders(string name, int currentpage, int supplierOrdersPerPage);
         SupplierOrderDetailsModel SupplierOrderDetail(int id);
         CustomerOrderDetailsModel CustomerOrderDetails(int id);
         bool EditCustomerOrder(int id, string number,
@@ -28,12 +27,12 @@ namespace SSMO.Services.Reports
                decimal paidAdvance, bool paidStatus,
                List<ProductCustomerFormModel> products);
         public IEnumerable<CustomerOrderListViewBySupplier> GetCustomerOrdersBySupplier(int customerId, string supplierId);
-        public IEnumerable<CustomerInvoicePaymentDetailsModel> CustomersInvoicesPaymentDetails(string customerName, int currentpage, int customerInvoicePerPage);
-        public IEnumerable<SupplierInvoicePaymentDetailsModel> SuppliersInvoicesPaymentDetails(string supplierName, int currentpage, int supplierInvoicePerPage);
+        public CustomerInvoicesPaymentCollectionViewModel CustomersInvoicesPaymentDetails(string customerName, int currentpage, int customerInvoicePerPage);
+        public SupplierInvoiceCollectionViewModel SuppliersInvoicesPaymentDetails(string supplierName, int currentpage, int supplierInvoicePerPage);
 
         public CustomerOrderForEdit CustomerOrderDetailsForEdit(int id);
 
-        public IEnumerable<CustomerOrderDetailsPaymentModel> CustomerOrdersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage);
+        public CustomerOrderPaymentCollectionViewModel CustomerOrdersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage);
         public SupplierOrderForEditModel SupplierOrderForEditDetails(int supplierOrderId);
 
         bool EditSupplierOrder(int supplierOrderId, string supplierOrderNumber,
@@ -47,11 +46,11 @@ namespace SSMO.Services.Reports
               decimal paidAdvance, bool paidStatus, int? vat,
               List<ProductsForEditSupplierOrder> products);
 
-        public IEnumerable<InvoiceCollectionViewModel> InvoiceCollection(string myCompanyName, int currentpage, int invoicesPerPage);
+        public InvoiceReportModel InvoiceCollection(string myCompanyName, int currentpage, int invoicesPerPage);
         public InvoiceDetailsViewModel InvoiceDetails(int id);
 
-        public ICollection<PurchaseInvoicesViewModel> PurchaseInvoices
-            (string supplierName, DateTime startDate, DateTime endDate, int invoiceperPage, int currentpage);
+        public PurchaseCollectionQueryModel PurchaseInvoices
+            (string supplierName, DateTime startDate, DateTime endDate, int currentpage, int invoiceperPage);
 
     }
 }

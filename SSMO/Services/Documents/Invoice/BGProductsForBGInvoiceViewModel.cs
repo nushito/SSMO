@@ -24,13 +24,10 @@ namespace SSMO.Services.Documents.Invoice
         public decimal OrderedQuantity { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
-        public decimal Price { get; set; }
+        public decimal BgPrice { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
-        public decimal PurchaseAmount { get; set; }
-
-        [Range(0.0, 9999999999999.99999)]
-        public decimal Amount { get; set; }
+        public decimal BgAmount { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
     }

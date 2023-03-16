@@ -19,6 +19,10 @@ namespace SSMO.Data.Models
         public int DocumentNumber { get; set; }
         [DisplayName("Purchase Invoice Number")]
         public string PurchaseNumber { get; set; }
+        public int CreditToInvoiceNumber { get; set; }
+        public DateTime CreditToInvoiceDate { get; set; }
+        public int DebitToInvoiceNumber { get; set; }
+        public DateTime DebitToInvoiceDate { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
         public int? CustomerId { get; set; }
@@ -60,9 +64,13 @@ namespace SSMO.Data.Models
         public ServiceOrder ServiceOrder { get; set; }
         public int? Vat { get; set; }
         public decimal Amount { get; set; }
+        public decimal CreditNoteTotalAmount { get; set; }
+        public decimal DebitNoteTotalAmount { get; set; }
         public decimal? VatAmount { get; set; }
         public decimal TotalAmount { get; set; }
         public ICollection<Product> Products { get; set; }
         public ICollection<Product> PurchaseProducts { get; set; }
+        public ICollection<Product> CreditNoteProducts { get; set; }
+        public ICollection<Product> DebitNoteProducts { get; set; }
     }
 }

@@ -49,14 +49,14 @@ namespace SSMO.Services.Reports
             this.customerOrderService = customerOrderService;
             this.supplierService = supplierService;
         }
-        public IEnumerable<CustomerOrderDetailsModel> AllCustomerOrders
+        public CustomerOrdersQueryModel AllCustomerOrders
             (string customerName, int currentpage, int customerOrdersPerPage)
         {
 
             if (String.IsNullOrEmpty(customerName))
             {
-                var query = dbcontext.CustomerOrders.ProjectTo<CustomerOrderDetailsModel>(this.mapper).ToList();
-                return query.Skip((currentpage - 1) * customerOrdersPerPage).Take(customerOrdersPerPage);
+                
+                return new CustomerOrdersQueryModel();
             }
 
             var customerId = dbcontext.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
@@ -69,10 +69,24 @@ namespace SSMO.Services.Reports
             // var totalOrders = queryOrders.Count();  
 
             var orders = queryOrders.ProjectTo<CustomerOrderDetailsModel>(this.mapper).ToList();
-
+           
             var customerOrdersList = orders.Skip((currentpage - 1) * customerOrdersPerPage).Take(customerOrdersPerPage);
 
-            return customerOrdersList;
+            foreach (var order in customerOrdersList)
+            {
+                order.StatusName = dbcontext.Statuses
+                    .Where(i => i.Id == order.StatusId)
+                    .Select(n => n.Name)
+                    .FirstOrDefault();
+            }
+
+            var customerOrdersCollection = new CustomerOrdersQueryModel
+            {
+                TotalCustomerOrders = orders.Count(),
+                CustomerOrders = customerOrdersList
+            };
+
+            return customerOrdersCollection;
         }
 
         public CustomerOrderForEdit CustomerOrderDetailsForEdit(int id)
@@ -103,36 +117,40 @@ namespace SSMO.Services.Reports
             return orderForEdit;
         }
 
-        public IEnumerable<CustomerInvoicePaymentDetailsModel> CustomersInvoicesPaymentDetails
+        public CustomerInvoicesPaymentCollectionViewModel CustomersInvoicesPaymentDetails
             (string customerName, int currentpage, int customerInvoicePerPage)
         {
             if (String.IsNullOrEmpty(customerName))
             {
-                return new List<CustomerInvoicePaymentDetailsModel>();
+                return new CustomerInvoicesPaymentCollectionViewModel();
             }
 
             var customerId = dbcontext.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
                                 .Select(a => a.Id)
                                 .FirstOrDefault();
 
-            var customerOrdersId = dbcontext.CustomerOrders.Where(c => c.CustomerId == customerId).Select(i => i.Id).ToList();
-
             var queryInvoices = dbcontext.Documents
-                    .Where(a => customerOrdersId.Contains(a.CustomerOrderId) || a.CustomerId == customerId && a.DocumentType == Data.Enums.DocumentTypes.Invoice);
+                    .Where(a => a.DocumentType == Data.Enums.DocumentTypes.Invoice && a.CustomerId == customerId);
 
             var invoices = queryInvoices.ProjectTo<CustomerInvoicePaymentDetailsModel>(this.mapper).ToList();
 
             var customerPaymentList = invoices.Skip((currentpage - 1) * customerInvoicePerPage).Take(customerInvoicePerPage);
 
-            return customerPaymentList;
+            var custpmerOrdersPayments = new CustomerInvoicesPaymentCollectionViewModel
+            {
+                TotalInvoices = queryInvoices.Count(),
+                CustomerInvoices = customerPaymentList
+            };
+
+            return custpmerOrdersPayments;
         }
 
-        public IEnumerable<SupplierInvoicePaymentDetailsModel> SuppliersInvoicesPaymentDetails
+        public SupplierInvoiceCollectionViewModel SuppliersInvoicesPaymentDetails
             (string supplierName, int currentpage, int supplierInvoicePerPage)
         {
             if (String.IsNullOrEmpty(supplierName))
             {
-                return new List<SupplierInvoicePaymentDetailsModel>();
+                return new SupplierInvoiceCollectionViewModel();
             }
 
             var supplierId = dbcontext.Suppliers
@@ -147,12 +165,30 @@ namespace SSMO.Services.Reports
             var purchases = purchaseInvoices.ProjectTo<SupplierInvoicePaymentDetailsModel>(mapper).ToList();
             var purchasePaymentList = purchases.Skip((currentpage - 1) * supplierInvoicePerPage).Take(supplierInvoicePerPage);
 
-            return purchasePaymentList;
+            var purchaseInvoiceCollection = new SupplierInvoiceCollectionViewModel
+            {
+                TotalPurchaseInvoices = purchaseInvoices.Count(),
+                PurchaseInvoices = purchasePaymentList
+            };
+
+            return purchaseInvoiceCollection;
         }
         public CustomerOrderDetailsModel CustomerOrderDetails(int id)
         {
             var findorder = dbcontext.CustomerOrders.Where(a => a.Id == id);
             CustomerOrderDetailsModel order = findorder.ProjectTo<CustomerOrderDetailsModel>(mapper).FirstOrDefault();
+            var products = dbcontext.Products
+                .Where(i => i.CustomerOrderId == id);
+            
+           order.Products = products.ProjectTo<ProductsForCustomerOrderDetailsViewModel>(mapper).ToList();
+
+            foreach (var product in order.Products)
+            {
+                product.DescriptionName = productService.GetDescriptionName(product.DescriptionId);
+                product.GradeName = productService.GetGradeName(product.GradeId);
+                product.SizeName = productService.GetSizeName(product.SizeId);
+            }
+
             var supplierOrderDetail = dbcontext.SupplierOrders
                 .Where(o => o.CustomerOrderId == id)
                 .Select(a => new
@@ -177,7 +213,7 @@ namespace SSMO.Services.Reports
                 .FirstOrDefault();
             order.SupplierName = supplierName;
             order.MyCompanyName = myCompanyName;
-            return (CustomerOrderDetailsModel)order;
+            return order;
         }
 
         public bool EditCustomerOrder(int id,
@@ -241,9 +277,9 @@ namespace SSMO.Services.Reports
 
                     productsPerCorder.ElementAt(i).TotalSheets = products.ElementAt(i).Pallets * products.ElementAt(i).SheetsPerPallet;
 
-                    if (products.ElementAt(i).QuantityM3 != 0)
+                    if (products.ElementAt(i).Quantity != 0)
                     {
-                        productsPerCorder.ElementAt(i).OrderedQuantity = products.ElementAt(i).QuantityM3;
+                        productsPerCorder.ElementAt(i).OrderedQuantity = products.ElementAt(i).Quantity;
                     }
                     else
                     {
@@ -296,11 +332,11 @@ namespace SSMO.Services.Reports
             return customerOrdersBySupplier;
         }
 
-        public IEnumerable<CustomerOrderDetailsPaymentModel> CustomerOrdersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage)
+        public CustomerOrderPaymentCollectionViewModel CustomerOrdersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage)
         {
             if (String.IsNullOrEmpty(customerName))
             {
-                return new List<CustomerOrderDetailsPaymentModel>();
+                return new CustomerOrderPaymentCollectionViewModel();
             }
 
             var customerId = dbcontext.Customers.Where(a => a.Name.ToLower() == customerName.ToLower())
@@ -312,16 +348,22 @@ namespace SSMO.Services.Reports
             var incustomerOrdersCollectionvoices = customerOrders.ProjectTo<CustomerOrderDetailsPaymentModel>(this.mapper).ToList();
 
             var customerOrdersPaymentList = incustomerOrdersCollectionvoices.Skip((currentpage - 1) * customerOrdersPerPage).Take(customerOrdersPerPage);
-
-            return customerOrdersPaymentList;
+            
+            var customerOrdersPayments = new CustomerOrderPaymentCollectionViewModel
+            {
+                TotalCustomerOrders = customerOrders.Count(),
+                CustomerPaymentCollection = customerOrdersPaymentList
+            };
+            return customerOrdersPayments;
 
         }
 
-        public IEnumerable<SupplierOrderDetailsModel> AllSupplierOrders(string name, int currentpage, int supplierOrdersPerPage)
+        public SupplierOrdersQueryModel AllSupplierOrders
+            (string name, int currentpage, int supplierOrdersPerPage)
         {
             if (String.IsNullOrEmpty(name))
             {
-                return new List<SupplierOrderDetailsModel>();
+                return new SupplierOrdersQueryModel();
             }
 
             var supplierId = dbcontext.Suppliers.Where(a => a.Name.ToLower() == name.ToLower())
@@ -336,7 +378,10 @@ namespace SSMO.Services.Reports
             // var totalOrders = queryOrders.Count();  
 
             var supplierOrders = queryOrders.ProjectTo<SupplierOrderDetailsModel>(this.mapper).ToList();
-            foreach (var order in supplierOrders)
+            
+            var supplierOrdersList = supplierOrders.Skip((currentpage - 1) * supplierOrdersPerPage).Take(supplierOrdersPerPage);
+
+            foreach (var order in supplierOrdersList)
             {
                 order.CustomerOrderConfirmationNumber = dbcontext.CustomerOrders
                     .Where(id => id.Id == order.CustomerOrderId)
@@ -344,9 +389,13 @@ namespace SSMO.Services.Reports
                     .FirstOrDefault();
             }
 
-            var supplierOrdersList = supplierOrders.Skip((currentpage - 1) * supplierOrdersPerPage).Take(supplierOrdersPerPage);
+            var supplierOrdersQery = new SupplierOrdersQueryModel
+            {
+                TotalSupplierOrders = supplierOrders.Count(),
+                SupplierOrders = supplierOrdersList
+            };
 
-            return supplierOrdersList;
+            return supplierOrdersQery;
         }
 
         public SupplierOrderForEditModel SupplierOrderForEditDetails(int supplierOrderId)
@@ -515,23 +564,39 @@ namespace SSMO.Services.Reports
                 .Select(num => num.OrderConfirmationNumber)
                 .FirstOrDefault();
 
+            var products = dbcontext.Products
+                .Where(s => s.SupplierOrderId == id);
+
+            supplierOrderDetail.Products = products.ProjectTo<ProductsSupplierOrderDetailsViewModel>(mapper).ToList();  
+
             return supplierOrderDetail;
         }
 
-        public IEnumerable<InvoiceCollectionViewModel> InvoiceCollection(string myCompanyName, int currentpage, int invoicesPerPage)
+        public InvoiceReportModel InvoiceCollection
+            (string myCompanyName, int currentpage =1, int invoicesPerPage = int.MaxValue)
         {
-            if (myCompanyName == null) return new List<InvoiceCollectionViewModel>();
+            if (myCompanyName == null) return new InvoiceReportModel();
 
             var companyId = myCompanyService.GetMyCompanyId(myCompanyName);
 
             var invoices = dbcontext.Documents
-                .Where(type => type.DocumentType == Data.Enums.DocumentTypes.Invoice)
+                .Where(type => type.DocumentType == DocumentTypes.Invoice || 
+                       type.DocumentType == DocumentTypes.CreditNote || 
+                       type.DocumentType == DocumentTypes.DebitNote)
                 .Where(m => m.MyCompanyId == companyId);
-            // .ToList();
-
+           
             var invoiceDetailsCollection = invoices.ProjectTo<InvoiceCollectionViewModel>(this.mapper).ToList();
+          
+            var collection = new InvoiceReportModel
+            {
+                InvoiceCollection = invoiceDetailsCollection.Skip((currentpage - 1) * invoicesPerPage).Take(invoicesPerPage),
+                TotalInvoices = invoiceDetailsCollection.Count(),
+                CurrentPage = currentpage,
+                InvoicesPerPage= invoicesPerPage
 
-            foreach (var invoice in invoiceDetailsCollection)
+            };
+
+            foreach (var invoice in collection.InvoiceCollection)
             {
                 var customerOrderNumber = customerOrderService.CustomerOrderNumberById(invoice.CustomerOrderId);
                 var customerName = dbcontext.Customers
@@ -545,9 +610,7 @@ namespace SSMO.Services.Reports
                 invoice.CustomerName = customerName;
             }
 
-            var invoiceCollection = invoiceDetailsCollection.Skip((currentpage - 1) * invoicesPerPage).Take(invoicesPerPage);
-
-            return invoiceCollection;
+            return collection;
         }
 
         public InvoiceDetailsViewModel InvoiceDetails(int id)
@@ -619,8 +682,8 @@ namespace SSMO.Services.Reports
             return invoiceDetails;
         }
 
-        ICollection<PurchaseInvoicesViewModel> IReportsService.PurchaseInvoices
-            (string supplierName, DateTime startDate, DateTime endDate, int invoiceperPage, int currentpage)
+        public PurchaseCollectionQueryModel PurchaseInvoices
+            (string supplierName, DateTime startDate, DateTime endDate, int currentpage = 1, int invoiceperPage = int.MaxValue)
         {
             var purchaseDocuments = dbcontext.Documents
                 .Where(d => d.DocumentType == Data.Enums.DocumentTypes.Purchase);
@@ -646,46 +709,44 @@ namespace SSMO.Services.Reports
                     .OrderByDescending(d => d.Date);
             }
 
-            var purchaseInvoices = new List<PurchaseInvoicesViewModel>();
+            var purchases = purchaseDocuments.ProjectTo<PurchaseInvoicesViewModel>(this.mapper).ToList();
 
-            foreach (var invoice in purchaseDocuments.ToList())
+            var purchaseCollection = purchases.Skip((currentpage - 1) * invoiceperPage).Take(invoiceperPage);
+
+            var purchaseInvoices = new PurchaseCollectionQueryModel 
+            { 
+                PurchaseInvoiceCollection = purchaseCollection,
+                TotalPurchaseInvoices = purchaseDocuments.Count()
+            };
+
+            foreach (var purchase in purchaseInvoices.PurchaseInvoiceCollection)
             {
                 var customerId = dbcontext.CustomerOrders
-                     .Where(n => n.Id == invoice.CustomerOrderId)
+                     .Where(n => n.Id == purchase.CustomerOrderId)
                      .Select(n => n.CustomerId)
                      .FirstOrDefault();
-                var purchaseInvoice = new PurchaseInvoicesViewModel
-                {
-                    Id = invoice.Id,
-                    CustomerName = dbcontext.Customers
-                   .Where(i => i.Id == customerId)
-                   .Select(n => n.Name)
-                   .FirstOrDefault(),
-                    OrderConfirmationNumber = dbcontext.CustomerOrders
-                     .Where(i => i.Id == invoice.CustomerOrderId)
-                     .Select(o => o.OrderConfirmationNumber)
-                     .FirstOrDefault(),
-                    Date = invoice.Date,
-                    GrossWeight = invoice.GrossWeight,
-                    Incoterms = invoice.Incoterms,
-                    Number = invoice.PurchaseNumber,
-                    NetWeight = invoice.NetWeight,
-                    TruckNumber = invoice.TruckNumber,
-                    Swb = invoice.Swb,
-                    TotalAmount = invoice.TotalAmount,
-                    SupplierName = dbcontext.Suppliers
-                    .Where(i => i.Id == invoice.SupplierId)
-                    .Select(n => n.Name).FirstOrDefault(),
-                    SupplierOrderNumber = dbcontext.SupplierOrders
-                    .Where(i => i.Id == invoice.SupplierOrderId)
-                    .Select(n => n.Number).FirstOrDefault()
-                };
 
-                purchaseInvoices.Add(purchaseInvoice);
+                purchase.CustomerName = dbcontext.Customers
+               .Where(i => i.Id == customerId)
+               .Select(n => n.Name)
+               .FirstOrDefault();
+
+                purchase.OrderConfirmationNumber = dbcontext.CustomerOrders
+                 .Where(i => i.Id == purchase.CustomerOrderId)
+                 .Select(o => o.OrderConfirmationNumber)
+                 .FirstOrDefault();
+
+                purchase.SupplierName = dbcontext.Suppliers
+                .Where(i => i.Id == purchase.SupplierId)
+                .Select(n => n.Name).FirstOrDefault();
+
+                purchase.SupplierOrderNumber = dbcontext.SupplierOrders
+                .Where(i => i.Id == purchase.SupplierOrderId)
+                .Select(n => n.Number).FirstOrDefault();                
             }
+
             return purchaseInvoices;
         }
-
 
     }
 }

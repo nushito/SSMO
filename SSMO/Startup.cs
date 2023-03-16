@@ -26,6 +26,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using iTextSharp.text;
 using SSMO.Services.PDF;
+using SSMO.Services.Documents.Credit_Note;
+using SSMO.Services.Documents.DebitNote;
 
 namespace SSMO
 {
@@ -88,7 +90,10 @@ namespace SSMO
             services.AddTransient<ISupplierOrderService, SupplierOrderService>();
             services.AddTransient<IPurchaseService, PurchaseService>();
             services.AddTransient<IInvoiceService, InvoiceService>();
+            services.AddTransient<ICreditNoteService, CreditNoteService>();
+            services.AddTransient<IDebitNoteService, DebitNoteService>();
             services.AddScoped<IViewRenderService, ViewRenderService>();
+            services.AddScoped<IHtmlToPdfConverter, HtmlToPdfConverter>();
             services.AddScoped<HttpContextUserIdExtension>();
 
             services.AddMvc(options =>

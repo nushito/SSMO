@@ -19,7 +19,7 @@ namespace SSMO.Services.SupplierOrders
                 string loadingAddress, string deliveryAddress, string deliveryTerms);
         void TotalAmountAndQuantitySum(int supplierOrderId);
 
-        public IEnumerable<SupplierOrdersPaymentDetailsModel> GetSupplierOrders(string supplierName);
+        public SupplierOrderPaymentCollectionModel GetSupplierOrders(string supplierName, int currentpage, int supplierOrdersPerPage);
 
         public EditSupplierOrderPaymentModel GetSupplierOrderForEdit(string supplierOrderNumber);
 

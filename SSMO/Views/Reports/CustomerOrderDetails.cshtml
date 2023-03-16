@@ -76,4 +76,88 @@
          @Model.SupplierOrderNumber
     </dd>
 </dl>
+<hr />
+<p class="text-uppercase font-weight-bold">Products</p>
+<table>
+     <thead>
+                     <tr>                       
+                            <th>Description</th>
+                            <th>Size</th>
+                            <th>Grade</th>
+                            <th>FSC Claim</th>
+                            <th>FSC Certificate</th>
+                            <th>Pallets</th> 
+                            <th>Sheets/Pallet</th> 
+                            <th>Unit</th>                                      
+                            <th>Quantity</th> 
+                            <th>Price</th>                             
+                            <th>Amount</th>
+                        </tr>
+            </thead>
+            <tbody>
+        @foreach (var product in Model.Products)
+        {
+            <tr>
+                    <td class="col-sm-1">
+                        <div class="editor-field">
+                            @product.DescriptionName
+                        </div>
+                    </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                        @product.SizeName
+                            </div>
+                        </td>
+                            <td class="col-sm-1">
+                            <div class="editor-field">
+                        @product.GradeName
+                            </div>
+                        </td>
+                            <td class="col-sm-1">
+                            <div class="editor-field">
+                        @product.FscClaim
+                            </div>
+                        </td>
+                            <td class="col-sm-1">
+                            <div class="editor-field">
+                        @product.FscCertificate
+                            </div>
+                        </td>
+                             <td class="col-sm-1">
+                                <div class="editor-field">
+                        @product.Pallets
+                                </div>
+                            </td>
+                                <td class="col-sm-1">
+                                <div class="editor-field">
+                        @product.SheetsPerPallet
+                                </div>
+                            </td>
+                            <td class="col-sm-1">
+                            <div class="editor-field">
+                        @product.Unit
+                            </div>
+                        </td>
+                            <td class="col-sm-1">
+                            <div class="editor-field">
+                        @product.OrderedQuantity
+                            </div>
+                        </td>
+                            <td class="col-sm-1">
+                            <div class="editor-field">
+                        @product.Price
+                            </div>
+                        </td>
+                        
+                            <td class="col-sm-1">
+                            <div class="editor-field">
+                        @product.Amount
+                            </div>
+                        </td>
+            </tr>
+
+        }
+            </tbody>
+   
+</table>
 

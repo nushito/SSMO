@@ -41,7 +41,7 @@
 
     @{
         var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
-        !Model.CustomerOrdersPaymentCollection.Any();
+                                     Model.CustomerOrdersPaymentCollection == null;
     }
 
     <div class="col-md-6">
@@ -64,6 +64,9 @@
                 <th>
                     Payment Status
                 </th>
+                 <th>
+                    Amount
+                </th>
                 <th>
                     Advance Payment
                 </th>
@@ -76,24 +79,28 @@
         </tr>
     </thead>
     <tbody>
-        @foreach(var order in Model.CustomerOrdersPaymentCollection)
+        @if(Model.CustomerOrdersPaymentCollection != null)
         {
-        <tr>
-            <th> @order.OrderConfirmationNumber</th>
-            <th> @order.Date</th>
-            @if( @order.PaidStatus == true)
+            @foreach (var order in Model.CustomerOrdersPaymentCollection)
             {
-            <th>Paid</th>
+                <tr>
+                    <th> @order.OrderConfirmationNumber</th>
+                    <th> @order.Date</th>
+                    @if (@order.PaidStatus == true)
+                    {
+                        <th>Paid</th>
+                    }
+                    else
+                    {
+                        <th>Not Paid</th>
+                    }
+                    <th> @order.TotalAmount</th>
+                    <th> @order.PaidAvance</th>
+                    <th> @order.DatePaidAmount</th>
+                    <th> @order.Balance</th>
+                   <th><a asp-controller="Reports" asp-action="EditCustomerOrderPayment" asp-route-orderConfirmationNumber="@order.OrderConfirmationNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
+                </tr>
             }
-            else
-            {
-            <th>Not Paid</th>
-            }
-            <th> @order.PaidAvance</th>
-            <th> @order.DatePaidAmount</th>
-            <th> @order.Balance</th>
-           <th><a asp-controller="Reports" asp-action="EditCustomerOrderPayment" asp-route-orderConfirmationNumber="@order.OrderConfirmationNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
-        </tr>
-        }
+        }        
     </tbody>
 </table>

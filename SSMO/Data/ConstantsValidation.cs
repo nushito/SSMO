@@ -7,5 +7,6 @@ namespace SSMO.Data
         public const int EikLength = 9;
         public const int VatLength = 11;
         public const int InvoiceNumber = 10;
+
     }
 }

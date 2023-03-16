@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace SSMO.Services.Reports
 {
@@ -18,5 +20,6 @@ namespace SSMO.Services.Reports
         public string StatusName { get; set; }
         public string CustomerName { get; set; }
         public bool PaidStatus { get; set; }
+        public ICollection<ProductsForCustomerOrderDetailsViewModel> Products { get; set; }
     }
 }

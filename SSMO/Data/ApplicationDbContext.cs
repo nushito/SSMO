@@ -203,9 +203,22 @@ namespace SSMO.Data
                .Property(a => a.PurchaseAmount)
                .HasPrecision(18, 4);
 
+
+            builder.Entity<Product>()
+               .Property(a => a.CreditNoteProductAmount)
+               .HasPrecision(18, 4);
+
             builder.Entity<Product>()
                 .Property(a => a.CostPrice)
                 .HasPrecision(18, 4);
+
+            builder.Entity<Product>()
+               .Property(a => a.BgPrice)
+               .HasPrecision(18, 4);
+
+            builder.Entity<Product>()
+              .Property(a => a.BgAmount)
+              .HasPrecision(18, 4);
 
             builder.Entity<Product>()
                 .Property(a => a.OrderedQuantity)
@@ -220,7 +233,33 @@ namespace SSMO.Data
             builder.Entity<Product>()
                 .Property(a => a.QuantityM3)
                 .HasColumnType("decimal")
-                .HasPrecision(18, 5);               
+                .HasPrecision(18, 5);
+
+            builder.Entity<Product>()
+                .Property(a => a.DebitNoteQuantity)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
+
+            builder.Entity<Product>()
+               .Property(a => a.DebitNoteAmount)
+               .HasPrecision(18, 4);
+
+            builder.Entity<Product>()
+              .Property(a => a.DebitNotePrice)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 5);
+
+            builder.Entity<Product>()
+                .Property(a => a.CreditNoteQuantity)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
+            builder.Entity<Product>()
+               .Property(a => a.CreditNotePrice)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 5);
+
 
             builder.Entity<Product>()
                 .Property(a => a.Amount)
@@ -244,6 +283,18 @@ namespace SSMO.Data
                .WithMany(a => a.PurchaseProducts)
                .HasForeignKey(a => a.PurchaseDocumentId)
                .OnDelete(DeleteBehavior.ClientSetNull);
+
+            builder.Entity<Product>()
+               .HasOne(d => d.CreditNote)
+               .WithMany(a => a.CreditNoteProducts)
+               .HasForeignKey(a => a.CreditNoteId)
+               .OnDelete(DeleteBehavior.ClientSetNull);
+
+            builder.Entity<Product>()
+             .HasOne(d => d.DebitNote)
+             .WithMany(a => a.DebitNoteProducts)
+             .HasForeignKey(a => a.DebitNoteId)
+             .OnDelete(DeleteBehavior.ClientSetNull);
 
             builder.Entity<Product>()
                 .Property(p => p.Unit)
@@ -332,6 +383,16 @@ namespace SSMO.Data
                .Property(a => a.TotalAmount)
                .HasColumnType("decimal")
                .HasPrecision(18, 2);
+
+            builder.Entity<Document>()
+              .Property(a => a.CreditNoteTotalAmount)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 2);
+
+            builder.Entity<Document>()
+              .Property(a => a.DebitNoteTotalAmount)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 2);
 
             builder.Entity<Document>()
               .Property(a => a.VatAmount)

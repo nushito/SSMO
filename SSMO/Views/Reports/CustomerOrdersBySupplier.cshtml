@@ -91,7 +91,6 @@
             debugger;
             if (@ViewData["SelectedSupplier"] != 0) {
                 $("#CustomerId").val(@Model.CustomerId);
-
                 $.ajax({
                     type: 'POST',
                     url: '@Url.Action("GetSupplier")',
@@ -116,7 +115,7 @@
                         alert('Failed to retrieve supplier.' + ex);
                     }
                 });
-            }
-        }
+            };
+        };
     </script>
 

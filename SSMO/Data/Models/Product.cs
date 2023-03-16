@@ -28,6 +28,14 @@ namespace SSMO.Data.Models
         public decimal LoadedQuantityM3 { get; set; }
         public decimal QuantityM2 { get; set; }
         public decimal? QuantityM3 { get; set; }
+        public decimal CreditNoteQuantity { get; set; }
+        public int CreditNotePallets { get; set; }
+        public int CreditNoteSheetsPerPallet { get; set; }
+        public decimal CreditNotePrice { get; set; }
+        public decimal CreditNoteProductAmount { get; set; }
+        public decimal DebitNoteQuantity { get; set; }
+        public decimal DebitNoteAmount { get; set; }
+        public decimal DebitNotePrice { get; set; }
         public Unit Unit { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
@@ -36,9 +44,12 @@ namespace SSMO.Data.Models
         public decimal Price { get; set; }
         public decimal PurchasePrice { get; set; }
         public decimal CostPrice { get; set; }
+        public decimal BgPrice { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
+        [Range(0.0, 9999999999999.99999)]
+        public decimal BgAmount { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal PurchaseAmount { get; set; }
         public string FSCClaim { get; set; }
@@ -53,6 +64,10 @@ namespace SSMO.Data.Models
         public Document Document { get; set; }
         public int? PurchaseDocumentId { get; set; }
         public Document PurchaseDocument { get; set; }
+        public int? CreditNoteId { get; set; }
+        public Document CreditNote { get; set; }
+        public int? DebitNoteId { get; set; }
+        public Document DebitNote { get; set; }
 
         [Column(TypeName = "decimal(18,4)")]
         public decimal? PurchaseTransportCost { get; set; }

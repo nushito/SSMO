@@ -8,6 +8,8 @@ namespace SSMO.Models.Documents.Invoice
     {
         public int OrderConfirmationNumber { get; set; }
         public IEnumerable<int> OrderConfirmationNumbers { get; set; }
+        public int CreditToInvoiceNumber { get; set; }
+        public int DebitToInvoiceNumber { get; set; }
         public DateTime Date { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
@@ -17,5 +19,6 @@ namespace SSMO.Models.Documents.Invoice
         public string TruckNumber { get; set; }
         public decimal DeliveryCost { get; set; }
         public decimal CurrencyExchangeRate { get; set; }
+        public List<EditProductForCreditAndDebitViewModel> Products { get; set; }
     }
 }

@@ -492,6 +492,16 @@ namespace SSMO.Data.Migrations
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
 
+                    b.Property<decimal>("CreditNoteTotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("CreditToInvoiceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("CreditToInvoiceNumber")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("CurrencyExchangeRateUsdToBGN")
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
@@ -514,6 +524,16 @@ namespace SSMO.Data.Migrations
 
                     b.Property<DateTime>("DatePaidAmount")
                         .HasColumnType("datetime2");
+
+                    b.Property<decimal>("DebitNoteTotalAmount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("DebitToInvoiceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("DebitToInvoiceNumber")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("DeliveryTrasnportCost")
                         .HasPrecision(18, 5)
@@ -696,15 +716,59 @@ namespace SSMO.Data.Migrations
                     b.Property<decimal?>("BankExpenses")
                         .HasColumnType("decimal(18,4)");
 
+                    b.Property<decimal>("BgAmount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("BgPrice")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<decimal>("CostPrice")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
+
+                    b.Property<int?>("CreditNoteId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreditNotePallets")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("CreditNotePrice")
+                        .HasPrecision(18, 5)
+                        .HasColumnType("decimal(18,5)");
+
+                    b.Property<decimal>("CreditNoteProductAmount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("CreditNoteQuantity")
+                        .HasPrecision(18, 5)
+                        .HasColumnType("decimal(18,5)");
+
+                    b.Property<int>("CreditNoteSheetsPerPallet")
+                        .HasColumnType("int");
 
                     b.Property<int>("CustomerOrderId")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("CustomsExpenses")
                         .HasColumnType("decimal(18,4)");
+
+                    b.Property<decimal>("DebitNoteAmount")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.Property<int?>("DebitNoteId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("DebitNotePrice")
+                        .HasPrecision(18, 5)
+                        .HasColumnType("decimal(18,5)");
+
+                    b.Property<decimal>("DebitNoteQuantity")
+                        .HasPrecision(18, 5)
+                        .HasColumnType("decimal(18,5)");
 
                     b.Property<decimal?>("DeliveryTrasnportCost")
                         .HasColumnType("decimal(18,4)");
@@ -803,7 +867,11 @@ namespace SSMO.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreditNoteId");
+
                     b.HasIndex("CustomerOrderId");
+
+                    b.HasIndex("DebitNoteId");
 
                     b.HasIndex("DescriptionId");
 
@@ -1232,11 +1300,19 @@ namespace SSMO.Data.Migrations
 
             modelBuilder.Entity("SSMO.Data.Models.Product", b =>
                 {
+                    b.HasOne("SSMO.Data.Models.Document", "CreditNote")
+                        .WithMany("CreditNoteProducts")
+                        .HasForeignKey("CreditNoteId");
+
                     b.HasOne("SSMO.Data.Models.CustomerOrder", "CustomerOrder")
                         .WithMany("Products")
                         .HasForeignKey("CustomerOrderId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("SSMO.Data.Models.Document", "DebitNote")
+                        .WithMany("DebitNoteProducts")
+                        .HasForeignKey("DebitNoteId");
 
                     b.HasOne("SSMO.Data.Models.Description", "Description")
                         .WithMany("Products")
@@ -1272,7 +1348,11 @@ namespace SSMO.Data.Migrations
                         .WithMany("Products")
                         .HasForeignKey("SupplierOrderId");
 
+                    b.Navigation("CreditNote");
+
                     b.Navigation("CustomerOrder");
+
+                    b.Navigation("DebitNote");
 
                     b.Navigation("Description");
 
@@ -1417,6 +1497,10 @@ namespace SSMO.Data.Migrations
 
             modelBuilder.Entity("SSMO.Data.Models.Document", b =>
                 {
+                    b.Navigation("CreditNoteProducts");
+
+                    b.Navigation("DebitNoteProducts");
+
                     b.Navigation("Products");
 
                     b.Navigation("PurchaseProducts");

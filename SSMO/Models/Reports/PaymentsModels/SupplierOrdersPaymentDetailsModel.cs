@@ -8,8 +8,9 @@ namespace SSMO.Models.Reports.PaymentsModels
         public DateTime Date { get; set; }
         public decimal PaidAvance { get; set; }
         public decimal Balance { get; set; }
-        public DateTime DatePaidAmount { get; set; }
+        public string DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
         public string SupplierName { get; set; }
+        public decimal TotalAmount { get; set; }
     }
 }

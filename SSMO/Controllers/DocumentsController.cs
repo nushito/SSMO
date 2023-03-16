@@ -13,14 +13,17 @@ using SSMO.Services.Documents.Purchase;
 using SSMO.Services.MyCompany;
 using SSMO.Services.SupplierOrders;
 using System;
-using System.IO;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components.RenderTree;
-using SSMO.Models.Documents.Invoice;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.AspNetCore.Hosting;
+using SSMO.Models.Documents.CreditNote;
+using SSMO.Services.Documents.Credit_Note;
+using System.Collections.Generic;
+using SSMO.Services.Products;
+using Microsoft.AspNetCore.Http;
+using System.Linq;
+using System.Text.Json;
+using Newtonsoft.Json;
+using SSMO.Models.Documents.DebitNote;
+using SSMO.Models.Documents;
+using SSMO.Services.Documents.DebitNote;
 
 namespace SSMO.Controllers
 {
@@ -33,13 +36,16 @@ namespace SSMO.Controllers
         private readonly IMycompanyService mycompanyService;
         private readonly IDocumentService documentService;
         private readonly ISupplierService supplierService;
-        private readonly IHostingEnvironment _hostingEnv;
-
+        private readonly ICreditNoteService creditNoteService;
+        private readonly IProductService productService;
+        private readonly IDebitNoteService debitNoteService;
+      
         public DocumentsController
             (ISupplierOrderService supplierOrderService,
             IPurchaseService purchaseService, ICustomerOrderService customerOrderService,
             IInvoiceService invoiceService, IMycompanyService mycompanyService,
-            IDocumentService documentService, ISupplierService supplierService, IHostingEnvironment hosting)
+            IDocumentService documentService, ISupplierService supplierService, ICreditNoteService creditNoteService,
+            IProductService productService, IDebitNoteService debitNoteService)
         {
             this.supplierOrderService = supplierOrderService;
             this.purchaseService = purchaseService;
@@ -47,8 +53,10 @@ namespace SSMO.Controllers
             this.invoiceService = invoiceService;
             this.mycompanyService = mycompanyService;
             this.documentService = documentService;
-            this.supplierService = supplierService;
-            hosting = _hostingEnv;
+            this.supplierService = supplierService;        
+            this.creditNoteService = creditNoteService;
+            this.productService= productService;
+            this.debitNoteService= debitNoteService;
         }
 
         public IActionResult AddPurchase(SupplierOrderListModel model)
@@ -317,6 +325,199 @@ namespace SSMO.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public IActionResult ChooseInvoiceForCreditNote()
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            var model = new ChooseInvoiceForCreditNoteViewModel
+            {              
+                MyCompanies = mycompanyService.GetAllCompanies(),
+                Products = new List<AddProductsToCreditAndDebitNoteFormModel>()               
+            };
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult ChooseInvoiceForCreditNote
+            (ChooseInvoiceForCreditNoteViewModel model,IFormCollection collection)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if(!ModelState.IsValid) 
+            { 
+                return View(new ChooseInvoiceForCreditNoteViewModel
+                {
+                    MyCompanies = mycompanyService.GetAllCompanies(),
+                    Products = new List<AddProductsToCreditAndDebitNoteFormModel>()
+                }); 
+            }
+            model.Products = new List<AddProductsToCreditAndDebitNoteFormModel>();
+
+            int loopsNum = 0;
+
+            foreach (var key in collection.Keys)
+            {
+                if (key.Contains("Description"))
+                {
+                    loopsNum++;
+                }
+            }
+
+            for (int i = 1; i <= loopsNum; i++)
+            {
+                var description = collection["DescriptionId["+ i +"]"];
+                var grade = collection["GradeId["+ i +"]"];
+                var size = collection["SizeId["+ i +"]"];
+                var unit = collection["Unit["+ i +"]"];
+                var price = collection["Price["+ i +"]"].ToString();
+                var pallets = collection["Pallets["+ i +"]"].ToString();
+                var sheetsPerPallet = collection["SheetsPerPallet[" + i + "]"].ToString();
+                var fscClaim = collection["FscClaim["+i+"]"];
+                var fscCertificate = collection["FscCertificate[" + i + "]"];
+                var quantity = collection["Quantity["+ i +"]"].ToString();
+                var product = new AddProductsToCreditAndDebitNoteFormModel
+                {
+                    DescriptionId = int.Parse(description.ToString()),
+                    GradeId = int.Parse(grade.ToString()),
+                    SizeId = int.Parse(size.ToString()),
+                    Unit = unit,
+                    Price = decimal.Parse(price.ToString()),
+                    FscClaim = fscClaim,    
+                    FscSertificate = fscCertificate,
+                    Quantity = decimal.Parse(quantity.ToString()),
+                    Pallets = int.Parse(pallets.ToString()),
+                    SheetsPerPallet = int.Parse(sheetsPerPallet.ToString())
+                };
+                model.Products.Add(product);
+            }
+
+            TempData["products"] = JsonConvert.SerializeObject(model.Products);
+
+            return RedirectToAction("CreateCreditNote",
+                new { invoiceId = model.InvoiceId, date = model.Date, quantityBack = model.QuantityBack});
+        }
+
+        public IActionResult CreateCreditNote
+            (int invoiceId, DateTime date, bool quantityBack)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+            if (invoiceId == 0) return BadRequest();
+         // 
+            List<AddProductsToCreditAndDebitNoteFormModel> productsForCredit = JsonConvert.DeserializeObject<List<AddProductsToCreditAndDebitNoteFormModel>>(TempData["products"].ToString());
+            var creditNote = creditNoteService.CreateCreditNote(invoiceId, date, quantityBack, productsForCredit);
+
+            return View(creditNote);  
+        }
+
+        [HttpGet]
+        public IActionResult ChooseInvoiceForDebitNote()
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+         
+            var model = new DebitNoteChooseInvoiceViewModel
+            {
+                MyCompanies = mycompanyService.GetAllCompanies(),
+                Products = new List<AddProductsToCreditAndDebitNoteFormModel>()
+            };
+            return View(model);
+        }
+        [HttpPost]
+        public IActionResult ChooseInvoiceForDebitNote(DebitNoteChooseInvoiceViewModel model, IFormCollection collections)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+            if (!ModelState.IsValid)
+            {
+                return View(new DebitNoteChooseInvoiceViewModel
+                {
+                    MyCompanies = mycompanyService.GetAllCompanies(),
+                    Products = new List<AddProductsToCreditAndDebitNoteFormModel>()
+                });
+            }
+
+            model.Products = new List<AddProductsToCreditAndDebitNoteFormModel>();
+            int loopsNum = 0;
+
+            foreach (var key in collections.Keys)
+            {
+                if (key.Contains("Description"))
+                {
+                    loopsNum++;
+                }
+            }
+
+            for (int i = 1; i <= loopsNum; i++)
+            {
+                var description = collections["DescriptionId[" + i + "]"];
+                var grade = collections["GradeId[" + i + "]"];
+                var size = collections["SizeId[" + i + "]"];
+                var unit = collections["Unit[" + i + "]"];
+                var price = collections["Price[" + i + "]"].ToString();                
+                var fscClaim = collections["FscClaim[" + i + "]"];
+                var fscCertificate = collections["FscCertificate[" + i + "]"];
+                var quantity = collections["Quantity[" + i + "]"].ToString();
+                var product = new AddProductsToCreditAndDebitNoteFormModel
+                {
+                    DescriptionId = int.Parse(description.ToString()),
+                    GradeId = int.Parse(grade.ToString()),
+                    SizeId = int.Parse(size.ToString()),
+                    Unit = unit,
+                    Price = decimal.Parse(price.ToString()),
+                    FscClaim = fscClaim,
+                    FscSertificate = fscCertificate,
+                    Quantity = decimal.Parse(quantity.ToString())                    
+                };
+                model.Products.Add(product);
+            }
+
+            TempData["products"] = JsonConvert.SerializeObject(model.Products);
+
+            return RedirectToAction("CreateDebitNote",
+                new { invoiceId = model.InvoiceId, date = model.Date, moreQuantity = model.MoreQuantity });
+        }
+
+        public IActionResult CreateDebitNote(int invoiceId, DateTime date, bool moreQuantity)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+            if (invoiceId == 0) return BadRequest();
+           
+            List<AddProductsToCreditAndDebitNoteFormModel> productsForDebit = JsonConvert.DeserializeObject<List<AddProductsToCreditAndDebitNoteFormModel>>(TempData["products"].ToString());
+            var debitNoteForPrint = debitNoteService.CreateDebitNote(invoiceId, date, moreQuantity,productsForDebit);
+
+            return View(debitNoteForPrint);
+        }
+
+        [HttpGet]
+        public IActionResult GetInvoiceNumbers(string id)
+        {
+            if (id == null)
+            {
+                id = "0";
+            }
+            var sellerId = int.Parse(id.ToString());           
+            var selectedInvoices = invoiceService.GetInvoiceDocumentNumbers(sellerId);
+            return Json(selectedInvoices, new JsonSerializerOptions() { PropertyNameCaseInsensitive = false });
+        }
        
+       //TODO This is not working!!!
+        public IActionResult GetProductsForDebitNote(string id)
+        {
+            if (id == null) { id = "0"; }
+            
+          //  var productList = 
+            return Json(new JsonSerializerOptions() { PropertyNameCaseInsensitive = false });
+        }
     }
 }

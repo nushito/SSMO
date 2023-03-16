@@ -161,5 +161,14 @@ namespace SSMO.Services.MyCompany
                 .Select(id=>id.Id)
                 .FirstOrDefault();
         }
+
+        public ICollection<string> MyCompaniesFscList()
+        {
+            var userId = _httpContextAccessor.ContextAccessUserId();
+            return dbContext.MyCompanies
+                .Where(u => u.UserId == userId)
+                .Select(f => f.FSCSertificate)
+                .ToList();            
+        }
     }
 }

@@ -31,7 +31,6 @@ namespace SSMO.Services.Products
 
             var product = new Product
             {
-                Amount = model.Amount,
                 Description = description,
                 Grade = grade,
                 Size = size,
@@ -41,8 +40,9 @@ namespace SSMO.Services.Products
                 Pallets = model.Pallets,
                 SheetsPerPallet = model.SheetsPerPallet,
                 CustomerOrderId = customerorderId,
-                QuantityM3 = model.QuantityM3,
-                Unit = Enum.Parse<Unit>(model.Unit)
+                QuantityM3 = model.Quantity,
+                Unit = Enum.Parse<Unit>(model.Unit),
+                TotalSheets = model.Pallets*model.SheetsPerPallet
             };
 
             var dimensionArray = size.Name.Split('/').ToArray();
@@ -53,23 +53,24 @@ namespace SSMO.Services.Products
             {
                 sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 4);
             }
-            product.TotalSheets = product.Pallets * product.SheetsPerPallet;
 
-            if (model.QuantityM3 != 0)
+            if (model.Quantity != 0)
             {
-                product.OrderedQuantity = model.QuantityM3;
+                product.OrderedQuantity = model.Quantity;
             }
             else
             {
-                product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
+                product.OrderedQuantity = Math.Round(sum * model.Pallets * model.SheetsPerPallet, 4);
             }
-            product.Amount = Math.Round(product.Price * product.OrderedQuantity, 4);
+
+            product.Amount = Math.Round(model.Price * product.OrderedQuantity, 4);
             dbContext.Products.Add(product);
             dbContext.SaveChanges();
 
 
-            var order = dbContext.CustomerOrders.Where(a => a.Id == customerorderId).FirstOrDefault();
+            var order = dbContext.CustomerOrders.Where(a => a.Id == customerorderId).FirstOrDefault();           
             order.Amount += product.Amount;
+            order.Products.Add(product);
 
             dbContext.SaveChanges();
         }
