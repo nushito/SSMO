@@ -3,9 +3,6 @@
 @{
     ViewBag.Title = "Purchase Invoices";   
 }
-    
-
-
 <form class="get">
     <div class="row">
         <div class="col-3">
@@ -31,7 +28,6 @@
                 <input asp-for="EndDate"  type="date" class="form-control" data-date-format="dd-mm-yyyy" value="@DateTime.Now.ToString("dd-MM-yyyy")"/> 
                 <span asp-validation-for="EndDate" class="glyphicon glyphicon-calendar"></span>
              </div>
-            
         </div>
     </div>
     <hr />
@@ -63,7 +59,7 @@
         asp-route-endDate ="@Model.EndDate"><<</a>
     </div>
     @{
-        var shouldButtonBeDisabled = Model.CurrentPage == maxPage || !Model.InvoiceCollection.Any();
+        var shouldButtonBeDisabled = Model.CurrentPage == maxPage || Model.InvoiceCollection == null;
     }
     <div class="col-md-6">
         <a class="btn btn-primary @(shouldButtonBeDisabled ? "disable" : string.Empty)"
@@ -102,54 +98,57 @@
             <th>
                 Supplier Order No
             </th>
-            <th>
+           @* <th>
                 Customer Name
             </th>
             <th>
                 Customer OC
-            </th>
+            </th>*@
         </tr>
     </thead>
     <tbody>
-            @foreach (var item in Model.InvoiceCollection)
+            @if(Model.InvoiceCollection != null)
             {
-                <tr>
-                    <td>
-                        @item.SupplierName
-                    </td>
-                    <td>
-                        @item.Number
-                    </td>
-                    <td>
-                        @item.Date
-                    </td>
-                    <td>
-                        @item.TotalAmount
-                    </td>
-                    <td>
-                        @item.Incoterms
-                    </td>
-                    <td>
-                        @item.TruckNumber
-                    </td>
-                    <td>
-                        @item.SupplierOrderNumber
-                    </td>
-                    <td>
-                        @item.CustomerName
-                    </td>
-                    <td>
-                        @item.OrderConfirmationNumber
-                    </td>
-                    <td>
-                        <a asp-controller="Reports" asp-action="PurchaseDetails" asp-route-id="@item.Id" class="btn btn-info mr-1">Details</a>
-                    </td>
-                    <td> 
-                        <a asp-controller="Reports" asp-action="EditPurchase" asp-route-id="@item.Id" class="btn btn-outline-info mr-1">Edit</a>
-                    </td>                 
-                       
-                </tr>
-            }
+                @foreach (var item in Model.InvoiceCollection)
+                {
+                        <tr>
+                             <td class="col-sm-1">
+                            @item.SupplierName
+                            </td>
+                            <td class="col-sm-1">
+                            @item.PurchaseNumber
+                            </td>
+                            <td class="col-sm-1">
+                            @item.Date
+                            </td>
+                             <td class="col-sm-1">
+                            @item.TotalAmount
+                            </td>
+                            <td class="col-sm-1">
+                            @item.Incoterms
+                            </td>
+                             <td class="col-sm-1">
+                            @item.TruckNumber
+                            </td>
+                            <td class="col-sm-1">
+                            @item.SupplierOrderNumber
+                            </td>
+                          @* <td class="col-sm-1">
+                            @item.CustomerName
+                            </td>
+                             <td class="col-sm-1">
+                            @item.OrderConfirmationNumber
+                            </td>*@
+                            <td>
+                               <a asp-controller="Reports" asp-action="PurchaseInvoiceDetails" asp-route-id="@item.Id" class="btn btn-info mr-1">Details</a>
+                            </td>
+                            <td> 
+                                <a asp-controller="Reports" asp-action="EditPurchase" asp-route-id="@item.Id" class="btn btn-outline-info mr-1">Edit</a>
+                            </td>                 
+
+                        </tr>
+                } 
+            }            
     </tbody>
 </table>
 </div>

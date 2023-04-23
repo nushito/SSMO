@@ -38,12 +38,12 @@
         {
             var data = services.GetRequiredService<ApplicationDbContext>();
 
-            if (data.Currencys.Any())
+            if (data.Currencies.Any())
             {
                 return;
             }
 
-            data.Currencys.AddRange(new[]
+            data.Currencies.AddRange(new[]
             {
               new Currency { Name = "EUR" },
               new Currency { Name = "BGN" },
@@ -188,10 +188,10 @@
                 new Size {Name = "21/2500/1250"},
                 new Size {Name = "21/1220/2440"},
                 new Size {Name = "21/2440/1220"},
-                new Size {Name ="24/1250/2500"},
+                new Size {Name = "24/1250/2500"},
                 new Size {Name = "24/2500/1250"},
                 new Size {Name = "24/1220/2440"},
-                new Size {Name ="24/2440/1220"},
+                new Size {Name = "24/2440/1220"},
                 new Size {Name = "27/1250/2500"},
                 new Size {Name = "27/2500/1250"},
                 new Size {Name = "27/1220/2440"},

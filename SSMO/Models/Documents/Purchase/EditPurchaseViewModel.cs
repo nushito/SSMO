@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SSMO.Models.Reports.Purchase;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -6,7 +7,7 @@ namespace SSMO.Models.Documents.Purchase
 {
     public class EditPurchaseViewModel
     {
-        public string Number { get; set; }
+        public string PurchaseNumber { get; set; }
         public DateTime Date { get; set; }
         public int SupplierOrderId { get; set; }
         public ICollection<SupplierOrdersListForPurchaseEditModel> SupplierOrders { get; set; }
@@ -24,5 +25,6 @@ namespace SSMO.Models.Documents.Purchase
         public decimal FiscalAgentExpenses { get; set; }
         public decimal ProcentComission { get; set; }
         public decimal OtherExpenses { get; set; }
+        public List<PurchaseProductsForEditFormModel> PurchaseProducts { get; set; }
     }
 }

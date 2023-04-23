@@ -24,5 +24,7 @@ namespace SSMO.Services
         public string GetSupplierFscCertificateByOrderNumber(string orderNumber);
         public string GetSupplierFscCertificateByOrderId(int orderId);
         public string SupplierNameById(int id);
+        public string SupplierNameBySupplierOrderId(int id);
+        public List<string> SuppliersFscCertificates();
     }
 }

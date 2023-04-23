@@ -8,8 +8,7 @@ namespace SSMO.Services.Documents.Credit_Note
     public interface ICreditNoteService
     {
         public CreditAndDebitNoteViewModel CreateCreditNote
-            (int invoiceId, DateTime date, bool quantityBack, List<AddProductsToCreditAndDebitNoteFormModel> products);
+            (int invoiceId, DateTime date, bool quantityBack, string deliveryAddress, List<AddProductsToCreditAndDebitNoteFormModel> products);
 
-       
     }
 }

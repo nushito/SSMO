@@ -2,25 +2,25 @@
 
 namespace SSMO.Data.Migrations
 {
-    public partial class BgPriceAndAmountProduct : Migration
+    public partial class InvoiceProductsAmount : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<decimal>(
-                name: "BgAmount",
-                table: "Products",
-                type: "decimal(18,4)",
+                name: "Amount",
+                table: "InvoiceProductDetails",
+                type: "decimal(18,5)",
                 precision: 18,
-                scale: 4,
+                scale: 5,
                 nullable: false,
                 defaultValue: 0m);
 
             migrationBuilder.AddColumn<decimal>(
-                name: "BgPrice",
-                table: "Products",
-                type: "decimal(18,4)",
+                name: "BgAmount",
+                table: "InvoiceProductDetails",
+                type: "decimal(18,5)",
                 precision: 18,
-                scale: 4,
+                scale: 5,
                 nullable: false,
                 defaultValue: 0m);
         }
@@ -28,12 +28,12 @@ namespace SSMO.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "BgAmount",
-                table: "Products");
+                name: "Amount",
+                table: "InvoiceProductDetails");
 
             migrationBuilder.DropColumn(
-                name: "BgPrice",
-                table: "Products");
+                name: "BgAmount",
+                table: "InvoiceProductDetails");
         }
     }
 }

@@ -13,11 +13,11 @@ namespace SSMO.Models.Documents.CreditNote
     public class ChooseInvoiceForCreditNoteViewModel
     {
         public int MyCompanyId { get; set; }
-        public string MyCompanyName { get; set; }
         public ICollection<MyCompaniesForReportViewModel> MyCompanies { get; set; }
         public DateTime Date { get; set; }
         public int InvoiceId { get; set; }
-        public ICollection<int> InvoiceNumbers { get; set; }        
+        public ICollection<int> InvoiceNumbers { get; set; }
+        public string CreditNoteDeliveryAddress { get; set; }
         public bool QuantityBack { get; set; }
         public ICollection<AddProductsToCreditAndDebitNoteFormModel> Products { get; set; }
     }

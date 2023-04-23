@@ -5,6 +5,7 @@ using SSMO.Models.CustomerOrders;
 using SSMO.Models.Customers;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Documents.Packing_List;
+using SSMO.Models.Documents.Purchase;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Models.Reports;
@@ -38,24 +39,29 @@ namespace SSMO.Infrastructure
             this.CreateMap<CustomerOrder, EditCustomerOrderPaymentModel>();           
 
             this.CreateMap<Product, ProductCustomerFormModel>()
-                .ForMember(a=>a.OrderedQuantity, b=>b.MapFrom(a=>a.OrderedQuantity))
-                .ForMember(a=>a.Price, b=>b.MapFrom(a=>a.Price));
-            this.CreateMap<Product, ProductsForPackingListPrint>();
+                .ForMember(a=>a.Quantity, b=>b.MapFrom(a=>a.OrderedQuantity))
+                .ForMember(a=>a.SellPrice, b=>b.MapFrom(a=>a.Price));
+            this.CreateMap<Product, Models.Documents.Packing_List.ProductsForPackingListModel>();
             this.CreateMap<ProductCustomerFormModel, Product>()
-                .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.OrderedQuantity))
-                .ForMember(a => a.Price, b => b.MapFrom(a => a.Price));
-            this.CreateMap<Product, ProductSupplierDetails>();
-            this.CreateMap<Product, ProductsForInvoiceModel>();
+                .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.Quantity))
+                .ForMember(a => a.Price, b => b.MapFrom(a => a.SellPrice));
+            this.CreateMap<Product, ProductPerSupplierOrderDetails>();
+            this.CreateMap<Product, Services.Documents.Invoice.ProductsForInvoiceModel>();
             this.CreateProjection<ProductCustomerFormModel, Product>()
-                .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.OrderedQuantity))
-                .ForMember(a => a.Price, b => b.MapFrom(a => a.Price));
+                .ForMember(a => a.OrderedQuantity, b => b.MapFrom(a => a.Quantity))
+                .ForMember(a => a.Price, b => b.MapFrom(a => a.SellPrice));
             this.CreateMap<Product, ProductsForEditSupplierOrder>();
-            this.CreateMap<Product, BGProductsForBGInvoiceViewModel>();
+            this.CreateMap<InvoiceProductDetails, BGProductsForBGInvoiceViewModel>();
             this.CreateMap<Product, InvoiceProductsDetailsViewModel>();
             this.CreateMap<Product, InvoiceProductsDetailsViewModel>();
             this.CreateMap<Product, EditProductForCreditAndDebitViewModel>();
             this.CreateMap<Product, ProductsForCustomerOrderDetailsViewModel>();
             this.CreateMap<Product, ProductsSupplierOrderDetailsViewModel>();
+            this.CreateMap<Product, PurchaseProductAsSupplierOrderViewModel>();
+            this.CreateMap<ProductsForInvoiceViewModel, Services.Documents.Invoice.ProductsForInvoiceModel>();
+            this.CreateMap<InvoiceProductDetails, ProductsForPackingListModel>();
+            this.CreateMap<CustomerOrderProductDetails, ProductCustomerFormModel>();
+            this.CreateMap<PurchaseProductDetails, PurchaseProductsForEditFormModel>();
 
             this.CreateMap<Status, StatusModel>();
 
@@ -65,6 +71,7 @@ namespace SSMO.Infrastructure
                 .ForMember(a => a.SupplierOrderNumber, b => b.MapFrom(a => a.Number));
             this.CreateMap<SupplierOrder, SupplierOrderDetailsModel>()
                 .ForMember(a => a.SupplierOrderNumber, b => b.MapFrom(a => a.Number));
+            this.CreateMap<SupplierOrder, SupplierOrdersListForPurchaseEditModel>();
 
             this.CreateMap<Document, InvoicePrintViewModel>();
             this.CreateMap<Document, EditInvoicePaymentModel>();

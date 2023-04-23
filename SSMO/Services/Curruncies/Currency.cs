@@ -19,7 +19,7 @@ namespace SSMO.Services
         public IEnumerable<GetCurrencyModel> AllCurrency()
         {
             return this.dbContext
-                 .Currencys
+                 .Currencies
                  .Select(a => new GetCurrencyModel
                  {
                      Name = a.Name,
@@ -31,7 +31,7 @@ namespace SSMO.Services
         ICollection<string> ICurrency.GetCurrency()
         {
             return this.dbContext
-                .Currencys
+                .Currencies
                 .Select(a => a.Name)
                 .ToList();
 

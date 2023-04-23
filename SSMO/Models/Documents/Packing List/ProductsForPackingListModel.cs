@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SSMO.Models.Documents.Packing_List
 {
-    public class ProductsForPackingListPrint
+    public class ProductsForPackingListModel
     {
         public int DescriptionId { get; set; }
         public string DescriptionName { get; set; }
@@ -17,8 +17,10 @@ namespace SSMO.Models.Documents.Packing_List
         public int CustomerOrderId { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
-        public decimal OrderedQuantity { get; set; }
+        public decimal InvoicedQuantity { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
+        public int ProductId { get; set; }
+        public string VehicleNumber { get; set; }
     }
 }

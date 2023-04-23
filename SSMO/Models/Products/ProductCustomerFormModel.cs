@@ -6,6 +6,8 @@ namespace SSMO.Models.Products
 {
     public class ProductCustomerFormModel
     {
+        public int Id { get; set; }
+        public int ProductId { get; set; }
         public int DescriptionId { get; set; }
         public string Description { get; set; }
         public IEnumerable<string> Descriptions { get; set; }
@@ -26,24 +28,13 @@ namespace SSMO.Models.Products
         public decimal Quantity { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
-        public decimal OrderedQuantity { get; set; }
-
-        [Range(0.0, 9999999999999.99999)]
-        public decimal Price { get; set; }
-
-        [Range(0.0, 9999999999999.99999)]
-        public decimal PurchaseAmount { get; set; }
+        public decimal SellPrice { get; set; }
        
         [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
-       
-
-
-
-
-
+        public int SupplierOrderId { get; set; }
 
     }
 }

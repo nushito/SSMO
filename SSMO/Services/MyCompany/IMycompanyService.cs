@@ -1,4 +1,5 @@
-﻿using SSMO.Models.MyCompany;
+﻿using SSMO.Models.Documents.Invoice;
+using SSMO.Models.MyCompany;
 using SSMO.Models.Reports;
 using System;
 using System.Collections.Generic;
@@ -23,5 +24,7 @@ namespace SSMO.Services.MyCompany
 
         public int GetMyCompanyId(string name);
         public ICollection<string> MyCompaniesFscList();
+
+        public ICollection<MyCompanyViewModel> GetCompaniesForInvoice();
     }
 }

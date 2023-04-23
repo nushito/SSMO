@@ -18,6 +18,7 @@ namespace SSMO.Models.CustomerOrders
             
         }
 
+        public int Id { get; set; }
         public int OrderConfirmationNumber { get; set; }
 
         public string CustomerPoNumber { get; set; }
@@ -40,9 +41,7 @@ namespace SSMO.Models.CustomerOrders
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
         public IEnumerable<GetCurrencyModel> Currencies { get; set; }
-        public IList<ProductCustomerFormModel> Products { get; set; }
-        public string FscClaim { get; set; }
-        public string FscCertificate { get; set; }
+        public IList<ProductCustomerFormModel> Products { get; set; }       
         public string Origin { get; set; }
         public decimal TotalQuantity { get; set; }
         public decimal TotalAmount { get; set; }
@@ -52,11 +51,11 @@ namespace SSMO.Models.CustomerOrders
         public bool PaidAmountStatus { get; set; }
         public decimal Amount { get; set; }
         public decimal SubTotal { get; set; }
-     
         public int SupplierOrderId { get; set; }
         public int SupplierId { get; set; }
-        public string Supplier { get; set; }
-        public IEnumerable<AllSuppliers>  Suppliers { get; set; }
+     //   public IEnumerable<AllSuppliers> Suppliers { get; set; }
+        public ICollection<int> SelectedSupplierOrders { get; set; }
         public int ProductsCount { get; set; }
+        public IEnumerable<SupplierOrdersBySupplier> SupplierOrdersBySupplier { get; set; }
     }
 }

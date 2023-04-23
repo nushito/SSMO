@@ -7,6 +7,7 @@ using SSMO.Models.MyCompany;
 using SSMO.Infrastructure;
 using SSMO.Models.Reports;
 using SSMO.Data.Models;
+using SSMO.Models.Documents.Invoice;
 
 namespace SSMO.Services.MyCompany
 {
@@ -169,6 +170,16 @@ namespace SSMO.Services.MyCompany
                 .Where(u => u.UserId == userId)
                 .Select(f => f.FSCSertificate)
                 .ToList();            
+        }
+
+        public ICollection<MyCompanyViewModel> GetCompaniesForInvoice()
+        {
+            return dbContext.MyCompanies
+                .Select(a=> new MyCompanyViewModel
+                {
+                    Id= a.Id,
+                    Name= a.Name,
+                }).ToList();
         }
     }
 }

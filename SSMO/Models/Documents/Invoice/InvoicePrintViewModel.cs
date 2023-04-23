@@ -12,7 +12,7 @@ namespace SSMO.Models.Documents.Invoice
         public string Number { get; set; }
         public MyCompanyForInvoicePrint Seller { get; set; }
         public int CustomerOrderId { get; set; }
-        public int OrderConfirmationNumber { get; set; }
+        public List<int> OrderConfirmationNumbers { get; set; }
         public CustomerForInvoicePrint Customer { get; set; }
         public int SupplierOrderId { get; set; }
         [Required]

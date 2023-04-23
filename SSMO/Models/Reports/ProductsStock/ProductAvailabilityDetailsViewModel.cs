@@ -6,7 +6,7 @@ namespace SSMO.Models.Reports.ProductsStock
     {
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
-        public int CustomerOrderId { get; set; }
+        public int? CustomerOrderId { get; set; }
         public int CustomerOrderNumber { get; set; }
         public DateTime OrderDate { get; set; }
         public string CustomerName { get; set; }

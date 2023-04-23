@@ -16,9 +16,11 @@ namespace SSMO.Models.Documents.Packing_List
         public decimal NetWeight { get; set; }
         public decimal GrossWeight { get; set; }        
         public string TruckNumber { get; set; }
+        public ICollection<string> CustomerPoNumber { get; set; }
         public MyCompanyForPackingPrint MyCompanyForPl { get; set; }
-        public ICollection<ProductsForPackingListPrint> Products { get; set; }
+        public ICollection<ProductsForPackingListModel> Products { get; set; }
         public CustomerForPackingListPrint Customer { get; set; }
+        public decimal InvoicedQuantity { get; set; }
 
     }
 }

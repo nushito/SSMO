@@ -141,58 +141,61 @@
             </tr>
         </thead>
         <tbody>
+        @if(Model.ProductsDetails != null)
+        {
             @foreach (var product in Model.ProductsDetails)
             {
-                <tr>
-                    <td>
+                        <tr>
+                            <td>
                         @product.CustomerOrderNumber
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.OrderDate
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.CustomerName
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.PurchaseNumber
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.PurchaseDate
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.SupplierName
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.DeliveryAddress
-                    </td>
-                     <td>
+                            </td>
+                             <td>
                         @product.Unit
-                     </td>
-                    <td>
+                             </td>
+                            <td>
                         @product.LoadedQuantity
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.Pallets
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.SheetsPerPallet
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.FSCClaim
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.FSCSertificate
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.PurchasePrice
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.CostPrice
-                    </td>
-                    <td>
+                            </td>
+                            <td>
                         @product.Price
-                    </td>
-                </tr>
-            }
+                            </td>
+                        </tr>
+            }  
+        }
         </tbody>
 </table>

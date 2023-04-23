@@ -60,10 +60,10 @@
 <table class="table-bordered">
     <thead>
         <tr>
-            <th>
+            <th class="text-center">
                 Supplier Order No
             </th>
-            <th>
+            <th class="text-center">
                 Date
             </th>
         </tr>
@@ -72,15 +72,17 @@
     @foreach(var order in Model.SupplierOrderNumbers)
     {
     <tr>
-       <td >
+        <input type="hidden" asp-for=" @order.Id">
+           <td class="col col-md-auto">
             @order.SupplierOrderNumber
        </td>
-       <td class="col">
+       <td class="col col-md-auto">
             @order.Date
        </td>  
        <td><a asp-controller="Documents" asp-action="PurchaseDetails" 
        asp-route-supplierOrderNumber="@order.SupplierOrderNumber" 
-       class="btn btn-outline-info btn-sm">Add Purchase Details</a>
+       asp-route-id="@order.Id"
+       class="btn btn-outline-info btn-sm col-md-auto">Add Purchase Details</a>
        </td>
     </tr>
     }

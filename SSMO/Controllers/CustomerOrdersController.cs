@@ -19,6 +19,8 @@ using System.IO;
 using iTextSharp.text.pdf;
 using iTextSharp.text;
 using SSMO.Infrastructure;
+using SSMO.Services.SupplierOrders;
+using System.Text.Json;
 
 namespace SSMO.Controllers
 {
@@ -33,13 +35,14 @@ namespace SSMO.Controllers
         private readonly IMapper mapper;
         private readonly IReportsService reportService;
         private readonly IStatusService statusService;
+        private readonly ISupplierOrderService supplierOrderService;
         public CustomerOrdersController(ISupplierService supplierService,
            ICurrency currency,
            IMycompanyService myCompanyService,
            ICustomerService customerService,
            IProductService productService, IMapper mapper,
  ApplicationDbContext dbContext, ICustomerOrderService cusomerOrderService,
- IReportsService reportService, IStatusService statusService)
+ IReportsService reportService, IStatusService statusService, ISupplierOrderService supplierOrderService)
         {
             this.supplierService = supplierService;
             this.currency = currency;
@@ -50,6 +53,7 @@ namespace SSMO.Controllers
             this.customerOrderService = cusomerOrderService;
             this.reportService = reportService;
             this.statusService = statusService;
+            this.supplierOrderService = supplierOrderService;   
         }
 
         [HttpGet]
@@ -64,28 +68,27 @@ namespace SSMO.Controllers
             if (customerOrderService.AnyCustomerOrderExist())
             {
                 ViewBag.NumberExist = 1;
-
             }
-            return View
-            (
-                new CustomerOrderViewModel
-                {
-                    Currencies = currency.AllCurrency(),
-                    Customers = customerService.CustomersData(),
-                    MyCompanies = myCompanyService.GetAllCompanies(),
-                    Suppliers = supplierService.GetSuppliers(),
-                    Products = new List<ProductCustomerFormModel>(),
-                    Statuses = statusService.GetAllStatus()
-                }
+            else
+            {
+                ViewBag.NumberExist = 0;
+            }
 
-            );
+            var customerOrderDetails = new CustomerOrderViewModel
+            {
+                Currencies = currency.AllCurrency(),
+                Customers = customerService.CustomersData(),
+                MyCompanies = myCompanyService.GetAllCompanies(),
+                Products = new List<ProductCustomerFormModel>(),
+                Statuses = statusService.GetAllStatus(),
+                SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders()
+        };
+            return View(customerOrderDetails);
         }
-
-
+      
         [HttpPost]
         [Authorize]
         public IActionResult AddCustomerOrder(CustomerOrderViewModel customermodel)
-
         {
             string userId = this.User.UserId();
             string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(customermodel.MyCompanyId);
@@ -102,9 +105,10 @@ namespace SSMO.Controllers
                     Currencies = currency.AllCurrency(),
                     Customers = customerService.CustomersData(),
                     MyCompanies = myCompanyService.GetAllCompanies(),
-                    Suppliers = supplierService.GetSuppliers(),
+                   // Suppliers = supplierService.GetSuppliers(),
                     Products = new List<ProductCustomerFormModel>(),
-                    Statuses = statusService.GetAllStatus()
+                    Statuses = statusService.GetAllStatus(),
+                    SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders()
                 };
 
                 new ProductCustomerFormModel
@@ -130,7 +134,8 @@ namespace SSMO.Controllers
                                  customermodel.CurrencyId,
                                  customermodel.Origin,
                                  customermodel.PaidAmountStatus,
-                                  customermodel.Vat ?? 0, customermodel.StatusId);
+                                 customermodel.Vat ?? 0, customermodel.StatusId, 
+                                 (List<int>)customermodel.SelectedSupplierOrders);
                 ViewBag.NumberExist = 0;
             }
             else
@@ -146,71 +151,94 @@ namespace SSMO.Controllers
                                  customermodel.CurrencyId,
                                  customermodel.Origin,
                                  customermodel.PaidAmountStatus,
-                                 customermodel.Vat ?? 0, customermodel.StatusId);
+                                 customermodel.Vat ?? 0, customermodel.StatusId, 
+                                 (List<int>)customermodel.SelectedSupplierOrders);
                 ViewBag.NumberExist = 1;
             }
-
-            TempData["Count"] = customermodel.ProductsCount;
-
-            return RedirectToAction("AddOrderProducts", new { CustomerOrderId = customerorderId });
+            return RedirectToAction("AddOrderProducts", new { selectedSupplierOrders = customermodel.SelectedSupplierOrders, customerorderId = customerorderId });
         }
 
-        public IActionResult AddOrderProducts()
+        public IActionResult AddOrderProducts(List<int> selectedSupplierOrders, int customerorderId)
         {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
 
-            var count = int.Parse(TempData["Count"].ToString());
+            var products = productService.Details(selectedSupplierOrders);
 
-            var products = new List<ProductCustomerFormModel>();
-            for (int i = 0; i < count; i++)
+            if (!products.Any())
             {
-                var product = new ProductCustomerFormModel()
-                {
+                return RedirectToAction("AddCustomerOrder", "CustomerOrdersController", customerorderId);
+            }
+
+            var listProducts = new List<ProductCustomerFormModel>();
+            
+            foreach (var product in products)
+            {
+                var productSupp = new ProductCustomerFormModel
+                {        
+                    Id = product.Id,          
+                    Description = product.Description,
+                    Grade = product.Grade,
+                    Size = product.Size,
+                    DescriptionId = product.DescriptionId,
+                    GradeId = product.GradeId,
+                    SizeId = product.SizeId,
+                    FSCSertificate = product.FSCSertificate,
+                    FSCClaim = product.FSCClaim,                    
+                    Pallets = product.Pallets,
+                    SheetsPerPallet = product.SheetsPerPallet,
                     Descriptions = productService.GetDescriptions(),
                     Grades = productService.GetGrades(),
                     Sizes = productService.GetSizes(),
-                    Units = productService.GetUnits()
+                    SupplierOrderId = product.SupplierOrderId,
+                    Quantity = product.OrderedQuantity,
+                    Unit = product.Unit
                 };
-                products.Add(product);
-            }
+                listProducts.Add(productSupp);
+            };
 
-            return View(products);
+            return View(listProducts);
+
         }
 
         [HttpPost]
         [Authorize]
-        public IActionResult AddOrderProducts(int customerorderId,
-           IEnumerable<ProductCustomerFormModel> model)
+        public IActionResult AddOrderProducts(IEnumerable<ProductCustomerFormModel> model, int customerorderId)
         {
             // var count = int.Parse(TempData["Count"].ToString());
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
 
             if (!ModelState.IsValid)
             {
-                var products = new List<ProductCustomerFormModel>();
-
-                foreach (var item in products)
-                {
-                    var product = new ProductCustomerFormModel()
+               new ProductCustomerFormModel()
                     {
                         Descriptions = productService.GetDescriptions(),
                         Grades = productService.GetGrades(),
                         Sizes = productService.GetSizes(),
                         Units = productService.GetUnits()
                     };
-                    products.Add(product);
-                }
-
             }
 
             if (!model.Any())
             {
                 return View(model);
             }
+            foreach (var product in model)
+            {       
+                if(product.Quantity == 0) { continue; }
+                var check = productService.EditProduct(product.Id, customerorderId, product.SupplierOrderId, product.Description,
+                             product.Grade, product.Size, product.FSCSertificate, product.FSCClaim, product.Pallets,
+                             product.SheetsPerPallet, product.SellPrice, product.Quantity, product.Unit);
 
-            foreach (var item in model)
-            {
-                productService.CreateProduct(item, customerorderId);
+                if (!check)
+                {
+                    return BadRequest();
+                }
+
             }
-
             customerOrderService.CustomerOrderCounting(customerorderId);
 
             return RedirectToAction("PrintCustomerOrder");

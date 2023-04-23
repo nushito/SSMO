@@ -1,0 +1,77 @@
+﻿@model CustomerOrdersForInvoice
+
+<form method="post">
+     <div class="form-group col-md-4">
+            <div class="form-group">
+                <label >Company</label>
+                <select name="MyCompanyId" id="MyCompanyId" asp-for="MyCompanyId" class="form-select">
+                <option value="">Choose Company</option>
+                @foreach (var item in Model.MyCompanies)
+                {
+                                <option value="@item.Id">@item.Name</option>                        
+                }
+                    <span asp-validation-for="MyCompanyId" class="small text-danger"></span>
+                </select>
+            </div>
+        </div>
+        <div class="form-group col-md-4">
+            <div class="form-group">
+                <label >Customer</label>
+                <select name="CustomerId" id="CustomerId" asp-for="CustomerId" class="form-select">
+                <option value="">Choose Customer</option>
+                    @foreach (var item in Model.Customers)
+                    {
+                            <option value="@item.Id">@item.Name</option>                        
+                    }
+                    <span asp-validation-for="CustomerId" class="small text-danger"></span>
+                </select>
+            </div>
+        </div>
+         <div class="row col-md-4 ">           
+                 <label asp-for="SelectedCustomerOrders" class="control-label"> Select Customer Order</label>
+                 <select asp-for="SelectedCustomerOrders" class="form-control" id="CustomerOrderNumber" name="SelectedCustomerOrders" asp-items="@(new SelectList(string.Empty,"CustomerOrderId", "CustomerOrderNumber"))"></select>               
+     </div>
+
+      <input type="submit" value="Add Invoice Details" 
+          class="btn btn-primary mt-3"/>     
+</form>
+
+@section Scripts {
+        <script type="text/javascript">
+                $(document).ready
+                (
+                        function() 
+                        {
+                        //Dropdownlist Selectedchange event
+                        $("#CustomerId").change(function() {                        
+                            $("#CustomerOrderNumber option").remove();
+                            var customerId = $(this).val(); 
+                            $.ajax({
+                                type: 'GET',
+                                url: "/Documents/GetCustomerOrders", 
+                                dataType: 'json',
+                                data: { id: customerId },
+                                success: function(selectedCustomerOrders) {                           
+                                    $("#CustomerOrderNumber").append('<option value="' + "0" + '">' + "Select CustomerOrderNumber" + '</option>');
+                                    debugger;
+                                    for (var i = 0; i < selectedCustomerOrders.length; i++) 
+                                    {
+                                       $("#CustomerOrderNumber").append('<option value="' + selectedCustomerOrders[i].CustomerOrderId + '">' + selectedCustomerOrders[i].CustomerOrderNumber + '</option>');
+                                    }     
+
+                                    debugger;                          
+                               },
+                                error: function(ex) {
+                                    alert('Failed to retrieve selectedCustomerOrders' + ex);
+                                }
+                            });
+                            return false;
+                        })
+                        }
+
+                    );
+
+         </script>
+}
+
+

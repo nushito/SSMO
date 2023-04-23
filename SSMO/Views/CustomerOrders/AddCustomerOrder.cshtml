@@ -1,5 +1,7 @@
 ﻿@using SSMO.Models.Products
 @using SSMO.Services.Curruncies
+@using SSMO.Services;
+@inject ISupplierService supplierService
 
 @model CustomerOrderViewModel
 @{
@@ -58,10 +60,10 @@
             <div class="form-group">
                 <label >Customer</label>
                 <select id="client" asp-for="CustomerId" class="form-control">
+                <option value="">All</option>
                     @foreach (var item in Model.Customers)
                     {
-                        <option value="@item.Id">@item.Name</option>
-                        
+                        <option value="@item.Id">@item.Name</option>                        
                     }
                     <span asp-validation-for="CustomerId" class="small text-danger"></span>
                 </select>
@@ -72,18 +74,17 @@
             <div class="form-group">
                 <label >My Company</label>
                 <select id="mycompany" asp-for="MyCompanyId" class="form-control">
+                <option value="">All</option>
                     @foreach (var company in Model.MyCompanies)
                     {
                         <option value="@company.Id">@company.Name</option>
                     }
                     <span asp-validation-for="MyCompanyId" class="small text-danger"></span>
                 </select>
-            </div>
-            
-        </div>
-    
+            </div>            
+        </div>    
     </div>
-    <div class="form-group-sm col-md-4">
+    <div class="form-group row col-md-4">
         <label asp-for="Origin"></label>
         <input asp-for="Origin" type="text" class="form-control" />
         <span asp-validation-for="Origin" class="small text-danger"></span>
@@ -93,11 +94,7 @@
             <label asp-for="Vat"></label>
             <input asp-for="Vat"  min="0" step="1" class="form-control" type="number" />
         </td>
-       <td>
-            <label asp-for="ProductsCount"></label>
-            <input type="number" asp-for="ProductsCount" min="0" step="1" class="form-control"/>
-
-       </td>
+      
              <td><label asp-for="StatusId"></label>
                 <select  asp-for="StatusId" class="form-control">
                     @foreach (var status in Model.Statuses)
@@ -106,29 +103,92 @@
                     }
                     <span asp-validation-for="StatusId" class="small text-danger"></span>
                 </select>
-
-             </td>  
-        
+             </td>          
     </div>
+    
+    @if(Model.SupplierOrdersBySupplier.Count() > 0)
+    {
+           <div class="form-group row col-sm-4">
+           <label>Supplier Order</label>
+                <select multiple asp-for="SelectedSupplierOrders" class="form-control">
+                @foreach (var item in Model.SupplierOrdersBySupplier)
+                {
+                        <option value="@item.SupplierOrderId">@item.SupplierAndOrderSelect</option>
+                }  
+            </select>
+
+       </div>   
+    }
+
+   @* <div class="row col-md-4 mb-3">
+        <div class="form-group">
+                <label asp-for="SupplierId">Supplier</label>
+                <select name="SupplierId" asp-for="SupplierId" class="form-select">
+                 <option value="">All</option>
+                @foreach (var supplier in Model.Suppliers)
+                {
+                    <option value="@supplier.Id">@supplier.Name</option>
+                }
+                <span asp-validation-for="SupplierId" class="small text-danger"></span> 
+                </select>
+        </div>
+
+    </div>
+     <div class="row col-md-4 mb-3">           
+                 <label class="control-label"> Select SupplierOrder</label>
+                 <select class="form-control" id="SupplierOrderNumber" name="SupplierOrderId" asp-for="SupplierOrderId" asp-items="@(new SelectList(string.Empty,"SupplierOrderId", "SupplierOrderNumber"))"></select>               
+     </div>   *@
     @* <input type="hidden" name="customerorderid" value="@model.id" />*@
-        <input type="submit" value="Add Products" class="btn btn-primary mt-3" />
+        <input type="submit" value="Add Order Products" class="btn btn-primary mt-3"/>        
  </form> 
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
-<script src="http://code.jquery.com/ui/1.11.1/jquery-ui.min.js"></script>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.css" rel="stylesheet">
-
-<script type="text/javascript">
-    $(function () {
-        $("#datepicker").datepicker();
-    });
-</script>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-}
 
- 
+        <script type="text/javascript">
+        $(function () {
+            $("#datepicker").datepicker();
+        });
+    </script>
+       
+ @*<script type="text/javascript">
+            $(document).ready
+            (
+                    function() 
+                    {
+                    //Dropdownlist Selectedchange event
+                    $("#SupplierId").change(function() {                        
+                        $("#SupplierOrderNumber option").remove();
+                        var supplierId = $(this).val(); 
+                        $.ajax({
+                            type: 'GET',
+                            url: "/CustomerOrders/GetSupplierOrders", 
+                            dataType: 'json',
+                            data: { id: supplierId },
+                            success: function(selectedSuppliers) {                           
+                                $("#SupplierOrderNumber").append('<option value="' + "0" + '">' + "Select SupplierOrderNumber" + '</option>');
+                                debugger;
+                                for (var i = 0; i < selectedSuppliers.length; i++) 
+                                {
+                                   $("#SupplierOrderNumber").append('<option value="' + selectedSuppliers[i].SupplierOrderId + '">' + selectedSuppliers[i].SupplierOrderNumber + '</option>');
+                                }      
+
+                                debugger;                          
+                           },
+                            error: function(ex) {
+                                alert('Failed to retrieve supplierOrderNumber' + ex);
+                            }
+                        });
+                        return false;
+                    })
+                    }
+
+                );
+         
+     </script>*@
+
+     }
 
         
 

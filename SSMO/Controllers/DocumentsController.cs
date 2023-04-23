@@ -24,6 +24,9 @@ using Newtonsoft.Json;
 using SSMO.Models.Documents.DebitNote;
 using SSMO.Models.Documents;
 using SSMO.Services.Documents.DebitNote;
+using SSMO.Models.Documents.Invoice;
+using SSMO.Services.Customer;
+using SSMO.Data.Models;
 
 namespace SSMO.Controllers
 {
@@ -39,13 +42,16 @@ namespace SSMO.Controllers
         private readonly ICreditNoteService creditNoteService;
         private readonly IProductService productService;
         private readonly IDebitNoteService debitNoteService;
+        private readonly ICustomerService customerService;
+        private readonly ICurrency currency;
       
         public DocumentsController
             (ISupplierOrderService supplierOrderService,
             IPurchaseService purchaseService, ICustomerOrderService customerOrderService,
             IInvoiceService invoiceService, IMycompanyService mycompanyService,
             IDocumentService documentService, ISupplierService supplierService, ICreditNoteService creditNoteService,
-            IProductService productService, IDebitNoteService debitNoteService)
+            IProductService productService, IDebitNoteService debitNoteService, ICustomerService customerService,
+            ICurrency currency)
         {
             this.supplierOrderService = supplierOrderService;
             this.purchaseService = purchaseService;
@@ -57,6 +63,8 @@ namespace SSMO.Controllers
             this.creditNoteService = creditNoteService;
             this.productService= productService;
             this.debitNoteService= debitNoteService;
+            this.customerService= customerService;
+            this.currency= currency;    
         }
 
         public IActionResult AddPurchase(SupplierOrderListModel model)
@@ -79,12 +87,13 @@ namespace SSMO.Controllers
 
             model.SupplierOrderNumbers = supplierOrdersList;
             model.SupplierNames = (System.Collections.Generic.ICollection<string>)suppliersList;
+            
 
             return View(model);
         }
 
         [HttpGet]
-        public IActionResult PurchaseDetails(string supplierOrderNumber)
+        public IActionResult PurchaseDetails(string supplierOrderNumber, int id)
         {
             if (supplierOrderNumber != null)
             {
@@ -101,17 +110,23 @@ namespace SSMO.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            return View(new PurchaseDetailsFormModel
+
+            var purchaseModel = new PurchaseDetailsFormModel
             {
                 SupplierOrderNumber = supplierOrderNumber,
-                SupplierFSCCertificate = supplierService.GetSupplierFscCertificateByOrderNumber(supplierOrderNumber)
-            });
+                SupplierFSCCertificate = supplierService.GetSupplierFscCertificateByOrderNumber(supplierOrderNumber),
+                ProductDetails = new List<PurchaseProductAsSupplierOrderViewModel>()
+            };
+
+            var productsBySupplier = purchaseService.Products(id);
+            purchaseModel.ProductDetails = productsBySupplier;
+            return View(purchaseModel);
         }
 
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public IActionResult PurchaseDetails(string supplierOrderNumber, PurchaseDetailsFormModel model)
+        public IActionResult PurchaseDetails(int id, string supplierOrderNumber, PurchaseDetailsFormModel model)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyBySupplierOrdreNum(supplierOrderNumber);
@@ -141,14 +156,15 @@ namespace SSMO.Controllers
                 return View(model);
             }
 
-            var purchase = purchaseService.CreatePurchaseAsPerSupplierOrder(
-                supplierOrderNumber, model.Number, model.Date,
+            var purchase = purchaseService.CreatePurchaseAsPerSupplierOrder(id,
+                model.Number, model.Date,
                 model.PaidStatus, model.NetWeight,
                 model.GrossWeight, model.Duty, model.Factoring,
                 model.CustomsExpenses, model.FiscalAgentExpenses,
                 model.ProcentComission, model.PurchaseTransportCost,
                 model.BankExpenses, model.OtherExpenses, model.Vat,
-                model.TruckNumber, model.FSCSertificate, model.FSCClaim, model.Swb);
+                model.TruckNumber,model.Swb, model.ProductDetails, model.Incoterms,
+                model.PaidAvance, model.DatePaidAmount);
 
             if (!purchase)
             {
@@ -156,32 +172,97 @@ namespace SSMO.Controllers
             }
             return RedirectToAction("Index", "Home");
         }
-
         [HttpGet]
-        public IActionResult CustomerOrderToInvoice()
+        public IActionResult CustomerOrdersForInvoice()
         {
-            if (!User.Identity.IsAuthenticated)
+            string userId = this.User.UserId();
+            var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            var customers = new CustomerOrdersForInvoice
+            {
+                Customers = customerService.GetCustomerNamesAndId(),
+                MyCompanies = mycompanyService.GetCompaniesForInvoice()
+            };
+
+            return View(customers);
+        }
+
+        [HttpPost]
+        public IActionResult CustomerOrdersForInvoice(CustomerOrdersForInvoice model)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid)
             {
                 return RedirectToAction("Index", "Home");
-
             }
-            var customerOrdersList = customerOrderService.AllCustomerOrderNumbers();
-            ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
+            
+            return  RedirectToAction("InvoiceDetails",  new
+            {
+                customerId = model.CustomerId,
+                selectedCustomerOrders = model.SelectedCustomerOrders,
+                myCompanyId = model.MyCompanyId
+            });
+        }
+        [HttpGet]
+        public IActionResult GetCustomerOrders(string id)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (id == null)
+            {
+                id = "0";
+            }
+
+            var customerId = int.Parse(id.ToString());
+            var customerOrdersNum = customerOrderService.CustomerOrderCollection(customerId);
+            return Json(customerOrdersNum, new JsonSerializerOptions() { PropertyNameCaseInsensitive = false });
+        }
+
+        [HttpGet]
+        public IActionResult InvoiceDetails(int customerId, List<int> selectedCustomerOrders, int myCompanyId)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return RedirectToAction("Index", "Home"); }
+
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Index", "Home");
+            }
+
+           ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice(myCompanyId);
 
             var companiesNames = mycompanyService.GetCompaniesNames();
-
+           
             var collectionCustomerOrders = new CustomerOrderNumbersListView
             {
-                OrderConfirmationNumberList = customerOrdersList,
-                MyCompanyNames = companiesNames
+                SelectedCustomerOrders = selectedCustomerOrders,
+                MyCompanyNames = companiesNames,
+                Products = new List<ProductsForInvoiceViewModel>(),
+                Currencies = currency.AllCurrency(),
+                CustomerId= customerId
             };
+
+            collectionCustomerOrders.Products = productService.ProductsForInvoice(selectedCustomerOrders);
+
+            ViewBag.Orders = selectedCustomerOrders;
+            TempData["orders"] = JsonConvert.SerializeObject(selectedCustomerOrders);
 
             return View(collectionCustomerOrders);
         }
 
+
         [HttpPost]
         [Authorize]
-        public IActionResult CustomerOrderToInvoice(CustomerOrderNumbersListView model)
+        public IActionResult InvoiceDetails
+            (CustomerOrderNumbersListView model, int customerId, int myCompanyId) 
+            
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(model.MyCompanyName);
@@ -196,38 +277,56 @@ namespace SSMO.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            model.OrderConfirmationNumberList = customerOrderService.AllCustomerOrderNumbers();
             model.MyCompanyNames = mycompanyService.GetCompaniesNames();
-            ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
-
+           ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice(myCompanyId);
+           
             if (!ModelState.IsValid)
             {
                 new CustomerOrderNumbersListView
                 {
-                    OrderConfirmationNumberList = customerOrderService.AllCustomerOrderNumbers(),
-                    MyCompanyNames = mycompanyService.GetCompaniesNames()
-
+                    SelectedCustomerOrders = JsonConvert.DeserializeObject<List<int>>(TempData["orders"].ToString()),
+                    MyCompanyNames = mycompanyService.GetCompaniesNames(),
+                    Products = new List<ProductsForInvoiceViewModel>(),
+                    Currencies = currency.AllCurrency(),
+                    CustomerId = customerId
                 };
-                ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice();
+                ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice(myCompanyId);
             }
+
+            foreach (var product in model.Products)
+            {
+                product.Amount = product.SellPrice * product.InvoicedQuantity;
+                product.BgAmount = product.Amount * model.CurrencyExchangeRateUsdToBGN;
+                product.TotalSheets = product.Pallets * product.SheetsPerPallet;
+            }
+
+            TempData["products"] = JsonConvert.SerializeObject(model.Products);
 
             return RedirectToAction("CreateInvoice",
                 new
                 {
-                    orderConfirmationNumber = model.OrderConfirmationNumber,
                     date = model.Date,
                     number = model.Number,
                     currencyExchangeRateUsdToBGN = model.CurrencyExchangeRateUsdToBGN,
                     mycompanyname = model.MyCompanyName,
                     truckNumber = model.TruckNumber,
                     deliveryCost = model.DeliveryCost,
-                    swb = model.Swb
+                    swb = model.Swb,                                      
+                    netWeight = model.NetWeight,
+                    grossWeight = model.GrossWeight,
+                    incoterms = model.Incoterms,
+                    customerId= customerId,
+                    currencyId = model.CurrencyId,
+                    vat = model.Vat,
+                    myCompanyId = myCompanyId
                 });
         }
 
         public IActionResult CreateInvoice(
-            int orderConfirmationNumber, DateTime date, decimal currencyExchangeRateUsdToBGN,
-          int number, string mycompanyname, string truckNumber, decimal deliveryCost, string swb)
+            DateTime date, decimal currencyExchangeRateUsdToBGN,
+          int number, string mycompanyname, string truckNumber, decimal deliveryCost, 
+          string swb, decimal netWeight, decimal grossWeight, string incoterms, 
+          int customerId, int currencyId, int vat, int myCompanyId)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(mycompanyname);
@@ -245,8 +344,13 @@ namespace SSMO.Controllers
                 return View();
             }
 
+            List<ProductsForInvoiceViewModel> products = JsonConvert.DeserializeObject<List<ProductsForInvoiceViewModel>>(TempData["products"].ToString());
+            List<int> orders = JsonConvert.DeserializeObject<List<int>>(TempData["orders"].ToString());
+
             var invoiceForPrint = invoiceService.CreateInvoice
-                (orderConfirmationNumber, date, currencyExchangeRateUsdToBGN, number, mycompanyname, truckNumber, deliveryCost, swb);
+                (orders, products, date, currencyExchangeRateUsdToBGN, number, 
+                mycompanyname, truckNumber, deliveryCost, swb, netWeight, grossWeight, incoterms, 
+                customerId, currencyId, vat, myCompanyId);
          
             if (invoiceForPrint == null)
             {
@@ -294,6 +398,7 @@ namespace SSMO.Controllers
             }
             //TODO Fix amount with currencyexchange
             var bgInvoice = invoiceService.CreateBgInvoiceForPrint(documentNumber);
+
             if (bgInvoice == null) return View();
 
             return View(bgInvoice);
@@ -403,15 +508,15 @@ namespace SSMO.Controllers
         }
 
         public IActionResult CreateCreditNote
-            (int invoiceId, DateTime date, bool quantityBack)
+            (int invoiceId, DateTime date, bool quantityBack, string deliveryAddress)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
             if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
             if (invoiceId == 0) return BadRequest();
-         // 
+         
             List<AddProductsToCreditAndDebitNoteFormModel> productsForCredit = JsonConvert.DeserializeObject<List<AddProductsToCreditAndDebitNoteFormModel>>(TempData["products"].ToString());
-            var creditNote = creditNoteService.CreateCreditNote(invoiceId, date, quantityBack, productsForCredit);
+            var creditNote = creditNoteService.CreateCreditNote(invoiceId, date, quantityBack, deliveryAddress, productsForCredit);
 
             return View(creditNote);  
         }
@@ -426,7 +531,7 @@ namespace SSMO.Controllers
             var model = new DebitNoteChooseInvoiceViewModel
             {
                 MyCompanies = mycompanyService.GetAllCompanies(),
-                Products = new List<AddProductsToCreditAndDebitNoteFormModel>()
+                Products = new List<AddProductsToCreditAndDebitNoteFormModel>()               
             };
             return View(model);
         }
@@ -441,7 +546,7 @@ namespace SSMO.Controllers
                 return View(new DebitNoteChooseInvoiceViewModel
                 {
                     MyCompanies = mycompanyService.GetAllCompanies(),
-                    Products = new List<AddProductsToCreditAndDebitNoteFormModel>()
+                    Products = new List<AddProductsToCreditAndDebitNoteFormModel>()                    
                 });
             }
 
@@ -483,7 +588,8 @@ namespace SSMO.Controllers
             TempData["products"] = JsonConvert.SerializeObject(model.Products);
 
             return RedirectToAction("CreateDebitNote",
-                new { invoiceId = model.InvoiceId, date = model.Date, moreQuantity = model.MoreQuantity });
+                new { invoiceId = model.InvoiceId, date = model.Date, 
+                    moreQuantity = model.MoreQuantity });
         }
 
         public IActionResult CreateDebitNote(int invoiceId, DateTime date, bool moreQuantity)

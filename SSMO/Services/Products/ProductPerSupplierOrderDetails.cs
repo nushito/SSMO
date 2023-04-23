@@ -2,7 +2,7 @@
 
 namespace SSMO.Services.Products
 {
-    public class ProductSupplierDetails
+    public class ProductPerSupplierOrderDetails
     {
         public int Id { get; set; }
         public int DescriptionId { get; set; }
@@ -17,13 +17,11 @@ namespace SSMO.Services.Products
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
         public string Unit { get; set; }
-        public string PurchaseFscClaim { get; set; }
-        public string PurchaseFscCertificate { get; set; }
-        public decimal Price { get; set; }
         public decimal PurchasePrice { get; set; }
-        public decimal QuantityM3 { get; set; }
+        public decimal OrderedQuantity { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
- 
+        public int SupplierOrderId { get; set; }
+
     }
 }

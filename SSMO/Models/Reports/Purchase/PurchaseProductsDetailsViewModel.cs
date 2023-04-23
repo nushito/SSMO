@@ -7,10 +7,13 @@
         public string Size { get; set; }
         public string Unit { get; set; }
         public decimal Quantity { get; set; }
-        public int Pallet { get; set; }
+        public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
         public string FscClaim { get; set; }
         public string FscCertificate { get; set; }
         public decimal PurchasePrice { get; set; }
+        public decimal CostPrice { get; set; }
+        public int TotalSheets { get; set; }
+        public decimal Amount { get; set; }        
     }
 }

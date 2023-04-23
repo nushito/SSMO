@@ -2,25 +2,25 @@
 
 namespace SSMO.Data.Migrations
 {
-    public partial class CreditAndDebitTotalAmount : Migration
+    public partial class Profit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<decimal>(
-                name: "CreditNoteTotalAmount",
-                table: "Documents",
-                type: "decimal(18,2)",
+                name: "DeliveryCost",
+                table: "InvoiceProductDetails",
+                type: "decimal(18,5)",
                 precision: 18,
-                scale: 2,
+                scale: 5,
                 nullable: false,
                 defaultValue: 0m);
 
             migrationBuilder.AddColumn<decimal>(
-                name: "DebitNoteTotalAmount",
-                table: "Documents",
-                type: "decimal(18,2)",
+                name: "Profit",
+                table: "InvoiceProductDetails",
+                type: "decimal(18,5)",
                 precision: 18,
-                scale: 2,
+                scale: 5,
                 nullable: false,
                 defaultValue: 0m);
         }
@@ -28,12 +28,12 @@ namespace SSMO.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "CreditNoteTotalAmount",
-                table: "Documents");
+                name: "DeliveryCost",
+                table: "InvoiceProductDetails");
 
             migrationBuilder.DropColumn(
-                name: "DebitNoteTotalAmount",
-                table: "Documents");
+                name: "Profit",
+                table: "InvoiceProductDetails");
         }
     }
 }

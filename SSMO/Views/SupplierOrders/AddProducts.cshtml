@@ -5,7 +5,8 @@
  
 @{
     ViewBag.Title = "Edit Product List";
-    
+    var count = int.Parse(TempData["Count"].ToString());
+    var fscCert = ViewBag.FscCert;
 }
 
     <form method="post">    
@@ -23,12 +24,12 @@
                 <td>Pallets</td>
                 <td>Sheets/pallet</td>
                 <td>Quantity m3</td>
-              <td>Purchase Price</td>
+                <td>Purchase Price</td>
                 </tr>
             </thead>
             <tbody>
  
-             @for (int i = 0; i < Model.Count(); i++)
+             @for (int i = 0; i < count; i++)
                 {
                     <div>
                      <input type="hidden" asp-for="@Model[i].Id">
@@ -69,14 +70,14 @@
                             </td>
                                <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <input asp-for="@Model[i].PurchaseFscClaim"  class="text-box single-line"   required="required">
+                                    <input asp-for="@Model[i].FscClaim"  class="text-box single-line" required="required">
                                 </div>
                             </td>
                              <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <select asp-for="@Model[i].PurchaseFscCertificate">
+                                    <select asp-for="@Model[i].FscCertificate">
                                         <option value="">-</option>
-                                        <option value="@Model[i].SupplierFscCertNumber">@Model[i].SupplierFscCertNumber</option>
+                                            <option value="@Model[i].SupplierFscCertNumber">@fscCert</option>
                                     </select>
                                 </div>
                             </td>

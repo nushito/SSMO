@@ -57,7 +57,12 @@
         <div class="row">
              <div class="col-xl-8">
             <ul class="list-unstyled">
-              <li class="text-muted">O/C No: <span style="color:#5d9fc5 ;">@Model.OrderConfirmationNumber</span></li>
+              <li class="text-muted">O/C No: <span style="color:#5d9fc5 ;">
+                  @foreach (var item in Model.OrderConfirmationNumbers)
+                                    {
+                                       @item <span>;</span>
+                                    }
+                  </span></li>
               <li class="text-muted">Delivery Terms: <span style="color:#5d9fc5 ;">@Model.Incoterms</span></li>
               <li class="text-muted">Truck Number: <span style="color:#5d9fc5 ;">@Model.TruckNumber</span></li>
               <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;">@Model.NetWeight kg</span></li>

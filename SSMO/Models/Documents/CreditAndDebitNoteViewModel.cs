@@ -11,6 +11,8 @@ namespace SSMO.Models.Documents
     {
         public int Id { get; set; }
         public int Number { get; set; }
+        [Required]
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
         public int ClientId { get; set; }
         [Display(Name = "Customer")]
@@ -28,5 +30,6 @@ namespace SSMO.Models.Documents
         public int VatPercent { get; set; }
         public decimal Amount { get; set; }
         public bool QuantityBack { get; set; }
+        public string CreditNoteDeliveryAddress { get; set; }
     }
 }

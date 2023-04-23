@@ -1,4 +1,5 @@
-﻿using SSMO.Models.Customers;
+﻿using SSMO.Models.CustomerOrders;
+using SSMO.Models.Customers;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Services.Curruncies;
@@ -39,6 +40,8 @@ namespace SSMO.Models.Reports.CustomerOrderReportForEdit
         public int SupplierId { get; set; }
         public string Supplier { get; set; }
         public IEnumerable<AllSuppliers> Suppliers { get; set; }
-        
+        public IEnumerable<SupplierOrdersBySupplier> SupplierOrdersBySupplier { get; set; }
+        public IEnumerable<int> SelectedSupplierOrders { get; set; }
+
     }
 }

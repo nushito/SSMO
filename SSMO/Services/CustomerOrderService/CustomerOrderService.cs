@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.PaymentsModels;
 using System;
@@ -31,7 +32,7 @@ namespace SSMO.Services.CustomerOrderService
 
         public int CreateOrder(string num, DateTime date, int customerId, int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,int currency,string origin, 
-            bool paidStatus, int vat, int statusId  )
+            bool paidStatus, int vat, int statusId, List<int> supplierOrders)
         {
            
             var fscClaim = dbContext.MyCompanies
@@ -60,11 +61,20 @@ namespace SSMO.Services.CustomerOrderService
                 StatusId = statusId,
                 Origin = origin,
                 PaidAmountStatus = paidStatus,
-                Vat = vat
+                Vat = vat,
+                SupplierOrders = new List<SupplierOrder>()
             };
+
+           
+            var supplierOrdersList = dbContext.SupplierOrders
+                .Where(i => supplierOrders.Contains(i.Id))
+                .ToList();
+
+            order.SupplierOrders = supplierOrdersList;
 
             dbContext.CustomerOrders.Add(order);
             dbContext.SaveChanges();
+
             return order.Id;
         }
 
@@ -85,7 +95,9 @@ namespace SSMO.Services.CustomerOrderService
                 thisorder.Balance = 0;
             }
 
-            thisorder.TotalQuantity = thisorder.Products.Sum(a=>a.OrderedQuantity);
+            thisorder.TotalQuantity = thisorder.CustomerOrderProducts.Sum(a=>a.Quantity);
+            thisorder.TotalPallets = thisorder.CustomerOrderProducts.Sum(a => a.Pallets);
+            thisorder.TotalSheets = thisorder.CustomerOrderProducts.Sum(a => a.TotalSheets);
 
             dbContext.SaveChanges();
 
@@ -115,7 +127,7 @@ namespace SSMO.Services.CustomerOrderService
         public int CreateFirstOrder(int number, string num, DateTime date, 
             int customerId, int company, string deliveryTerms, string loadingAddress, 
             string deliveryAddress, int currency, string origin, bool paidStatus, 
-           int vat, int statusId)
+           int vat, int statusId, List<int> supplierOrders)
         {
             var fscClaim = dbContext.MyCompanies
                  .Where(a => a.Id == company)
@@ -141,9 +153,15 @@ namespace SSMO.Services.CustomerOrderService
                 StatusId = statusId,
                 Origin = origin,
                 PaidAmountStatus = paidStatus,
-                Vat = vat
+                Vat = vat,
+                SupplierOrders = new List<SupplierOrder>()
             };
 
+            var supplierOrdersList = dbContext.SupplierOrders
+                .Where(i => supplierOrders.Contains(i.Id))
+                .ToList();
+
+            order.SupplierOrders = supplierOrdersList;
 
             dbContext.CustomerOrders.Add(order);
             dbContext.SaveChanges();
@@ -215,6 +233,38 @@ namespace SSMO.Services.CustomerOrderService
                 .Where(i=>i.Id == id)
                 .Select(n=>n.OrderConfirmationNumber)
                 .FirstOrDefault();
+        }
+
+        public List<CustomerOrdersJsonList> CustomerOrderCollection(int customerorderId)
+        {
+            return dbContext.CustomerOrders
+                .Where(c=>c.CustomerId == customerorderId)
+                .Select(i=> new CustomerOrdersJsonList
+                {
+                    CustomerOrderId = i.Id,
+                    CustomerOrderNumber = i.OrderConfirmationNumber.ToString()
+                })
+                .ToList();
+        }
+
+        public void CheckCustomerOrderStatus(int id)
+        {
+            var customerOrderAustandingQuantity = dbContext.CustomerOrderProductDetails
+                .Where(ic=>ic.CustomerOrderId == id)
+                .Select(a=>a.AutstandingQuantity).ToList();
+
+            var customerOrder = dbContext.CustomerOrders
+                .Where(i => i.Id == id)                
+                .FirstOrDefault();
+           
+            if(customerOrderAustandingQuantity.Sum() >= 0.001m)           
+            {
+                customerOrder.StatusId = dbContext.Statuses
+                    .Where(n=>n.Name == "Finished")
+                    .Select(i=>i.Id)
+                    .FirstOrDefault();
+            }
+
         }
     }
 }

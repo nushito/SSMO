@@ -1,4 +1,5 @@
-﻿using SSMO.Models.Products;
+﻿using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Products;
 using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using System;
@@ -10,7 +11,8 @@ namespace SSMO.Services.Products
 {
     public interface IProductService
     {
-        public void CreateProduct(ProductCustomerFormModel model, int customerorderId);
+        public void CreateProduct(ProductSupplierFormModel model, int supplierOrderId);
+        public void CreateNewProductOnEditSupplierOrder(NewProductsForSupplierOrderModel products);
         public bool DescriptionExist(string name);
         public void AddDescription(string name, string bgName);
         public void AddGrade(string name);
@@ -21,12 +23,11 @@ namespace SSMO.Services.Products
         public IEnumerable<string> GetSizes();
         public IEnumerable<string> GetGrades();
         public ICollection<string> GetUnits();
-        public IEnumerable<ProductSupplierDetails> Details(int customerId);
+        public IEnumerable<ProductPerSupplierOrderDetails> Details(List<int> supplierOrderserId);
         public bool EditProduct(int id, int customerorderId,
-            int supplierOrderId,
-            string description, string grade,
-            string size, string purchaseFscCert, string purchaseFscClaim,
-            int pallets, int sheetsPerPallet, decimal purchasePrice, decimal quantityM3, string unit);
+            int supplierOrderId, string description, string grade,
+            string size, string fscCert, string fscClaim,
+            int pallets, int sheetsPerPallet, decimal price, decimal orderedQuantity, string unit);
         public ICollection<ProductCustomerFormModel> DetailsPerCustomerOrder(int id);
         public ICollection<ProductsForEditSupplierOrder> ProductsDetailsPerSupplierOrder(int supplierOrderId);
         public ICollection<string> GetFascCertMyCompany();
@@ -37,13 +38,16 @@ namespace SSMO.Services.Products
 
         public void ClearProductQuantityWhenDealIsFinished(int productId);
         public void ReleaseProductExcludedFromInvoice(int productId);
-        public IEnumerable<ProductAvailabilityDetailsViewModel> ProductsOnStock
+        public ProductsAvailabilityCollectionViewModel ProductsOnStock
             (int? descriptionId, int? gradeId, int? sizeId, int currentPage, int productsPerPage);
         public ICollection<DescriptionForProductSearchModel> DescriptionIdAndNameList();
         public ICollection<SizeForProductSearchModel> SizeIdAndNameList();
         public ICollection<GradeForProductSearchModel> GradeIdAndNameList();
         public void ResetToNullLoadingQuantityIfPurchaseIsChanged(int productId);
         public void NewLoadingQuantityToEditPurchase(int productId, int purchaseId);
+        public ICollection<string> FscClaimList();
+
+        public List<ProductsForInvoiceViewModel> ProductsForInvoice(List<int> customerOrders);
 
     }
 }

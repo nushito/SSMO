@@ -7,7 +7,6 @@ namespace SSMO.Data.Models
 {
     public class CustomerOrder
     {
-        
         public int Id { get; init; }
         [Required]
         public int OrderConfirmationNumber { get; set; }
@@ -29,9 +28,11 @@ namespace SSMO.Data.Models
         public Status Status { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
-        public ICollection<Product> Products { get; set; }
+        public ICollection<CustomerOrderProductDetails> CustomerOrderProducts { get; set; }        
         public decimal TotalQuantity { get; set; }
         public decimal TotalAmount { get; set; }
+        public int TotalSheets { get; set; }
+        public int TotalPallets { get; set; }
         public int? Vat { get; set; }
         public decimal PaidAvance { get; set; }
         public decimal Balance { get; set; }
@@ -41,7 +42,13 @@ namespace SSMO.Data.Models
         public decimal NetWeight { get; set; }
         public decimal GrossWeight { get; set; }
         public string Origin { get; set; }
-        public ICollection<Document> Documents { get; set; }
-        public IEnumerable<SupplierOrder> SupplierOrder { get; set; }
+        public ICollection<Document> Documents { get; set;}
+        public IEnumerable<SupplierOrder> SupplierOrders { get; set; }
+        public ICollection<InvoiceProductDetails> InvoiceProductDetails { get; set; }
+
+        public static explicit operator CustomerOrder(int v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

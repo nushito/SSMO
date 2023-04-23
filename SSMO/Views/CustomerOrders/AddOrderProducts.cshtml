@@ -1,14 +1,10 @@
 ﻿@model List<ProductCustomerFormModel>
-
 @using SSMO.Services.Products
 @inject IProductService service;
 @{
-
-    var count = int.Parse(TempData["Count"].ToString());
+    ViewBag.Title = "Add Products to CO";
     var fscCert = service.GetFascCertMyCompany();
 }
-
-
 <form method="post">
     <fieldset>
         <h4>Add Products</h4>
@@ -23,15 +19,21 @@
                     <td>Unit</td>
                     <td>Pallets</td>
                     <td>Sheets/pallet</td>
-                    <td>Quantity m3</td>
+                    <td>Quantity</td>
                     <td>Price</td>
 
                 </tr>
             </thead>
             <tbody>
 
-                @for (int i = 0; i < count; i++)
+                @for (int i = 0; i < Model.Count(); i++)
                 {
+                    <div>
+                         <input type="hidden" asp-for="@Model[i].Id">
+                        </div>
+                             <div>
+                             <input type="hidden" asp-for="@Model[i].SupplierOrderId">
+                            </div>
                     <tr>
                         <td class="col-sm-1">
                             <div class="editor-field">
@@ -69,7 +71,7 @@
 
                         <td class="col-sm-1">
                             <div class="editor-field">                              
-                                <input asp-for="@Model[i].FSCClaim" class="text-box single-line" value="" required="required">
+                                <input asp-for="@Model[i].FSCClaim" class="text-box single-line" required="required">
                             </div>
                         </td>
 
@@ -99,33 +101,28 @@
 
                         <td class="col-sm-1">
                             <div class="editor-field">
-
-                                <input asp-for="@Model[i].Pallets" class="text-box single-line" value="" required="required">
+                                <input asp-for="@Model[i].Pallets" type="number" class="text-box single-line" required="required">
                             </div>
                         </td>
                         <td class="col-sm-1">
                             <div class="editor-field">
-                                <input asp-for="@Model[i].SheetsPerPallet" class="text-box single-line" value="" required="required">
+                                <input asp-for="@Model[i].SheetsPerPallet" type="number" class="text-box single-line" required="required">
                             </div>
                         </td>
                          <td class="col-sm-1">
                             <div class="editor-field">
-                                <input asp-for="@Model[i].Quantity" class="text-box single-line" value="">
+                                <input asp-for="@Model[i].Quantity" class="text-box single-line" required="required">
                             </div>
                         </td>
 
                         <td class="col-sm-1">
                             <div class="editor-field">
-                                <input asp-for="@Model[i].Price" type="number" min="0.0000" step="0.0001" class="text-box single-line" value="" required="required">
+                                <input asp-for="@Model[i].SellPrice" type="number" min="0.0000" step="0.0001" class="text-box single-line" required="required">
                             </div>
                         </td>
-
-
                     </tr>
                 }
-
             </tbody>
-
         </table>
 
         <hr />

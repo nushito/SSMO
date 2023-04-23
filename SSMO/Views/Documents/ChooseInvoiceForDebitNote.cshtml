@@ -12,7 +12,7 @@
             <option value="">All</option>
                 @foreach (var myCompany in Model.MyCompanies)
                 {
-                           <option value="@myCompany.Id">@myCompany.Name</option>
+                    <option value="@myCompany.Id">@myCompany.Name</option>
                 }
 
             </select>
@@ -26,10 +26,9 @@
         <input itemid="date" asp-for="Date" name="Date" type="date" value="@DateTime.Now.ToString("dd-MM-yyyy")" class="form-control"/> 
         <span asp-validation-for="Date" class="small text-danger"></span>
         </div>
-
         <div class="row col-md-4">         
-         <input id="moreQuantity" class="form-check-input" type="checkbox" asp-for="MoreQuantity" name="moreQuantity">
-         <label asp-for="MoreQuantity">More Quantity</label>
+         <input id="moreQyantity" class="form-check-input" type="checkbox" asp-for="MoreQuantity" name="moreQuantity">
+         <label asp-for="MoreQuantity">Update Exist Product</label>
         </div>
         <hr />
         <div  class="table-responsive-sm">
@@ -38,7 +37,9 @@
                     <tr>                       
                         <th>Description</th>
                         <th>Size</th>
-                        <th>Grade</th>                        
+                        <th>Grade</th>          
+                        <th>FSC Claim</th>
+                        <th>FSC Certificate</th>
                         <th>Unit</th>
                         <th>Unit Price</th>   
                         <th class="center">Quantity</th>                        
@@ -50,11 +51,11 @@
                                 <tr id="tablerow0">                           
                                     <td>
                                         <div class="editor-field">
-                                                <select name="DescriptionId[0]" asp-for="Products.ElementAt(i).DescriptionId" class="text-box single-line">
-                                                <option value="0">All</option>
+                                            <select name="DescriptionId[0]" asp-for="Products.ElementAt(i).DescriptionId" class="text-box single-line">
+                                            <option value="0">All</option>
                                         @foreach (var description in Model.Products.ElementAt(i).Descriptions)
                                         {
-                                                                 <option value="@description.Id">@description.Name</option>
+                                            <option value="@description.Id">@description.Name</option>
                                         }
                                             </select>
                                         </div>
@@ -62,47 +63,47 @@
                                     <td>
                                         <div class="editor-field">
                                                     <select name="SizeId[0]" asp-for="Products.ElementAt(i).SizeId" class="text-box single-line">
-                                                <option value="">All</option>
+                                            <option value="">All</option>
                                         @foreach (var size in Model.Products.ElementAt(i).Sizes)
                                         {
-                                                                        <option value="@size">@size</option>
+                                              <option value="@size">@size</option>
                                         }
                                             </select>
                                         </div>
                                     </td>
                                     <td>
                                         <div class="editor-field">
-                                                <select name="GradeId[0]" asp-for="Products.ElementAt(i).GradeId" class="text-box single-line">
-                                                <option value="">All</option>
+                                             <select name="GradeId[0]" asp-for="Products.ElementAt(i).GradeId" class="text-box single-line">
+                                             <option value="">All</option>
                                         @foreach (var grade in Model.Products.ElementAt(i).Grades)
                                         {
-                                                                        <option value="@grade">@grade</option>
+                                               <option value="@grade">@grade</option>
                                         }
                                             </select>
                                         </div>
                                     </td>                           
                                      <td>
                                         <div class="editor-field">
-                                                <input asp-for="Products.ElementAt(i).FscClaim" class="text-box single-line" name="FscClaim[0]" value="" required="required">
+                                            <input asp-for="Products.ElementAt(i).FscClaim" class="text-box single-line" name="FscClaim[0]" value="" required="required">
                                         </div>
                                     </td>
                                     <td>
                                         <div class="editor-field">
-                                                <select name="FscCertificate[0]" asp-for="Products.ElementAt(i).FscSertificate" class="text-box single-line">
-                                                <option value="">-</option>
+                                            <select name="FscCertificate[0]" asp-for="Products.ElementAt(i).FscSertificate" class="text-box single-line">
+                                            <option value="">-</option>
                                         @foreach (var fsc in mycompanyService.MyCompaniesFscList())
                                         {
-                                                                         <option value="@fsc">@fsc</option>
+                                             <option value="@fsc">@fsc</option>
                                         }
                                                 </select>
                                         </div>
                                     </td>
                                          <td class="col-sm-1">
                                                 <div class="editor-field">
-                                                    <select name="Unit" asp-for="Products.ElementAt(i).Unit" class="text-box single-line">
+                                                <select name="Unit" asp-for="Products.ElementAt(i).Unit" class="text-box single-line">
                                         @foreach (var unit in service.GetUnits())
                                         {
-                                                                                <option value="@unit">@unit</option>
+                                            <option value="@unit">@unit</option>
                                         }
                                                     </select>
                                             </div>
@@ -180,44 +181,6 @@
                         });
                     });
 
-                    $(function onchange(){
-                             $("#InvoiceId").change(function()
-                                { 
-                                    var invoiceId = $(this).find('option:selected').val();  
-                                if(invoiceId != 0 {
-                                         $.ajax({
-                                                type:'GET',
-                                                url: "/Documents/GetProductsForDebitNote",
-                                                dataType : 'json',
-                                                data: {id = invoiceId},
-                                                success: function(products)
-                                                    {
-                                                        var table = $('#productTable');
-                                                        $(table).find("tr:gt(0)").remove();                                                
-                                                        var row="";
-                                                        for(var i=0; i< products.length;i++)
-                                                            {
-                                                                row += "<tr><td>" + ' <select class="text-box single-line" name="DescriptionId[' + i + ']" asp-for="DescriptionId" ><option value="">All</option>@foreach (var desc in service.DescriptionIdAndNameList())
-        {
-            <option value="@desc.Id">@desc.Name</option>
-        }</select>' + 
-                "</td><td>" + products[i].Grade + "</td><td>" + products[i].Size + "</td><td>" + products[i].Unit + "</td><td>" + products[i].Quantity + "</td><td>" + products[i].Price + "</td></tr>");
-                                                            }
-                                                        table.append(rows);    
-                                                        },
-                                        });
-                                }
-                                    debugger
-                                   // return false;
-                             });
-                    });
-                         
-                                          
-                                     
-
-
-
-
                         var counter = 1;
                         $(function products () {
                                 $('#addrow').click(function () {
@@ -263,34 +226,36 @@
                             return false;
                         }
                   </script>
-                       
-                       
-                @*  <script type="text/javascript">               
-                                 $(function (){
-                                       $("#InvoiceId").change(function()
-                                            {
-                                               var invoiceId = $("#InvoiceId").val();   
-                                               $.ajax({
-                                                     type:'GET',
-                                                     url: "/Documents/GetProductsForDebitNote",
-                                                     dataType : 'json',
-                                                     data: {invoiceId = invoiceId},
-                                                     success: function(products)
-                                                           {
-                                                             var table = $('#productTable');
-                                                             $(table).find("tr:gt(0)").remove();                                                
-                                                             var row="";
-                                                             for(var i=0; i< products.length;i++)
-                                                                 {
-                                                                    row += "<tr><td>" + products[i].Description + "</td><td>" + products[i].Grade + "</td><td>" + products[i].Size + "</td><td>" + products[i].Unit + "</td><td>" + products[i].Quantity + "</td><td>" + products[i].Price + "</td></tr>");
-                                                                 }
-                                                             table.append(rows);    
-                                                                },
-                                               });
-                                               debugger
-                                                return false;
-                                        });
-                                  });
-                      </script>*@
     }
 
+                    @*$(function onchange(){
+        //                     $("#InvoiceId").change(function()
+        //                        { 
+        //                            var invoiceId = $(this).find('option:selected').val();  
+        //                        if(invoiceId != 0 {
+        //                                 $.ajax({
+        //                                        type:'GET',
+        //                                        url: "/Documents/GetProductsForDebitNote",
+        //                                        dataType : 'json',
+        //                                        data: {id = invoiceId},
+        //                                        success: function(products)
+        //                                            {
+        //                                                var table = $('#productTable');
+        //                                                $(table).find("tr:gt(0)").remove();                                                
+        //                                                var row="";
+        //                                                for(var i=0; i< products.length;i++)
+        //                                                    {
+        //                                                        row += "<tr><td>" + ' <select class="text-box single-line" name="DescriptionId[' + i + ']" asp-for="DescriptionId" ><option value="">All</option>@foreach (var desc in service.DescriptionIdAndNameList())
+        //{
+        //    <option value="@desc.Id">@desc.Name</option>
+        //}</select>' + 
+        //        "</td><td>" + products[i].Grade + "</td><td>" + products[i].Size + "</td><td>" + products[i].Unit + "</td><td>" + products[i].Quantity + "</td><td>" + products[i].Price + "</td></tr>");
+        //                                                    }
+        //                                                table.append(rows);    
+        //                                                },
+        //                                });
+        //                        }
+        //                            debugger
+        //                           // return false;
+        //                     });
+        //            });*@

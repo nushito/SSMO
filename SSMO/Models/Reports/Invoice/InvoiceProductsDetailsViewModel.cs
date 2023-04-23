@@ -18,7 +18,11 @@ namespace SSMO.Models.Reports.Invoice
         public decimal Price { get; set; }
         public decimal PurchaseAmount { get; set; }
         public decimal Amount { get; set; }
-        public int Pallets { get; set; }
-        public int SheetsPerPallet { get; set; }
+        public decimal CreditNoteQuantity { get; set; }
+        public decimal CreditNotePrice { get; set; }
+        public decimal CreditNoteProductAmount { get; set; }
+        public decimal DebitNoteQuantity { get; set; }
+        public decimal DebitNoteAmount { get; set; }
+        public decimal DebitNotePrice { get; set; }
     }
 }

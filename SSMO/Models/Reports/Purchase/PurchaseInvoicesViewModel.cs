@@ -5,7 +5,7 @@ namespace SSMO.Models.Reports.Purchase
     public class PurchaseInvoicesViewModel
     {
         public int Id { get; set; }
-        public string Number { get; set; }
+        public string PurchaseNumber { get; set; }
         public DateTime Date { get; set; }
         public int MyCompanyId { get; set; }
         public string MyCompanyName { get; set; }

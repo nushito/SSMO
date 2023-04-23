@@ -21,8 +21,8 @@
                    <div class="row">
                      <div class="col-xl-8">
                        <ul class="list-unstyled">
-                         <li class="text-muted">към Фактура N: <span style="color:#5d9fc5 ;">@Model.CreditNoteOrDebitNoteNumber</span></li>
-                         <li class="text-muted">Дата: <span style="color:#5d9fc5 ;">@Model.CreditNoteOrDebitNoteDate</span></li>            
+                         <li class="text-muted">към Фактура N: <span style="color:#5d9fc5 ;">@Model.CreditToInvoiceNumber</span></li>
+                         <li class="text-muted">Дата: <span style="color:#5d9fc5 ;">@Model.CreditToInvoiceDate</span></li>            
                         </ul>
                      </div>
                    </div>
@@ -36,8 +36,8 @@
                        <div class="row">
                          <div class="col-xl-8">
                            <ul class="list-unstyled">
-                                 <li class="text-muted">към Фактура N: <span style="color:#5d9fc5 ;">@Model.CreditNoteOrDebitNoteNumber</span></li>
-                                 <li class="text-muted">Дата: <span style="color:#5d9fc5 ;">@Model.CreditNoteOrDebitNoteDate</span></li>            
+                                 <li class="text-muted">към Фактура N: <span style="color:#5d9fc5 ;">@Model.DebitToInvoiceNumber</span></li>
+                                 <li class="text-muted">Дата: <span style="color:#5d9fc5 ;">@Model.DebitToInvoiceDate</span></li>            
                             </ul>
                          </div>
                        </div>
@@ -113,9 +113,24 @@
                                         <td>@product.FSCClaim</td>
                                         <td>@product.FSCSertificate</td>
                                         <td>@product.Unit</td>
+                                    @if(Model.DocumentType == "CreditNote")
+                                    {
+                                        <td>@product.CreditNoteQuantity</td>
+                                        <td>@product.CreditNoteBgPrice</td>
+                                        <td>@product.CreditNoteBgAmount.ToString("N2")</td>
+                                    }
+                                    else if(Model.DocumentType == "DebitNote")
+                                    {
+                                        <td>@product.DebitNoteQuantity</td>
+                                        <td>@product.DebitNoteBgPrice</td>
+                                        <td>@product.DebitNoteBgAmount.ToString("N2")</td>
+                                    }
+                                    else
+                                    {
                                         <td>@product.OrderedQuantity</td>
                                         <td>@product.BgPrice</td>
                                         <td>@product.BgAmount.ToString("N2")</td>
+                                    }                                   
                                     </tr>
                             }
              </tbody>

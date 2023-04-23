@@ -7,7 +7,7 @@ namespace SSMO.Models.Reports.Purchase
 {
     public class PurchaseInvoiceDetailsViewModel
     {
-        public string Number { get; set; }
+        public string PurchaseNumber { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
         public string Incoterms { get; set; }
@@ -27,6 +27,7 @@ namespace SSMO.Models.Reports.Purchase
         public decimal OtherExpenses { get; set; }
         public decimal PurchaseTransportCost { get; set; }
         public decimal BankExpenses { get; set; }
+        public int SupplierOrderId { get; set; }
         public ICollection<PurchaseProductsDetailsViewModel> Products { get; set; }
 
     }

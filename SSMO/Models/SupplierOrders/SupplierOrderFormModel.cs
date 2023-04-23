@@ -1,5 +1,6 @@
 ﻿using SSMO.Models.CustomerOrders;
 using SSMO.Models.Customers;
+using SSMO.Models.Documents;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Models.Reports;
@@ -20,14 +21,10 @@ namespace SSMO.Models.SupplierOrders
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
         public int SupplierId { get; set; }
-        public string Supplier { get; set; }
-        public IEnumerable<AllSuppliers> Suppliers { get; set; }
-        public int CustomerOrderId { get; set; }
-        public int CustomerOrderNumber { get; set; }
-        public string FscClaim { get; set; }
-        public IEnumerable<int> CustomerOrders { get; set; }
+        
+        public IEnumerable<AllSuppliers> Suppliers { get; set; }       
+        public string FscClaim { get; set; }        
         public int MyCompanyId { get; set; }
-        public string MyCompanyName { get; set; }
         public IEnumerable<MyCompaniesForReportViewModel> MyCompanies { get; set; }
         public int StatusId { get; set; }
         public StatusModel Status { get; set; }
@@ -41,30 +38,20 @@ namespace SSMO.Models.SupplierOrders
 
         [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
-        public decimal TotalAmount {
-            get {
-                if(Products == null)
-                {
-                    return 0;
-                }
+        public decimal TotalAmount { get; set; }
 
-                var vatAmount = Products.Sum(a => a.PurchaseAmount) * VAT / 100??0;
-                return Products.Sum(a => a.PurchaseAmount) + vatAmount;
-                    } 
-        }
         [Range(0.0, 9999999999999.99999)]
         public decimal PaidAvance { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal Balance { get; set; }
+        [Required]
+        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
         public int? VAT { get; set; }
-        public IList<ProductCustomerFormModel> Products { get; set; }
-        [Range(0.0, 9999999999999.99999)]
-        public decimal TotalQuantity { get; set; }
-
-
-
-
+      
+        [Range(0.0, 9999999999999.99999)]      
+        public ICollection<ProductSupplierFormModel> ProductList { get; set; }
+        public List<string> SupplierFscCertificate { get; set; }
     }
 }

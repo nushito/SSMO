@@ -177,25 +177,36 @@ namespace SSMO.Services.Reports
         {
             var findorder = dbcontext.CustomerOrders.Where(a => a.Id == id);
             CustomerOrderDetailsModel order = findorder.ProjectTo<CustomerOrderDetailsModel>(mapper).FirstOrDefault();
-            var products = dbcontext.Products
+
+            var products = dbcontext.CustomerOrderProductDetails
                 .Where(i => i.CustomerOrderId == id);
             
            order.Products = products.ProjectTo<ProductsForCustomerOrderDetailsViewModel>(mapper).ToList();
 
             foreach (var product in order.Products)
             {
-                product.DescriptionName = productService.GetDescriptionName(product.DescriptionId);
-                product.GradeName = productService.GetGradeName(product.GradeId);
-                product.SizeName = productService.GetSizeName(product.SizeId);
-            }
+                var mainProduct = dbcontext.Products
+                    .Where(i => i.Id == product.ProductId)
+                    .FirstOrDefault();
 
-            var supplierOrderDetail = dbcontext.SupplierOrders
-                .Where(o => o.CustomerOrderId == id)
-                .Select(a => new
-                {
-                    supplierNumber = a.Number,
-                    supplierId = a.SupplierId
-                }).FirstOrDefault();
+                product.DescriptionName = productService.GetDescriptionName(mainProduct.DescriptionId);
+                product.GradeName = productService.GetGradeName(mainProduct.GradeId);
+                product.SizeName = productService.GetSizeName(mainProduct.SizeId);
+
+                var supplierId = dbcontext.SupplierOrders
+                    .Where(i => i.Id == product.SupplierOrderId)
+                    .Select(i => i.SupplierId).FirstOrDefault();
+
+
+               product.SupplierOrderNumber = dbcontext.SupplierOrders
+                    .Where(i => i.Id == product.SupplierOrderId)
+                    .Select(i => i.Number).FirstOrDefault();
+
+
+                product.SupplierName = dbcontext.Suppliers
+                    .Where(i=>i.Id == supplierId)
+                    .Select(n=>n.Name).FirstOrDefault();
+            }
 
             var myCompanyId = findorder.
                 Select(id => id.MyCompanyId).
@@ -206,12 +217,6 @@ namespace SSMO.Services.Reports
                 .Select(n => n.Name)
                 .FirstOrDefault();
 
-            order.SupplierOrderNumber = supplierOrderDetail.supplierNumber;
-            var supplierName = dbcontext.Suppliers
-                .Where(id => id.Id == supplierOrderDetail.supplierId)
-                .Select(n => n.Name)
-                .FirstOrDefault();
-            order.SupplierName = supplierName;
             order.MyCompanyName = myCompanyName;
             return order;
         }
@@ -245,57 +250,37 @@ namespace SSMO.Services.Reports
             order.PaidAmountStatus = paidStatus;
             order.Amount = 0;
 
-            var productsPerCorder = dbcontext.Products.Where(co => co.CustomerOrderId == order.Id).ToList();
-
             if (products.Count != 0)
             {
-                for (int i = 0; i < products.Count; i++)
+                foreach (var product in products)
                 {
-                    var descriptionId = dbcontext.Descriptions
-                        .Where(n => n.Name == products[i].Description)
-                        .Select(i => i.Id).FirstOrDefault();
-                    productsPerCorder.ElementAt(i).DescriptionId = descriptionId;
-                    var gradeId = dbcontext.Grades.Where(n => n.Name == products[i].Grade).Select(i => i.Id).FirstOrDefault();
-                    productsPerCorder.ElementAt(i).GradeId = gradeId;
-                    var sizeId = dbcontext.Sizes.Where(n => n.Name == products[i].Size).Select(i => i.Id).FirstOrDefault();
-                    productsPerCorder.ElementAt(i).SizeId = sizeId;
-                    productsPerCorder.ElementAt(i).Price = products.ElementAt(i).Price;
-                    productsPerCorder.ElementAt(i).Pallets = products.ElementAt(i).Pallets;
-                    productsPerCorder.ElementAt(i).SheetsPerPallet = products.ElementAt(i).SheetsPerPallet;
-                    productsPerCorder.ElementAt(i).Unit = Enum.Parse<Unit>(products.ElementAt(i).Unit.ToString());
+                    var productsPerCorder = dbcontext.CustomerOrderProductDetails
+                                       .Where(co => co.Id == product.Id)
+                                       .FirstOrDefault();
 
-                    var sizeName = dbcontext.Sizes
-                        .Where(a => a.Id == sizeId).Select(n => n.Name).FirstOrDefault();
-                    var dimensionArray = sizeName.Split('/').ToArray();
-                    var countArray = dimensionArray.Count();
-                    decimal sum = 1M;
-
-                    for (int j = 0; j < countArray; j++)
+                    if (product.Quantity == 0)
                     {
-                        sum *= Math.Round(decimal.Parse(dimensionArray[j]) / 1000, 7);
-                    }
-
-                    productsPerCorder.ElementAt(i).TotalSheets = products.ElementAt(i).Pallets * products.ElementAt(i).SheetsPerPallet;
-
-                    if (products.ElementAt(i).Quantity != 0)
-                    {
-                        productsPerCorder.ElementAt(i).OrderedQuantity = products.ElementAt(i).Quantity;
+                        productsPerCorder.Quantity = 0;
+                        productsPerCorder.AutstandingQuantity = 0;
+                        continue;
                     }
                     else
                     {
-                        productsPerCorder.ElementAt(i).OrderedQuantity = Math.Round(sum * productsPerCorder.ElementAt(i).TotalSheets, 4);
+                        productsPerCorder.Pallets = product.Pallets;
+                        productsPerCorder.SheetsPerPallet = product.SheetsPerPallet;
+                        productsPerCorder.Unit = Enum.Parse<Unit>(product.Unit.ToString());
+                        productsPerCorder.Quantity = product.Quantity;
+                        productsPerCorder.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                        productsPerCorder.Amount = Math.Round(product.SellPrice * product.Quantity, 4);
                     }
-
-                    productsPerCorder.ElementAt(i).Amount = Math.Round
-                        (productsPerCorder.ElementAt(i).Price * productsPerCorder.ElementAt(i).OrderedQuantity, 4);
-
-                    order.Amount += productsPerCorder.ElementAt(i).Amount;
+                    order.Amount += productsPerCorder.Amount;
+                
                 }
+            }
 
                 order.SubTotal = order.Amount * order.Vat / 100 ?? 0;
                 order.TotalAmount = order.Amount + order.SubTotal;
                 order.Balance = order.TotalAmount - paidAdvance;
-            }
 
             dbcontext.SaveChanges();
 
@@ -373,21 +358,9 @@ namespace SSMO.Services.Reports
             var queryOrders = dbcontext.SupplierOrders
                     .Where(a => a.SupplierId == supplierId);
 
-            //   var customerOrdersNumber = queryOrders.Select(num => num.CustomerOrderId);
-
-            // var totalOrders = queryOrders.Count();  
-
             var supplierOrders = queryOrders.ProjectTo<SupplierOrderDetailsModel>(this.mapper).ToList();
             
             var supplierOrdersList = supplierOrders.Skip((currentpage - 1) * supplierOrdersPerPage).Take(supplierOrdersPerPage);
-
-            foreach (var order in supplierOrdersList)
-            {
-                order.CustomerOrderConfirmationNumber = dbcontext.CustomerOrders
-                    .Where(id => id.Id == order.CustomerOrderId)
-                    .Select(num => num.OrderConfirmationNumber)
-                    .FirstOrDefault();
-            }
 
             var supplierOrdersQery = new SupplierOrdersQueryModel
             {
@@ -411,19 +384,19 @@ namespace SSMO.Services.Reports
                 Number = supplierOrder.Number,
                 Amount = supplierOrder.Amount,
                 CurrencyId = supplierOrder.CurrencyId,
-                CustomerOrderId = supplierOrder.CustomerOrderId,
                 Date = supplierOrder.Date,
                 DatePaidAmount = supplierOrder.DatePaidAmount,
                 DeliveryAddress = supplierOrder.DeliveryAddress,
                 LoadingAddress = supplierOrder.LoadingAddress,
                 DeliveryTerms = supplierOrder.DeliveryTerms,
-                FSCClaim = supplierOrder.FSCClaim,
-                FSCSertificate = supplierOrder.FSCSertificate,
+                FSCClaim = supplierOrder.FscClaim,
+                FSCSertificate = supplierOrder.FscSertificate,
                 GrossWeight = supplierOrder.GrossWeight,
                 TotalQuantity = supplierOrder.TotalQuantity,
                 MyCompanyId = supplierOrder.MyCompanyId,
                 NetWeight = supplierOrder.NetWeight,
-                VAT = supplierOrder.VAT
+                VAT = supplierOrder.VAT,
+                NewProducts = new List<NewProductsForSupplierOrderModel>()
             };
 
             return supplierOrderForEdit;
@@ -435,17 +408,13 @@ namespace SSMO.Services.Reports
             string loadingPlace, string deliveryAddress,
             decimal grossWeight, decimal netWeight, int currencyId,
             int status, int customerOrderNumber, string fscClaim, string fscCertificate,
-            decimal paidAdvance, bool paidStatus, int? vat, List<ProductsForEditSupplierOrder> products)
+            decimal paidAdvance, bool paidStatus, int? vat, List<ProductsForEditSupplierOrder> products, 
+            List<NewProductsForSupplierOrderModel> newProducts)
         {
             if (supplierOrderNumber == null) return false;
 
             var supplierOrder = dbcontext.SupplierOrders
                 .Where(num => num.Number.ToLower() == supplierOrderNumber.ToLower())
-                .FirstOrDefault();
-
-            var customerOrderId = dbcontext.CustomerOrders
-                .Where(num => num.OrderConfirmationNumber == customerOrderNumber)
-                .Select(id => id.Id)
                 .FirstOrDefault();
 
             if (supplierOrder == null) return false;
@@ -460,58 +429,47 @@ namespace SSMO.Services.Reports
             supplierOrder.NetWeight = netWeight;
             supplierOrder.CurrencyId = currencyId;
             supplierOrder.StatusId = status;
-            supplierOrder.CustomerOrderId = customerOrderId;
-            supplierOrder.FSCClaim = fscClaim;
-            supplierOrder.FSCSertificate = fscCertificate;
+            supplierOrder.FscClaim = fscClaim;
+            supplierOrder.FscSertificate = fscCertificate;
             supplierOrder.PaidStatus = paidStatus;
             supplierOrder.Amount = 0;
 
-
-
-            var productsPerCorder = dbcontext.Products.Where(co => co.CustomerOrderId == customerOrderId).ToList();
-
             if (products.Count != 0)
             {
-                for (int i = 0; i < products.Count; i++)
+                foreach (var item in products)
                 {
-                    var descriptionId = dbcontext.Descriptions.Where(n => n.Name == products[i].Description).Select(i => i.Id).FirstOrDefault();
-                    productsPerCorder.ElementAt(i).DescriptionId = descriptionId;
-                    var gradeId = dbcontext.Grades.Where(n => n.Name == products[i].Grade).Select(i => i.Id).FirstOrDefault();
-                    productsPerCorder.ElementAt(i).GradeId = gradeId;
-                    var sizeId = dbcontext.Sizes.Where(n => n.Name == products[i].Size).Select(i => i.Id).FirstOrDefault();
-                    productsPerCorder.ElementAt(i).SizeId = sizeId;
-                    productsPerCorder.ElementAt(i).PurchasePrice = products.ElementAt(i).PurchasePrice;
-                    productsPerCorder.ElementAt(i).Pallets = products.ElementAt(i).Pallets;
-                    productsPerCorder.ElementAt(i).SheetsPerPallet = products.ElementAt(i).SheetsPerPallet;
-                    productsPerCorder.ElementAt(i).Unit = Enum.Parse<Unit>(products.ElementAt(i).Unit);
+                    var product = dbcontext.Products
+                       .Where(i => i.Id == item.Id).FirstOrDefault();
 
-                    var sizeName = dbcontext.Sizes
-                        .Where(a => a.Id == sizeId).Select(n => n.Name).FirstOrDefault();
-                    var dimensionArray = sizeName.Split('/').ToArray();
-                    var countArray = dimensionArray.Count();
-                    decimal sum = 1M;
-
-                    for (int j = 0; j < countArray; j++)
+                    if(item.OrderedQuantity == 0)
                     {
-                        sum *= Math.Round(decimal.Parse(dimensionArray[j]) / 1000, 4);
+                        product.OrderedQuantity = 0;
+                        product.QuantityAvailableForCustomerOrder = 0;
+                        product.QuantityLeftForPurchaseLoading = 0;
+                        continue;
                     }
 
-                    productsPerCorder.ElementAt(i).TotalSheets = products.ElementAt(i).Pallets * products.ElementAt(i).SheetsPerPallet;
-
-                    if (products.ElementAt(i).QuantityM3 != 0)
-                    {
-                        productsPerCorder.ElementAt(i).OrderedQuantity = products.ElementAt(i).QuantityM3;
-                    }
-                    else
-                    {
-                        productsPerCorder.ElementAt(i).OrderedQuantity = Math.Round(sum * productsPerCorder.ElementAt(i).TotalSheets, 4);
-                    }
-
-                    productsPerCorder.ElementAt(i).Amount = Math.Round
-                        (productsPerCorder.ElementAt(i).PurchasePrice * productsPerCorder.ElementAt(i).OrderedQuantity, 4);
-
-                    supplierOrder.Amount += productsPerCorder.ElementAt(i).Amount;
+                    product.DescriptionId = item.DescriptionId;
+                    product.GradeId = item.GradeId;
+                    product.SizeId = item.SizeId;
+                    product.PurchasePrice = item.PurchasePrice;
+                    product.Pallets = item.Pallets;
+                    product.SheetsPerPallet= item.SheetsPerPallet;
+                    product.Unit = Enum.Parse<Unit>(item.Unit);
+                    product.TotalSheets = item.Pallets * item.SheetsPerPallet;
+                    product.Amount = item.OrderedQuantity * item.PurchasePrice;
+               
+                    supplierOrder.Amount += product.Amount;
                 }
+
+                if(newProducts.Count > 0)
+                {
+                    foreach (var item in newProducts)
+                    {
+                        productService.CreateNewProductOnEditSupplierOrder(item);
+                    }
+                }
+
                 supplierOrderService.TotalAmountAndQuantitySum(supplierOrderId);
             }
 
@@ -536,6 +494,11 @@ namespace SSMO.Services.Reports
                 .Select(n => n.Name)
                 .FirstOrDefault();
 
+            supplierOrderDetail.Currency = dbcontext.Currencies
+                .Where(i => i.Id == supplierOrderDetail.CurrencyId)
+                .Select(n=>n.Name)
+                .FirstOrDefault();
+
             supplierOrderDetail.MyCompanyName = myCompanyName;
 
             var supplierId = supplierOrder.Select(id => id.SupplierId).FirstOrDefault();
@@ -544,25 +507,30 @@ namespace SSMO.Services.Reports
                 .Select(n => n.Name)
                 .FirstOrDefault();
 
-            var customerId = dbcontext.CustomerOrders
-                .Where(i => i.Id == supplierOrderDetail.CustomerOrderId)
-                .Select(c => c.CustomerId)
-                .FirstOrDefault();
+            //var customerId = dbcontext.CustomerOrders
+            //    .Where(i => i.Id == supplierOrderDetail.CustomerOrderId)
+            //    .Select(c => c.CustomerId)
+            //    .FirstOrDefault();
 
-            supplierOrderDetail.CustomerName = dbcontext.Customers
-                 .Where(i => i.Id == customerId)
-                 .Select(n => n.Name)
-                 .FirstOrDefault();
+            //supplierOrderDetail.CustomerName = dbcontext.Customers
+            //     .Where(i => i.Id == customerId)
+            //     .Select(n => n.Name)
+            //     .FirstOrDefault();
 
             supplierOrderDetail.StatusName = dbcontext.Statuses
                 .Where(i => i.Id == supplierOrderDetail.StatusId)
                 .Select(n => n.Name)
                 .FirstOrDefault();
 
-            supplierOrderDetail.CustomerOrderConfirmationNumber = dbcontext.CustomerOrders
-                .Where(id => id.Id == supplierOrderDetail.CustomerOrderId)
-                .Select(num => num.OrderConfirmationNumber)
-                .FirstOrDefault();
+            //supplierOrderDetail.CustomerOrderConfirmationNumber = dbcontext.CustomerOrders
+            //    .Where(id => id.Id == supplierOrderDetail.CustomerOrderId)
+            //    .Select(num => num.OrderConfirmationNumber)
+            //    .FirstOrDefault();
+
+            supplierOrderDetail.PurchaseInvoiceNumbers = dbcontext.Documents
+                .Where(s => s.SupplierOrderId == id)
+                .Select(n => n.PurchaseNumber)
+                .ToList();
 
             var products = dbcontext.Products
                 .Where(s => s.SupplierOrderId == id);
@@ -604,7 +572,7 @@ namespace SSMO.Services.Reports
                     .Select(n => n.Name)
                     .FirstOrDefault();
 
-                var supplierName = supplierService.SupplierNameById(invoice.SupplierOrderId);
+                var supplierName = supplierService.SupplierNameBySupplierOrderId(invoice.SupplierOrderId);
                 invoice.SupplierName = supplierName;
                 invoice.OrderConfirmationNumber = customerOrderNumber;
                 invoice.CustomerName = customerName;
@@ -619,6 +587,11 @@ namespace SSMO.Services.Reports
                 .Where(i => i.Id == id);
 
             var invoiceDetails = invoice.ProjectTo<InvoiceDetailsViewModel>(mapper).FirstOrDefault();
+
+            invoiceDetails.OrderConfirmationNumber = dbcontext.CustomerOrders
+                .Where(i=>i.Id == invoiceDetails.CustomerOrderId)
+                .Select(num=>num.OrderConfirmationNumber) 
+                .FirstOrDefault();
 
             if (invoice == null) return null;
 
@@ -657,7 +630,7 @@ namespace SSMO.Services.Reports
 
             foreach (var bankDetail in invoiceBankDetails)
             {
-                bankDetail.CurrencyName = dbcontext.Currencys
+                bankDetail.CurrencyName = dbcontext.Currencies
                      .Where(i => i.Id == bankDetail.CurrencyId)
                      .Select(n => n.Name)
                      .FirstOrDefault();
@@ -698,16 +671,17 @@ namespace SSMO.Services.Reports
                  purchaseDocuments = purchaseDocuments
                     .Where(s => s.SupplierId == supplierId);
             }
-            var start = startDate.Date.ToShortDateString();
-            var end = endDate.Date.ToShortDateString();
+            var start = Convert.ToDateTime(startDate.ToShortDateString()); //startDate.Date.ToShortDateString();
+            var end = Convert.ToDateTime(endDate.ToShortDateString()); //endDate.Date.ToShortDateString();
 
-            //TODO Why in the view dates are 1/1/0001 
-            if (start != "1/1/0001" && end != "1/1/0001")
+            if (start > end)
             {
-                purchaseDocuments = purchaseDocuments
+                return new PurchaseCollectionQueryModel();
+            }
+
+            purchaseDocuments = purchaseDocuments
                     .Where(d => d.Date.CompareTo(startDate) > 0 && d.Date.CompareTo(endDate) < 0)
                     .OrderByDescending(d => d.Date);
-            }
 
             var purchases = purchaseDocuments.ProjectTo<PurchaseInvoicesViewModel>(this.mapper).ToList();
 
@@ -716,25 +690,25 @@ namespace SSMO.Services.Reports
             var purchaseInvoices = new PurchaseCollectionQueryModel 
             { 
                 PurchaseInvoiceCollection = purchaseCollection,
-                TotalPurchaseInvoices = purchaseDocuments.Count()
+                TotalPurchaseInvoices = purchases.Count
             };
 
             foreach (var purchase in purchaseInvoices.PurchaseInvoiceCollection)
             {
-                var customerId = dbcontext.CustomerOrders
-                     .Where(n => n.Id == purchase.CustomerOrderId)
-                     .Select(n => n.CustomerId)
-                     .FirstOrDefault();
+               // var customerId = dbcontext.CustomerOrders
+               //      .Where(n => n.Id == purchase.CustomerOrderId)
+               //      .Select(n => n.CustomerId)
+               //      .FirstOrDefault();
 
-                purchase.CustomerName = dbcontext.Customers
-               .Where(i => i.Id == customerId)
-               .Select(n => n.Name)
-               .FirstOrDefault();
+               // purchase.CustomerName = dbcontext.Customers
+               //.Where(i => i.Id == customerId)
+               //.Select(n => n.Name)
+               //.FirstOrDefault();
 
-                purchase.OrderConfirmationNumber = dbcontext.CustomerOrders
-                 .Where(i => i.Id == purchase.CustomerOrderId)
-                 .Select(o => o.OrderConfirmationNumber)
-                 .FirstOrDefault();
+               // purchase.OrderConfirmationNumber = dbcontext.CustomerOrders
+               //  .Where(i => i.Id == purchase.CustomerOrderId)
+               //  .Select(o => o.OrderConfirmationNumber)
+               //  .FirstOrDefault();
 
                 purchase.SupplierName = dbcontext.Suppliers
                 .Where(i => i.Id == purchase.SupplierId)

@@ -1,0 +1,229 @@
+﻿@model CustomerOrderNumbersListView
+
+@{
+    ViewBag.Title = "Select Customer Order";
+    
+}
+
+<form method="post">
+  @if (!ViewBag.CheckInvoice)
+    { <div class="row col-md-4">
+        <label asp-for="Number">Fill First Invoice Number</label>
+        <input asp-for="Number" type="text" class="form-control" class="form-control">
+        </div>
+
+    }
+       <div>
+        <input type="hidden" value="@Model.CustomerId" asp-for="@Model.CustomerId">
+      </div>
+
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="MyCompanyName"></label>
+            <select asp-for="MyCompanyName" class="form-control">
+            <option value="">All</option>
+                @foreach (var name in Model.MyCompanyNames)
+                {
+                    <option value="@name">@name</option>
+                }
+
+            </select>
+        </div>
+    </div>
+    
+    <div class="row col-md-4">
+        <label asp-for="Date" >Date of the Invoice</label>
+        <input itemid="date" asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
+        <span asp-validation-for="Date" class="small text-danger"></span>
+    </div>
+     <div class="row col-md-4">
+        <label asp-for="Vat">Vat %</label>
+        <input asp-for="Vat" type="number"  min="0" step="1" class="form-control" >
+    </div>
+     <div class="row col-md-4">
+        <label asp-for="TruckNumber">Truck Number</label>
+        <input asp-for="TruckNumber" type="text" class="form-control">
+    </div>
+     <div class="row col-md-4">
+        <label asp-for="Swb">Swb</label>
+        <input asp-for="Swb" type="text" class="form-control">
+    </div>
+     <div class="row col-md-4">
+        <label asp-for="Incoterms">Incoterms</label>
+        <input asp-for="Incoterms" type="text" class="form-control">
+    </div>
+     <div class="row col-md-4">
+        <label asp-for="NetWeight">Net Weight</label>
+        <input asp-for="NetWeight" type="text" class="form-control">
+    </div>
+     <div class="row col-md-4">
+        <label asp-for="GrossWeight">Gross Weight</label>
+        <input asp-for="GrossWeight" type="text" class="form-control">
+    </div>
+       <div class="row col-md-4">
+        <label asp-for="DeliveryCost">Delivery Cost</label>
+        <input asp-for="DeliveryCost" type="text" class="form-control">
+    </div>
+     <div class="form-group row col-md-4">
+        <label asp-for="Currency"></label>
+        <select id="currency" asp-for="CurrencyId" class="form-control">
+            @foreach (var item in Model.Currencies)
+            {
+                    <option value="@item.Id">@item.Name</option>
+            }   
+
+        </select>
+    </div>
+
+    <div class="row col-md-4">
+        <label asp-for="CurrencyExchangeRateUsdToBGN">Currency Exchange Rate to BGN</label>
+        <input asp-for="CurrencyExchangeRateUsdToBGN" type="number"  min="0.00000" step="0.00001" class="form-control" >
+    </div>
+    <hr />
+   <table class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <td>Description</td>
+                <td>Size</td>
+                <td>Grade</td>
+                <td>FSC claim</td>
+                <td>FSC certificate</td>
+                <td>Unit</td>
+                <td>Pallets</td>
+                <td>Sheets/pallet</td>
+                <td>Quantity</td>
+                <td>Price</td>
+                <td>Truck/Container No</td>
+                <td>Choose Cost Price</td>
+            </tr>
+        </thead>
+        <tbody>
+
+            @for (int i = 0; i < Model.Products.Count; i++)
+            {
+                <div>
+                     <input type="hidden" value="@Model.Products[i].Id" asp-for="@Model.Products[i].Id">
+                 </div>
+                <div>
+                     <input type="hidden" value="@Model.Products[i].ProductId" asp-for="@Model.Products[i].ProductId">
+                </div>
+                <div>
+                    <input type="hidden" value="@Model.Products[i].CustomerOrderId" asp-for="@Model.Products[i].CustomerOrderId">
+                </div>
+               
+                <tr>
+                    <td class="col-sm-1">
+                        <div class="editor-field">
+                           <input asp-for="@Model.Products[i].Description" value="@Model.Products[i].Description" type="text"  required="required">
+                          <span asp-validation-for="@Model.Products[i].Description" class="small text-danger"></span>
+                       </div>
+                    </td>
+                    <td class="col-sm-1">
+                        <div class="editor-field">
+                            <input asp-for="@Model.Products[i].Size" value="@Model.Products[i].Size" type="text"  required="required">
+                             <span asp-validation-for="@Model.Products[i].Size" class="small text-danger"></span>
+                        </div>
+                    </td>
+                    <td class="col-sm-1">
+                        <div class="editor-field">
+                            <input asp-for="@Model.Products[i].Grade" value="@Model.Products[i].Grade" type="text"  required="required">
+                            <span asp-validation-for="@Model.Products[i].Grade" class="small text-danger"></span>
+                        </div>
+                    </td>
+
+                    <td class="col-sm-1">
+                        <div class="editor-field">                              
+                          <input asp-for="@Model.Products[i].FscClaim" value="@Model.Products[i].FscClaim" required="required">
+                           <span asp-validation-for="@Model.Products[i].FscClaim" class="small text-danger"></span>
+                      </div>
+                    </td>
+
+                    <td class="col-sm-1">
+                        <div class="editor-field">
+                            <select asp-for="@Model.Products[i].FscCertificate" >
+                                <option value="-">-</option>
+                                <option value="@Model.Products[i].FscCertificate">@Model.Products[i].FscCertificate</option>
+                                <span asp-validation-for="@Model.Products[i].FscCertificate" class="small text-danger"></span>
+                            </select>
+                        </div>
+                    </td>
+                    <td class="col-sm-1">
+                            <div class="editor-field">
+                                    <input asp-for="@Model.Products[i].Unit" value="@Model.Products[i].Unit" required="required">
+                            <span asp-validation-for="@Model.Products[i].Unit" class="small text-danger"></span>
+                                </div>
+                    </td>
+                    <td class="col-sm-1">
+                        <div class="editor-field">
+                               <input asp-for="@Model.Products[i].Pallets" value="@Model.Products[i].Pallets" type="number"  required="required">
+                              <span asp-validation-for="@Model.Products[i].Pallets" class="small text-danger"></span>
+                            </div>
+                    </td>
+                    <td class="col-sm-1">
+                        <div class="editor-field">
+                                   <input asp-for="@Model.Products[i].SheetsPerPallet" value="@Model.Products[i].SheetsPerPallet" type="number" required="required">
+                             <span asp-validation-for="@Model.Products[i].SheetsPerPallet" class="small text-danger"></span>
+                                </div>
+                    </td>
+                        <td class="col-sm-1">
+                        <div class="editor-field">
+                                            <input asp-for="@Model.Products[i].InvoicedQuantity" value="@Model.Products[i].InvoicedQuantity"  required="required">
+                                   <span asp-validation-for="@Model.Products[i].InvoicedQuantity" class="small text-danger"></span>
+                                </div>
+                    </td>
+
+                    <td class="col-sm-1">
+                        <div class="editor-field">
+                               <input asp-for="@Model.Products[i].SellPrice" value="@Model.Products[i].SellPrice" type="number" min="0.0000" step="0.0001" required="required">
+                               <span asp-validation-for="@Model.Products[i].SellPrice" class="small text-danger"></span>
+                        </div>
+                    </td>
+                        <td class="col-sm-1">
+                        <div class="editor-field">
+                             <input asp-for="@Model.Products[i].VehicleNumber" value="@Model.Products[i].VehicleNumber" type="text"  >
+                            <span asp-validation-for="@Model.Products[i].VehicleNumber" class="small text-danger"></span>
+                    </div>
+                    </td>
+                    <td class="col-sm-1">
+                    <div class="editor-field">                            
+                            <select asp-for="@Model.Products[i].PurchaseCostPriceId" >
+                            <option value="">Choose cost price</option>
+                                @foreach (var costPrice in Model.Products[i].PurchaseCostPrice)
+                                {
+                                    <option value="@costPrice.PurchaseCostPriceId">@costPrice.CostPrice</option>
+                                }
+                            </select>
+                    </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <input type="submit" value="Create Invoice" class="btn btn-primary mt-3" />
+
+   @* <input type="submit" value="Create Invoice" class="btn btn-primary mt-3"  
+        asp-route-orderConfirmationNumber="@Model.SelectedCustomerOrders"
+        asp-route-date="@Model.Date" 
+        asp-route-currencyExchangeRateUsdToBGN="@Model.CurrencyExchangeRateUsdToBGN" 
+        asp-route-number="@Model.Number"
+        asp-route-mycompanyname = "@Model.MyCompanyName"/>*@
+
+  @*<div class="row">
+        <a class="btn btn-primary float-sm-right"
+        asp-controller="Documents"
+         asp-action="CreateInvoice"
+        asp-route-orderConfirmationNumber="@Model.OrderConfirmationNumber"
+        asp-route-date="@Model.Date" 
+        asp-route-currencyExchangeRateUsdToBGN="@Model.CurrencyExchangeRateUsdToBGN" 
+        asp-route-number="@Model.Number"
+        asp-route-mycompanyname = "@Model.MyCompanyName"
+       > Create Invoice</a>
+    </div>*@
+   <hr />
+</form>
+
+        <script type="text/javascript">
+    $(function () {
+        $("#datepicker").datepicker();
+    });
+</script>

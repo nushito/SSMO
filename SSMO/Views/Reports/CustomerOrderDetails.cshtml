@@ -60,22 +60,6 @@
          @Model.StatusName
     </dd>
 </dl>
-<dl class="row">
-    <dt class="col-sm-3">
-        Supplier:
-    </dt>
-    <dd class="col-sm-5">
-         @Model.SupplierName
-    </dd>
-</dl>
-<dl class="row">
-     <dt class="col-sm-3">
-        Supplier Specification No:
-    </dt>
-    <dd class="col-sm-5">
-         @Model.SupplierOrderNumber
-    </dd>
-</dl>
 <hr />
 <p class="text-uppercase font-weight-bold">Products</p>
 <table>
@@ -140,19 +124,31 @@
                         </td>
                             <td class="col-sm-1">
                             <div class="editor-field">
-                        @product.OrderedQuantity
+                        @product.Quantity
                             </div>
                         </td>
                             <td class="col-sm-1">
                             <div class="editor-field">
-                        @product.Price
+                        @product.SellPrice
                             </div>
                         </td>
                         
-                            <td class="col-sm-1">
+                        <td class="col-sm-1">
                             <div class="editor-field">
                         @product.Amount
                             </div>
+                        </td>
+
+                        <td class="col-sm-1">
+                        <div class="editor-field">
+                        @product.SupplierName
+                        </div>
+                        </td>
+
+                        <td class="col-sm-1">
+                        <div class="editor-field">
+                        @product.SupplierOrderNumber
+                        </div>
                         </td>
             </tr>
 

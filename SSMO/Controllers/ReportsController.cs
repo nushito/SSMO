@@ -38,8 +38,8 @@ using iTextSharp.tool.xml.pipeline.css;
 using iTextSharp.tool.xml.pipeline.end;
 using iTextSharp.tool.xml.parser;
 using ClosedXML.Excel;
-using Microsoft.AspNetCore.Hosting;
-using System.Drawing;
+using SSMO.Models.Reports.FSC;
+using iTextSharp.text.pdf.qrcode;
 
 namespace SSMO.Controllers
 {
@@ -58,8 +58,7 @@ namespace SSMO.Controllers
 		private readonly ISupplierOrderService supplierOrderService;
 		private readonly IViewRenderService viewRenderService;
 		private readonly IHtmlToPdfConverter htmlToPdfConverter;
-
-
+	
 		public ReportsController(IReportsService service,
 		   ICustomerService customerService, ISupplierService supplierService,
 		   ICurrency currency, IMycompanyService mycompanyService, IProductService productService,
@@ -110,7 +109,11 @@ namespace SSMO.Controllers
 		}
 		public IActionResult CustomerOrderDetails(int id)
 		{
-			var order = reportService.CustomerOrderDetails(id);
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            var order = reportService.CustomerOrderDetails(id);
 
 			return View(order);
 		}
@@ -126,17 +129,23 @@ namespace SSMO.Controllers
 					MyCompanies = myCompanyService.GetAllCompanies(),
 					Suppliers = supplierService.GetSuppliers(),
 					Products = new List<ProductCustomerFormModel>(),
-					Statuses = statusService.GetAllStatus()
-				};
+					Statuses = statusService.GetAllStatus(),
+                    SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders()
+                };
 			}
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
 
-			var customerOrderForEdit = reportService.CustomerOrderDetailsForEdit(id);
+            var customerOrderForEdit = reportService.CustomerOrderDetailsForEdit(id);
 			customerOrderForEdit.Suppliers = supplierService.GetSuppliers();
 			customerOrderForEdit.Currencies = currency.AllCurrency();
 			customerOrderForEdit.MyCompanies = myCompanyService.GetAllCompanies();
 			customerOrderForEdit.Statuses = statusService.GetAllStatus();
 			customerOrderForEdit.Products = (List<ProductCustomerFormModel>)productService.DetailsPerCustomerOrder(id);
-			foreach (var item in customerOrderForEdit.Products)
+			customerOrderForEdit.SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders();
+
+            foreach (var item in customerOrderForEdit.Products)
 			{
 				item.Descriptions = productService.GetDescriptions();
 				item.Grades = productService.GetGrades();
@@ -148,7 +157,7 @@ namespace SSMO.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public IActionResult CustomerOrderEdit(int id, CustomerOrderForEdit model)
+		public IActionResult CustomerOrderEdit(int id, CustomerOrderForEdit model, string command)
 		{
 			string userId = this.User.UserId();
 			string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(model.MyCompanyId);
@@ -171,8 +180,9 @@ namespace SSMO.Controllers
 					MyCompanies = myCompanyService.GetAllCompanies(),
 					Suppliers = supplierService.GetSuppliers(),
 					Products = new List<ProductCustomerFormModel>(),
-					Statuses = statusService.GetAllStatus()
-				};
+					Statuses = statusService.GetAllStatus(),
+                    SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders()
+                };
 			}
 
 			var editOrder = reportService.EditCustomerOrder
@@ -195,15 +205,22 @@ namespace SSMO.Controllers
 			{
 				return BadRequest();
 			}
-
+			if(command == "Add More Products")
+			{
+                return RedirectToAction("AddOrderProducts", "CustomerOrders", new {id = id, selectedSupplierOrders = model.SelectedSupplierOrders});
+            }
 			return RedirectToAction("Index", "Home");
 		}
 
-		[HttpGet]
+        [HttpGet]
 		[Authorize]
 		public IActionResult CustomerOrdersBySupplier()
 		{
-			var customersList = customerService.GetCustomerNamesAndId();
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            var customersList = customerService.GetCustomerNamesAndId();
 
 			CustomerBySupplierOrdersViewModel cascadeCustomerOrders = new()
 			{
@@ -219,7 +236,11 @@ namespace SSMO.Controllers
 		[Authorize]
 		public IActionResult CustomerOrdersBySupplier(CustomerBySupplierOrdersViewModel model, IFormCollection fc)
 		{
-			if (!User.Identity.IsAuthenticated)
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!User.Identity.IsAuthenticated)
 			{
 				return RedirectToAction("Index", "Home");
 			}
@@ -248,7 +269,11 @@ namespace SSMO.Controllers
 		[HttpGet]
 		public IActionResult GetSupplier(string id)
 		{
-			if (id == null)
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (id == null)
 			{
 				id = "0";
 			}
@@ -286,22 +311,31 @@ namespace SSMO.Controllers
 			return View(model);
 		}
 		public IActionResult SupplierOrderDetails(int id)
-		{
-			var supplierOrderDetails = reportService.SupplierOrderDetail(id);
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            var supplierOrderDetails = reportService.SupplierOrderDetail(id);
 			return View(supplierOrderDetails);
 		}
 
 		[HttpGet]
 		public IActionResult SupplierOrderEdit(int id)
-		{
-			if (!ModelState.IsValid)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid)
 			{
 				new SupplierOrderForEditModel
 				{
 					Currencies = currency.AllCurrency(),
 					MyCompanies = myCompanyService.GetAllCompanies(),
 					Products = new List<ProductsForEditSupplierOrder>(),
-					Statuses = statusService.GetAllStatus()
+					Statuses = statusService.GetAllStatus(),
+					NewProducts = new List<NewProductsForSupplierOrderModel>()
 				};
 			}
 			var suppplierOrderForEdit = reportService.SupplierOrderForEditDetails(id);
@@ -310,6 +344,7 @@ namespace SSMO.Controllers
 			suppplierOrderForEdit.Statuses = statusService.GetAllStatus();
 			suppplierOrderForEdit.Products = (List<ProductsForEditSupplierOrder>)productService.ProductsDetailsPerSupplierOrder(id);
 			suppplierOrderForEdit.CustomerOrderNumber = customerOrderService.CustomerOrderNumber(id);
+			suppplierOrderForEdit.NewProducts = new List<NewProductsForSupplierOrderModel>();
 
 			foreach (var item in suppplierOrderForEdit.Products)
 			{
@@ -323,7 +358,7 @@ namespace SSMO.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult SupplierOrderEdit(SupplierOrderForEditModel model, int id)
+		public IActionResult SupplierOrderEdit(SupplierOrderForEditModel model, int id, IFormCollection collection)
 		{
 			string userId = this.User.UserId();
 			string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(model.MyCompanyId);
@@ -345,15 +380,60 @@ namespace SSMO.Controllers
 					Currencies = currency.AllCurrency(),
 					MyCompanies = myCompanyService.GetAllCompanies(),
 					Products = new List<ProductsForEditSupplierOrder>(),
-					Statuses = statusService.GetAllStatus()
+					Statuses = statusService.GetAllStatus(),
+					NewProducts = new List<NewProductsForSupplierOrderModel>()
 				};
+			}
+
+			model.NewProducts = new List<NewProductsForSupplierOrderModel>();
+
+			int loopsNum = 0;
+
+			foreach (var key in collection.Keys)
+			{
+				if (key.StartsWith("Quantity"))
+				{
+					loopsNum++;
+				}
+			}
+
+			if (loopsNum > 0)
+			{
+				for (int i = 1; i <= loopsNum; i++)
+				{
+					var description = collection["DescriptionId[" + i + "]"];
+					var grade = collection["GradeId[" + i + "]"];
+					var size = collection["SizeId[" + i + "]"];
+					var unit = collection["Unit[" + i + "]"];
+					var price = collection["Price[" + i + "]"].ToString();
+					var fscClaim = collection["FscClaim[" + i + "]"];
+					var fscCertificate = collection["FscCertificate[" + i + "]"];
+					var pallets = collection["Pallets[" + i + "]"];
+					var sheetsPerPallet = collection["SheetsPerPallet[" + i + "]"];
+					var quantity = collection["Quantity[" + i + "]"].ToString();
+					var product = new NewProductsForSupplierOrderModel
+					{
+						DescriptionId = int.Parse(description.ToString()),
+						GradeId = int.Parse(grade.ToString()),
+						SizeId = int.Parse(size.ToString()),
+						Unit = unit,
+						PurchasePrice = decimal.Parse(price.ToString()),
+						FscClaim = fscClaim,
+						SupplierFscCertNumber = fscCertificate,
+						Pallets = int.Parse(pallets.ToString()),
+						SheetsPerPallet = int.Parse(sheetsPerPallet.ToString()),
+						Quantity = decimal.Parse(quantity.ToString()),
+						SupplierOrderId = id
+					};
+					model.NewProducts.Add(product);
+				}
 			}
 
 			var orderForEdit = reportService.EditSupplierOrder
 				(id, model.Number, model.Date, model.MyCompanyId,
 				model.DeliveryTerms, model.LoadingAddress, model.DeliveryAddress, model.GrossWeight, model.NetWeight,
 				model.CurrencyId, model.StatusId, model.CustomerOrderNumber, model.FSCClaim, model.FSCSertificate, model.PaidAvance,
-				model.PaidStatus, model.VAT, model.Products);
+				model.PaidStatus, model.VAT, model.Products, model.NewProducts);
 
 			if (orderForEdit == false)
 			{
@@ -390,8 +470,12 @@ namespace SSMO.Controllers
 		}
 		[HttpGet]
 		public IActionResult EditInvoicePayment(int documentNumber)
-		{
-			if (!ModelState.IsValid)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid)
 			{
 				return BadRequest();
 			}
@@ -402,8 +486,12 @@ namespace SSMO.Controllers
 		[HttpPost]
 		[Authorize]
 		public IActionResult EditInvoicePayment(EditInvoicePaymentModel model, int documentNumber)
-		{
-			if (!User.Identity.IsAuthenticated)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!User.Identity.IsAuthenticated)
 			{
 				return BadRequest();
 			}
@@ -451,8 +539,12 @@ namespace SSMO.Controllers
 		[HttpGet]
 		[Authorize]
 		public IActionResult EditPurchasePayment(string number)
-		{
-			if (!ModelState.IsValid)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid)
 			{
 				return BadRequest();
 			}
@@ -464,8 +556,12 @@ namespace SSMO.Controllers
 		[HttpPost]
 		[Authorize]
 		public IActionResult EditPurchasePayment(EditPurchasePaymentDetails model, string number)
-		{
-			if (!User.Identity.IsAuthenticated)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!User.Identity.IsAuthenticated)
 			{
 				return BadRequest();
 			}
@@ -512,8 +608,12 @@ namespace SSMO.Controllers
 		[HttpGet]
 		[Authorize]
 		public IActionResult EditCustomerOrderPayment(int orderConfirmationNumber)
-		{
-			if (!ModelState.IsValid)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid)
 			{
 				return BadRequest();
 			}
@@ -526,8 +626,12 @@ namespace SSMO.Controllers
 		[HttpPost]
 		[Authorize]
 		public IActionResult EditCustomerOrderPayment(EditCustomerOrderPaymentModel model, int orderConfirmationNumber)
-		{
-			if (!User.Identity.IsAuthenticated)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!User.Identity.IsAuthenticated)
 			{
 				return BadRequest();
 			}
@@ -547,21 +651,14 @@ namespace SSMO.Controllers
 		}
 
 		public IActionResult SupplierOrdersPaymentReport(SupplierOrdersPaymentReportViewModel model)
-		{
-			if (!ModelState.IsValid)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid)
 			{
 				return View();
-			}
-
-			if (model.SupplierName != null)
-			{
-				string userId = this.User.UserId();
-				var userIdMyCompany = myCompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
-
-				if (!userIdMyCompany.Contains(userId))
-				{
-					return BadRequest();
-				}
 			}
 
 			var supplierNames = supplierService.GetSupplierNames();
@@ -578,8 +675,12 @@ namespace SSMO.Controllers
 		[HttpGet]
 		[Authorize]
 		public IActionResult EditSupplierOrderPayment(string supplierOrderNumber)
-		{
-			if (!ModelState.IsValid)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid)
 			{
 				return BadRequest();
 			}
@@ -590,8 +691,12 @@ namespace SSMO.Controllers
 		[HttpPost]
 		[Authorize]
 		public IActionResult EditSupplierOrderPayment(string supplierOrderNumber, EditSupplierOrderPaymentModel model)
-		{
-			if (!User.Identity.IsAuthenticated)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!User.Identity.IsAuthenticated)
 			{
 				return BadRequest();
 			}
@@ -607,13 +712,17 @@ namespace SSMO.Controllers
 			return View();
 		}
 		public IActionResult ProductsOnStock(ProductAvailabilityViewModel model)
-		{
-			if (!ModelState.IsValid)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid)
 			{
 				return View(model);
 			}
 
-			if (myCompanyService.GetAllCompanies().Count() == 0) return BadRequest();
+			if (myCompanyService.GetAllCompanies().Count == 0) return BadRequest();
 
 			var descriptions = productService.DescriptionIdAndNameList();
 			var grades = productService.GradeIdAndNameList();
@@ -624,14 +733,35 @@ namespace SSMO.Controllers
 			model.Sizes = sizes;
 
 			var productCollection = productService.ProductsOnStock
-				(model.DescriptionId, model.GradeId, model.SizeId, model.CurrentPage, ProductAvailabilityViewModel.ProductsPerPage);
+				(model.DescriptionId, model.GradeId, model.SizeId, model.CurrentPage, 
+				ProductAvailabilityViewModel.ProductsPerPage);
 
-			model.ProductsDetails = productCollection;
-			model.TotalProducts = productCollection.Count();
+			model.ProductsDetails = productCollection.Products;
+			model.TotalProducts = productCollection.TotalProducts;
 
 			return View(model);
 		}
+		public IActionResult FscReport(ProductsFscCollectionViewModel model)
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
 
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+			var fscClaims = productService.FscClaimList();
+			var fscCertificates = myCompanyService.MyCompaniesFscList();
+			var myCompanies = myCompanyService.GetCompaniesNames();
+
+			model.FSCCertificates = fscCertificates;
+			model.FscClaims= fscClaims;
+			model.MyCompanies = myCompanies;
+
+            return View();	
+		}
 		public IActionResult AllInvoices([FromQuery] InvoicesViewModel model)
         {
 			string userId = this.User.UserId();
@@ -690,8 +820,12 @@ namespace SSMO.Controllers
 		}
 
 		public IActionResult InvoiceDetails(int id)
-		{
-			var invoiceDetails = reportService.InvoiceDetails(id);
+        {
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            var invoiceDetails = reportService.InvoiceDetails(id);
             ClientService.AddClient(invoiceDetails);
 
            // return RedirectToAction("ExportInvoiceToPdf", new { Model = invoiceDetails })
@@ -725,8 +859,8 @@ namespace SSMO.Controllers
             if (!myuserId.Contains(userId)) { return BadRequest(); }
 
             if (!ModelState.IsValid) { return BadRequest(); }
-			//TODO change model and finish the action
-			var purchaseForEdit = purchaseService.PurchaseDetailsForEdit(id);
+			
+			var purchaseForEdit = purchaseService.PurchaseDetails(id);
 
             return View(purchaseForEdit);
 		}
@@ -755,9 +889,11 @@ namespace SSMO.Controllers
 
             if (!ModelState.IsValid) { return BadRequest(); }
 
-			var purchaseForEdit = purchaseService.EditPurchaseInvoice(id, model.Number, model.Date, model.SupplierOrderId, model.Vat,
-				model.NetWeight, model.GrossWeight, model.TruckNumber, model.Swb, model.PurchaseTransportCost, model.BankExpenses, model.Duty,
-				model.CustomsExpenses, model.Factoring, model.FiscalAgentExpenses, model.ProcentComission, model.OtherExpenses);
+			var purchaseForEdit = purchaseService.EditPurchaseInvoice(id, model.PurchaseNumber, model.Date, 
+				model.SupplierOrderId, model.Vat,model.NetWeight, model.GrossWeight, model.TruckNumber, model.Swb, 
+				model.PurchaseTransportCost, model.BankExpenses, model.Duty,model.CustomsExpenses, 
+				model.Factoring, model.FiscalAgentExpenses, model.ProcentComission, model.OtherExpenses, 
+				model.PurchaseProducts);
 
 			if(purchaseForEdit == false) { return BadRequest(); }
 

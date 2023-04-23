@@ -18,7 +18,7 @@
                 {
              <div class="col-xl-9">
               <p style="color: #7e8d9f;font-size: 20px;">Debit Invoice No: <strong>@Model.DocumentNumber</strong></p>
-                       <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.DebitToInvoiceNumber, date: @Model.DebitToInvoiceDate.Date.ToString()</p>
+                           <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.DebitToInvoiceNumber, date: @Model.DebitToInvoiceDate.Date.ToString("dd-MM-yyyy")</p>
             </div>
                 }
                 else
@@ -116,10 +116,27 @@
                                     <td>@product.Size</td>
                                     <td>@product.FSCClaim</td>
                                     <td>@product.FSCSertificate</td>
-                                    <td>@product.Unit</td>
-                                    <td>@product.OrderedQuantity</td>
-                                    <td>@product.Price</td>
-                                    <td>@product.Amount.ToString("N2")</td>
+                                    @if(product.CreditNotePrice != 0)
+                                    {
+                                        <td>@product.Unit</td>
+                                        <td>@product.CreditNoteQuantity</td>
+                                        <td>@product.CreditNotePrice</td>
+                                        <td>@product.CreditNoteProductAmount.ToString("N2")</td>       
+                                    }
+                                    else if(product.DebitNotePrice != 0)
+                                    {
+                                        <td>@product.Unit</td>
+                                        <td>@product.DebitNoteQuantity</td>
+                                        <td>@product.DebitNotePrice</td>
+                                        <td>@product.DebitNoteAmount.ToString("N2")</td>  
+                                    }
+                                    else
+                                    {
+                                        <td>@product.Unit</td>
+                                        <td>@product.OrderedQuantity</td>
+                                        <td>@product.Price</td>
+                                        <td>@product.Amount.ToString("N2")</td>                                        
+                                    }                                   
                                 </tr>
                             }
              </tbody>

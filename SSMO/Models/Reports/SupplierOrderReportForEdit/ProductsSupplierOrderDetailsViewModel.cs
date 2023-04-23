@@ -15,6 +15,6 @@
         public decimal Price { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
-        public decimal Amount { get; set; }
+        public decimal PurchaseAmount { get; set; }
     }
 }

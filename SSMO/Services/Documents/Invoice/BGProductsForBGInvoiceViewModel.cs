@@ -5,6 +5,7 @@ namespace SSMO.Services.Documents.Invoice
 {
     public class BGProductsForBGInvoiceViewModel
     {
+        public int ProductId { get; set; }
         public int DescriptionId { get; set; }
         public string BgDescription { get; set; }
         public IEnumerable<string> Descriptions { get; set; }
@@ -28,7 +29,15 @@ namespace SSMO.Services.Documents.Invoice
 
         [Range(0.0, 9999999999999.99999)]
         public decimal BgAmount { get; set; }
-        public int Pallets { get; set; }
-        public int SheetsPerPallet { get; set; }
+        public decimal CreditNoteQuantity { get; set; }      
+        public decimal CreditNotePrice { get; set; }
+        public decimal CreditNoteProductAmount { get; set; }
+        public decimal CreditNoteBgPrice { get; set; }
+        public decimal CreditNoteBgAmount { get; set; }
+        public decimal DebitNoteQuantity { get; set; }
+        public decimal DebitNoteAmount { get; set; }
+        public decimal DebitNotePrice { get; set; }
+        public decimal DebitNoteBgPrice { get; set; }
+        public decimal DebitNoteBgAmount { get; set; }
     }
 }

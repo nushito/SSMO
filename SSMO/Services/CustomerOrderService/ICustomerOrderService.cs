@@ -1,4 +1,5 @@
-﻿using SSMO.Models.Products;
+﻿using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Products;
 using SSMO.Models.Reports.PaymentsModels;
 using System;
 using System.Collections.Generic;
@@ -12,19 +13,20 @@ namespace SSMO.Services.CustomerOrderService
             int company, string deliveryTerms, 
             string loadingAddress, string deliveryAddress,
             int currency,string origin, bool paidStatus, 
-            int vat, int statusId);
+            int vat, int statusId,List<int> supplierOrders);
 
         public int CreateFirstOrder
             (int number, string num, DateTime date, int customer,
             int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,
             int currency, string origin, bool paidStatus,
-            int vat, int statusId);
+            int vat, int statusId, List<int> supplierOrders);
 
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id);
         public SSMO.Data.Models.CustomerOrder OrderPerNumber(int number);
-
         public bool CheckOrderNumberExist(int number);
+
+        public void CheckCustomerOrderStatus(int id);
 
         //public bool EditProductAsPerSupplierSpec(int productId,int descriptionId,
         //    int sizeId,
@@ -42,6 +44,7 @@ namespace SSMO.Services.CustomerOrderService
 
         public bool AnyCustomerOrderExist();
 
+        public List<CustomerOrdersJsonList> CustomerOrderCollection(int customerorderId);
         public ICollection<int> AllCustomerOrderNumbers();
 
         public EditCustomerOrderPaymentModel GetCustomerOrderPaymentForEdit(int orderConfirmationNumber);

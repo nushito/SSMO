@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.Purchase;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.PaymentsModels;
@@ -9,6 +10,7 @@ using SSMO.Services.Documents.Purchase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace SSMO.Services.SupplierOrders
 {
@@ -16,22 +18,20 @@ namespace SSMO.Services.SupplierOrders
     {
         private readonly ApplicationDbContext dbContext;
         private readonly IConfigurationProvider mapper;
-
-        public SupplierOrderService(ApplicationDbContext dbContext, IMapper mapper)
+        private readonly ISupplierService supplierService;
+        public SupplierOrderService(ApplicationDbContext dbContext, IMapper mapper, ISupplierService supplierService)
         {
             this.dbContext = dbContext;
             this.mapper = mapper.ConfigurationProvider;
+            this.supplierService = supplierService; 
         }
 
         public int CreateSupplierOrder(int myCompanyId, int supplierId, DateTime Date, 
-            string number, int customerOrderNumber, int statusId, int currencyId, string fscClaim, int vat,
+            string number, int statusId, int currencyId, string fscClaim, int vat,
             DateTime datePaidAmount, decimal paidAvance, bool paidStatus,
             string loadingAddress, string deliveryAddress, string deliveryTerms)
         {
-            var customerOrder = dbContext.CustomerOrders
-                .Where(a => a.OrderConfirmationNumber == customerOrderNumber)
-                .FirstOrDefault();
-
+            
             var thisSupplier = dbContext.Suppliers.Where(a=>a.Id == supplierId).FirstOrDefault();   
 
             var supplierSpec = new SupplierOrder
@@ -40,12 +40,11 @@ namespace SSMO.Services.SupplierOrders
                 SupplierId = supplierId,
                 Supplier = thisSupplier,
                 Date = Date,
-                Number = number,
-                CustomerOrderId = customerOrder.Id,
+                Number = number,                
                 StatusId = statusId,
                 CurrencyId = currencyId,
                 VAT = vat,
-                FSCClaim = fscClaim,
+                FscClaim = fscClaim,
                 Products = new List<Product>(),
                 PaidAvance = paidAvance,               
                 PaidStatus = paidStatus,
@@ -143,6 +142,41 @@ namespace SSMO.Services.SupplierOrders
                     Number = n.Number
                 })
                 .ToList();
+        }
+
+        public ICollection<SupplierOrdersNumbersListViewModel> GetSupplierOrdersNumbersJsonList(int id)
+        {
+           return dbContext.SupplierOrders
+                .Where(s=>s.SupplierId == id)
+                .Select(l=>new SupplierOrdersNumbersListViewModel
+                {
+                    SupplierOrderId = l.Id,  
+                    SupplierOrderNumber = l.Number
+                })
+                .ToList();
+        }
+
+        public ICollection<SupplierOrdersBySupplier> SuppliersAndOrders()
+        {
+            var supplierOrders = dbContext.SupplierOrders
+                .Where(a=>a.StatusId == 3)
+                .Select(a=> new SupplierOrdersBySupplier
+                {
+                    SupplierId= a.SupplierId,
+                    SupplierOrderId = a.Id,
+                    SupplierOrderNumber = a.Number,                   
+                })                
+                .ToList();
+
+            foreach (var item in supplierOrders)
+            {
+                item.SupplierName = supplierService.SupplierNameById(item.SupplierId);
+                item.SupplierAndOrderSelect = item.SupplierName +"-" + item.SupplierOrderNumber;
+            }
+
+            supplierOrders = supplierOrders.OrderBy(a=>a.SupplierName).ToList();    
+
+            return supplierOrders;
         }
 
         public void TotalAmountAndQuantitySum(int supplierOrderId)

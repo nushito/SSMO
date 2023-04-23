@@ -8,7 +8,7 @@
         Invoice No:
     </dt>
     <dd class="col-sm-5">
-        @Model.Number
+        @Model.PurchaseNumber
     </dd>
 </dl>
 <dl class="row">
@@ -107,7 +107,13 @@
                 Sheets/pallet
             </th>
             <th>
+                Total Sheets
+            </th>
+            <th>
                 Price
+            </th>
+            <th>
+               Cost Price
             </th>
         </tr>
     </thead>
@@ -115,38 +121,44 @@
         @foreach (var product in Model.Products)
         {
             <tr>
-                <td>
+                    <td class="col-sm-1">
                     @product.Description
                 </td>
-                <td>
+                    <td class="col-sm-1">
                     @product.Grade
                 </td>
-                <td>
+                    <td class="col-sm-1">
                     @product.Size
                 </td>
-                <td>
+                    <td class="col-sm-1">
                     @product.FscCertificate
                 </td>
-                <td>
+                    <td class="col-sm-1">
                     @product.FscClaim
                 </td>
-                <td>
+                    <td class="col-sm-1">
                     @product.Unit
-                </td>
-                <td>
+                </td >
+                    <td class="col-sm-1">
                     @product.Quantity
                 </td>
-                <td>
-                    @product.Pallet
+                    <td class="col-sm-1">
+                    @product.Pallets
                 </td>
-                <td>
+                    <td class="col-sm-1">
                     @product.SheetsPerPallet
                 </td>
-                <td>
+                     <td class="col-sm-1">
+                    @product.TotalSheets
+                    </td>
+                    <td class="col-sm-1">
                     @product.PurchasePrice
                 </td>
+                        <td class="col-sm-1">
+                    @product.CostPrice
+                    </td>
             </tr>
-
+            <hr />
         }
     </tbody>
 </table>

@@ -44,7 +44,7 @@ namespace SSMO.Services.Reports
               int currencyId, int status, int customerOrderNumber,
               string fscClaim, string fscCertificate,
               decimal paidAdvance, bool paidStatus, int? vat,
-              List<ProductsForEditSupplierOrder> products);
+              List<ProductsForEditSupplierOrder> products, List<NewProductsForSupplierOrderModel> newProducts);
 
         public InvoiceReportModel InvoiceCollection(string myCompanyName, int currentpage, int invoicesPerPage);
         public InvoiceDetailsViewModel InvoiceDetails(int id);

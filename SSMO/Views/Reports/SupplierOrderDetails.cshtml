@@ -60,20 +60,24 @@
          @Model.StatusName
     </dd>
 </dl>
-<dl class="row">
+ <dl class="row">
     <dt class="col-sm-3">
-        Customer:
+        Amount:
     </dt>
     <dd class="col-sm-5">
-         @Model.CustomerName
+        @Model.Amount @Model.Currency
     </dd>
 </dl>
 <dl class="row">
-     <dt class="col-sm-3">
-        Customer Order No:
+    <dt class="col-sm-3">
+        Purchase Invoices:
     </dt>
     <dd class="col-sm-5">
-         @Model.CustomerOrderConfirmationNumber
+       @foreach (var invoice in Model.PurchaseInvoiceNumbers)
+        {
+            @invoice 
+            <br />
+        }
     </dd>
 </dl>
 <hr />
@@ -151,7 +155,7 @@
 
                                 <td class="col-sm-1">
                                 <div class="editor-field">
-                        @product.Amount
+                        @product.PurchaseAmount
                                 </div>
                             </td>
                 </tr>

@@ -27,9 +27,6 @@ namespace SSMO.Data.Models
         public string FSCSertificate { get; set; }
         public int? CustomerId { get; set; }
         public Customer Customer { get; set; }
-        public int CustomerOrderId { get; set; }
-        [Required]
-        public CustomerOrder CustomerOrder { get; set; }
         public int? SupplierId { get; set; }
         public Supplier Supplier { get; set; }
         public int SupplierOrderId { get; set; }
@@ -40,6 +37,7 @@ namespace SSMO.Data.Models
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
         public string Incoterms { get; set; }
+        public string CreditNoteDeliveryAddress { get; set; }
         public decimal NetWeight { get; set; }
         public decimal GrossWeight { get; set; }
         public string TruckNumber { get; set; }
@@ -58,7 +56,7 @@ namespace SSMO.Data.Models
         public Currency Currency { get; set; }
         public decimal Balance { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime DatePaidAmount { get; set; }
+        public DateTime? DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
         public decimal CurrencyExchangeRateUsdToBGN { get; set; }
         public ServiceOrder ServiceOrder { get; set; }
@@ -68,9 +66,15 @@ namespace SSMO.Data.Models
         public decimal DebitNoteTotalAmount { get; set; }
         public decimal? VatAmount { get; set; }
         public decimal TotalAmount { get; set; }
-        public ICollection<Product> Products { get; set; }
-        public ICollection<Product> PurchaseProducts { get; set; }
-        public ICollection<Product> CreditNoteProducts { get; set; }
-        public ICollection<Product> DebitNoteProducts { get; set; }
+        public decimal TotalQuantity { get; set; }
+        public string Comment { get; set; }
+        public ICollection<CustomerOrder> CustomerOrders { get; set; }
+        public ICollection<PurchaseProductDetails> PurchaseProducts { get; set; }
+        public ICollection<CustomerOrderProductDetails> CustomerOrderProducts { get; set; }
+        public ICollection<InvoiceProductDetails> InvoiceProducts { get; set; }
+        public ICollection<Product> CreditAndDebitNoteProducts { get; set; }
+        public ICollection<InvoiceProductDetails> DebitNoteProducts { get; set; }
+        public ICollection<InvoiceProductDetails> CreditNoteProducts { get; set; }
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using SIA.Data.Enums;
+using SSMO.Controllers;
 using SSMO.Data.Enums;
 using SSMO.Enums;
 using System.Collections.Generic;
@@ -9,7 +10,6 @@ namespace SSMO.Data.Models
 {
    public class Product
     {
-      
         public int Id { get; init; }
         [Required]
         public int DescriptionId { get; set; }
@@ -24,18 +24,13 @@ namespace SSMO.Data.Models
         [Required]
         [Range(0.0, 9999999999999.99999)]
         public decimal OrderedQuantity { get; set; }
+        public decimal? QuantityM3 { get; set; }
+
         [Range(0.0, 9999999999999.99999)]
         public decimal LoadedQuantityM3 { get; set; }
-        public decimal QuantityM2 { get; set; }
-        public decimal? QuantityM3 { get; set; }
-        public decimal CreditNoteQuantity { get; set; }
-        public int CreditNotePallets { get; set; }
-        public int CreditNoteSheetsPerPallet { get; set; }
-        public decimal CreditNotePrice { get; set; }
-        public decimal CreditNoteProductAmount { get; set; }
-        public decimal DebitNoteQuantity { get; set; }
-        public decimal DebitNoteAmount { get; set; }
-        public decimal DebitNotePrice { get; set; }
+        public decimal QuantityLeftForPurchaseLoading { get; set; }
+        public decimal QuantityAvailableForCustomerOrder { get; set; }
+        public decimal SoldQuantity { get; set; }
         public Unit Unit { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
@@ -52,22 +47,17 @@ namespace SSMO.Data.Models
         public decimal BgAmount { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal PurchaseAmount { get; set; }
-        public string FSCClaim { get; set; }
-        public string FSCSertificate { get; set; }
+        public string FscClaim { get; set; }
+        public string FscSertificate { get; set; }
         public string PurchaseFscClaim { get; set; }
         public string PurchaseFscCertificate { get; set; }
-        public int CustomerOrderId { get; set; }
+        public int? CustomerOrderId { get; set; }
         public CustomerOrder CustomerOrder { get; set; }
         public int? SupplierOrderId { get; set; }
         public SupplierOrder SupplierOrder { get; set; }
         public int? DocumentId { get; set; }
         public Document Document { get; set; }
-        public int? PurchaseDocumentId { get; set; }
-        public Document PurchaseDocument { get; set; }
-        public int? CreditNoteId { get; set; }
-        public Document CreditNote { get; set; }
-        public int? DebitNoteId { get; set; }
-        public Document DebitNote { get; set; }
+      
 
         [Column(TypeName = "decimal(18,4)")]
         public decimal? PurchaseTransportCost { get; set; }
@@ -87,5 +77,9 @@ namespace SSMO.Data.Models
         public decimal? ProcentComission { get; set; }
         [Column(TypeName = "decimal(18,4)")]
         public decimal? OtherExpenses { get; set; }
+        public ICollection<CustomerOrderProductDetails> CustomerOrderProductDetails { get; set; }
+        public ICollection<PurchaseProductDetails> PurchaseProductDetails { get; set; }
+        public ICollection<InvoiceProductDetails> InvoiceProductDetails { get; set; }
+                
     }
 }

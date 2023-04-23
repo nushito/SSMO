@@ -15,7 +15,7 @@
              <div class="col-xl-8">
             <ul class="list-unstyled">
               <li class="text-muted">to Invoice No: <span style="color:#5d9fc5 ;">@Model.InvoiceNumber</span></li>
-              <li class="text-muted">Date: <span style="color:#5d9fc5 ;">@Model.InvoiceDate</span></li>            
+              <li class="text-muted">Date: <span style="color:#5d9fc5 ;">@Model.InvoiceDate.Date.ToShortDateString()</span></li>            
             </ul>
           </div>
         </div>
@@ -35,7 +35,6 @@
             <i class="fab fa-mdb fa-4x ms-0" style="color:#5d9fc5 ;"></i>
             <p class="pt-0">@Model.Date.Date.ToShortDateString()</p>
           </div>
-
         </div>
 
         <div class="row">
@@ -62,8 +61,7 @@
                   <span class="badge bg-warning text-black fw-bold">@Model.Seller.FSCClaim @Model.Seller.FSCSertificate</span></li>*@
             </ul>
           </div>
-        </div>      
-
+        </div>    
 
         <div class="row my-2 mx-1 justify-content-center">
           <table class="table table-striped table-borderless">

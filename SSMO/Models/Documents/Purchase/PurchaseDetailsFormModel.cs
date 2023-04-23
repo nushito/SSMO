@@ -17,9 +17,9 @@ namespace SSMO.Models.Documents.Purchase
         public string FSCSertificate { get; set; }
         public string SupplierFSCCertificate { get; set; }
         public decimal PaidAvance { get; set; }
-        public decimal Balance { get; set; }
+        public decimal Balance { get; set; }        
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime DatePaidAmount { get; set; }
+        public DateTime? DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
         public decimal Amount { get; set; }
         public decimal NetWeight { get; set; }
@@ -35,7 +35,9 @@ namespace SSMO.Models.Documents.Purchase
         public decimal OtherExpenses { get; set; }
         public decimal PurchaseTransportCost { get; set; }
         public decimal BankExpenses { get; set; }
-       
+        public string Incoterms { get; set; }
+        public List<PurchaseProductAsSupplierOrderViewModel> ProductDetails { get; set; }
 
     }
 }
+

@@ -1,9 +1,11 @@
-﻿using SSMO.Models.Documents.Purchase;
+﻿using SSMO.Models.CustomerOrders;
+using SSMO.Models.Documents.Purchase;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Services.Documents.Purchase;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SSMO.Services.SupplierOrders
 {
@@ -12,8 +14,7 @@ namespace SSMO.Services.SupplierOrders
         public int CreateSupplierOrder(int myCompanyId,
                 int supplierId,
                 DateTime Date,
-                string number,
-               int customerOrderNumber ,
+                string number,              
                 int statusId, int currencyId, string fscClaim, int vat,
                 DateTime datePaidAmount, decimal paidAvance,  bool paidStatus, 
                 string loadingAddress, string deliveryAddress, string deliveryTerms);
@@ -26,6 +27,8 @@ namespace SSMO.Services.SupplierOrders
         public bool EditSupplierOrderPayment(string supplierOrderNumber, decimal paidAdvance, DateTime date, bool paidStatus);
 
         public ICollection<SupplierOrdersListForPurchaseEditModel> GetSupplierOrdersNumbers();
+        public ICollection<SupplierOrdersNumbersListViewModel> GetSupplierOrdersNumbersJsonList(int id);
+        public ICollection<SupplierOrdersBySupplier> SuppliersAndOrders();
 
     }
 }

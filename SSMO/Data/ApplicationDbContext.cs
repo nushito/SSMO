@@ -17,12 +17,10 @@ namespace SSMO.Data
             : base(options)
         {
         }
-
-
         public DbSet<Address> Addresses { get; set; }
         public DbSet<BankDetails> BankDetails { get; set; }
         public DbSet<Customer> Customers { get; set; }
-        public DbSet<Currency> Currencys { get; set; }
+        public DbSet<Currency> Currencies { get; set; }
         public DbSet<SupplierOrder> SupplierOrders { get; set; }
         public DbSet<MyCompany> MyCompanies { get; set; }
         public DbSet<CustomerOrder> CustomerOrders { get; set; }
@@ -34,7 +32,9 @@ namespace SSMO.Data
         public DbSet<Grade> Grades { get; set; }
         public DbSet<Size> Sizes { get; set; }
         public DbSet<Status> Statuses { get; set; }
-
+        public DbSet<InvoiceProductDetails> InvoiceProductDetails { get; set; }
+        public DbSet<CustomerOrderProductDetails> CustomerOrderProductDetails { get; set; }
+        public DbSet<PurchaseProductDetails> PurchaseProductDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -133,14 +133,13 @@ namespace SSMO.Data
               .HasPrecision(18, 3);
 
             builder.Entity<SupplierOrder>()
-                .HasOne(a => a.CustomerOrder)
-                .WithMany(a => a.SupplierOrder)
-                .OnDelete(DeleteBehavior.Restrict);
+                .HasMany(a => a.CustomerOrders)
+                .WithMany(a => a.SupplierOrders);              
 
-            builder.Entity<SupplierOrder>()
-                .HasOne(a => a.Status)
-                .WithMany(a => a.SupplierOrders)
-               .OnDelete(DeleteBehavior.Restrict);
+            //builder.Entity<SupplierOrder>()
+            //    .HasOne(a => a.Status)
+            //    .WithMany(a => a.SupplierOrders)
+            //   .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<SupplierOrder>()
                 .HasOne(a => a.Currency)
@@ -186,7 +185,7 @@ namespace SSMO.Data
                .HasPrecision(18, 2);
 
             builder.Entity<Product>()
-                .Property(a => a.QuantityM2)
+                .Property(a => a.QuantityLeftForPurchaseLoading)
                 .HasColumnType("decimal")
                 .HasPrecision(18, 5);
 
@@ -201,11 +200,6 @@ namespace SSMO.Data
 
             builder.Entity<Product>()
                .Property(a => a.PurchaseAmount)
-               .HasPrecision(18, 4);
-
-
-            builder.Entity<Product>()
-               .Property(a => a.CreditNoteProductAmount)
                .HasPrecision(18, 4);
 
             builder.Entity<Product>()
@@ -236,30 +230,14 @@ namespace SSMO.Data
                 .HasPrecision(18, 5);
 
             builder.Entity<Product>()
-                .Property(a => a.DebitNoteQuantity)
-                .HasColumnType("decimal")
-                .HasPrecision(18, 5);
-
-
-            builder.Entity<Product>()
-               .Property(a => a.DebitNoteAmount)
-               .HasPrecision(18, 4);
-
-            builder.Entity<Product>()
-              .Property(a => a.DebitNotePrice)
-              .HasColumnType("decimal")
-              .HasPrecision(18, 5);
-
-            builder.Entity<Product>()
-                .Property(a => a.CreditNoteQuantity)
+                .Property(a=>a.QuantityAvailableForCustomerOrder)
                 .HasColumnType("decimal")
                 .HasPrecision(18, 5);
 
             builder.Entity<Product>()
-               .Property(a => a.CreditNotePrice)
-               .HasColumnType("decimal")
-               .HasPrecision(18, 5);
-
+           .Property(a => a.SoldQuantity)
+           .HasColumnType("decimal")
+           .HasPrecision(18, 5);
 
             builder.Entity<Product>()
                 .Property(a => a.Amount)
@@ -273,30 +251,6 @@ namespace SSMO.Data
                 .IsRequired(false);
 
             builder.Entity<Product>()
-                .HasOne(d=>d.Document)
-                .WithMany(a=>a.Products)
-                .HasForeignKey(a=>a.DocumentId)
-                .OnDelete(DeleteBehavior.ClientSetNull);
-
-            builder.Entity<Product>()
-               .HasOne(d => d.PurchaseDocument)
-               .WithMany(a => a.PurchaseProducts)
-               .HasForeignKey(a => a.PurchaseDocumentId)
-               .OnDelete(DeleteBehavior.ClientSetNull);
-
-            builder.Entity<Product>()
-               .HasOne(d => d.CreditNote)
-               .WithMany(a => a.CreditNoteProducts)
-               .HasForeignKey(a => a.CreditNoteId)
-               .OnDelete(DeleteBehavior.ClientSetNull);
-
-            builder.Entity<Product>()
-             .HasOne(d => d.DebitNote)
-             .WithMany(a => a.DebitNoteProducts)
-             .HasForeignKey(a => a.DebitNoteId)
-             .OnDelete(DeleteBehavior.ClientSetNull);
-
-            builder.Entity<Product>()
                 .Property(p => p.Unit)
                 .HasConversion(u => u.ToString(), u => (Unit)Enum.Parse(typeof(Unit), u));
 
@@ -306,6 +260,7 @@ namespace SSMO.Data
                 .HasForeignKey(s => s.CurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+           
             builder.Entity<Document>()
                 .HasOne(i => i.MyCompany)
                 .WithMany(a => a.Documents)
@@ -331,6 +286,11 @@ namespace SSMO.Data
                 .Property(a => a.OtherExpenses)
                 .HasColumnType("decimal")
                 .HasPrecision(18, 5);
+
+            builder.Entity<Document>()
+               .Property(a => a.TotalQuantity)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 5);
 
             builder.Entity<Document>()
                .Property(a => a.GrossWeight)
@@ -415,12 +375,7 @@ namespace SSMO.Data
                 .HasForeignKey(s => s.SupplierOrderId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<Document>()
-               .HasOne(s => s.CustomerOrder)
-               .WithMany(d => d.Documents)
-               .HasForeignKey(s => s.CustomerOrderId)
-               .OnDelete(DeleteBehavior.Restrict);
-
+         
             builder.Entity<Document>()
                .HasOne(s => s.Supplier)
                .WithMany(d => d.Documents)
@@ -462,6 +417,192 @@ namespace SSMO.Data
                 .WithOne(a=>a.Currency)
                 .HasForeignKey(a=>a.CurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<CustomerOrderProductDetails>()
+                .HasOne(a=>a.Product)
+                .WithMany(a=>a.CustomerOrderProductDetails)
+                .HasForeignKey(a=>a.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<CustomerOrderProductDetails>()
+                .HasOne(a=>a.CustomerOrder)
+                .WithMany(a=>a.CustomerOrderProducts)
+                .HasForeignKey(a=>a.CustomerOrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<CustomerOrderProductDetails>()
+                .Property(a => a.Amount)
+                .HasColumnType("decimal")
+                .HasPrecision(18,4);
+
+            builder.Entity<CustomerOrderProductDetails>()
+                .Property(a => a.Quantity)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
+            builder.Entity<CustomerOrderProductDetails>()
+                .Property(a => a.SellPrice)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 4);
+
+            builder.Entity<CustomerOrderProductDetails>()
+             .Property(a => a.AutstandingQuantity)
+             .HasColumnType("decimal")
+             .HasPrecision(18, 4);
+
+
+            builder.Entity<PurchaseProductDetails>()
+                .HasOne(a => a.Product)
+                .WithMany(a => a.PurchaseProductDetails)
+                .HasForeignKey(a => a.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            
+            builder.Entity<PurchaseProductDetails>()
+                .Property(a => a.Amount)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 4);
+
+            builder.Entity<PurchaseProductDetails>()
+                .Property(a => a.Quantity)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
+            builder.Entity<PurchaseProductDetails>()
+                .Property(a => a.PurchasePrice)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 4);
+
+            builder.Entity<PurchaseProductDetails>()
+               .Property(a => a.CostPrice)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 4);
+
+            builder.Entity<PurchaseProductDetails>()
+                .HasOne(a=>a.PurchaseInvoice)
+                .WithMany(a => a.PurchaseProducts)
+                .HasForeignKey(a=>a.PurchaseInvoiceId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PurchaseProductDetails>()
+                .HasOne(s=>s.SupplierOrder)
+                .WithMany(p=>p.PurchaseProductDetails)
+                .HasForeignKey(s=>s.SupplierOrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<InvoiceProductDetails>()
+                .Property(a=>a.SellPrice)
+                .HasColumnType("decimal")
+                .HasPrecision (18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+                .Property(a => a.Amount)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+              .Property(a => a.BgAmount)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+                .Property(a=>a.InvoicedQuantity)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+                .Property(a => a.DeliveryCost)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+               .Property(a => a.BgPrice)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+                .Property(a => a.Profit)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+                .HasOne(a => a.Invoice)
+                .WithMany(a => a.InvoiceProducts)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<InvoiceProductDetails>()
+             .HasOne(a => a.PurchaseProductDetails)
+             .WithMany(a => a.InvoiceProductDetails)
+             .HasForeignKey(a=>a.PurchaseProductDetailsId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<InvoiceProductDetails>()
+               .Property(a => a.DebitNoteQuantity)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+               .Property(a => a.DebitNoteAmount)
+               .HasPrecision(18, 4);
+
+            builder.Entity<InvoiceProductDetails>()
+              .Property(a => a.DebitNotePrice)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+                .Property(a => a.CreditNoteQuantity)
+                .HasColumnType("decimal")
+                .HasPrecision(18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+               .Property(a => a.CreditNotePrice)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+              .Property(a => a.CreditNoteProductAmount)
+              .HasPrecision(18, 4);
+
+            builder.Entity<InvoiceProductDetails>()
+               .Property(a => a.CreditNoteBgPrice)
+               .HasPrecision(18, 4);
+
+            builder.Entity<InvoiceProductDetails>()
+             .Property(a => a.CreditNoteBgAmount)
+             .HasPrecision(18, 4);
+
+            builder.Entity<InvoiceProductDetails>()
+               .Property(a => a.DebitNoteBgPrice)
+               .HasPrecision(18, 4);
+
+            builder.Entity<InvoiceProductDetails>()
+             .Property(a => a.DebitNoteBgAmount)
+             .HasPrecision(18, 4);
+
+            builder.Entity<InvoiceProductDetails>()
+                .HasOne(p=>p.Product)
+                .WithMany(i=>i.InvoiceProductDetails)
+                .HasForeignKey(p=>p.ProductId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<InvoiceProductDetails>()
+                .HasOne(c => c.CustomerOrder)
+                .WithMany(i => i.InvoiceProductDetails)
+                .HasForeignKey(f => f.CustomerOrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<InvoiceProductDetails> ()
+                .HasOne(p=>p.CreditNote)
+                .WithMany(a=>a.CreditNoteProducts)
+                .HasForeignKey(a=>a.CreditNoteId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<InvoiceProductDetails>()
+              .HasOne(p => p.DebitNote)
+              .WithMany(a => a.DebitNoteProducts)
+              .HasForeignKey(a => a.DebitNoteId)
+              .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(builder);
         }

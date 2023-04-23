@@ -14,6 +14,15 @@ namespace SSMO.Services
     {
         private readonly ApplicationDbContext dbContext;
         private readonly IMapper mapper;
+
+        public List<string> SuppliersFscCertificates()
+        {
+            
+            return dbContext.Suppliers
+                .Select(f=>f.FSCSertificate)               
+                .ToList();
+        }
+
         public SupplierService(ApplicationDbContext dbContext, IMapper mapper)
         {
             this.dbContext = dbContext;
@@ -196,7 +205,7 @@ namespace SSMO.Services
 
             var supplierDetailList = dbContext.CustomerOrders.
                 Where(a => a.CustomerId == id)
-                .SelectMany(a => a.SupplierOrder
+                .SelectMany(a => a.SupplierOrders
                          .Select(a => new SupplierDetailsList
                          {
                              SupplierId = a.SupplierId,
@@ -206,10 +215,18 @@ namespace SSMO.Services
 
            var distinctSupplierDetailsList = supplierDetailList.GroupBy(a=>a.SupplierId).Select(a=>a.First()).ToList();   
            
-            return distinctSupplierDetailsList;
+           return distinctSupplierDetailsList;
         }
 
         public string SupplierNameById(int id)
+        {
+            return dbContext.Suppliers
+                  .Where(i => i.Id == id)
+                  .Select(n => n.Name)
+                  .FirstOrDefault();
+        }
+
+        public string SupplierNameBySupplierOrderId(int id)
         {
             var supplierId = dbContext.SupplierOrders
                 .Where(i => i.Id == id)

@@ -21,6 +21,10 @@ namespace SSMO.Models.Reports.SupplierOrderReportForEdit
         public int CustomerOrderConfirmationNumber { get; set; }
         public string CustomerName { get; set; }
         public bool PaidStatus { get; set; }
+        public decimal Amount { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
+        public IEnumerable<string> PurchaseInvoiceNumbers { get; set; }
         public IEnumerable<ProductsSupplierOrderDetailsViewModel> Products { get; set; }
     }
 }

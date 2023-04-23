@@ -20,7 +20,7 @@ namespace SSMO.Data.Models
         [Required]
         public Supplier Supplier { get; set; }
         public int CustomerOrderId { get; set; }
-        public CustomerOrder CustomerOrder { get; set; }
+        public ICollection<CustomerOrder> CustomerOrders { get; set; }
         public int MyCompanyId { get; set; }
         public MyCompany MyCompany { get; set; }
         public int StatusId { get; set; }
@@ -34,8 +34,8 @@ namespace SSMO.Data.Models
         public bool PaidStatus { get; set; }
         public string DeliveryTerms { get; set; }
         public decimal TotalAmount  { get; set; }
-        public string FSCClaim { get; set; }
-        public string FSCSertificate { get; set; }
+        public string FscClaim { get; set; }
+        public string FscSertificate { get; set; }
         public int? VAT { get; set; }
         public decimal? VatAmount { get; set; }
         public decimal NetWeight { get; set; }
@@ -45,5 +45,8 @@ namespace SSMO.Data.Models
         public ICollection<Document> Documents { get; set; }
         public ICollection<Product> Products { get; set; }
         public decimal TotalQuantity { get; set; }
+        public ICollection<PurchaseProductDetails> PurchaseProductDetails { get; set; }
+        public ICollection<CustomerOrderProductDetails> CustomerOrderProductDetails { get; set; }
+
     }
 }

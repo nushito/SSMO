@@ -37,6 +37,7 @@ namespace SSMO.Models.Reports.SupplierOrderReportForEdit
         public string DeliveryAddress { get; set; }
         public decimal TotalQuantity { get; set; }
         public List<ProductsForEditSupplierOrder> Products { get; set; }
+        public List<NewProductsForSupplierOrderModel> NewProducts { get; set; }
     }
 }
 

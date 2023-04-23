@@ -1,108 +1,234 @@
 ﻿@model PurchaseDetailsFormModel
+@{
+    
+}
 
 <form method="post">
-    <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="Number">Number Invoice</label>
-        <input asp-for="Number" type="text" class="form-control" >
-        <span asp-validation-for="Number" class="small text-danger"></span>
-    </div>
-    <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="Date">Date</label>
-        <input asp-for="Date" type="date" class="form-control" >
-        <span asp-validation-for="Date" class="small text-danger"></span>
-    </div>
-     <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="FSCClaim">FSC Claim</label>
-        <input asp-for="FSCClaim" type="text" class="form-control" >
-        <span asp-validation-for="FSCClaim" class="small text-danger"></span>
-    </div>
-    <div class="form-group offset-3 mb-2 col-md-3">
-            <label asp-for="FSCSertificate"></label>
-            <select asp-for="FSCSertificate" class="form-select">
-                <option selected value="">-</option>
-                <option value="@Model.SupplierFSCCertificate">@Model.SupplierFSCCertificate</option>
-            </select>
-      </div>
-     <div class="form-group offset-3 mb-2 col-md-3">  
-       <label class="form-check-label" asp-for="Vat"> VAT </label>    
+    <table class="col-sm-auto">         
+        <tr>
+            <td class="col-sm-auto">
+               <label asp-for="Number">Number Invoice</label>
+              <input asp-for="Number" type="text" class="form-control" >
+              <span asp-validation-for="Number" class="small text-danger"></span>
+            </td>
+            <td class="col-sm-auto">
+             <label asp-for="Date">Date</label>
+             <input asp-for="Date" type="date" class="form-control" >
+             <span asp-validation-for="Date" class="small text-danger"></span>
+            </td>
+        </tr>
+       <tr>
+            <td class="col-sm-auto">
+                 <label asp-for="PaidAvance">Paid advance</label>
+        <input asp-for="PaidAvance" type="number" class="form-control" >
+        <span asp-validation-for="PaidAvance" class="small text-danger"></span>
+            </td>
+            <td class="col-sm-auto">
+             <label asp-for="DatePaidAmount">Date of Payment</label>
+             <input asp-for="DatePaidAmount" class="form-control" >            
+            </td>
+              <td  class="col-sm-auto">
+                <input class="form-check-input" type="checkbox" asp-for="PaidStatus">
+               <label class="form-check-label" asp-for="PaidStatus"> Payment status </label>   
+            </td>
+        </tr>
+        <tr>
+              <td class="col-sm-auto">
+                  <label class="form-check-label" asp-for="Incoterms"> Delivery terms </label>    
+       <input class="form-control" type="text" asp-for="Incoterms">
+            </td>
+            <td class="col-sm-auto">
+                  <label class="form-check-label" asp-for="Vat"> VAT </label>    
        <input class="form-control" min="0" step="1" type="number" asp-for="Vat">
-    </div>
-
-   <div class="form-group offset-3 mb-2 col-md-3">      
-      <input class="form-check-input" type="checkbox" asp-for="PaidStatus">
-      <label class="form-check-label" asp-for="PaidStatus"> Paid </label>    
-    </div>
-      <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="TruckNumber">Truck Number</label>
+            </td>
+        </tr>
+        <tr>
+            <td class="col-sm-auto">
+                 <label asp-for="TruckNumber">Truck/Container Number</label>
         <input asp-for="TruckNumber" type="text" class="form-control" >
         <span asp-validation-for="TruckNumber" class="small text-danger"></span>
-    </div>
-     <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="Swb">SWB</label>
+            </td>
+             <td class="col-sm-auto">
+                  <label asp-for="Swb">SWB</label>
         <input asp-for="Swb" type="text" class="form-control" >
         <span asp-validation-for="Swb" class="small text-danger"></span>
-    </div>
-    <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="NetWeight">Net Weight</label>
+            </td>
+        </tr>
+        <tr>
+           <td class="col-sm-auto">
+                 <label asp-for="NetWeight">Net Weight</label>
         <input asp-for="NetWeight"min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="NetWeight" class="small text-danger"></span>
-    </div>
-
-     <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="GrossWeight">Gross Weight</label>
+            </td>
+             <td class="col-sm-auto">
+                  <label asp-for="GrossWeight">Gross Weight</label>
         <input asp-for="GrossWeight" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="GrossWeight" class="small text-danger"></span>
-    </div>
-
-    <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="Duty">Duty</label>
+            </td>
+        </tr>
+          <tr>
+           <td class="col-sm-auto">
+                   <label asp-for="Duty">Duty</label>
         <input asp-for="Duty" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="Duty" class="small text-danger"></span>
-    </div>
-
-    <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="Factoring">Factoring %</label>
+            </td>
+             <td class="col-sm-auto">
+                   <label asp-for="Factoring">Factoring %</label>
         <input asp-for="Factoring" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="Factoring" class="small text-danger"></span>
-    </div>
-
-    <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="CustomsExpenses">Customs Expenses</label>
+            </td>
+        </tr>
+   <tr>
+           <td class="col-sm-auto">
+                  <label asp-for="CustomsExpenses">Customs Expenses</label>
         <input asp-for="CustomsExpenses" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="CustomsExpenses" class="small text-danger"></span>
-    </div>
-
-        <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="FiscalAgentExpenses">Fiscal Agent Expenses</label>
+            </td>
+             <td class="col-sm-auto">
+                  <label asp-for="FiscalAgentExpenses">Fiscal Agent Expenses</label>
         <input asp-for="FiscalAgentExpenses" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="FiscalAgentExpenses" class="small text-danger"></span>
-    </div>
-
-     <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="ProcentComission">Comission %</label>
+            </td>
+        </tr>
+         <tr>
+           <td class="col-sm-auto">
+                   <label asp-for="ProcentComission">Comission %</label>
         <input asp-for="ProcentComission" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="ProcentComission" class="small text-danger"></span>
-    </div>
-
-     <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="PurchaseTransportCost">Transport Cost</label>
+            </td>
+             <td class="col-sm-auto">
+               <label asp-for="PurchaseTransportCost">Transport Cost</label>
         <input asp-for="PurchaseTransportCost" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="PurchaseTransportCost" class="small text-danger"></span>
-    </div>
-
-     <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="BankExpenses">Bank Expenses</label>
+            </td>
+        </tr>
+         <tr>
+           <td class="col-sm-auto">
+                 <label asp-for="BankExpenses">Bank Expenses</label>
         <input asp-for="BankExpenses" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="BankExpenses" class="small text-danger"></span>
-    </div>
-
-     <div class="form-group  offset-3 mb-2 col-md-3">
-        <label asp-for="OtherExpenses">Other Expenses </label>
+            </td>
+             <td class="col-sm-auto">
+               <label asp-for="OtherExpenses">Other Expenses </label>
         <input asp-for="OtherExpenses" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="OtherExpenses" class="small text-danger"></span>
-    </div>
-    
+            </td>
+        </tr>
+    </table>
+ 
+    <table class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <td>Description</td>
+                <td>Size</td>
+                <td>Grade</td>
+                <td>FSC claim</td>
+                <td>FSC certificate</td>
+                <td>Unit</td>
+                <td>Pallets</td>
+                <td>Sheets/pallet</td>
+                <td>Quantity</td>
+                <td>Price</td>
+                <td>Truck/Container No</td>
+            </tr>
+        </thead>
+        <tbody>
+
+        @for (int i = 0; i < Model.ProductDetails.Count; i++)
+        {
+            <div>
+                      <input type="hidden" value="@Model.ProductDetails[i].Id" asp-for="@Model.ProductDetails[i].Id">
+             </div>
+            <div>
+                      <input type="hidden" value="@Model.ProductDetails[i].SupplierOrderId" asp-for="@Model.ProductDetails[i].SupplierOrderId">
+            </div>
+            <tr>
+                <td class="col-sm-1">
+                    <div class="editor-field">
+                       <input asp-for="@Model.ProductDetails[i].Description" value="@Model.ProductDetails[i].Description" type="text" calss="text-box single-line" required="required">
+                      <span asp-validation-for="@Model.ProductDetails[i].Description" class="small text-danger"></span>
+                   </div>
+                </td>
+                <td class="col-sm-1">
+                    <div class="editor-field">
+                        <input asp-for="@Model.ProductDetails[i].Size" value="@Model.ProductDetails[i].Size" type="text" calss="text-box single-line" required="required">
+                         <span asp-validation-for="@Model.ProductDetails[i].Size" class="small text-danger"></span>
+                    </div>
+                </td>
+                <td class="col-sm-1">
+                    <div class="editor-field">
+                        <input asp-for="@Model.ProductDetails[i].Grade" value="@Model.ProductDetails[i].Grade" type="text" calss="text-box single-line" required="required">
+                        <span asp-validation-for="@Model.ProductDetails[i].Grade" class="small text-danger"></span>
+                    </div>
+                </td>
+
+                <td class="col-sm-1">
+                    <div class="editor-field">                              
+                      <input asp-for="@Model.ProductDetails[i].PurchaseFscClaim" value="@Model.ProductDetails[i].PurchaseFscClaim" class="text-box single-line" required="required">
+                       <span asp-validation-for="@Model.ProductDetails[i].PurchaseFscClaim" class="small text-danger"></span>
+                  </div>
+                </td>
+
+                <td class="col-sm-1">
+                    <div class="editor-field">
+                        <select asp-for="@Model.ProductDetails[i].PurchaseFscCertificate" >
+                            <option value="-">-</option>
+                            <option value="@Model.ProductDetails[i].PurchaseFscCertificate">@Model.ProductDetails[i].PurchaseFscCertificate</option>
+                            <span asp-validation-for="@Model.ProductDetails[i].PurchaseFscCertificate" class="small text-danger"></span>
+                        </select>
+
+    @* <input asp-for="@Model[i].FSCSertificate" class="text-box single-line" value="" required="required">*@
+                    </div>
+                </td>
+                <td class="col-sm-1">
+                        <div class="editor-field">
+                                <input asp-for="@Model.ProductDetails[i].Unit" value="@Model.ProductDetails[i].Unit" class="text-box single-line" required="required">
+                        <span asp-validation-for="@Model.ProductDetails[i].Unit" class="small text-danger"></span>
+                            </div>
+                </td>
+
+                <td class="col-sm-1">
+                    <div class="editor-field">
+                       <input asp-for="@Model.ProductDetails[i].Pallets" value="@Model.ProductDetails[i].Pallets" type="number" class="text-box single-line" required="required">
+                      <span asp-validation-for="@Model.ProductDetails[i].Pallets" class="small text-danger"></span>
+                        </div>
+                </td>
+                <td class="col-sm-1">
+                    <div class="editor-field">
+                       <input asp-for="@Model.ProductDetails[i].SheetsPerPallet" value="@Model.ProductDetails[i].SheetsPerPallet" type="number" class="text-box single-line" required="required">
+                     <span asp-validation-for="@Model.ProductDetails[i].SheetsPerPallet" class="small text-danger"></span>
+                            </div>
+                </td>
+                    <td class="col-sm-1">
+                    <div class="editor-field">
+                                <input asp-for="@Model.ProductDetails[i].OrderedQuantity" value="@Model.ProductDetails[i].OrderedQuantity" class="text-box single-line" required="required">
+                           <span asp-validation-for="@Model.ProductDetails[i].OrderedQuantity" class="small text-danger"></span>
+                            </div>
+                </td>
+
+                <td class="col-sm-1">
+                    <div class="editor-field">
+                         <input asp-for="@Model.ProductDetails[i].PurchasePrice" value="@Model.ProductDetails[i].PurchasePrice" type="number" min="0.0000" step="0.0001" class="text-box single-line" required="required">
+                       <span asp-validation-for="@Model.ProductDetails[i].PurchasePrice" class="small text-danger"></span>
+                    </div>
+                </td>
+                    <td class="col-sm-1">
+                    <div class="editor-field">
+                            <input asp-for="@Model.ProductDetails[i].VehicleNumber" value="@Model.ProductDetails[i].VehicleNumber" type="text" class="text-box single-line" >
+                        <span asp-validation-for="@Model.ProductDetails[i].VehicleNumber" class="small text-danger"></span>
+                    </div>
+                    </td>
+            </tr>
+        }
+            
+        </tbody>
+    </table>
+
         <input type="submit" class="btn btn-primary text-center" value="Save">
         <br />
     
 </form>
+
+@section Scripts {
+            <partial name="_ValidationScriptsPartial" />
+}
