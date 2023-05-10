@@ -537,6 +537,12 @@ namespace SSMO.Data
              .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<InvoiceProductDetails>()
+             .HasOne(a => a.CustomerOrderProductDetails)
+             .WithMany(a => a.InvoiceProductDetails)
+             .HasForeignKey(a => a.CustomerOrderProductDetailsId)
+             .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<InvoiceProductDetails>()
                .Property(a => a.DebitNoteQuantity)
                .HasColumnType("decimal")
                .HasPrecision(18, 5);

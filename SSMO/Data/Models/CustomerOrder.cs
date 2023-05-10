@@ -45,10 +45,6 @@ namespace SSMO.Data.Models
         public ICollection<Document> Documents { get; set;}
         public IEnumerable<SupplierOrder> SupplierOrders { get; set; }
         public ICollection<InvoiceProductDetails> InvoiceProductDetails { get; set; }
-
-        public static explicit operator CustomerOrder(int v)
-        {
-            throw new NotImplementedException();
-        }
+        
     }
 }

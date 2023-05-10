@@ -1,0 +1,124 @@
+﻿@model List<ProductsForInvoiceViewModel>
+
+<form method="post">
+     <table class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <td>Description</td>
+                <td>Size</td>
+                <td>Grade</td>
+                <td>FSC claim</td>
+                <td>FSC certificate</td>
+                <td>Unit</td>
+                <td>Pallets</td>
+                <td>Sheets/pallet</td>
+                <td>Quantity</td>
+                <td>Price</td>
+                <td>Truck/Container No</td>
+                <td>Choose Cost Price</td>
+            </tr>
+        </thead>
+        <tbody>
+
+            @for (int i = 0; i < Model.Count; i++)
+            {
+                    <div>
+                         <input type="hidden" value="@Model[i].Id" asp-for="@Model[i].Id">
+                     </div>
+                    <div>
+                         <input type="hidden" value="@Model[i].ProductId" asp-for="@Model[i].ProductId">
+                    </div>
+                    <div>
+                        <input type="hidden" value="@Model[i].CustomerOrderId" asp-for="@Model[i].CustomerOrderId">
+                    </div>
+
+                    <tr>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                               <input asp-for="@Model[i].Description" value="@Model[i].Description" type="text"  required="required">
+                              <span asp-validation-for="@Model[i].Description" class="small text-danger"></span>
+                           </div>
+                        </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                <input asp-for="@Model[i].Size" value="@Model[i].Size" type="text"  required="required">
+                                 <span asp-validation-for="@Model[i].Size" class="small text-danger"></span>
+                            </div>
+                        </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                <input asp-for="@Model[i].Grade" value="@Model[i].Grade" type="text"  required="required">
+                                <span asp-validation-for="@Model[i].Grade" class="small text-danger"></span>
+                            </div>
+                        </td>
+
+                        <td class="col-sm-1">
+                            <div class="editor-field">                              
+                              <input asp-for="@Model[i].FscClaim" value="@Model[i].FscClaim" required="required">
+                               <span asp-validation-for="@Model[i].FscClaim" class="small text-danger"></span>
+                          </div>
+                        </td>
+
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                <select asp-for="@Model[i].FscCertificate" >
+                                    <option value="-">-</option>
+                                    <option value="@Model[i].FscCertificate">@Model[i].FscCertificate</option>
+                                    <span asp-validation-for="@Model[i].FscCertificate" class="small text-danger"></span>
+                                </select>
+                            </div>
+                        </td>
+                        <td class="col-sm-1">
+                                <div class="editor-field">
+                                 <input asp-for="@Model[i].Unit" value="@Model[i].Unit" required="required">
+                                <span asp-validation-for="@Model[i].Unit" class="small text-danger"></span>
+                                    </div>
+                        </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                   <input asp-for="@Model[i].Pallets" value="@Model[i].Pallets" type="number"  required="required">
+                                  <span asp-validation-for="@Model[i].Pallets" class="small text-danger"></span>
+                                </div>
+                        </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                 <input asp-for="@Model[i].SheetsPerPallet" value="@Model[i].SheetsPerPallet" type="number" required="required">
+                                 <span asp-validation-for="@Model[i].SheetsPerPallet" class="small text-danger"></span>
+                                    </div>
+                        </td>
+                            <td class="col-sm-1">
+                            <div class="editor-field">
+                                  <input asp-for="@Model[i].InvoicedQuantity" value="@Model[i].InvoicedQuantity"  required="required">
+                                  <span asp-validation-for="@Model[i].InvoicedQuantity" class="small text-danger"></span>
+                                    </div>
+                        </td>
+
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                   <input asp-for="@Model[i].SellPrice" value="@Model[i].SellPrice" type="number" min="0.0000" step="0.0001" required="required">
+                                   <span asp-validation-for="@Model[i].SellPrice" class="small text-danger"></span>
+                            </div>
+                        </td>
+                            <td class="col-sm-1">
+                            <div class="editor-field">
+                                 <input asp-for="@Model[i].VehicleNumber" value="@Model[i].VehicleNumber" type="text"  >
+                                <span asp-validation-for="@Model[i].VehicleNumber" class="small text-danger"></span>
+                        </div>
+                        </td>
+                        <td class="col-sm-1">
+                        <div class="editor-field">                            
+                                <select asp-for="@Model[i].PurchaseCostPriceId" >
+                                <option value="">Choose cost price</option>
+                                @foreach (var costPrice in Model[i].PurchaseCostPrice)
+                                {
+                                     <option value="@costPrice.PurchaseCostPriceId">@costPrice.CostPrice</option>
+                                }
+                                </select>
+                        </div>
+                        </td>
+                    </tr>
+            }
+        </tbody>
+    </table>
+ <input type="submit" value="Save" class="btn btn-primary mt-3" />
+</form>

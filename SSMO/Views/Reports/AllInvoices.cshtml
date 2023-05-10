@@ -63,22 +63,22 @@
                 Invoice Number
             </th>
             <th>
+                Document type
+            </th>
+            <th>
                 Date
             </th>
             <th>
                 Customer
             </th>
             <th>
-                Customer OC No
+                Customer OC Numbers
             </th>
             <th>
                 Delivery Terms
             </th>
             <th>
                 Invoice Amount
-            </th>
-            <th>
-                Supplier
             </th>
             <th>
                 Credit Note to Invoice N
@@ -97,6 +97,9 @@
                             <th>
                         @order.DocumentNumber
                             </th>
+                        <th>
+                        @order.DocumentType
+                        </th>
                             <th>
                         @order.Date
                             </th>
@@ -104,7 +107,10 @@
                         @order.CustomerName
                             </th>
                             <th>
-                        @order.OrderConfirmationNumber
+                        @foreach (var item in order.CustomerOrders)
+                        {
+                            @item.OrderConfirmationNumber <br />
+                        }
                             </th>
                             <th>
                         @order.Incoterms
@@ -113,16 +119,25 @@
                         @order.TotalAmount
                             </th>
                             <th>
-                        @order.SupplierName
-                            </th>
-                            <th>
                         @order.CreditToInvoiceNumber
                             </th>
                             <th>
                         @order.DebitToInvoiceNumber
                             </th>
                             <th><a asp-controller="Reports" asp-action="InvoiceDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a></th>
-                            <th> <a asp-controller="Reports" asp-action="EditInvoice" asp-route-id="@order.Id" class="btn btn-info mr-1">Edit</a> </th>
+                    @if(order.DocumentType == "Invoice")
+                    {
+                                    <th> <a asp-controller="Reports" asp-action="EditInvoice" asp-route-id="@order.Id" asp-route-documentType="@order.DocumentType" class="btn btn-info mr-1">Edit</a> </th>
+                    }
+                    else if(order.DocumentType == "CreditNote")
+                    {
+                                    <th> <a asp-controller="Reports" asp-action="EditCreditNote" asp-route-id="@order.Id" asp-route-documentType="@order.DocumentType" class="btn btn-info mr-1">Edit</a> </th>
+                    }
+                    else
+                    {
+                                    <th> <a asp-controller="Reports" asp-action="EditDebitNote" asp-route-id="@order.Id" asp-route-documentType="@order.DocumentType" class="btn btn-info mr-1">Edit</a> </th>
+                    }
+                    
                         </tr>
             }  
         }                     

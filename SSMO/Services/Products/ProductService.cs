@@ -7,10 +7,15 @@ using Microsoft.EntityFrameworkCore;
 using SSMO.Data;
 using SSMO.Data.Enums;
 using SSMO.Data.Models;
+using SSMO.Models.Descriptions;
+using SSMO.Models.Documents.CreditNote;
 using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Grades;
 using SSMO.Models.Products;
+using SSMO.Models.Reports.CreditNote;
 using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
+using SSMO.Models.Sizes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -45,28 +50,28 @@ namespace SSMO.Services.Products
                 Pallets = model.Pallets,
                 SheetsPerPallet = model.SheetsPerPallet,
                 SupplierOrderId = supplierOrderId,
-                QuantityM3 = model.QuantityM3,
+                OrderedQuantity = model.Quantity,
                 Unit = Enum.Parse<Unit>(model.Unit),
                 TotalSheets = model.Pallets*model.SheetsPerPallet
             };
 
-            var dimensionArray = size.Split('/').ToArray();
-            var countArray = dimensionArray.Count();
-            decimal sum = 1M;
+            //var dimensionArray = size.Split('/').ToArray();
+            //var countArray = dimensionArray.Count();
+            //decimal sum = 1M;
 
-            for (int i = 0; i < countArray; i++)
-            {
-                sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 4);
-            }
+            //for (int i = 0; i < countArray; i++)
+            //{
+            //    sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 4);
+            //}
 
-            if (model.QuantityM3 != 0)
-            {
-                product.OrderedQuantity = model.QuantityM3;
-            }
-            else
-            {
-                product.OrderedQuantity = Math.Round(sum * model.Pallets * model.SheetsPerPallet, 4);
-            }
+            //if (model.QuantityM3 != 0)
+            //{
+            //    product.OrderedQuantity = model.QuantityM3;
+            //}
+            //else
+            //{
+            //    product.OrderedQuantity = Math.Round(sum * model.Pallets * model.SheetsPerPallet, 4);
+            //}
 
             product.QuantityAvailableForCustomerOrder = product.OrderedQuantity;
             product.QuantityLeftForPurchaseLoading = product.OrderedQuantity;
@@ -231,7 +236,7 @@ namespace SSMO.Services.Products
                 .ToList();
 
             foreach (var item in products)
-            {
+            { 
                 item.Description = GetDescriptionName(item.DescriptionId);
                 item.Grade = GetGradeName(item.GradeId);
                 item.Size = GetSizeName(item.SizeId);
@@ -317,7 +322,8 @@ namespace SSMO.Services.Products
             return products;       
         }
 
-        public void ClearProductQuantityWhenDealIsFinished(int productId)
+        public void ClearProductQuantityWhenDealIsFinished
+            (int productId, decimal quantity, decimal oldQuantity)
         {
             var product = dbContext.Products
                 .Where(id => id.Id == productId)
@@ -325,7 +331,7 @@ namespace SSMO.Services.Products
 
             if (product != null)
             {
-                product.LoadedQuantityM3 = 0;
+                product.QuantityAvailableForCustomerOrder += quantity - oldQuantity;
             }
 
             dbContext.SaveChanges();
@@ -458,18 +464,6 @@ namespace SSMO.Services.Products
                     Name = n.Name
                 }).ToList();
         }
-
-        public void ReleaseProductExcludedFromInvoice(int productId)
-        {
-            var product = dbContext.Products
-                .Where(i => i.Id == productId)
-                .FirstOrDefault();
-
-            product.LoadedQuantityM3 = product.OrderedQuantity;
-            product.DocumentId = null;
-            dbContext.SaveChanges();
-        }
-
         public void ResetToNullLoadingQuantityIfPurchaseIsChanged(int productId)
         {
             var product = dbContext.Products
@@ -485,7 +479,7 @@ namespace SSMO.Services.Products
                 .Where(i => i.Id == productId).FirstOrDefault();
 
             product.LoadedQuantityM3 = product.OrderedQuantity;
-            
+            dbContext.SaveChanges();
         }
         public ICollection<string> GetUnits()
         {
@@ -507,7 +501,7 @@ namespace SSMO.Services.Products
                 .ToList();
 
             var products = dbContext.CustomerOrderProductDetails
-                .Where(i => customerOrdersIdList.Contains(i.CustomerOrderId))
+                .Where(i => customerOrdersIdList.Contains(i.CustomerOrderId) && i.AutstandingQuantity > 0)
                 .ToList();
 
             var invoicedProducts = new List<ProductsForInvoiceViewModel>();
@@ -531,14 +525,17 @@ namespace SSMO.Services.Products
                         SellPrice = product.SellPrice,
                         FscCertificate = product.FscCertificate,
                         FscClaim = product.FscClaim,
-                        PurchaseCostPrice = new List<PurchaseProductCostPriceViewModel>()
+                        PurchaseCostPrice = new List<PurchaseProductCostPriceViewModel>() ,
+                        Descriptions = new List<DescriptionForInvoiceViewModel>(),
+                        Sizes = new List<SizeForInvoiceViewModel>(),
+                        Grades = new List<GradeForInvoiceViewModel>()
                     };
 
                     var descriptionId = dbContext.Products
                    .Where(i => i.Id == mainProduct.Id)
                    .Select(d => d.DescriptionId).FirstOrDefault();
 
-                    var gardeId = dbContext.Products
+                    var gradeId = dbContext.Products
                         .Where(i => i.Id == mainProduct.Id)
                         .Select(d => d.GradeId).FirstOrDefault();
 
@@ -548,8 +545,33 @@ namespace SSMO.Services.Products
 
 
                     productForInvoice.Description = GetDescriptionName(descriptionId);
-                    productForInvoice.Grade = GetGradeName(gardeId);
+                    productForInvoice.Grade = GetGradeName(gradeId);
                     productForInvoice.Size = GetSizeName(sizeId);
+                    productForInvoice.DescriptionId = descriptionId;
+                    productForInvoice.GradeId = gradeId;
+                    productForInvoice.SizeId = sizeId;
+
+                    var descriptions = new DescriptionForInvoiceViewModel
+                    {
+                        Id = descriptionId,
+                        Name = GetDescriptionName(descriptionId)
+                    };
+
+                    var grades = new GradeForInvoiceViewModel
+                    {
+                        Id = gradeId,
+                        Name = GetGradeName(gradeId)
+                    };
+
+                    var sizes = new SizeForInvoiceViewModel
+                    {
+                        Id = sizeId,
+                        Name = GetSizeName(sizeId)
+                    };
+
+                    productForInvoice.Descriptions.Add(descriptions);
+                    productForInvoice.Grades.Add(grades);
+                    productForInvoice.Sizes.Add(sizes);
 
                     var purchaseProductCostPrice = dbContext.PurchaseProductDetails
                         .Where(pi => pi.ProductId == mainProduct.Id)
@@ -564,7 +586,6 @@ namespace SSMO.Services.Products
                     invoicedProducts.Add(productForInvoice);
                 }
             }
-
             return invoicedProducts;           
         }
 
@@ -599,6 +620,128 @@ namespace SSMO.Services.Products
             order.Products.Add(product);
 
             dbContext.SaveChanges();
+        }
+
+        public bool AddNewProductsToEditedInvoice(int id, List<ProductsForInvoiceViewModel> products)
+        {
+            if(id == 0) return false;
+
+            var invoice = dbContext.Documents
+                .Where(i => i.Id == id)
+                .FirstOrDefault();
+
+            foreach (var product in products)
+            {
+                if(product.InvoicedQuantity == 0) continue;
+
+                var mainProduct = dbContext.Products
+                    .Where(co => co.Id == product.ProductId).FirstOrDefault();
+
+                mainProduct.SoldQuantity += product.InvoicedQuantity;
+
+                var customerOrderProduct = dbContext.CustomerOrderProductDetails
+                    .Where(i => i.ProductId == product.ProductId && i.CustomerOrderId == product.CustomerOrderId)
+                    .FirstOrDefault();
+
+                var customerOrder = dbContext.CustomerOrders
+                    .Where(i => i.Id == product.CustomerOrderId)
+                    .FirstOrDefault();
+
+                if(invoice.CustomerId != customerOrder.CustomerId)
+                {
+                    invoice.CustomerId= customerOrder.CustomerId;
+                }
+
+                customerOrderProduct.AutstandingQuantity -= product.InvoicedQuantity;
+
+                var purchaseProductDetail = dbContext.PurchaseProductDetails
+                    .Where(a => a.Id == product.PurchaseCostPriceId).FirstOrDefault();
+
+                var supplierOrder = dbContext.SupplierOrders
+                    .Where(a => a.Id == purchaseProductDetail.SupplierOrderId).FirstOrDefault();
+
+                var invoiceProduct = new InvoiceProductDetails
+                {
+                    CustomerOrderId = product.CustomerOrderId,
+                    Pallets = product.Pallets,
+                    SheetsPerPallet = product.SheetsPerPallet,
+                    FscCertificate = product.FscCertificate,
+                    FscClaim = product.FscClaim,
+                    ProductId = product.ProductId,
+                    PurchaseProductDetailsId = purchaseProductDetail.Id,
+                    SellPrice = product.SellPrice,
+                    Unit = product.Unit,
+                    VehicleNumber = product.VehicleNumber,
+                    InvoicedQuantity = product.InvoicedQuantity,
+                    BgPrice = product.SellPrice * invoice.CurrencyExchangeRateUsdToBGN,
+                    CustomerOrderProductDetailsId = customerOrderProduct.Id,
+
+                };
+
+                invoiceProduct.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                invoiceProduct.Amount = invoiceProduct.SellPrice * invoiceProduct.InvoicedQuantity;
+                invoiceProduct.BgAmount = invoiceProduct.BgPrice * invoiceProduct.InvoicedQuantity;
+               
+                invoice.SupplierOrderId = supplierOrder.Id;
+                invoice.InvoiceProducts.Add(invoiceProduct);
+                invoiceProduct.CustomerOrderProductDetailsId = customerOrderProduct.Id;
+
+                dbContext.SaveChanges();
+            }
+
+            foreach (var product in invoice.InvoiceProducts)
+            {
+                var purchaseProductDetailCostPrice = dbContext.PurchaseProductDetails
+                    .Where(a => a.Id == product.PurchaseProductDetailsId)
+                    .Select(p=>p.CostPrice)
+                    .FirstOrDefault();
+
+                product.DeliveryCost = CalculateDeliveryCostOfTheProductInCo
+                   (product.InvoicedQuantity, invoice.TotalQuantity, invoice.DeliveryTrasnportCost);
+                product.Profit = (product.SellPrice - purchaseProductDetailCostPrice) * 
+                    product.InvoicedQuantity - product.DeliveryCost;
+            }
+
+            dbContext.SaveChanges();
+            return true;
+        }
+
+        public List<ProductForCreditNoteViewModelPerInvoice> ProductsForCreditNotePerInvoice(int invoiceId)
+        {
+            if(invoiceId == 0) return null;
+
+            var products = dbContext.InvoiceProductDetails
+                .Where(i => i.InvoiceId == invoiceId)
+                .ToList();
+
+            var productsForEdit = new List<ProductForCreditNoteViewModelPerInvoice>();    
+
+            foreach (var product in products)
+            {
+                var mainProduct = dbContext.Products
+                    .Where(i => i.Id == product.ProductId)
+                    .FirstOrDefault();
+
+                productsForEdit.Add(new ProductForCreditNoteViewModelPerInvoice
+                {
+                    ProductId = product.ProductId,
+                    FscClaim = product.FscClaim,
+                    FscCertificate = product.FscCertificate,
+                    SellPrice = product.SellPrice,
+                    InvoicedQuantity = product.InvoicedQuantity,
+                    Pallets = product.Pallets,
+                    SheetsPerPallet = product.SheetsPerPallet,
+                    Unit = product.Unit,
+                    DescriptionId = mainProduct.DescriptionId,
+                    GradeId = mainProduct.GradeId,
+                    SizeId = mainProduct.SizeId,
+                    Description = GetDescriptionName(mainProduct.DescriptionId),
+                    Grade = GetGradeName(mainProduct.GradeId),
+                    Size = GetSizeName(mainProduct.SizeId)
+                });
+            }
+
+            return productsForEdit;
         }
     }
 }

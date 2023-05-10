@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace SSMO.Models.CustomerOrders
 {
-    public class CustomerOrderNumbersListView
+    public class CustomerOrderNumbersForInvoiceListView
     {
         public int OrderConfirmationNumber { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
@@ -25,6 +25,7 @@ namespace SSMO.Models.CustomerOrders
         public decimal NetWeight { get; set; }
         public string Incoterms { get; set; }
         public int Vat { get; set; }
+        public string Comment { get; set; }
         public List<int> SelectedCustomerOrders { get; set; }
         public List<ProductsForInvoiceViewModel> Products { get; set; }
         public int CustomerId { get; set; }

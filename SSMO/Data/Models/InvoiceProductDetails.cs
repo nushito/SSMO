@@ -44,7 +44,9 @@ namespace SSMO.Data.Models
         public decimal DebitNotePrice { get; set; }
         public decimal DebitNoteBgPrice { get; set; }
         public decimal DebitNoteBgAmount { get; set; }
-        public int PurchaseProductDetailsId { get; set; }
+        public int? PurchaseProductDetailsId { get; set; }
         public PurchaseProductDetails PurchaseProductDetails { get; set; }
+        public int? CustomerOrderProductDetailsId { get; set; }
+        public CustomerOrderProductDetails CustomerOrderProductDetails { get; set; }
     }
 }

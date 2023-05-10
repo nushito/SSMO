@@ -32,6 +32,7 @@ namespace SSMO.Models.Documents.Invoice
         public int? VAT { get; set; }
         public decimal VatAmount { get; set; }
         public decimal TotalAmount { get; set; }
+        public string Comment { get; set; }
         public ICollection<InvoiceBankDetailsViewModel> CompanyBankDetails { get; set; }
         public IEnumerable<ProductsForInvoiceModel> Products { get; set; }
     }

@@ -22,7 +22,7 @@ namespace SSMO.Services.Documents.Invoice
         public int CustomerOrderId { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
-        public decimal OrderedQuantity { get; set; }
+        public decimal InvoicedQuantity { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
         public decimal BgPrice { get; set; }

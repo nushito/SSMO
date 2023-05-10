@@ -10,6 +10,7 @@ namespace SSMO.Models.Reports.Invoice
 
         public int MyCompanyId { get; set; }
         public MyCompanyInvoiceDetailsModel Seller { get; set; }
+        public ICollection<CustomerOrderForInvoiceViewModel> CustomerOrders { get; set; }
         public int CustomerOrderId { get; set; }
         public int OrderConfirmationNumber { get; set; }
         public int CustomerId { get; set; }
@@ -26,6 +27,7 @@ namespace SSMO.Models.Reports.Invoice
         public string Swb { get; set; }
         public bool PaidStatus { get; set; }
         public decimal CurrencyExchangeRateUsdToBGN { get; set; }
+        public string Comment { get; set; }
         //  public ServiceOrder ServiceOrder { get; set; }
         public decimal Amount { get; set; }
         public int? VAT { get; set; }

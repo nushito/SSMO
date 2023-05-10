@@ -4,6 +4,7 @@ using SSMO.Data;
 using SSMO.Data.Models;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Products;
+using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using System;
 using System.Collections.Generic;
@@ -168,11 +169,15 @@ namespace SSMO.Services.CustomerOrderService
             return order.Id;
         }
 
-        public ICollection<int> AllCustomerOrderNumbers()
+        public ICollection<CustomerOrderForInvoiceViewModel> AllCustomerOrderNumbers()
         {
             return dbContext.CustomerOrders
                 .OrderByDescending(n=>n.OrderConfirmationNumber)
-                .Select(a => a.OrderConfirmationNumber)
+                .Select(a => new CustomerOrderForInvoiceViewModel 
+                {
+                    Id= a.Id,
+                    OrderConfirmationNumber= a.OrderConfirmationNumber,                
+                })
                 .ToList();
         }
 

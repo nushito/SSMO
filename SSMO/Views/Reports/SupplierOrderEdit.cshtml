@@ -4,7 +4,6 @@
 @{
     ViewBag.Title = "Edit Supplier Order";
 }
-
 <form method="post">
     <div class="row col-md-4">
         <label asp-for="Number"></label>
@@ -234,8 +233,8 @@
                     <tr id="tablerow0">                           
                         <td>
                             <div class="editor-field">
-                                            <select name="DescriptionId[0]" asp-for="NewProducts.ElementAt(i).DescriptionId" class="text-box single-line">
-                                    <option value="0">All</option>
+                                  <select name="DescriptionId[0]" asp-for="NewProducts.ElementAt(i).DescriptionId" class="text-box single-line">
+                                 <option value="0">All</option>
                         @foreach (var description in Model.NewProducts.ElementAt(i).Descriptions)
                         {
                                         <option value="@description.Id">@description.Name</option>
@@ -267,7 +266,7 @@
                         </td>                           
                             <td>
                             <div class="editor-field">
-                                            <input asp-for="NewProducts.ElementAt(i).FscClaim" class="text-box single-line" name="FscClaim[0]" value="" required="required">
+                                  <input asp-for="NewProducts.ElementAt(i).FscClaim" class="text-box single-line" name="FscClaim[0]" value="" required="required">
                             </div>
                         </td>
                         <td>

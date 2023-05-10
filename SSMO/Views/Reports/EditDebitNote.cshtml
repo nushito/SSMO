@@ -1,8 +1,6 @@
-﻿@model EditInvoiceViewModel
-@inject IInvoiceService invoiceService
-@using SSMO.Services.Reports
+﻿@model EditDebitNoteViewModel
 @{
-    ViewBag.Title = "Invoice for edit";  
+    ViewBag.Title = "Invoice for edit";
 }
 <form method="post">
     <div class="row">       
@@ -37,13 +35,25 @@
         <label asp-for="CurrencyExchangeRate">Currency Exchange Rate to BGN</label>
         <input asp-for="CurrencyExchangeRate" type="number"  min="0.00000" step="0.00001" class="form-control" >
     </div>
+
+    <div class="row col-md-4">
+        <label asp-for="CreditToInvoiceNumber">New Invoice N for Credit Note</label>
+        <input asp-for="CreditToInvoiceNumber" type="number"  min="0" step="1" class="form-control" >
+    </div>
+      <div class="row col-md-4">
+        <label asp-for="DebitToInvoiceNumber">New Invoice N for Debit Note</label>
+        <input asp-for="DebitToInvoiceNumber" type="number"  min="0" step="1" class="form-control" >
+    </div>
       <div class="row col-md-4">
         <label asp-for="Comment">Comment</label>
         <input asp-for="Comment" type="text" class="form-control">
     </div>
     
             <p><b>Edit Products</b></p>
-      <table>
+        
+            <partial name="_DebitNoteProductsForEdit" model="Model.Products"/>
+          
+      @*  <table>
         <thead>
             <tr>                       
                 <th>Description</th>
@@ -62,11 +72,11 @@
             @for (var i = 0; i < Model.Products.Count; i++)
             {
                             <tr>
-                              <input type="hidden" asp-for="@Model.Products[i].Id"/>
-                              <input type="hidden" asp-for="@Model.Products[i].ProductId"/>
-                                <td class="col-sm-1" scope="col">
+                                    <input type="hidden" asp-for="@Model.Products[i].Id"/>
+                                    <input type="hidden" asp-for="@Model.Products[i].ProductId"/>
+                                <td class="col-sm-1">
                                     <div class="editor-field">
-                                          <select asp-for="@Model.Products[i].DescriptionId" value="@Model.Products[i].DescriptionId">
+                                                    <select asp-for="@Model.Products[i].DescriptionId" value="@Model.Products[i].DescriptionId">
                                         <option value="">All</option>
                                 @foreach (var description in Model.Products[i].Descriptions)
                                 {
@@ -75,8 +85,8 @@
                                         </select>                                        
                                     </div>
                                 </td>
-                                    <td class="col-sm-1" scope="col">
-                                        <div class="editor-field" >
+                                <td class="col-sm-1">
+                                    <div class="editor-field">
                                                      <select asp-for="@Model.Products[i].GradeId" value="@Model.Products[i].GradeId">
                                          <option value="">All</option>
                                 @foreach (var grade in Model.Products[i].Grades)
@@ -86,7 +96,7 @@
                                         </select>  
                                             </div>
                                         </td>
-                                    <td class="col-sm-1" scope="col">
+                                <td class="col-sm-1">
                                     <div class="editor-field">
                                                       <select asp-for="@Model.Products[i].SizeId" value="@Model.Products[i].SizeId">
                                           <option value="">All</option>
@@ -97,61 +107,49 @@
                                         </select>  
                                     </div>
                                 </td>
-                                    <td class="col-sm-2" scope="col">
+                                <td class="col-sm-2">
                                     <div class="editor-field">
                                                 <input asp-for="@Model.Products[i].FscClaim" value="@Model.Products[i].FscClaim" type="text" class="form-control"/>
                                     </div>
                                 </td>
-                                    <td class="col-sm-2" scope="col">
+                                <td class="col-sm-2">
                                     <div class="editor-field">
                                                <input asp-for="@Model.Products[i].FscSertificate" value="@Model.Products[i].FscSertificate" type="text" class="form-control"/>
                                     </div>
                                 </td>
-                                            <td class="col-sm-2" scope="col">
+                                        <td class="col-sm-2">
                                     <div class="editor-field">
-                                        <input asp-for="@Model.Products[i].Unit" value="@Model.Products[i].Unit" type="text" class="form-control"/>
+                                                <input asp-for="@Model.Products[i].Unit" value="@Model.Products[i].Unit" type="text" class="form-control"/>
                                     </div>
                                 </td>
-                                <td class="col-sm-2" scope="col">
-                                    <div class="editor-field" scope="col">
-                                       <input asp-for="@Model.Products[i].InvoicedQuantity" value="@Model.Products[i].InvoicedQuantity" type="number" class="form-control"/>
+                            <td class="col-sm-2">
+                                <div class="editor-field">
+                                                 <input asp-for="@Model.Products[i].InvoicedQuantity" value="@Model.Products[i].InvoicedQuantity" type="number" class="form-control"/>
                                 </div>
                             </td>
-                                  <td class="col-sm-2" scope="col">
+                              <td class="col-sm-2">
                                 <div class="editor-field">
                                            <input asp-for="@Model.Products[i].SellPrice" value="@Model.Products[i].SellPrice" type="number" class="form-control"/>
                                         <span asp-validation-for="@Model.Products[i].SellPrice" class="small text-danger"></span>
                                 </div>
                             </td>
-                                <td class="col-sm-2" scope="col" width="150">
+                            <td class="col-sm-2">
                                 <div class="editor-field">
                                                 <input asp-for="@Model.Products[i].Pallets" value="@Model.Products[i].Pallets" type="number" class="form-control"/>
                                         <span asp-validation-for="@Model.Products[i].Pallets" class="small text-danger"></span>
                                 </div>
                             </td>
-                                <td class="col-sm-2" scope="col">
+                            <td class="col-sm-2">
                                 <div class="editor-field">
-                                   <input asp-for="@Model.Products[i].SheetsPerPallet" value="@Model.Products[i].SheetsPerPallet" type="number" class="form-control"/>
-                                  <span asp-validation-for="@Model.Products[i].SheetsPerPallet" class="small text-danger"></span>
+                                                <input asp-for="@Model.Products[i].SheetsPerPallet" value="@Model.Products[i].SheetsPerPallet" type="number" class="form-control"/>
+                                        <span asp-validation-for="@Model.Products[i].SheetsPerPallet" class="small text-danger"></span>
                                 </div>
                             </td>
                           </tr>                    
             }
           </tbody>
- </table>
- <div class="editor-field">
-       <select name="CustomerId" id="CustomerId" asp-for="CustomerId" >
-           <option value="">All</option>
-            @foreach (var customer in invoiceService.CustomersForeEditInvoice())
-            {
-                <option value="@customer.Id">@customer.Name</option>
-            }
-       </select>
-   </div>
-   <div class="row col-md-4 ">           
-                 <label asp-for="SelectedCustomerOrders" class="control-label"> Select Customer Order</label>
-                 <select multiple asp-for="SelectedCustomerOrders" class="form-control" id="CustomerOrderNumber" name="SelectedCustomerOrders" asp-items="@(new SelectList(string.Empty,"CustomerOrderId", "CustomerOrderNumber"))"></select>               
-     </div>
+ </table>*@
+   
     @*<div class="form-group col-md-4">
             <label>Choose/Add New CustomerOrder</label>
             <select multiple asp-for="CustomerOrdersId" class="form-control">
@@ -165,13 +163,13 @@
      </div>*@
   <div class="row">
        <td class="col"> <input type="submit" name="Command" value="Save" class="btn btn-primary mt-3" /></td> 
-       <td> </td>
+       <td></td>
        <td class="col"><input type="submit" name="Command" value="Add New Products" class="btn btn-primary mt-3" /></td> 
     </div>
 </form>
 
     
- <script type="text/javascript">
+        <script type="text/javascript">
     $(function () {
         $("#datepicker").datepicker();
     });
@@ -179,39 +177,4 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-        <script type="text/javascript">
-                    $(document).ready
-                    (
-                            function() 
-                            {
-                            //Dropdownlist Selectedchange event
-                            $("#CustomerId").change(function() {                        
-                                $("#CustomerOrderNumber option").remove();
-                                var customerId = $(this).val(); 
-                                $.ajax({
-                                    type: 'GET',
-                                    url: "/Documents/GetCustomerOrders", 
-                                    dataType: 'json',
-                                    data: { id: customerId },
-                                    success: function(selectedCustomerOrders) {                           
-                                        $("#CustomerOrderNumber").append('<option value="' + "0" + '">' + "Select CustomerOrderNumber" + '</option>');
-                                        debugger;
-                                        for (var i = 0; i < selectedCustomerOrders.length; i++) 
-                                        {
-                                           $("#CustomerOrderNumber").append('<option value="' + selectedCustomerOrders[i].CustomerOrderId + '">' + selectedCustomerOrders[i].CustomerOrderNumber + '</option>');
-                                        }     
-
-                                        debugger;                          
-                                   },
-                                    error: function(ex) {
-                                        alert('Failed to retrieve selectedCustomerOrders' + ex);
-                                    }
-                                });
-                                return false;
-                            })
-                            }
-
-                        );
-
-             </script>
 }

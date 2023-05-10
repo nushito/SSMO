@@ -1,0 +1,86 @@
+﻿@model List<EditProductForDebitNoteViewModel>
+
+    <table>
+            <thead>
+                     <tr>                       
+                            <th>Description</th>
+                            <th>Size</th>
+                            <th>Grade</th>
+                            <th>FSC Claim</th>
+                            <th>FSC Certificate</th>
+                            <th>Unit</th>
+                            <th>Quantity</th>  
+                            <th>Unit Price</th>                                                                                
+                        </tr>
+            </thead>
+            <tbody>
+        @for (var i = 0; i < Model.Count; i++)
+        {
+            <input type="hidden" asp-for="@Model[i].Id"/>
+             <input type="hidden" asp-for="@Model[i].ProductId"/>
+                    <tr>
+                             <input type="hidden" asp-for="@Model[i].Id"/>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                    <select asp-for="@Model[i].DescriptionId" value="@Model[i].DescriptionId">
+                                <option value="">All</option>
+            @foreach (var description in Model[i].Descriptions)
+            {
+                                                <option value="@description.Id">@description.Name</option>
+            }
+                                </select>                                        
+                            </div>
+                        </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                            <select asp-for="@Model[i].GradeId" value="@Model[i].GradeId">
+                                    <option value="">All</option>
+            @foreach (var grade in Model[i].Grades)
+            {
+                         <option value="@grade.Id">@grade.Name</option>
+            }
+                                </select>  
+                                    </div>
+                                </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                        <select asp-for="@Model[i].SizeId" value="@Model[i].SizeId">
+                                    <option value="">All</option>
+            @foreach (var size in Model[i].Sizes)
+            {
+                                                <option value="@size.Id">@size.Name</option>
+            }
+                                </select>  
+                            </div>
+                        </td>
+                        <td class="col-sm-1">
+                                    <div class="editor-field">
+                                                <input asp-for="@Model[i].FscClaim" value="@Model[i].FscClaim" type="text" class="form-control"/>
+                                    </div>
+                                </td>
+                                <td class="col-sm-2">
+                                    <div class="editor-field">
+                                                    <input asp-for="@Model[i].FscSertificate" value="@Model[i].FscSertificate" type="text" class="form-control"/>
+                                    </div>
+                                </td>
+                                        <td class="col-sm-2">
+                                    <div class="editor-field">
+                                                <input asp-for="@Model[i].Unit" value="@Model[i].Unit" type="text" class="form-control"/>
+                                    </div>
+                                </td>   
+                            <td class="col-sm-2">
+                                        <div class="editor-field">
+                                            <input asp-for="@Model[i].DebitNoteQuantity" value="@Model[i].DebitNoteQuantity" type="text" class="form-control"/>
+                                        </div>
+                                </td>
+                                <td class="col-sm-2">
+                                    <div class="editor-field">
+                                            <input asp-for="@Model[i].DebitNotePrice" value="@Model[i].DebitNotePrice" type="text" class="form-control"/>
+                                    </div>
+                                </td>
+
+                    </tr>                    
+        }
+            </tbody>
+
+        </table>

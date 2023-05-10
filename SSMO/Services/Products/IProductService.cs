@@ -1,5 +1,7 @@
-﻿using SSMO.Models.Documents.Invoice;
+﻿using SSMO.Models.Documents.CreditNote;
+using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Products;
+using SSMO.Models.Reports.CreditNote;
 using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using System;
@@ -35,9 +37,7 @@ namespace SSMO.Services.Products
         public string GetGradeName(int id);
         public string GetSizeName(int id);
         public decimal CalculateDeliveryCostOfTheProductInCo(decimal quantity, decimal totalQuantity, decimal deliveryCost);
-
-        public void ClearProductQuantityWhenDealIsFinished(int productId);
-        public void ReleaseProductExcludedFromInvoice(int productId);
+        public void ClearProductQuantityWhenDealIsFinished(int productId, decimal quantity, decimal oldQuantity);
         public ProductsAvailabilityCollectionViewModel ProductsOnStock
             (int? descriptionId, int? gradeId, int? sizeId, int currentPage, int productsPerPage);
         public ICollection<DescriptionForProductSearchModel> DescriptionIdAndNameList();
@@ -46,8 +46,9 @@ namespace SSMO.Services.Products
         public void ResetToNullLoadingQuantityIfPurchaseIsChanged(int productId);
         public void NewLoadingQuantityToEditPurchase(int productId, int purchaseId);
         public ICollection<string> FscClaimList();
-
         public List<ProductsForInvoiceViewModel> ProductsForInvoice(List<int> customerOrders);
-
+        public bool AddNewProductsToEditedInvoice(int id, List<ProductsForInvoiceViewModel> products);
+       // public List<EditProductForCompanyInvoicesViewModel> NewProductsForEditInvoice(List<int> customerOrders);
+       public List<ProductForCreditNoteViewModelPerInvoice> ProductsForCreditNotePerInvoice(int invoiceId);
     }
 }

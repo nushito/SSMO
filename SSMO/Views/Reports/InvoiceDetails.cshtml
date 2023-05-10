@@ -88,7 +88,9 @@
             </ul>
           </div>
         </div>
-
+        <div>
+            <p>@Model.Comment</p>
+        </div>
         <div class="row my-2 mx-1 justify-content-center">
           <table class="table table-striped table-borderless">
             <thead style="background-color:#84B0CA ;" class="text-white">
@@ -133,8 +135,8 @@
                                     else
                                     {
                                         <td>@product.Unit</td>
-                                        <td>@product.OrderedQuantity</td>
-                                        <td>@product.Price</td>
+                                        <td>@product.InvoicedQuantity</td>
+                                        <td>@product.SellPrice</td>
                                         <td>@product.Amount.ToString("N2")</td>                                        
                                     }                                   
                                 </tr>

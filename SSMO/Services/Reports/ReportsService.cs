@@ -274,7 +274,6 @@ namespace SSMO.Services.Reports
                         productsPerCorder.Amount = Math.Round(product.SellPrice * product.Quantity, 4);
                     }
                     order.Amount += productsPerCorder.Amount;
-                
                 }
             }
 
@@ -551,33 +550,31 @@ namespace SSMO.Services.Reports
                 .Where(type => type.DocumentType == DocumentTypes.Invoice || 
                        type.DocumentType == DocumentTypes.CreditNote || 
                        type.DocumentType == DocumentTypes.DebitNote)
-                .Where(m => m.MyCompanyId == companyId);
+                .Where(m => m.MyCompanyId == companyId).OrderByDescending(d=>d.DocumentNumber);
            
             var invoiceDetailsCollection = invoices.ProjectTo<InvoiceCollectionViewModel>(this.mapper).ToList();
-          
+
             var collection = new InvoiceReportModel
             {
                 InvoiceCollection = invoiceDetailsCollection.Skip((currentpage - 1) * invoicesPerPage).Take(invoicesPerPage),
                 TotalInvoices = invoiceDetailsCollection.Count(),
                 CurrentPage = currentpage,
                 InvoicesPerPage= invoicesPerPage
-
             };
 
             foreach (var invoice in collection.InvoiceCollection)
             {
-                var customerOrderNumber = customerOrderService.CustomerOrderNumberById(invoice.CustomerOrderId);
-                var customerName = dbcontext.Customers
-                    .Where(i => i.Id == invoice.CustomerId)
-                    .Select(n => n.Name)
-                    .FirstOrDefault();
-
-                var supplierName = supplierService.SupplierNameBySupplierOrderId(invoice.SupplierOrderId);
-                invoice.SupplierName = supplierName;
-                invoice.OrderConfirmationNumber = customerOrderNumber;
-                invoice.CustomerName = customerName;
+                foreach (var order in invoice.CustomerOrders)
+                {
+                    var customerOrderNumber = customerOrderService.CustomerOrderNumberById(order.Id);
+                    var customerName = dbcontext.Customers
+                        .Where(i => i.Id == invoice.CustomerId)
+                        .Select(n => n.Name)
+                        .FirstOrDefault();
+                    
+                    invoice.CustomerName = customerName;
+                }
             }
-
             return collection;
         }
 
@@ -587,24 +584,22 @@ namespace SSMO.Services.Reports
                 .Where(i => i.Id == id);
 
             var invoiceDetails = invoice.ProjectTo<InvoiceDetailsViewModel>(mapper).FirstOrDefault();
-
-            invoiceDetails.OrderConfirmationNumber = dbcontext.CustomerOrders
-                .Where(i=>i.Id == invoiceDetails.CustomerOrderId)
-                .Select(num=>num.OrderConfirmationNumber) 
-                .FirstOrDefault();
-
+          
             if (invoice == null) return null;
 
-            var products = dbcontext.Products
-                .Where(inv => inv.DocumentId == id);
+            var products = dbcontext.InvoiceProductDetails
+                .Where(inv => inv.InvoiceId == id);
 
             var productsDetails = products.ProjectTo<InvoiceProductsDetailsViewModel>(mapper).ToList();
 
             foreach (var product in productsDetails)
             {
-                product.Description = productService.GetDescriptionName(product.DescriptionId);
-                product.Size = productService.GetSizeName(product.SizeId);
-                product.Grade = productService.GetGradeName(product.GradeId);
+                var mainProduct = dbcontext.Products
+                    .Where(i => i.Id == product.ProductId).FirstOrDefault();
+
+                product.Description = productService.GetDescriptionName(mainProduct.DescriptionId);
+                product.Size = productService.GetSizeName(mainProduct.SizeId);
+                product.Grade = productService.GetGradeName(mainProduct.GradeId);
             }
 
             invoiceDetails.Products = productsDetails;

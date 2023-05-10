@@ -4,6 +4,7 @@ namespace SSMO.Models.Reports.Invoice
 {
     public class InvoiceProductsDetailsViewModel
     {
+        public int ProductId { get; set; }
         public int DescriptionId { get; set; }
         public string Description { get; set; }
         public int SizeId { get; set; }
@@ -14,8 +15,8 @@ namespace SSMO.Models.Reports.Invoice
         public string FSCSertificate { get; set; }
         public string Unit { get; set; }
         public int DocumentId { get; set; }
-        public decimal OrderedQuantity { get; set; }
-        public decimal Price { get; set; }
+        public decimal InvoicedQuantity { get; set; }
+        public decimal SellPrice { get; set; }
         public decimal PurchaseAmount { get; set; }
         public decimal Amount { get; set; }
         public decimal CreditNoteQuantity { get; set; }

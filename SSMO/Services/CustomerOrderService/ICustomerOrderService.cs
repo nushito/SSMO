@@ -1,5 +1,6 @@
 ﻿using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Products;
+using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using System;
 using System.Collections.Generic;
@@ -45,7 +46,7 @@ namespace SSMO.Services.CustomerOrderService
         public bool AnyCustomerOrderExist();
 
         public List<CustomerOrdersJsonList> CustomerOrderCollection(int customerorderId);
-        public ICollection<int> AllCustomerOrderNumbers();
+        public ICollection<CustomerOrderForInvoiceViewModel> AllCustomerOrderNumbers();
 
         public EditCustomerOrderPaymentModel GetCustomerOrderPaymentForEdit(int orderConfirmationNumber);
         public bool EditCustomerOrdersPayment(int orderConfirmationNumber, bool paidStatus, decimal paidAdvance);

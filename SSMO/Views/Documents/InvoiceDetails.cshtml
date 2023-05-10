@@ -1,8 +1,7 @@
-﻿@model CustomerOrderNumbersListView
+﻿@model CustomerOrderNumbersForInvoiceListView
 
 @{
-    ViewBag.Title = "Select Customer Order";
-    
+    ViewBag.Title = "Select Customer Order";    
 }
 
 <form method="post">
@@ -11,7 +10,6 @@
         <label asp-for="Number">Fill First Invoice Number</label>
         <input asp-for="Number" type="text" class="form-control" class="form-control">
         </div>
-
     }
        <div>
         <input type="hidden" value="@Model.CustomerId" asp-for="@Model.CustomerId">
@@ -79,6 +77,11 @@
         <label asp-for="CurrencyExchangeRateUsdToBGN">Currency Exchange Rate to BGN</label>
         <input asp-for="CurrencyExchangeRateUsdToBGN" type="number"  min="0.00000" step="0.00001" class="form-control" >
     </div>
+     <div class="row col-md-4">        
+               <label asp-for="Comment">Comment</label>
+        <input asp-for="Comment" type="text"  class="form-control" />
+        
+    </div>
     <hr />
    <table class="table table-bordered">
         <thead class="thead-light">
@@ -114,23 +117,40 @@
                 <tr>
                     <td class="col-sm-1">
                         <div class="editor-field">
-                           <input asp-for="@Model.Products[i].Description" value="@Model.Products[i].Description" type="text"  required="required">
+                          <select asp-for="@Model.Products[i].DescriptionId" value="@Model.Products[i].Description">
+                               <option value="@Model.Products[i].Description">All</option>
+                                @foreach (var description in Model.Products[i].Descriptions)
+                                {
+                                       <option value="@description.Id">@description.Name</option>
+                                }
+                          </select>                          
                           <span asp-validation-for="@Model.Products[i].Description" class="small text-danger"></span>
                        </div>
                     </td>
                     <td class="col-sm-1">
                         <div class="editor-field">
-                            <input asp-for="@Model.Products[i].Size" value="@Model.Products[i].Size" type="text"  required="required">
+                               <select asp-for="@Model.Products[i].SizeId" value="@Model.Products[i].Size">
+                                   <option value="@Model.Products[i].Size">All</option>
+                                @foreach (var size in Model.Products[i].Sizes)
+                                {
+                                               <option value="@size.Id">@size.Name</option>
+                                }
+                                </select>
                              <span asp-validation-for="@Model.Products[i].Size" class="small text-danger"></span>
                         </div>
                     </td>
                     <td class="col-sm-1">
                         <div class="editor-field">
-                            <input asp-for="@Model.Products[i].Grade" value="@Model.Products[i].Grade" type="text"  required="required">
+                               <select asp-for="@Model.Products[i].GradeId" value="@Model.Products[i].Grade">
+                                     <option value="@Model.Products[i].Grade">All</option>
+                                @foreach (var grade in Model.Products[i].Grades)
+                                {
+                                      <option value="@grade.Id">@grade.Name</option>
+                                }
+                               </select>
                             <span asp-validation-for="@Model.Products[i].Grade" class="small text-danger"></span>
                         </div>
                     </td>
-
                     <td class="col-sm-1">
                         <div class="editor-field">                              
                           <input asp-for="@Model.Products[i].FscClaim" value="@Model.Products[i].FscClaim" required="required">

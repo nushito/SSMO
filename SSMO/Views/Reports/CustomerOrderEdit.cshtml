@@ -112,6 +112,7 @@
                 @for (int i = 0; i < Model.Products.Count; i++)
                 {
                       <tr>
+                              <input type="hidden" asp-for="@Model.Products[i].Id" value="@Model.Products[i].Id">
                             <td class="col-sm-1">
                                 <div class="editor-field">
                                    <select asp-for="@Model.Products[i].Description">
@@ -219,7 +220,8 @@
     }
     @* <input type="hidden" name="customerorderid" value="@model.id" />*@
     <div class="row">
-       <td class="col"> <input type="submit" name="Command" value="Save" class="btn btn-primary mt-3" /></td>
+       <td class="col"> <input type="submit" name="Command" value="Save" class="btn btn-primary mt-3" /></td> 
+       <td></td>
        <td class="col"><input type="submit" name="Command" value="Add More Products" class="btn btn-primary mt-3" /></td> 
     </div>
   <br />

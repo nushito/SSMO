@@ -40,6 +40,14 @@ using iTextSharp.tool.xml.parser;
 using ClosedXML.Excel;
 using SSMO.Models.Reports.FSC;
 using iTextSharp.text.pdf.qrcode;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using SSMO.Models.Documents.CreditNote;
+using System.Runtime.CompilerServices;
+using SSMO.Services.Documents.Credit_Note;
+using SSMO.Services.Documents.DebitNote;
+using SSMO.Models.Documents.DebitNote;
+using SSMO.Models.Reports.CreditNote;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace SSMO.Controllers
 {
@@ -58,13 +66,16 @@ namespace SSMO.Controllers
 		private readonly ISupplierOrderService supplierOrderService;
 		private readonly IViewRenderService viewRenderService;
 		private readonly IHtmlToPdfConverter htmlToPdfConverter;
+		private readonly ICreditNoteService creditNoteService;
+		private readonly IDebitNoteService debitNoteService;
 	
 		public ReportsController(IReportsService service,
 		   ICustomerService customerService, ISupplierService supplierService,
 		   ICurrency currency, IMycompanyService mycompanyService, IProductService productService,
 		   ICustomerOrderService customerOrderService, IStatusService statusService, IInvoiceService invoiceService,
 		   IPurchaseService purchaseService, ISupplierOrderService supplierOrderService,
-		   IViewRenderService viewRenderService, IHtmlToPdfConverter htmlToPdfConverter) //IWebHostEnvironment environment)
+		   IViewRenderService viewRenderService, IHtmlToPdfConverter htmlToPdfConverter,
+		   ICreditNoteService creditNoteService, IDebitNoteService debitNoteService) //IWebHostEnvironment environment)
 		{
 			this.reportService = service;
 			this.customerService = customerService;
@@ -79,7 +90,8 @@ namespace SSMO.Controllers
 			this.supplierOrderService = supplierOrderService;
 			this.viewRenderService = viewRenderService;
 			this.htmlToPdfConverter = htmlToPdfConverter;
-
+			this.creditNoteService = creditNoteService;
+			this.debitNoteService = debitNoteService;
 		}
 		public IActionResult AllCustomerOrders(CustomerOrderReportAll model)
 		{
@@ -786,7 +798,7 @@ namespace SSMO.Controllers
         }
 
         [HttpGet]
-		public IActionResult EditInvoice(int id)
+		public IActionResult EditInvoice(int id, string documentType)
         {
 			string userId = this.User.UserId();
 			var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
@@ -795,12 +807,22 @@ namespace SSMO.Controllers
 				return BadRequest();
 			}
 
-			var invoiceToEdit = invoiceService.ViewEditInvoice(id);
+			if (!ModelState.IsValid)
+			{
+				new EditInvoiceViewModel
+				{					
+					DocumentType = documentType,
+					Products = new List<EditProductForCompanyInvoicesViewModel>(),
+					Customers = invoiceService.CustomersForeEditInvoice()
+				};
+			}
+			var invoiceToEdit = invoiceService.ViewEditInvoice(id);			
 			return View(invoiceToEdit);
 		}
 
 		[HttpPost]
-		public IActionResult EditInvoice(int id, EditInvoiceViewModel model)
+		public IActionResult EditInvoice(int id, EditInvoiceViewModel model, 
+			string documentType, string command)
 		{
 			//TODO Can i make this global
 			string userId = this.User.UserId();
@@ -809,17 +831,266 @@ namespace SSMO.Controllers
 			{
 				return BadRequest();
 			}
-			var checkEditableInvoice = invoiceService.EditInvoice
-				(id, model.CurrencyExchangeRate, model.Date, model.GrossWeight, model.NetWeight,
-				model.DeliveryCost, model.OrderConfirmationNumber, model.TruckNumber, 
-				model.CreditToInvoiceNumber,model.DebitToInvoiceNumber, model.Products);
 
-			if(!checkEditableInvoice) return BadRequest();
+            if (!ModelState.IsValid)
+            {
+                new EditInvoiceViewModel
+                {                  
+                    DocumentType = documentType,
+                    Products = new List<EditProductForCompanyInvoicesViewModel>(),
+                    Customers = invoiceService.CustomersForeEditInvoice()
+                };
+            }
+
+            var checkEditableInvoice = invoiceService.EditInvoice
+                (id, model.CurrencyExchangeRate, model.Date, model.GrossWeight, model.NetWeight,
+                model.DeliveryCost, model.OrderConfirmationNumber, model.TruckNumber,
+               model.Products, model.Incoterms, model.Comment);
+
+            if (!checkEditableInvoice) return BadRequest();
+
+            if (command == "Add New Products")
+			{
+                return RedirectToAction("NewProductsForEditInvoice", new { Id = id, selectedOrders = model.SelectedCustomerOrders });
+            }
 
             return RedirectToAction("InvoiceDetails", new { Id = id });
 		}
 
-		public IActionResult InvoiceDetails(int id)
+		[HttpGet]
+		public IActionResult NewProductsForEditInvoice(int id, List<int> selectedOrders)
+		{
+            string userId = this.User.UserId();
+            var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+            if (!mycompaniesUserId.Contains(userId))
+            {
+                return BadRequest();
+            }
+
+			var newProducts = productService.ProductsForInvoice(selectedOrders);
+
+            return View(newProducts);
+        }
+
+		[HttpPost]
+		public IActionResult NewProductsForEditInvoice(int id, List<int> selectedOrders,
+            List<ProductsForInvoiceViewModel> products)
+		{
+            string userId = this.User.UserId();
+            var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+            if (!mycompaniesUserId.Contains(userId))
+            {
+                return BadRequest();
+            }
+
+			var addNewProductsToInvoiceForEdit = productService.AddNewProductsToEditedInvoice(id, products);
+
+			if(addNewProductsToInvoiceForEdit == false)
+			{
+				return BadRequest();
+			}
+
+            return RedirectToAction("InvoiceDetails", new { Id = id });
+        }
+
+		public IActionResult EditCreditNote(int id, string documentType)
+		{
+            string userId = this.User.UserId();
+            var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+            if (!mycompaniesUserId.Contains(userId))
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                new EditCreditNoteViewModel
+                {                    
+                    DocumentType = documentType,
+                    Products = new List<EditProductForCreditNoteViewModel>(),
+					InvoiceNumbers = new List<InvoiceNumbersForEditedCreditNoteViewModel>()
+                };
+            }
+            var invoiceToEdit = creditNoteService.ViewCreditNoteForEdit(id);
+			invoiceToEdit.InvoiceNumbers = creditNoteService.InvoiceNumbers();
+
+            return View(invoiceToEdit);            
+		}
+
+		[HttpPost]
+        public IActionResult EditCreditNote(int id, string documentType, string command, EditCreditNoteViewModel model)
+        {
+            string userId = this.User.UserId();
+            var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+            if (!mycompaniesUserId.Contains(userId))
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                new EditCreditNoteViewModel
+				{
+                    DocumentType = documentType,
+                    Products = new List<EditProductForCreditNoteViewModel>(),
+                    InvoiceNumbers = new List<InvoiceNumbersForEditedCreditNoteViewModel>()
+                };
+            }
+
+			var editcreditnote = creditNoteService.EditCreditNote
+				(id, model.Date, model.Incoterms, model.TruckNumber, model.NetWeight, 
+				model.GrossWeight, model.DeliveryCost, model.CurrencyExchangeRate, model.Comment,model.Products);
+
+			if(editcreditnote == false)
+			{
+				return BadRequest();
+			}
+
+			if (command == "Add New/More Products")
+			{
+				return RedirectToAction("AddMoreProductsToCreditNote", new {id = id, invoiceNumberId= model.InvoiceNumberId});
+			}
+
+            return View();
+        }
+
+		[HttpGet]
+		public IActionResult AddMoreProductsToCreditNote
+            (int id, int invoiceNumberId)
+		{
+            string userId = this.User.UserId();
+            var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+
+            if (!mycompaniesUserId.Contains(userId))
+            {
+                return BadRequest();
+            }
+
+			if (!ModelState.IsValid)
+			{
+				new EditedCreditNoteNewProductViewModel() 
+				{
+					CreditNoteId = id,
+                    InvoiceNumberId = invoiceNumberId,
+                    NewProducts = new List<NewProductsForCreditNoteViewModel>(),
+                    Products = new List<ProductForCreditNoteViewModelPerInvoice>()
+                };
+			}
+
+			var editedModel = new EditedCreditNoteNewProductViewModel();
+
+            var products = productService.ProductsForCreditNotePerInvoice(invoiceNumberId);
+
+            editedModel.Products = products;
+            editedModel.NewProducts = new List<NewProductsForCreditNoteViewModel>();
+            editedModel.CreditNoteId = id;
+            editedModel.InvoiceNumberId = invoiceNumberId;
+
+            return View(editedModel);
+		}
+
+		[HttpPost]
+		public IActionResult AddMoreProductsToCreditNote
+            (int id, EditedCreditNoteNewProductViewModel model, int invoiceNumberId, IFormCollection collection)
+		{
+            string userId = this.User.UserId();
+            var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+
+            if (!mycompaniesUserId.Contains(userId))
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                new EditedCreditNoteNewProductViewModel()
+                {
+                    CreditNoteId = id,
+                    InvoiceNumberId = invoiceNumberId,
+                    NewProducts = new List<NewProductsForCreditNoteViewModel>(),
+                    Products = new List<ProductForCreditNoteViewModelPerInvoice>()
+                };
+            }
+
+			model.NewProducts = new List<NewProductsForCreditNoteViewModel>();
+            int loopsNum = 0;
+
+            foreach (var key in collection.Keys)
+            {
+                if (key.StartsWith("Quantity"))
+                {
+                    loopsNum++;
+                }
+            }
+
+            if (loopsNum > 0)
+            {
+                for (int i = 1; i <= loopsNum; i++)
+                {
+                    var description = collection["DescriptionId[" + i + "]"];
+                    var grade = collection["GradeId[" + i + "]"];
+                    var size = collection["SizeId[" + i + "]"];
+                    var unit = collection["Unit[" + i + "]"];
+                    var price = collection["CreditNotePrice[" + i + "]"].ToString();
+                    var fscClaim = collection["FscClaim[" + i + "]"];
+                    var fscCertificate = collection["FscCertificate[" + i + "]"];
+                    var pallets = collection["CreditNotePallets[" + i + "]"];
+                    var sheetsPerPallet = collection["CreditNoteSheetsPerPallet[" + i + "]"];
+                    var quantity = collection["CreditNoteQuantity[" + i + "]"].ToString();
+                    var product = new NewProductsForCreditNoteViewModel
+                    {
+                        DescriptionId = int.Parse(description.ToString()),
+                        GradeId = int.Parse(grade.ToString()),
+                        SizeId = int.Parse(size.ToString()),
+                        Unit = (Data.Enums.Unit) Enum.Parse(typeof(Data.Enums.Unit), unit,true),
+                        CreditNotePrice = decimal.Parse(price.ToString()),
+                        FscClaim = fscClaim,
+                        FscCertificate = fscCertificate,
+                        CreditNotePallets = int.Parse(pallets.ToString()),
+                        CreditNoteSheetsPerPallet = int.Parse(sheetsPerPallet.ToString()),
+                        CreditNoteQuantity = decimal.Parse(quantity.ToString()),
+                        CreditNoteId = id
+                    };
+
+                    model.NewProducts.Add(product);
+                }
+            }
+
+			var addProductsToEditCredtNote = creditNoteService.AddNewProductsToCreditNoteWhenEdit
+				(id, invoiceNumberId, model.Products, model.NewProducts);
+
+			if (addProductsToEditCredtNote == false) return null;
+
+            return View()
+;		}
+        public IActionResult EditDebitNote(int id, string documentType)
+        {
+            string userId = this.User.UserId();
+            var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+            if (!mycompaniesUserId.Contains(userId))
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                new EditDebitNoteViewModel
+                {
+                    DocumentType = documentType,
+                    Products = new List<EditProductForDebitNoteViewModel>()
+                };
+            }
+            var invoiceToEdit = debitNoteService.ViewDebitNoteForEdit(id);
+            return View(invoiceToEdit);
+        }
+
+        [HttpPost]
+        public IActionResult EditDebitNote()
+        {
+            return View();
+        }
+
+        public IActionResult InvoiceDetails(int id)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
@@ -913,7 +1184,7 @@ namespace SSMO.Controllers
            var pdfModel = ClientService.GetClient();
 			var filename = "doc"+ pdfModel.DocumentNumber +"_" + DateTime.Now.ToString("ddMMyyyy");
             var stringForPrint = await viewRenderService.RenderToStringAsync("~/Views/Reports/ExportInvoiceToPdf.cshtml", pdfModel);
-            Document document = new Document();
+            iTextSharp.text.Document document = new iTextSharp.text.Document();
 			XMLWorkerFontProvider fontProvider= new XMLWorkerFontProvider(XMLWorkerFontProvider.DONTLOOKFORFONTS);
 			var path = Directory.GetCurrentDirectory() + filename + ".pdf";
 			PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(path,FileMode.Create));
@@ -985,7 +1256,7 @@ namespace SSMO.Controllers
             using (MemoryStream stream = new System.IO.MemoryStream())
             {
                 StringReader reader = new StringReader(exportData);
-                Document PdfFile = new Document(PageSize.A4);
+                iTextSharp.text.Document PdfFile = new iTextSharp.text.Document(iTextSharp.text.PageSize.A4);
                 PdfWriter writer = PdfWriter.GetInstance(PdfFile, stream);
                 PdfFile.Open();
                 XMLWorkerHelper.GetInstance().ParseXHtml(writer, PdfFile, reader);
@@ -1070,8 +1341,8 @@ namespace SSMO.Controllers
                     worksheet.Cell(row, 5).Value = product.FSCClaim;
                     worksheet.Cell(row, 6).Value = product.FSCSertificate;
                     worksheet.Cell(row, 7).Value = product.Unit;
-                    worksheet.Cell(row, 8).Value = product.OrderedQuantity;
-                    worksheet.Cell(row, 9).Value = product.Price;
+                    worksheet.Cell(row, 8).Value = product.InvoicedQuantity;
+                    worksheet.Cell(row, 9).Value = product.SellPrice;
                     worksheet.Cell(row, 10).Value = product.Amount;
 
                     row++;

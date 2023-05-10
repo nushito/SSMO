@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSMO.Data;
 
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230426055412_InvoiceAndCustomerProductConnection")]
+    partial class InvoiceAndCustomerProductConnection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -878,7 +880,7 @@ namespace SSMO.Data.Migrations
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
 
-                    b.Property<int?>("PurchaseProductDetailsId")
+                    b.Property<int>("PurchaseProductDetailsId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("SellPrice")
@@ -1682,7 +1684,8 @@ namespace SSMO.Data.Migrations
                     b.HasOne("SSMO.Data.Models.PurchaseProductDetails", "PurchaseProductDetails")
                         .WithMany("InvoiceProductDetails")
                         .HasForeignKey("PurchaseProductDetailsId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("CreditNote");
 

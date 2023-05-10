@@ -163,8 +163,9 @@ namespace SSMO.Services.Documents
 
         public void CreateBgInvoice(int documentNumberId)
         {
+            //TODO for credit and debit note
             var invoice = dbContext.Documents
-                .Where(i => i.Id == documentNumberId && i.DocumentType == Data.Enums.DocumentTypes.Invoice)
+                .Where(i => i.Id == documentNumberId)
                 .FirstOrDefault();
 
             if (invoice == null) return;
@@ -191,15 +192,14 @@ namespace SSMO.Services.Documents
             var customerAdress = dbContext.Addresses.
                 Where(id => id.Id == customer.AddressId)
                 .FirstOrDefault();
-
+            
             var bgInvoice = new Document
             {
                 DocumentType = Data.Enums.DocumentTypes.BGInvoice,
                 DocumentNumber = invoice.DocumentNumber,
                 Amount = invoice.Amount * currencyExchange,
                 Vat = invoice.Vat,
-                VatAmount = invoice.VatAmount * currencyExchange,
-                TotalAmount = invoice.TotalAmount * currencyExchange,
+                VatAmount = invoice.VatAmount * currencyExchange,                
                 CustomerId = invoice.CustomerId,
                 Date = invoice.Date,
                 FSCClaim = invoice.FSCClaim,
@@ -214,15 +214,22 @@ namespace SSMO.Services.Documents
                 Swb = invoice.Swb,
                 CurrencyExchangeRateUsdToBGN = currencyExchange,
                 CurrencyId = invoice.CurrencyId,
-                TotalQuantity= invoice.TotalQuantity,
-                InvoiceProducts = new List<InvoiceProductDetails>()
+                TotalQuantity= invoice.TotalQuantity               
             };
 
-            var bgProducts = dbContext.InvoiceProductDetails
-                .Where(i=>i.InvoiceId == invoice.Id)
-                .ToList();
-
-            bgInvoice.InvoiceProducts = bgProducts;
+            switch (invoice.DocumentType)
+            {
+                case Data.Enums.DocumentTypes.Invoice:
+                    bgInvoice.TotalAmount = invoice.TotalAmount * currencyExchange; break;
+                case Data.Enums.DocumentTypes.CreditNote: 
+                    bgInvoice.CreditToInvoiceNumber = invoice.CreditToInvoiceNumber; 
+                    bgInvoice.CreditToInvoiceDate = invoice.CreditToInvoiceDate;
+                    bgInvoice.CreditNoteTotalAmount = invoice.CreditNoteTotalAmount * currencyExchange; break;
+                case Data.Enums.DocumentTypes.DebitNote:
+                    bgInvoice.DebitToInvoiceNumber = invoice.DebitToInvoiceNumber;
+                    bgInvoice.DebitToInvoiceDate = invoice.DebitToInvoiceDate;bgInvoice.DebitNoteTotalAmount = invoice.DebitNoteTotalAmount * currencyExchange;  break;
+                default: break;
+            }
 
             dbContext.Documents.Add(bgInvoice);
             dbContext.SaveChanges();
@@ -241,8 +248,7 @@ namespace SSMO.Services.Documents
                 Number = creditOrDebitNote.DocumentNumber,               
                 SellerId = creditOrDebitNote.MyCompanyId,
                 VatPercent = creditOrDebitNote.Vat ?? 0,
-                VatAmount = creditOrDebitNote.VatAmount ?? 0,
-                Total = creditOrDebitNote.TotalAmount,
+                VatAmount = creditOrDebitNote.VatAmount ?? 0,                
                 CurrencyId = creditOrDebitNote.CurrencyId,
                 Products = new List<AddProductsToCreditAndDebitNoteFormModel>(),
                 CompanyBankDetails = new List<InvoiceBankDetailsViewModel>()
@@ -252,11 +258,13 @@ namespace SSMO.Services.Documents
             {
                 creditOrDebitNoteForPrint.InvoiceNumber = creditOrDebitNote.CreditToInvoiceNumber;
                 creditOrDebitNoteForPrint.InvoiceDate = creditOrDebitNote.CreditToInvoiceDate;
+                creditOrDebitNoteForPrint.Total = creditOrDebitNote.CreditNoteTotalAmount;
             }
             else if(creditOrDebitNote.DocumentType == Data.Enums.DocumentTypes.DebitNote) 
             {
                 creditOrDebitNoteForPrint.InvoiceNumber = creditOrDebitNote.DebitToInvoiceNumber;
                 creditOrDebitNoteForPrint.InvoiceDate = creditOrDebitNote.DebitToInvoiceDate;
+                creditOrDebitNoteForPrint.Total = creditOrDebitNote.DebitNoteTotalAmount;
             }   
 
             var customer = dbContext.Customers
@@ -271,17 +279,11 @@ namespace SSMO.Services.Documents
                 .Where(i => i.CompanyId == seller.Id)
                 .ToList();
 
-            var productList = dbContext.Products
-                .Where(d => d.DocumentId == creditOrDebitNote.Id || d.DocumentId == creditOrDebitNote.Id)
-                .ToList();
-
             var productsFromInvoice = new List<InvoiceProductDetails>();
-
-            if (productList == null)
-            {
-                productsFromInvoice = dbContext.InvoiceProductDetails
-                    .Where(a=>a.CreditNoteId == creditOrDebitNote.Id || a.DebitNoteId == creditOrDebitNote.Id)
-                    .ToList() as List<InvoiceProductDetails>;
+            
+            productsFromInvoice = dbContext.InvoiceProductDetails
+                .Where(a=>a.CreditNoteId == creditOrDebitNote.Id || a.DebitNoteId == creditOrDebitNote.Id)
+                .ToList() as List<InvoiceProductDetails>;
 
                 foreach (var product in productsFromInvoice)
                 {
@@ -319,44 +321,7 @@ namespace SSMO.Services.Documents
                         default: break;
                     }
                     creditOrDebitNoteForPrint.Products.Add(productForPrint);
-                }
-            }
-            else
-            {
-                foreach (var product in productList)
-                {
-                    var description = productService.GetDescriptionName(product.DescriptionId);
-                    var grade = productService.GetGradeName(product.GradeId);
-                    var size = productService.GetSizeName(product.SizeId);
-
-                    var productForPrint = new AddProductsToCreditAndDebitNoteFormModel
-                    {
-                        Description = description,
-                        Grade = grade,
-                        Size = size,
-                        Unit = product.Unit.ToString(),
-                        FscClaim = product.FscClaim,
-                        FscSertificate = product.FscSertificate,
-                        Pallets = product.Pallets,
-                        SheetsPerPallet = product.SheetsPerPallet
-                    };
-                    switch (creditOrDebitNote.DocumentType)
-                    {
-                        case Data.Enums.DocumentTypes.CreditNote:
-                            productForPrint.Price = product.Price;
-                            productForPrint.Quantity = product.OrderedQuantity;
-                            productForPrint.Amount = product.Amount;
-                            break;
-                        case Data.Enums.DocumentTypes.DebitNote:
-                            productForPrint.Price = product.Price;
-                            productForPrint.Quantity = product.OrderedQuantity;
-                            productForPrint.Amount = product.OrderedQuantity;
-                            break;
-                        default: break;
-                    }
-                    creditOrDebitNoteForPrint.Products.Add(productForPrint);
-                }
-            }
+                }  
 
             var addressCustomer = dbContext.Addresses
                 .Where(i => i.Id == customer.AddressId)

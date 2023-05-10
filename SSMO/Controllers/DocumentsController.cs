@@ -240,7 +240,7 @@ namespace SSMO.Controllers
 
             var companiesNames = mycompanyService.GetCompaniesNames();
            
-            var collectionCustomerOrders = new CustomerOrderNumbersListView
+            var collectionCustomerOrders = new CustomerOrderNumbersForInvoiceListView
             {
                 SelectedCustomerOrders = selectedCustomerOrders,
                 MyCompanyNames = companiesNames,
@@ -261,7 +261,7 @@ namespace SSMO.Controllers
         [HttpPost]
         [Authorize]
         public IActionResult InvoiceDetails
-            (CustomerOrderNumbersListView model, int customerId, int myCompanyId) 
+            (CustomerOrderNumbersForInvoiceListView model, int customerId, int myCompanyId) 
             
         {
             string userId = this.User.UserId();
@@ -282,7 +282,7 @@ namespace SSMO.Controllers
            
             if (!ModelState.IsValid)
             {
-                new CustomerOrderNumbersListView
+                new CustomerOrderNumbersForInvoiceListView
                 {
                     SelectedCustomerOrders = JsonConvert.DeserializeObject<List<int>>(TempData["orders"].ToString()),
                     MyCompanyNames = mycompanyService.GetCompaniesNames(),
@@ -318,7 +318,8 @@ namespace SSMO.Controllers
                     customerId= customerId,
                     currencyId = model.CurrencyId,
                     vat = model.Vat,
-                    myCompanyId = myCompanyId
+                    myCompanyId = myCompanyId,
+                    comment = model.Comment
                 });
         }
 
@@ -326,7 +327,7 @@ namespace SSMO.Controllers
             DateTime date, decimal currencyExchangeRateUsdToBGN,
           int number, string mycompanyname, string truckNumber, decimal deliveryCost, 
           string swb, decimal netWeight, decimal grossWeight, string incoterms, 
-          int customerId, int currencyId, int vat, int myCompanyId)
+          int customerId, int currencyId, int vat, int myCompanyId, string comment)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(mycompanyname);
@@ -350,7 +351,7 @@ namespace SSMO.Controllers
             var invoiceForPrint = invoiceService.CreateInvoice
                 (orders, products, date, currencyExchangeRateUsdToBGN, number, 
                 mycompanyname, truckNumber, deliveryCost, swb, netWeight, grossWeight, incoterms, 
-                customerId, currencyId, vat, myCompanyId);
+                customerId, currencyId, vat, myCompanyId, comment);
          
             if (invoiceForPrint == null)
             {
@@ -516,7 +517,8 @@ namespace SSMO.Controllers
             if (invoiceId == 0) return BadRequest();
          
             List<AddProductsToCreditAndDebitNoteFormModel> productsForCredit = JsonConvert.DeserializeObject<List<AddProductsToCreditAndDebitNoteFormModel>>(TempData["products"].ToString());
-            var creditNote = creditNoteService.CreateCreditNote(invoiceId, date, quantityBack, deliveryAddress, productsForCredit);
+            var creditNote = creditNoteService.CreateCreditNote
+                (invoiceId, date, quantityBack, deliveryAddress, productsForCredit);
 
             return View(creditNote);  
         }

@@ -1,15 +1,17 @@
-﻿
+﻿using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Reports.CreditNote;
 using SSMO.Models.Reports.Invoice;
 using System;
 using System.Collections.Generic;
 
-namespace SSMO.Models.Documents.Invoice
+namespace SSMO.Models.Documents.CreditNote
 {
-    public class EditInvoiceViewModel
+    public class EditCreditNoteViewModel
     {
         public string DocumentType { get; set; }
-        public int OrderConfirmationNumber { get; set; }
-        public IEnumerable<int> OrderConfirmationNumbers { get; set; }
+        public int InvoiceNumberId { get; set; }
+        public IEnumerable<InvoiceNumbersForEditedCreditNoteViewModel> InvoiceNumbers { get; set; }
+        public int CreditToInvoiceNumber { get; set; }       
         public DateTime Date { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }
@@ -21,10 +23,7 @@ namespace SSMO.Models.Documents.Invoice
         public decimal CurrencyExchangeRate { get; set; }
         public string Incoterms { get; set; }
         public string Comment { get; set; }
-        public List<EditProductForCompanyInvoicesViewModel> Products { get; set; }
-        public int? CustomerId { get; set; }      
-        public ICollection<CustomerCollectionForChoosingNewOrderForInvoiceEditViewModel> Customers { get; set; }
-        public List<int> SelectedCustomerOrders { get; set; }      
-       
+        public List<EditProductForCreditNoteViewModel> Products { get; set; }
+        
     }
 }

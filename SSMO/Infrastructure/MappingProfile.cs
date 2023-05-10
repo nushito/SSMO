@@ -36,7 +36,8 @@ namespace SSMO.Infrastructure
             this.CreateMap<CustomerOrder, CustomerOrderViewModel>();
             this.CreateMap<CustomerOrder, CustomerOrderDetailsModel>();
             this.CreateMap<CustomerOrder, CustomerOrderDetailsPaymentModel>();
-            this.CreateMap<CustomerOrder, EditCustomerOrderPaymentModel>();           
+            this.CreateMap<CustomerOrder, EditCustomerOrderPaymentModel>();
+            this.CreateMap<CustomerOrder, CustomerOrderForInvoiceViewModel>();
 
             this.CreateMap<Product, ProductCustomerFormModel>()
                 .ForMember(a=>a.Quantity, b=>b.MapFrom(a=>a.OrderedQuantity))
@@ -52,15 +53,15 @@ namespace SSMO.Infrastructure
                 .ForMember(a => a.Price, b => b.MapFrom(a => a.SellPrice));
             this.CreateMap<Product, ProductsForEditSupplierOrder>();
             this.CreateMap<InvoiceProductDetails, BGProductsForBGInvoiceViewModel>();
-            this.CreateMap<Product, InvoiceProductsDetailsViewModel>();
-            this.CreateMap<Product, InvoiceProductsDetailsViewModel>();
-            this.CreateMap<Product, EditProductForCreditAndDebitViewModel>();
-            this.CreateMap<Product, ProductsForCustomerOrderDetailsViewModel>();
+            this.CreateMap<InvoiceProductDetails, InvoiceProductsDetailsViewModel>();          
+            this.CreateMap<InvoiceProductDetails, EditProductForCompanyInvoicesViewModel>();
+           
             this.CreateMap<Product, ProductsSupplierOrderDetailsViewModel>();
             this.CreateMap<Product, PurchaseProductAsSupplierOrderViewModel>();
             this.CreateMap<ProductsForInvoiceViewModel, Services.Documents.Invoice.ProductsForInvoiceModel>();
             this.CreateMap<InvoiceProductDetails, ProductsForPackingListModel>();
             this.CreateMap<CustomerOrderProductDetails, ProductCustomerFormModel>();
+            this.CreateMap<CustomerOrderProductDetails, ProductsForCustomerOrderDetailsViewModel>();
             this.CreateMap<PurchaseProductDetails, PurchaseProductsForEditFormModel>();
 
             this.CreateMap<Status, StatusModel>();

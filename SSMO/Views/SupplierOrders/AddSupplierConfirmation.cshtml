@@ -33,7 +33,7 @@
    
     <div class="row col-md-4 mb-2">            
         <td>
-            <label asp-for="MyCompanyId">Seller</label>
+            <label asp-for="MyCompanyId">Buyer/My Company</label>
         <select id="mycompany" asp-for="MyCompanyId" class="form-control">
             @foreach (var company in Model.MyCompanies)
             {
@@ -212,7 +212,7 @@
         </div> 
 
 
-        <input type="submit" value="Add Products" class="btn btn-primary mt-3"/>
+        <input type="submit" value="Save" class="btn btn-primary mt-3"/>
  </form> 
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.3/jquery.min.js"></script>
