@@ -45,69 +45,57 @@ namespace SSMO.Services.Products
                 GradeId = model.GradeId,
                 SizeId = model.SizeId,
                 PurchaseFscClaim = model.FscClaim,
-                PurchaseFscCertificate = model.FscCertificate,
+                PurchaseFscCertificate = model.PurchaseFscCertificate,
                 PurchasePrice = model.PurchasePrice,
                 Pallets = model.Pallets,
                 SheetsPerPallet = model.SheetsPerPallet,
-                SupplierOrderId = supplierOrderId,
-                OrderedQuantity = model.Quantity,
+                SupplierOrderId = supplierOrderId,               
                 Unit = Enum.Parse<Unit>(model.Unit),
                 TotalSheets = model.Pallets*model.SheetsPerPallet
             };
 
-            //var dimensionArray = size.Split('/').ToArray();
-            //var countArray = dimensionArray.Count();
-            //decimal sum = 1M;
+            
 
-            //for (int i = 0; i < countArray; i++)
-            //{
-            //    sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 4);
-            //}
-
-            //if (model.QuantityM3 != 0)
-            //{
-            //    product.OrderedQuantity = model.QuantityM3;
-            //}
-            //else
-            //{
-            //    product.OrderedQuantity = Math.Round(sum * model.Pallets * model.SheetsPerPallet, 4);
-            //}
+            if(model.Quantity == 0)
+            {
+                var sum = ConvertStringSizeToQubicMeters(size);
+               
+               product.OrderedQuantity = Math.Round(sum * model.Pallets * model.SheetsPerPallet, 5);
+                
+            }
+            else
+            {
+                product.OrderedQuantity = model.Quantity;
+            }
 
             product.QuantityAvailableForCustomerOrder = product.OrderedQuantity;
             product.QuantityLeftForPurchaseLoading = product.OrderedQuantity;
-            product.PurchaseAmount = Math.Round(model.PurchasePrice * product.OrderedQuantity, 4);
-            dbContext.Products.Add(product);
-            dbContext.SaveChanges();
-
-
+            product.PurchaseAmount = Math.Round(model.PurchasePrice * product.OrderedQuantity, 5);
+           
             var order = dbContext.SupplierOrders.Where(a => a.Id == supplierOrderId).FirstOrDefault();           
             order.Amount += product.PurchaseAmount;
             order.Products.Add(product);
 
             dbContext.SaveChanges();
         }
-
         public void AddDescription(string name, string bgName)
         {
             dbContext.Descriptions.Add(new Description { Name = name, BgName = bgName });
             dbContext.SaveChanges();
             return;
         }
-
         public void AddGrade(string name)
         {
             dbContext.Grades.Add(new Grade { Name = name });
             dbContext.SaveChanges();
             return;
         }
-
         public void AddSize(string name)
         {
             dbContext.Sizes.Add(new Size { Name = name });
             dbContext.SaveChanges();
             return;
         }
-
         public bool DescriptionExist(string name)
         {
             var check = dbContext.Descriptions.Where(a => a.Name.ToLower() == name.ToLower()).FirstOrDefault();
@@ -119,7 +107,6 @@ namespace SSMO.Services.Products
 
             return true;
         }
-
         public bool GradeExist(string name)
         {
             var check = dbContext.Grades.Where(a => a.Name.ToLower() == name.ToLower()).FirstOrDefault();
@@ -131,7 +118,6 @@ namespace SSMO.Services.Products
 
             return true;
         }
-
         public bool SizeExist(string name)
         {
             var check = dbContext.Sizes.Where(a => a.Name.ToLower() == name.ToLower()).FirstOrDefault();
@@ -143,7 +129,6 @@ namespace SSMO.Services.Products
 
             return true;
         }
-
         public IEnumerable<string> GetDescriptions()
         {
             return dbContext.Descriptions.Select(a => a.Name).ToList();
@@ -152,24 +137,17 @@ namespace SSMO.Services.Products
         {
             return dbContext.Sizes.Select(a => a.Name).ToList();
         }
-
         public IEnumerable<string> GetGrades()
         {
             return dbContext.Grades.Select(a => a.Name).ToList();
         }
-
-        public bool EditProduct(int id, int customerorderId,
+        public bool CreateCustomerOrderProduct(int id, int customerorderId,
             int supplierOrderId, string description, string grade,
             string size, string fscCert, string fscClaim,
             int pallets, int sheetsPerPallet, decimal price, decimal orderedQuantity, string unit)
         {
-
-
             var product = dbContext.Products.Find(id);
-            //var descriptionEdit = dbContext.Descriptions.Where(a => a.Name == description).Select(a => a.Id).FirstOrDefault();
-            //var gradeEdit = dbContext.Grades.Where(a => a.Name == grade).Select(a => a.Id).FirstOrDefault();
-            //var sizeEdit = dbContext.Sizes.Where(a => a.Name == size).Select(a => a.Id).FirstOrDefault();
-
+           
             if (product == null || product.QuantityAvailableForCustomerOrder < orderedQuantity || product.QuantityAvailableForCustomerOrder <= 0)
             {
                 return false;
@@ -197,31 +175,26 @@ namespace SSMO.Services.Products
             product.CustomerOrderProductDetails.Add(customerOrderProduct);
             
             product.QuantityAvailableForCustomerOrder -= customerOrderProduct.Quantity;
-
-            //var dimensionArray = size.Split('/').ToArray();
-            //var countArray = dimensionArray.Count();
-            //decimal sum = 1M;
-
-            //for (int i = 0; i < countArray; i++)
-            //{
-            //    sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 4);
-            //}
-
-
-            //if (quantityM3 != 0)
-            //{
-            //    product.OrderedQuantity = quantityM3;
-            //}
-            //else
-            //{
-            //    product.OrderedQuantity = Math.Round(sum * product.TotalSheets, 4);
-            //}
-
+            
             var customerOrder = dbContext.CustomerOrders.Where(i => i.Id == customerorderId).FirstOrDefault();
-           // customerOrder.CustomerOrderProducts = new List<CustomerOrderProductDetails>();  
+            // customerOrder.CustomerOrderProducts = new List<CustomerOrderProductDetails>();  
 
             customerOrder.Amount += customerOrderProduct.Amount;
-           // customerOrder.CustomerOrderProducts.Add(customerOrderProduct);
+            // customerOrder.CustomerOrderProducts.Add(customerOrderProduct);
+
+            var purchaseProductId = dbContext.PurchaseProductDetails
+                .Where(i => i.SupplierOrderId == supplierOrderId && i.ProductId == product.Id)
+                .Select(i => i.Id)
+                .FirstOrDefault();
+
+            var purchase  = dbContext.Documents
+                .Where(s=>s.PurchaseProducts.Select(i=>i.Id).Contains(purchaseProductId))
+                .FirstOrDefault();
+
+            if(purchase != null && !purchase.CustomerOrderProducts.Contains(customerOrderProduct))
+            {
+              purchase.CustomerOrderProducts.Add(customerOrderProduct);
+            }
 
             dbContext.SaveChanges();
 
@@ -271,7 +244,6 @@ namespace SSMO.Services.Products
             var fscCert = dbContext.MyCompanies.Select(f => f.FSCSertificate).ToList();
             return fscCert;
         }
-
         public string GetDescriptionName(int id)
         {
             var name = dbContext.Descriptions
@@ -280,7 +252,6 @@ namespace SSMO.Services.Products
                .FirstOrDefault();
             return name;
         }
-
         public string GetGradeName(int id)
         {
             var name = dbContext.Grades
@@ -289,7 +260,6 @@ namespace SSMO.Services.Products
                 .FirstOrDefault();
             return name;
         }
-
         public string GetSizeName(int id)
         {
             var name = dbContext.Sizes
@@ -298,13 +268,37 @@ namespace SSMO.Services.Products
                 .FirstOrDefault();
             return name;
         }
-
-        public decimal CalculateDeliveryCostOfTheProductInCo(decimal quantity, decimal totalQuantity, decimal deliveryCost)
+        public decimal CalculateDeliveryCostOfTheProductInCo
+            (decimal quantity, decimal quantityM3, decimal totalQuantity, decimal deliveryCost, Unit unit, string size)
         {
-            var cost = deliveryCost / totalQuantity * quantity;
+            var cost = deliveryCost / totalQuantity * quantityM3;
+
+            var dimensionArray = size.Split('/').ToArray();
+            decimal sum = 1M;
+            decimal thickness = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5);
+            decimal calcMeter = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5) * 
+                Math.Round(decimal.Parse(dimensionArray[2]) / 1000, 5);
+
+            for (int i = 0; i < dimensionArray.Count(); i++)
+            {
+                sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 5);
+            }
+
+            if (unit == Data.Enums.Unit.m2)
+            {
+                cost *= thickness;
+            }
+            else if (unit == Data.Enums.Unit.pcs || unit == Data.Enums.Unit.sheets)
+            {
+                cost *= sum;
+            }
+            else if(unit == Data.Enums.Unit.m)
+            {
+                cost *= calcMeter;
+            }
+
             return cost;
         }
-
         public ICollection<ProductsForEditSupplierOrder> ProductsDetailsPerSupplierOrder(int supplierOrderId)
         {
             
@@ -321,7 +315,6 @@ namespace SSMO.Services.Products
             }
             return products;       
         }
-
         public void ClearProductQuantityWhenDealIsFinished
             (int productId, decimal quantity, decimal oldQuantity)
         {
@@ -336,7 +329,6 @@ namespace SSMO.Services.Products
 
             dbContext.SaveChanges();
         }
-
         public ProductsAvailabilityCollectionViewModel ProductsOnStock
             (int? descriptionId, int? gradeId, int? sizeId, int currentPage = 1, int productsPerPage = int.MaxValue)
         {
@@ -435,7 +427,6 @@ namespace SSMO.Services.Products
 
             return productListAndCount;
         }
-
         public ICollection<DescriptionForProductSearchModel> DescriptionIdAndNameList()
         {
             return dbContext.Descriptions
@@ -454,7 +445,6 @@ namespace SSMO.Services.Products
                    Name = n.Name
                }).ToList();
         }
-
         public ICollection<GradeForProductSearchModel> GradeIdAndNameList()
         {
             return dbContext.Grades
@@ -472,7 +462,6 @@ namespace SSMO.Services.Products
 
             product.LoadedQuantityM3 = 0;   
         }
-
         public void NewLoadingQuantityToEditPurchase(int productId, int purchaseId)
         {
             var product = dbContext.Products
@@ -492,11 +481,10 @@ namespace SSMO.Services.Products
                 .Distinct()
                 .ToList();
         }
-
         public List<ProductsForInvoiceViewModel> ProductsForInvoice(List<int> customerOrders)
         {
            var customerOrdersIdList = dbContext.CustomerOrders
-                .Where(i=> customerOrders.Contains(i.OrderConfirmationNumber))
+                .Where(i=> customerOrders.Contains(i.Id))
                 .Select(i=>i.Id) 
                 .ToList();
 
@@ -588,7 +576,6 @@ namespace SSMO.Services.Products
             }
             return invoicedProducts;           
         }
-
         public void CreateNewProductOnEditSupplierOrder(NewProductsForSupplierOrderModel modelProduct)
         {
             if (modelProduct == null) return;
@@ -621,7 +608,6 @@ namespace SSMO.Services.Products
 
             dbContext.SaveChanges();
         }
-
         public bool AddNewProductsToEditedInvoice(int id, List<ProductsForInvoiceViewModel> products)
         {
             if(id == 0) return false;
@@ -696,8 +682,16 @@ namespace SSMO.Services.Products
                     .Select(p=>p.CostPrice)
                     .FirstOrDefault();
 
+                var mainProduct = dbContext.Products
+                    .Where(i => i.Id == product.ProductId)
+                    .FirstOrDefault();
+
+                var size = GetSizeName(mainProduct.SizeId);
+
                 product.DeliveryCost = CalculateDeliveryCostOfTheProductInCo
-                   (product.InvoicedQuantity, invoice.TotalQuantity, invoice.DeliveryTrasnportCost);
+                   (product.InvoicedQuantity,product.QuantityM3ForCalc, invoice.TotalQuantity, 
+                   invoice.DeliveryTrasnportCost,product.Unit,size);
+
                 product.Profit = (product.SellPrice - purchaseProductDetailCostPrice) * 
                     product.InvoicedQuantity - product.DeliveryCost;
             }
@@ -705,7 +699,6 @@ namespace SSMO.Services.Products
             dbContext.SaveChanges();
             return true;
         }
-
         public List<ProductForCreditNoteViewModelPerInvoice> ProductsForCreditNotePerInvoice(int invoiceId)
         {
             if(invoiceId == 0) return null;
@@ -742,6 +735,19 @@ namespace SSMO.Services.Products
             }
 
             return productsForEdit;
+        }
+
+        public decimal ConvertStringSizeToQubicMeters(string size)
+        {
+            var dimensionArray = size.Split('/').ToArray();           
+            decimal sum = 1M;
+
+            for (int i = 0; i < dimensionArray.Count(); i++)
+            {
+                sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 5);
+            }
+
+            return sum;
         }
     }
 }

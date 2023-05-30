@@ -10,8 +10,9 @@ namespace SSMO.Models.Documents.DebitNote
         public string DocumentType { get; set; }
         public int OrderConfirmationNumber { get; set; }
         public IEnumerable<int> OrderConfirmationNumbers { get; set; }
-        public int CreditToInvoiceNumber { get; set; }
-        public int DebitToInvoiceNumber { get; set; }
+        public int InvoiceNumber { get; set; }
+        public int DebitToInvoiceNumberId { get; set; }
+        public ICollection<InvoiceNumbersForEditedDebitNoteViewModel> DebitNoteInvoicenumbers { get; set; }
         public DateTime Date { get; set; }
         public int CurrencyId { get; set; }
         public string Currency { get; set; }

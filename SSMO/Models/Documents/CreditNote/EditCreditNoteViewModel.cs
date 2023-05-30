@@ -23,7 +23,7 @@ namespace SSMO.Models.Documents.CreditNote
         public decimal CurrencyExchangeRate { get; set; }
         public string Incoterms { get; set; }
         public string Comment { get; set; }
-        public List<EditProductForCreditNoteViewModel> Products { get; set; }
+        public IList<EditProductForCreditNoteViewModel> Products { get; set; }
         
     }
 }

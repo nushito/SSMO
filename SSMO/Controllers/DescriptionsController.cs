@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using SSMO.Data.Models;
 using SSMO.Models.Descriptions;
 using SSMO.Services.Products;
+using System.Text.RegularExpressions;
 
 namespace SSMO.Controllers
 {
@@ -52,6 +53,14 @@ namespace SSMO.Controllers
             if (!ModelState.IsValid)
             {
                 return View();
+            }
+
+            string checkRegex = @"^\\d+[\\.|,]?\\d+\\/\\d+\\/\\d+\\s?$";
+            Regex regex = new Regex(checkRegex);
+
+            if (!regex.IsMatch(model.Name))
+            {
+                return View(model);
             }
 
             if (_productservice.SizeExist(model.Name) == true)

@@ -6,6 +6,7 @@
     var fscCert = service.GetFascCertMyCompany();
 }
 <form method="post">
+   
     <fieldset>
         <h4>Add Products</h4>
         <table id="clientTable" class="table table-bordered">
@@ -30,6 +31,7 @@
                 {
                     <div>
                          <input type="hidden" asp-for="@Model[i].Id">
+                          <input type="hidden" asp-for="@Model[i].CustomerOrderId" />
                         </div>
                              <div>
                              <input type="hidden" asp-for="@Model[i].SupplierOrderId">
@@ -111,7 +113,7 @@
                         </td>
                          <td class="col-sm-1">
                             <div class="editor-field">
-                              <input asp-for="@Model[i].Quantity"  min="0.00000" step="0.00001" class="text-box single-line" required="required">
+                              <input asp-for="@Model[i].Quantity" type="number"  min="0.00000" step="0.00001" class="text-box single-line" required="required">
                             </div>
                         </td>
 

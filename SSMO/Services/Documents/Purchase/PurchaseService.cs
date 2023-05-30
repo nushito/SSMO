@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using SSMO.Data;
+using SSMO.Data.Enums;
+using SSMO.Data.Migrations;
 using SSMO.Data.Models;
+using SSMO.Models.Documents.DebitNote;
 using SSMO.Models.Documents.Purchase;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.Purchase;
+using SSMO.Repository;
 using SSMO.Services.Products;
 using SSMO.Services.SupplierOrders;
 using System;
@@ -19,14 +23,16 @@ namespace SSMO.Services.Documents.Purchase
         private readonly IConfigurationProvider mapper;
         private readonly IProductService productService;
         private readonly ISupplierOrderService supplierOrderService;
+        private readonly IProductRepository productRepository;
 
         public PurchaseService(ApplicationDbContext dbContext, IConfigurationProvider mapper, IProductService productService,
-            ISupplierOrderService supplierOrderService)
+            ISupplierOrderService supplierOrderService, IProductRepository productRepository)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
             this.productService = productService;
             this.supplierOrderService = supplierOrderService;
+            this.productRepository = productRepository; 
         }
         public bool CreatePurchaseAsPerSupplierOrder(int id,
             string number, DateTime date, bool paidStatus,
@@ -34,7 +40,7 @@ namespace SSMO.Services.Documents.Purchase
             decimal duty, decimal factoring, decimal customsExpenses, decimal fiscalAgentExpenses,
             decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses, 
             int vat, string truckNumber, string swb,List<PurchaseProductAsSupplierOrderViewModel> products, 
-            string incoterms, decimal paidAdvance, DateTime? dateOfPayment)
+            string incoterms, decimal paidAdvance, DateTime? dateOfPayment, string deliveryAddress)
         {
             var supplierOrder = dbContext.SupplierOrders.FirstOrDefault
                 (o => o.Id == id);
@@ -79,7 +85,9 @@ namespace SSMO.Services.Documents.Purchase
             {
                 if(product.OrderedQuantity == 0) { continue; }
 
-                var mainProduct = dbContext.Products.Where(s => s.Id == product.Id).FirstOrDefault();   
+                var mainProduct = productRepository.GetMainProduct(product.Id);
+                var size = productService.GetSizeName(mainProduct.SizeId);
+
                 mainProduct.PurchaseProductDetails = new List<PurchaseProductDetails>();
 
                 if(product.OrderedQuantity > mainProduct.OrderedQuantity) { return false; }
@@ -100,19 +108,45 @@ namespace SSMO.Services.Documents.Purchase
                 };
                 purchaseProduct.Amount = purchaseProduct.Quantity*purchaseProduct.PurchasePrice;
                 purchaseProduct.TotalSheets = purchaseProduct.Pallets*purchaseProduct.SheetsPerPallet;
+                var quantityM3 = productService.ConvertStringSizeToQubicMeters(size);
+               purchaseProduct.QuantityM3 = quantityM3 * product.Pallets * product.SheetsPerPallet;
 
-                mainProduct.PurchaseProductDetails.Add(purchaseProduct);
+                //  mainProduct.PurchaseProductDetails.Add(purchaseProduct);
                 mainProduct.LoadedQuantityM3 += purchaseProduct.Quantity;
                 mainProduct.QuantityLeftForPurchaseLoading = mainProduct.OrderedQuantity - purchaseProduct.Quantity;
                 purchase.PurchaseProducts.Add(purchaseProduct);
 
-                var customerOrder = dbContext.CustomerOrderProductDetails
+                var customerOrderProducts = dbContext.CustomerOrderProductDetails
               .Where(c => c.SupplierOrderId == supplierOrder.Id && c.ProductId == mainProduct.Id)
               .FirstOrDefault();
 
-                purchase.CustomerOrderProducts.Add(customerOrder);
+                if(customerOrderProducts != null)
+                {
+                    purchase.CustomerOrderProducts.Add(customerOrderProducts);
+                }               
+                purchase.Amount +=  purchaseProduct.Amount;
+
+                if (products.All(u => u.Unit == Unit.m3) || products.All(u => u.Unit == Unit.m2)
+                   || products.All(u => u.Unit == Unit.pcs) || products.All(u => u.Unit == Unit.sheets)
+                   || products.All(u => u.Unit == Unit.m))
+                {
+                    purchase.TotalQuantity = (decimal)products.Where(i => i.ProductOrNot == true).Sum(a => a.OrderedQuantity);                   
+                }
+                else
+                if (product.ProductOrNot == true)
+                {
+                    if(product.Unit == Data.Enums.Unit.m3)
+                    {
+                        purchase.TotalQuantity += purchaseProduct.Quantity;    
+                    }
+                    else 
+                    {                                            
+                        purchase.TotalQuantity += (decimal)purchaseProduct.QuantityM3;
+                    }                    
+                }
+            
             }
-            purchase.Amount = purchase.PurchaseProducts.Sum(purchaseProduct => purchaseProduct.Amount);
+            
             purchase.VatAmount = purchase.Amount * purchase.Vat / 100;
             purchase.TotalAmount = purchase.Amount + purchase.VatAmount ?? 0;
            
@@ -135,22 +169,46 @@ namespace SSMO.Services.Documents.Purchase
                 else
                 {
                     purchase.Balance = purchase.TotalAmount;
-                }
-               
+                }               
             }
 
             var expenses = purchase.Duty + purchase.Factoring * purchase.Amount / 100 +
                       purchase.CustomsExpenses + purchase.FiscalAgentExpenses +
                       purchase.ProcentComission * purchase.Amount / 100 + purchase.PurchaseTransportCost +
-                      purchase.BankExpenses + purchase.OtherExpenses;
-
-          purchase.TotalQuantity = purchase.PurchaseProducts.Sum(p => p.Quantity);
+                      purchase.BankExpenses + purchase.OtherExpenses;         
 
             foreach (var product in purchase.PurchaseProducts)
-            {
-                var transportCost = purchase.PurchaseTransportCost / purchase.TotalQuantity * product.Quantity;
-                product.CostPrice = (product.Amount + (expenses / purchase.TotalQuantity * product.Quantity)) / product.Quantity;
-             
+            {               
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
+
+                var size = productService.GetSizeName(mainProduct.SizeId);
+                var dimensionArray = size.Split('/').ToArray();
+                decimal sum = 1M;
+                decimal thickness = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5); 
+                decimal calcMeter = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5)* Math.Round(decimal.Parse(dimensionArray[2]) / 1000, 5); ;
+
+                for (int i = 0; i < dimensionArray.Count(); i++)
+                {
+                    sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 5);
+                }
+
+                if(product.Unit == Data.Enums.Unit.m3)
+                {
+                    product.CostPrice = (product.Amount + (expenses / purchase.TotalQuantity * product.Quantity)) / product.Quantity;                    
+                }
+                else
+                if (product.Unit == Data.Enums.Unit.m2)
+                {
+                    product.CostPrice = ((product.Amount + (expenses / purchase.TotalQuantity * product.QuantityM3)) / product.QuantityM3 ?? 0)*thickness;                    
+                }
+                else if (product.Unit == Data.Enums.Unit.pcs || product.Unit == Data.Enums.Unit.sheets)
+                {
+                    product.CostPrice = ((product.Amount + (expenses / purchase.TotalQuantity * product.QuantityM3)) / product.QuantityM3 ?? 0) * sum;
+                }
+                else
+                {
+                    product.CostPrice = ((product.Amount + (expenses / purchase.TotalQuantity * product.QuantityM3)) / product.QuantityM3 ?? 0) * calcMeter;
+                }                
             }
 
             var productsBySupplierOrder = dbContext.Products
@@ -163,7 +221,6 @@ namespace SSMO.Services.Documents.Purchase
                     .Select(i=>i.Id)
                     .FirstOrDefault();
             }
-
             
             dbContext.SaveChanges();
             return true;
@@ -198,23 +255,16 @@ namespace SSMO.Services.Documents.Purchase
             purchaseInvoiceForEdit.FiscalAgentExpenses= fiscalAgentExpenses;
             purchaseInvoiceForEdit.ProcentComission= procentComission;
             purchaseInvoiceForEdit.OtherExpenses= otherExpenses;
-
-            var expenses = purchaseInvoiceForEdit.Duty + purchaseInvoiceForEdit.Factoring * purchaseInvoiceForEdit.Amount / 100 +
-                   purchaseInvoiceForEdit.CustomsExpenses + purchaseInvoiceForEdit.FiscalAgentExpenses +
-                   purchaseInvoiceForEdit.ProcentComission * purchaseInvoiceForEdit.Amount / 100 + purchaseInvoiceForEdit.PurchaseTransportCost +
-                   purchaseInvoiceForEdit.BankExpenses + purchaseInvoiceForEdit.OtherExpenses;
-
-            purchaseInvoiceForEdit.TotalQuantity = purchaseInvoiceForEdit.PurchaseProducts.Sum(p => p.Quantity);
-
-
+            purchaseInvoiceForEdit.TotalQuantity = 0;
+        
             foreach (var product in purchaseProducts)
             {
                 var productForEdit = dbContext.PurchaseProductDetails
                    .Where(s => s.Id == product.Id)
                    .FirstOrDefault();
 
-                var mainProduct = dbContext.Products
-                    .Where(a=> a.Id == product.ProductId).FirstOrDefault();
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
+
                 if(mainProduct.OrderedQuantity < product.Quantity)
                 {
                     return false;
@@ -232,10 +282,84 @@ namespace SSMO.Services.Documents.Purchase
                 productForEdit.Quantity = product.Quantity;
                 productForEdit.Amount = product.Quantity * product.PurchasePrice;
 
-                var transportCost = purchaseInvoiceForEdit.PurchaseTransportCost / purchaseInvoiceForEdit.TotalQuantity * product.Quantity;
-                productForEdit.CostPrice = (productForEdit.Amount + (expenses / purchaseInvoiceForEdit.TotalQuantity * product.Quantity)) / product.Quantity;
+                if(purchaseProducts.All(u=>u.Unit == Unit.m3.ToString()) || purchaseProducts.All(u => u.Unit == Unit.m2.ToString())
+                    || purchaseProducts.All(u => u.Unit == Unit.pcs.ToString()) || purchaseProducts.All(u => u.Unit == Unit.sheets.ToString())
+                    || purchaseProducts.All(u => u.Unit == Unit.m.ToString()))
+                {
+                    purchaseInvoiceForEdit.TotalQuantity += purchaseProducts.Where(i=>i.ProductOrNot == true).Sum(a => a.Quantity);                    
+                }
+
+                else
+                {
+                    if (product.ProductOrNot == true)
+                    {
+                        if (productForEdit.Unit == Data.Enums.Unit.m3)
+                        {
+                            purchaseInvoiceForEdit.TotalQuantity += productForEdit.Quantity;                            
+                        }
+                        else
+                        {
+                            var size = productService.GetSizeName(mainProduct.SizeId);
+                            var quantityM3 = productService.ConvertStringSizeToQubicMeters(size);
+                            productForEdit.QuantityM3 = quantityM3 * productForEdit.Pallets*productForEdit.SheetsPerPallet;
+                            purchaseInvoiceForEdit.TotalQuantity += productForEdit.QuantityM3 ?? 0;
+                        }
+                    }
+                }
+
+                if (productForEdit.Unit != Unit.m3)
+                {
+                    var size = productService.GetSizeName(mainProduct.SizeId);
+                    var quantityM3 = productService.ConvertStringSizeToQubicMeters(size);
+                    productForEdit.QuantityM3 = quantityM3 * productForEdit.Pallets * productForEdit.SheetsPerPallet;
+                }                
             }
            
+
+            dbContext.SaveChanges();
+
+            var expenses = purchaseInvoiceForEdit.Duty + purchaseInvoiceForEdit.Factoring * purchaseInvoiceForEdit.Amount / 100 +
+                   purchaseInvoiceForEdit.CustomsExpenses + purchaseInvoiceForEdit.FiscalAgentExpenses +
+                   purchaseInvoiceForEdit.ProcentComission * purchaseInvoiceForEdit.Amount / 100 + purchaseInvoiceForEdit.PurchaseTransportCost +
+                   purchaseInvoiceForEdit.BankExpenses + purchaseInvoiceForEdit.OtherExpenses;
+
+            foreach (var product in purchaseInvoiceForEdit.PurchaseProducts)
+            {
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
+
+                var size = productService.GetSizeName(mainProduct.SizeId);
+                var quantityM3 = productService.ConvertStringSizeToQubicMeters(size);
+                product.QuantityM3 = quantityM3 * product.Pallets * product.SheetsPerPallet;
+
+                var dimensionArray = size.Split('/').ToArray();
+                decimal sum = 1M;
+                decimal thickness = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5);
+                decimal calcMeter = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5) * Math.Round(decimal.Parse(dimensionArray[2]) / 1000, 5); 
+
+                for (int i = 0; i < dimensionArray.Count(); i++)
+                {
+                    sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 5);
+                }
+                if (product.Unit == Data.Enums.Unit.m3)
+                {
+                    product.QuantityM3 = product.Quantity;
+                    product.CostPrice = (product.Amount + (expenses / purchaseInvoiceForEdit.TotalQuantity * product.Quantity)) / product.Quantity;
+                }
+                else
+                if (product.Unit == Data.Enums.Unit.m2)
+                {
+                    product.CostPrice = ((product.Amount + (expenses / purchaseInvoiceForEdit.TotalQuantity * product.QuantityM3)) / product.QuantityM3 ?? 0) * thickness;
+                }
+                else if (product.Unit == Data.Enums.Unit.pcs || product.Unit == Data.Enums.Unit.sheets)
+                {
+                    product.CostPrice = ((product.Amount + (expenses / purchaseInvoiceForEdit.TotalQuantity * product.QuantityM3)) / product.QuantityM3 ?? 0) * sum;
+                }
+                else
+                {
+                    product.CostPrice = ((product.Amount + (expenses / purchaseInvoiceForEdit.TotalQuantity * product.QuantityM3)) / product.QuantityM3 ?? 0) * calcMeter;
+                }
+            }
+
             var productsBySupplierOrder = dbContext.Products
                 .Where(p => p.SupplierOrderId == supplierOrderId).ToList();
 
@@ -249,6 +373,7 @@ namespace SSMO.Services.Documents.Purchase
                     .Select(i => i.Id)
                     .FirstOrDefault();
             }
+
             dbContext.SaveChanges();
             return true;
         }
@@ -376,9 +501,7 @@ namespace SSMO.Services.Documents.Purchase
 
             foreach (var product in products)
             {
-                var mainProduct = dbContext.Products
-                    .Where(i => i.Id == product.ProductId)
-                    .FirstOrDefault();
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
 
                 purchaseForEdit.Products.Add(
                     new PurchaseProductsDetailsViewModel
@@ -445,9 +568,7 @@ namespace SSMO.Services.Documents.Purchase
 
             foreach (var product in purchaseForEdit.PurchaseProducts)
             {
-                var mainProduct = dbContext.Products
-                    .Where(i => i.Id == product.ProductId)
-                    .FirstOrDefault();
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
 
                 product.Description = productService.GetDescriptionName(mainProduct.DescriptionId);
                 product.Grade = productService.GetGradeName(mainProduct.GradeId);
@@ -455,6 +576,42 @@ namespace SSMO.Services.Documents.Purchase
             }
 
             return purchaseForEdit; 
+        }
+
+        public IList<PurchaseProductsForDebitNoteViewModel> PurchaseProducts()
+        {
+            var productsForSale = dbContext.Products
+                .Where(a=>a.LoadedQuantityM3 > 0 && a.SoldQuantity < a.LoadedQuantityM3)
+                .SelectMany(p=>p.PurchaseProductDetails)
+                .ToList();
+            var purchaseProducts = new List<PurchaseProductsForDebitNoteViewModel>();
+
+            foreach (var product in productsForSale)
+            {
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
+
+                var productForDebit = new PurchaseProductsForDebitNoteViewModel
+                {
+                    Id = product.Id,
+                    ProductId = product.ProductId,
+                    DescriptionId = mainProduct.DescriptionId,
+                    Description = productService.GetDescriptionName(mainProduct.DescriptionId),
+                    SizeId = mainProduct.SizeId,
+                    Size = productService.GetSizeName(mainProduct.SizeId),
+                    GradeId = mainProduct.GradeId,
+                    Grade = productService.GetGradeName(mainProduct.GradeId),
+                    AvailableQuantity = mainProduct.LoadedQuantityM3 - mainProduct.SoldQuantity,
+                    PurchaseInvoicelId = product.PurchaseInvoiceId,
+                    Unit = product.Unit,
+                    FscSertificate = product.FscCertificate,
+                    FscClaim = product.FscClaim                    
+                };
+                productForDebit.ProductFullDescription = String.Join
+                    (", ", productForDebit.Description,productForDebit.Size,productForDebit.Grade, productForDebit.AvailableQuantity);
+                purchaseProducts.Add(productForDebit);
+            }
+
+            return purchaseProducts;
         }
     }
 }

@@ -12,7 +12,7 @@
         public string FscCertificate { get; set; }
         public string Unit { get; set; }
         public decimal OrderedQuantity { get; set; }
-        public decimal Price { get; set; }
+        public decimal PurchasePrice { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
         public decimal PurchaseAmount { get; set; }

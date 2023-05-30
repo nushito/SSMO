@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SSMO.Data;
 
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230514174522_PurchaseProductM3")]
+    partial class PurchaseProductM3
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -650,9 +652,6 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("DebitToInvoiceNumber")
                         .HasColumnType("int");
 
-                    b.Property<string>("DeliveryAddress")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<decimal>("DeliveryTrasnportCost")
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
@@ -854,12 +853,6 @@ namespace SSMO.Data.Migrations
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
 
-                    b.Property<int>("DeditNotePallets")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DeditNoteSheetsPerPallet")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("DeliveryCost")
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
@@ -889,10 +882,6 @@ namespace SSMO.Data.Migrations
 
                     b.Property<int?>("PurchaseProductDetailsId")
                         .HasColumnType("int");
-
-                    b.Property<decimal>("QuantityM3ForCalc")
-                        .HasPrecision(18, 5)
-                        .HasColumnType("decimal(18,5)");
 
                     b.Property<decimal>("SellPrice")
                         .HasPrecision(18, 5)

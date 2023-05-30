@@ -9,6 +9,7 @@ using SSMO.Models.Documents;
 using SSMO.Models.Documents.CreditNote;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Reports.CreditNote;
+using SSMO.Repository;
 using SSMO.Services.Documents.Invoice;
 using SSMO.Services.Products;
 using System;
@@ -22,11 +23,14 @@ namespace SSMO.Services.Documents.Credit_Note
         private readonly ApplicationDbContext dbContext;
         private readonly IProductService productService;
         private readonly IDocumentService documentService;
-        public CreditNoteService(ApplicationDbContext dbContex, IDocumentService documentService, IProductService productService)
+        private readonly IProductRepository productRepository;
+        public CreditNoteService(ApplicationDbContext dbContex, IDocumentService documentService, 
+            IProductService productService, IProductRepository productRepository)
         {
             this.dbContext = dbContex;
             this.documentService = documentService;
             this.productService = productService;
+            this.productRepository = productRepository; 
         }
 
        
@@ -45,7 +49,7 @@ namespace SSMO.Services.Documents.Credit_Note
                 Date = date,
                 DocumentType = Data.Enums.DocumentTypes.CreditNote,
                 CreditToInvoiceDate = invoiceForCredit.Date,
-                CreditToInvoiceNumber = invoiceForCredit.DocumentNumber,
+                CreditToInvoiceNumber = invoiceForCredit.Id,
                 SupplierId = invoiceForCredit.SupplierId,
                 SupplierOrderId = invoiceForCredit.SupplierOrderId,
                 CurrencyId = invoiceForCredit.CurrencyId,
@@ -69,40 +73,42 @@ namespace SSMO.Services.Documents.Credit_Note
             
             foreach (var product in products)
             {
-                var existProduct = dbContext.Products
+                var mainProductList = dbContext.Products
                     .Where(d => d.DescriptionId == product.DescriptionId
                     && d.GradeId == product.GradeId
                     && d.SizeId == product.SizeId 
-                    && d.LoadedQuantityM3 >0
-                    && d.SoldQuantity > 0
-                    && d.InvoiceProductDetails.Select(a => a.InvoiceId).ToList().Contains(invoiceForCredit.Id))
+                    && d.LoadedQuantityM3 > 0 && d.LoadedQuantityM3 >= product.Quantity)
+                    .ToList();
+
+               var existProduct = dbContext.InvoiceProductDetails
+                    .Where(a=> mainProductList.Select(a=>a.Id).Contains(a.ProductId) && a.InvoiceId == invoiceForCredit.Id)
                     .FirstOrDefault();
+
+                var mainProduct = productRepository.GetMainProduct(existProduct.ProductId);                  
+
 
                 if(existProduct != null)
                 {
-                    var invoicedProductForBack = dbContext.InvoiceProductDetails
-                    .Where(i => i.ProductId == existProduct.Id)
-                    .FirstOrDefault();
-
-                    if (product.Quantity > invoicedProductForBack.InvoicedQuantity)
+                   
+                    if (product.Quantity > existProduct.InvoicedQuantity)
                     {
                         return null;
                     }
-                    invoicedProductForBack.CreditNoteId = creditNote.Id;
-                    invoicedProductForBack.CreditNotePallets = product.Pallets;
-                    invoicedProductForBack.CreditNotePrice = product.Price;
-                    invoicedProductForBack.CreditNoteSheetsPerPallet = product.SheetsPerPallet;
-                    invoicedProductForBack.CreditNoteQuantity = product.Quantity;
-                    invoicedProductForBack.CreditNoteProductAmount = product.Quantity * product.Price;
-                    invoicedProductForBack.CreditNoteBgPrice = product.Price * creditNote.CurrencyExchangeRateUsdToBGN;
-                    invoicedProductForBack.CreditNoteBgAmount = product.Price * creditNote.CurrencyExchangeRateUsdToBGN * product.Quantity;
-                    invoicedProductForBack.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                    existProduct.CreditNoteId = creditNote.Id;
+                    existProduct.CreditNotePallets = product.Pallets;
+                    existProduct.CreditNotePrice = product.Price;
+                    existProduct.CreditNoteSheetsPerPallet = product.SheetsPerPallet;
+                    existProduct.CreditNoteQuantity = product.Quantity;
+                    existProduct.CreditNoteProductAmount = product.Quantity * product.Price;
+                    existProduct.CreditNoteBgPrice = product.Price * creditNote.CurrencyExchangeRateUsdToBGN;
+                    existProduct.CreditNoteBgAmount = product.Price * creditNote.CurrencyExchangeRateUsdToBGN * product.Quantity;
+                    existProduct.TotalSheets = product.Pallets * product.SheetsPerPallet;
                     creditNote.Amount += product.Price * product.Quantity;
-                    creditNote.TotalQuantity += product.Quantity;
+                    //creditNote.TotalQuantity += product.Quantity;
 
                     if (quantityBack == true)
                     {  
-                        existProduct.QuantityAvailableForCustomerOrder += product.Quantity;
+                        mainProduct.QuantityAvailableForCustomerOrder += product.Quantity;
                     }                    
                 }
                 else
@@ -148,7 +154,7 @@ namespace SSMO.Services.Documents.Credit_Note
 
                     creditNote.Amount += product.Price * product.Quantity;
                     creditNote.CreditAndDebitNoteProducts.Add(newProduct);
-                    creditNote.TotalQuantity += product.Quantity;
+                   // creditNote.TotalQuantity += product.Quantity;
                 }
             }                
             
@@ -175,7 +181,7 @@ namespace SSMO.Services.Documents.Credit_Note
 
         public bool EditCreditNote
             (int id, DateTime date, string incoterms, string truckNumber, decimal netWeight, 
-            decimal grossWeight, decimal deliveryCost, decimal currencyExchangeRate, string comment, List<EditProductForCreditNoteViewModel> products)
+            decimal grossWeight, decimal deliveryCost, decimal currencyExchangeRate, string comment, IList<EditProductForCreditNoteViewModel> products)
         {
             if(id == 0) { return false; }
 
@@ -190,6 +196,7 @@ namespace SSMO.Services.Documents.Credit_Note
             creditNote.DeliveryTrasnportCost= deliveryCost;
             creditNote.CurrencyExchangeRateUsdToBGN = currencyExchangeRate;
             creditNote.Comment= comment;
+            creditNote.Amount = 0m;
 
             foreach (var product in products)
             {
@@ -210,8 +217,10 @@ namespace SSMO.Services.Documents.Credit_Note
                 productForEdit.CreditNoteBgAmount = productForEdit.CreditNoteProductAmount * currencyExchangeRate;
 
                 creditNote.Amount += product.CreditNotePrice * product.CreditNoteQuantity;
-                creditNote.TotalQuantity += product.CreditNoteQuantity;               
+               // creditNote.TotalQuantity += product.CreditNoteQuantity;               
             }
+            creditNote.VatAmount = creditNote.Amount * creditNote.Vat / 100;
+            creditNote.CreditNoteTotalAmount = creditNote.Amount + creditNote.VatAmount ?? 0;
 
             dbContext.SaveChanges();
             return true;
@@ -226,7 +235,16 @@ namespace SSMO.Services.Documents.Credit_Note
             var creditNote = dbContext.Documents
                 .Find(id);
 
-            if(productsFromInvoice.Count != 0)
+            var invoice = dbContext.Documents
+                .Where(i=>i.Id== invoiceId)
+                .FirstOrDefault();
+
+            invoice.CreditToInvoiceNumber= invoiceId;
+
+            var customerOrders = dbContext.CustomerOrders
+                .Where(a=>a.Documents.Select(i=>i.Id).Contains(invoiceId)).ToList();
+
+            if(productsFromInvoice != null)
             {
                 foreach (var product in productsFromInvoice)
                 {
@@ -257,9 +275,52 @@ namespace SSMO.Services.Documents.Credit_Note
             {
                 foreach (var product in newPoducts)
                 {
+                  var  newProduct = new Product
+                    {
+                        DescriptionId = product.DescriptionId,
+                        GradeId = product.GradeId,
+                        SizeId = product.SizeId,
+                        DocumentId = creditNote.Id,
+                        InvoiceProductDetails = new List<InvoiceProductDetails>(),
+                        SupplierOrderId = null
+                    };
 
+                    var invoiceProduct = new InvoiceProductDetails
+                    {
+                        Unit = product.Unit,
+                        CreditNotePallets = product.CreditNotePallets,
+                        CreditNotePrice = product.CreditNotePrice,
+                        CreditNoteQuantity = product.CreditNoteQuantity,
+                        CreditNoteSheetsPerPallet = product.CreditNoteSheetsPerPallet,
+                        FscClaim = product.FscClaim,
+                        FscCertificate = product.FscCertificate,
+                        CreditNoteProductAmount = product.CreditNotePrice * product.CreditNoteQuantity,
+                        CreditNoteBgAmount = product.CreditNotePrice * creditNote.CurrencyExchangeRateUsdToBGN * product.CreditNoteQuantity,
+                        CreditNoteBgPrice = product.CreditNotePrice * creditNote.CurrencyExchangeRateUsdToBGN,
+                        CreditNoteId = creditNote.Id,
+                        CustomerOrderId = customerOrders.Select(a => a.Id).First(),
+                        InvoiceId = creditNote.Id                        
+                    };
+
+                    invoiceProduct.TotalSheets = product.CreditNotePallets * product.CreditNoteSheetsPerPallet;                  
+                    creditNote.Amount += invoiceProduct.CreditNoteProductAmount;
+                    if(newPoducts.All(i=>i.Unit == Unit.m3) || newPoducts.All(i => i.Unit == Unit.m2)
+                        || newPoducts.All(i => i.Unit == Unit.pcs) || newPoducts.All(i => i.Unit == Unit.sheets)
+                        || newPoducts.All(i => i.Unit == Unit.m))
+                    {
+                        creditNote.TotalQuantity += invoiceProduct.CreditNoteQuantity;
+                    }
+                    
+                    dbContext.Products.Add(newProduct);
+                    dbContext.SaveChanges();
+                    newProduct.InvoiceProductDetails.Add(invoiceProduct);
                 }
             }
+
+            creditNote.VatAmount = creditNote.Amount * creditNote.Vat;
+            creditNote.TotalAmount = creditNote.Amount + creditNote.VatAmount ?? 0; 
+            
+            dbContext.SaveChanges();    
 
             return true;
         }
@@ -276,9 +337,7 @@ namespace SSMO.Services.Documents.Credit_Note
                 .ToList();
            return invoiceNumbers;
         }
-
-        
-
+                
         public EditCreditNoteViewModel ViewCreditNoteForEdit(int id)
         {
             if (id == 0)
@@ -316,17 +375,11 @@ namespace SSMO.Services.Documents.Credit_Note
             var productsListFromEditInvoice = dbContext.InvoiceProductDetails
                   .Where(cd => cd.CreditNoteId == id ).ToList();
 
-            //var productsList = dbContext.Products
-            //    .Where(d=>d.DocumentId == id)
-            //    .ToList();
-
             if (productsListFromEditInvoice.Any())
             {
                 foreach (var product in productsListFromEditInvoice)
                 {
-                    var mainProduct = dbContext.Products
-                 .Where(a => a.Id == product.ProductId)
-                 .FirstOrDefault();
+                    var mainProduct = productRepository.GetMainProduct(product.ProductId);
 
                     var productCreditNote = new EditProductForCreditNoteViewModel
                     {
@@ -360,40 +413,6 @@ namespace SSMO.Services.Documents.Credit_Note
                     creditNoteForEdit.Products.Add(productCreditNote);
                 }
             }
-
-            //if(productsList.Any())
-            //{
-            //    foreach (var product in productsList)
-            //    {
-            //        var productCreditNote = new EditProductForCreditNoteViewModel
-            //        {
-            //            DescriptionId= product.Id,
-            //            SizeId= product.SizeId,
-            //            GradeId= product.GradeId,
-            //            Description = productService.GetDescriptionName(product.DescriptionId),
-            //            Grade = productService.GetGradeName(product.GradeId),
-            //            Size = productService.GetSizeName(product.SizeId),
-            //            Descriptions = productService.DescriptionIdAndNameList(),
-            //            Grades = productService.GradeIdAndNameList(),
-            //            Sizes = productService.SizeIdAndNameList(),
-            //            Unit = product.Unit,
-            //            CreditNoteAmount = product.Amount,
-            //            CreditNoteBgAmount = product.BgAmount,
-            //            CreditNoteBgPrice = product.BgPrice,
-            //            CreditNoteId = product.DocumentId,
-            //            CreditNotePrice = product.Price,
-            //            CreditNoteQuantity = product.OrderedQuantity,
-            //            CustomerOrderId = product.CustomerOrderId ?? 0,                        
-            //            FscClaim = product.FscClaim,
-            //            FscSertificate = product.FscSertificate,                      
-            //            ProductId = product.Id,
-            //            CreditNotePallets = product.Pallets,
-            //            CreditNoteSheetsPerPallet = product.SheetsPerPallet,                        
-            //        };
-            //        productCreditNote.TotalSheets = product.Pallets * product.SheetsPerPallet;
-            //        creditNoteForEdit.Products.Add(productCreditNote);
-            //    }
-            //}
             return creditNoteForEdit;
         }
     }

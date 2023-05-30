@@ -240,6 +240,10 @@ namespace SSMO.Services.Documents
             var creditOrDebitNote = dbContext.Documents
                 .Find(id);
 
+            var invoice = dbContext.Documents
+                .Where(a => a.Id == creditOrDebitNote.DebitToInvoiceNumber || a.Id == creditOrDebitNote.CreditToInvoiceNumber)
+                .FirstOrDefault();
+
             var creditOrDebitNoteForPrint = new CreditAndDebitNoteViewModel
             {
                 ClientId = creditOrDebitNote.CustomerId ?? 0,
@@ -256,13 +260,13 @@ namespace SSMO.Services.Documents
 
             if(creditOrDebitNote.DocumentType == Data.Enums.DocumentTypes.CreditNote) 
             {
-                creditOrDebitNoteForPrint.InvoiceNumber = creditOrDebitNote.CreditToInvoiceNumber;
+                creditOrDebitNoteForPrint.InvoiceNumber = invoice.CreditToInvoiceNumber;
                 creditOrDebitNoteForPrint.InvoiceDate = creditOrDebitNote.CreditToInvoiceDate;
                 creditOrDebitNoteForPrint.Total = creditOrDebitNote.CreditNoteTotalAmount;
             }
             else if(creditOrDebitNote.DocumentType == Data.Enums.DocumentTypes.DebitNote) 
             {
-                creditOrDebitNoteForPrint.InvoiceNumber = creditOrDebitNote.DebitToInvoiceNumber;
+                creditOrDebitNoteForPrint.InvoiceNumber = invoice.DebitToInvoiceNumber;
                 creditOrDebitNoteForPrint.InvoiceDate = creditOrDebitNote.DebitToInvoiceDate;
                 creditOrDebitNoteForPrint.Total = creditOrDebitNote.DebitNoteTotalAmount;
             }   

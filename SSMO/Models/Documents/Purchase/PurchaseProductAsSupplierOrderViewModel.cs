@@ -37,5 +37,6 @@ namespace SSMO.Models.Documents.Purchase
         public string PurchaseFscCertificate { get; set; }
         public int? SupplierOrderId { get; set; }
         public string VehicleNumber { get; set; }
+        public bool ProductOrNot { get; set; }
     }
 }

@@ -43,7 +43,7 @@
         </select>
         </td>
         <td>
-            <label >Supplier</label>
+            <label asp-for="SupplierId"> Supplier </label>
             <select asp-for="SupplierId" class="form-control">
                 @foreach(var supplier in Model.Suppliers)
                 {
@@ -158,7 +158,7 @@
                                 </td>
                                 <td>
                                     <div class="editor-field">
-                                                <select name="FscCertificate[0]" asp-for="ProductList.ElementAt(i).FscCertificate" class="text-box single-line">
+                                                    <select name="PurchaseFscCertificate[0]" asp-for="ProductList.ElementAt(i).PurchaseFscCertificate" class="text-box single-line">
                                             <option value="">-</option>
                                     @foreach (var fsc in Model.SupplierFscCertificate)
                                     {
@@ -246,7 +246,7 @@
                                     '<input class="text-box single-line" name="FscClaim[' + counter + ']" value="" required="required" />' +
                                     '</td>' +
                                     '<td>' +
-                                        '<select class="text-box single-line" name ="FscSertificate[' + counter +']" asp-for = "FscSertificate"><option value="">-</option> @foreach (var fsc in Model.SupplierFscCertificate){<option value="@fsc">@fsc</option> }</select>' +
+                                       '<select class="text-box single-line" name ="PurchaseFscCertificate[' + counter +']" asp-for = "PurchaseFscCertificate"><option value="">-</option> @foreach (var fsc in Model.SupplierFscCertificate) {<option value="@fsc">@fsc</option>}</select>' +
                                     '</td>'+
                                     '<td>' +
                                             '<select class="text-box single-line" name ="Unit[' + counter +']" asp-for = "Unit"><option value="">All</option> @foreach (var unit in service.GetUnits()){<option value="@unit">@unit</option>}</select>' +

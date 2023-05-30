@@ -18,20 +18,113 @@
             </select>
         </div>
          <div class="row col-md-4 mb-3">           
-                 <label class="control-label"> Select Invoice</label>
-                 <select class="form-control" id="InvoiceId" name="InvoiceId" asp-for="InvoiceId" asp-items="@(new SelectList(string.Empty,"InvoiceId", "InvoiceNumber"))"></select>               
+            <label class="control-label"> Select Invoice</label>
+           <select class="form-control" id="InvoiceId" name="InvoiceId" asp-for="InvoiceId" asp-items="@(new SelectList(string.Empty,"InvoiceId", "InvoiceNumber"))"></select>               
         </div>    
         <div class="row col-md-4" id="datepicker">
         <label asp-for="Date" >Date Debit note</label>
         <input itemid="date" asp-for="Date" name="Date" type="date" value="@DateTime.Now.ToString("dd-MM-yyyy")" class="form-control"/> 
         <span asp-validation-for="Date" class="small text-danger"></span>
-        </div>
-        <div class="row col-md-4">         
-         <input id="moreQyantity" class="form-check-input" type="checkbox" asp-for="MoreQuantity" name="moreQuantity">
-         <label asp-for="MoreQuantity">Update Exist Product</label>
-        </div>
+        </div>       
+         <div class="row col-md-4">   
+         <label asp-for="DeliveryAddress"></label>
+         <input id="deliveryAddress" class="form-control" type="text" asp-for="DeliveryAddress" name="DeliveryAddress">         
+        </div>        
         <hr />
-        <div  class="table-responsive-sm">
+        <div class="table-responsive">
+            <p>Available Products on stock</p>
+       <table id="purchaseProductsTable" class="table table-bordered">
+        <thead class="thead-light">
+            <tr>
+                <td>Check</td>
+                <td>Description</td>                
+                <td>FSC claim</td>
+                <td>FSC certificate</td>
+                <td>Unit</td>
+                <td>Pallets</td>
+                <td>Sheets/pallet</td>
+                <td>Quantity</td>
+                <td>Price</td>               
+            </tr>
+        </thead>
+        <tbody>
+                    @for (int i = 0; i < Model.PurchaseProducts.Count(); i++)
+                    {
+                    <div>
+                           <input type="hidden" value="@Model.PurchaseProducts[i].Id" asp-for="@Model.PurchaseProducts[i].Id">
+                     </div>
+                    <div>
+                           <input type="hidden" value="@Model.PurchaseProducts[i].ProductId" asp-for="@Model.PurchaseProducts[i].ProductId">
+                    </div>
+
+                    <tr>   
+                        <td>
+                            <input asp-for="@Model.PurchaseProducts[i].Checked" type="checkbox">
+                        </td>
+                            <td class="col-md-2">
+                                    <div class="editor-field">
+                                        <input asp-for="@Model.PurchaseProducts[i].ProductFullDescription" value="@Model.PurchaseProducts[i].ProductFullDescription" required="required">
+                                        <span asp-validation-for="@Model.PurchaseProducts[i].ProductFullDescription" class="small text-danger"></span>
+                                        </div>
+                            </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">                              
+                                      <input asp-for="@Model.PurchaseProducts[i].FscClaim" value="@Model.PurchaseProducts[i].FscClaim" required="required">
+                                   <span asp-validation-for="@Model.PurchaseProducts[i].FscClaim" class="small text-danger"></span>
+                          </div>
+                        </td>
+
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                    <select asp-for="@Model.PurchaseProducts[i].FscSertificate" >
+                                    <option value="-">-</option>
+                                            <option value="@Model.PurchaseProducts[i].FscSertificate">@Model.PurchaseProducts[i].FscSertificate</option>
+                                        <span asp-validation-for="@Model.PurchaseProducts[i].FscSertificate" class="small text-danger"></span>
+                                </select>
+                            </div>
+                        </td>
+                        <td class="col-sm-1">
+                                <div class="editor-field">
+                                    <input asp-for="@Model.PurchaseProducts[i].Unit" value="@Model.PurchaseProducts[i].Unit" required="required">
+                                    <span asp-validation-for="@Model.PurchaseProducts[i].Unit" class="small text-danger"></span>
+                                    </div>
+                        </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                      <input asp-for="@Model.PurchaseProducts[i].Pallets" type="number"  required="required">
+                                      <span asp-validation-for="@Model.PurchaseProducts[i].Pallets" class="small text-danger"></span>
+                                </div>
+                        </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                               <input asp-for="@Model.PurchaseProducts[i].SheetsPerPallet"  type="number" required="required">
+                                     <span asp-validation-for="@Model.PurchaseProducts[i].SheetsPerPallet" class="small text-danger"></span>
+                                    </div>
+                        </td>
+                            <td class="col-sm-1">
+                            <div class="editor-field">
+                                              <input asp-for="@Model.PurchaseProducts[i].DebitNoteQuantity"  required="required">
+                                           <span asp-validation-for="@Model.PurchaseProducts[i].DebitNoteQuantity" class="small text-danger"></span>
+                                    </div>
+                        </td>
+
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                           <input asp-for="@Model.PurchaseProducts[i].Price"  type="number" min="0.0000" step="0.0001" required="required">
+                                           <span asp-validation-for="@Model.PurchaseProducts[i].Price" class="small text-danger"></span>
+                            </div>
+                        </td>                          
+                       
+                    </tr>
+                    }
+        </tbody>
+    </table>
+        </div>
+         <div class="row col-md-4">         
+         <input id="moreQuantity" class="form-check-input" type="checkbox" asp-for="MoreQuantity" name="moreQuantity">
+         <label asp-for="MoreQuantity">Update Quantity on Existing Product from the Invoice</label>
+        </div>
+        <div class="table-responsive-sm">
             <table id="productTable" class="table-striped">
                 <thead>
                     <tr>                       
@@ -143,6 +236,14 @@
                     $("#datepicker").datepicker();
                 });
                 </script>
+                <script>
+                    $function(){
+                            $("#moreQuantity").onclick(function(){
+                                    $("#purchaseProductsTable").load()
+                            }
+                            )
+                    }
+                </script>
 
                  <script type="text/javascript">
                     $(document).ready(function() {                       
@@ -226,36 +327,35 @@
                             return false;
                         }
                   </script>
+                    @*  <script type="text/javascript">
+        $(function onchange(){
+                             $("#InvoiceId").change(function()
+                                { 
+                                    var invoiceId = $(this).find('option:selected').val();  
+                                if(invoiceId != 0 {
+                                         $.ajax({
+                                                type:'GET',
+                                                url: "/Documents/GetProductsForDebitNote",
+                                                dataType : 'json',
+                                                data: {id = invoiceId},
+                                                success: function(products)
+                                                    {
+                                                        var table = $('#productTable');
+                                                        $(table).find("tr:gt(0)").remove();                                                
+                                                        var row="";
+                                                        for(var i=0; i< products.length;i++)
+                                                            {
+                                                                row += "<tr><td>" + ' <select class="text-box single-line" name="DescriptionId[' + i + ']" asp-for="DescriptionId" ><option value="">All</option>@foreach (var desc in service.DescriptionIdAndNameList()) { <option value="@desc.Id">@desc.Name</option>}</select>' + "</td><td>" + products[i].Grade + "</td><td>" + products[i].Size + "</td><td>" + products[i].Unit + "</td><td>" + products[i].Quantity + "</td><td>" + products[i].Price + "</td></tr>");
+                                                            }
+                                                        table.append(rows);    
+                                                        },
+                                        });
+                                }
+                                    debugger
+                                   // return false;
+                             });
+                    });
+                  </script>*@
     }
 
-                    @*$(function onchange(){
-        //                     $("#InvoiceId").change(function()
-        //                        { 
-        //                            var invoiceId = $(this).find('option:selected').val();  
-        //                        if(invoiceId != 0 {
-        //                                 $.ajax({
-        //                                        type:'GET',
-        //                                        url: "/Documents/GetProductsForDebitNote",
-        //                                        dataType : 'json',
-        //                                        data: {id = invoiceId},
-        //                                        success: function(products)
-        //                                            {
-        //                                                var table = $('#productTable');
-        //                                                $(table).find("tr:gt(0)").remove();                                                
-        //                                                var row="";
-        //                                                for(var i=0; i< products.length;i++)
-        //                                                    {
-        //                                                        row += "<tr><td>" + ' <select class="text-box single-line" name="DescriptionId[' + i + ']" asp-for="DescriptionId" ><option value="">All</option>@foreach (var desc in service.DescriptionIdAndNameList())
-        //{
-        //    <option value="@desc.Id">@desc.Name</option>
-        //}</select>' + 
-        //        "</td><td>" + products[i].Grade + "</td><td>" + products[i].Size + "</td><td>" + products[i].Unit + "</td><td>" + products[i].Quantity + "</td><td>" + products[i].Price + "</td></tr>");
-        //                                                    }
-        //                                                table.append(rows);    
-        //                                                },
-        //                                });
-        //                        }
-        //                            debugger
-        //                           // return false;
-        //                     });
-        //            });*@
+                    

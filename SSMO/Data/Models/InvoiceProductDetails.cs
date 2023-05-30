@@ -28,6 +28,7 @@ namespace SSMO.Data.Models
         public decimal Profit { get; set; }
         public string VehicleNumber { get; set; }
         public decimal InvoicedQuantity { get; set; }
+        public decimal QuantityM3ForCalc { get; set; }
         public int? CreditNoteId { get; set; }
         public Document CreditNote { get; set; }
         public int? DebitNoteId { get; set; }
@@ -40,6 +41,8 @@ namespace SSMO.Data.Models
         public decimal CreditNoteBgPrice { get; set; }
         public decimal CreditNoteBgAmount { get; set; }
         public decimal DebitNoteQuantity { get; set; }
+        public int DeditNotePallets { get; set; }
+        public int DeditNoteSheetsPerPallet { get; set; }
         public decimal DebitNoteAmount { get; set; }
         public decimal DebitNotePrice { get; set; }
         public decimal DebitNoteBgPrice { get; set; }

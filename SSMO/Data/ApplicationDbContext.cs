@@ -479,6 +479,11 @@ namespace SSMO.Data
                .HasPrecision(18, 4);
 
             builder.Entity<PurchaseProductDetails>()
+              .Property(a => a.QuantityM3)
+              .HasColumnType("decimal")
+              .HasPrecision(18, 5);
+
+            builder.Entity<PurchaseProductDetails>()
                 .HasOne(a=>a.PurchaseInvoice)
                 .WithMany(a => a.PurchaseProducts)
                 .HasForeignKey(a=>a.PurchaseInvoiceId)
@@ -509,6 +514,11 @@ namespace SSMO.Data
                 .Property(a=>a.InvoicedQuantity)
                 .HasColumnType("decimal")
                 .HasPrecision(18, 5);
+
+            builder.Entity<InvoiceProductDetails>()
+               .Property(a => a.QuantityM3ForCalc)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 5);
 
             builder.Entity<InvoiceProductDetails>()
                 .Property(a => a.DeliveryCost)

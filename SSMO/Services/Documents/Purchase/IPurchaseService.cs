@@ -1,4 +1,5 @@
-﻿using SSMO.Models.Documents.Purchase;
+﻿using SSMO.Models.Documents.DebitNote;
+using SSMO.Models.Documents.Purchase;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.Purchase;
 using System;
@@ -17,7 +18,7 @@ namespace SSMO.Services.Documents.Purchase
             decimal duty, decimal factoring, decimal customsExpenses, decimal fiscalAgentExpenses,
             decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses,
             int vat, string truckNumber, string swb, List<PurchaseProductAsSupplierOrderViewModel> products,
-            string incoterms, decimal paidAdvance, DateTime? dateOfPayment);
+            string incoterms, decimal paidAdvance, DateTime? dateOfPayment,string deliveryAddress);
         public EditPurchasePaymentDetails GetPurchaseForPaymentEdit(string number);
         public bool EditPurchasePayment(string number, bool paidStatus, decimal paidAvance, DateTime datePaidAmount);
 
@@ -30,5 +31,6 @@ namespace SSMO.Services.Documents.Purchase
             decimal procentComission, decimal otherExpenses, List<PurchaseProductsForEditFormModel> purchaseProducts);
 
         public List<PurchaseProductAsSupplierOrderViewModel> Products(int id);
+        public IList<PurchaseProductsForDebitNoteViewModel> PurchaseProducts();
     }
 }

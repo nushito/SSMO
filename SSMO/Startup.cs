@@ -28,6 +28,7 @@ using iTextSharp.text;
 using SSMO.Services.PDF;
 using SSMO.Services.Documents.Credit_Note;
 using SSMO.Services.Documents.DebitNote;
+using SSMO.Repository;
 
 namespace SSMO
 {
@@ -92,6 +93,7 @@ namespace SSMO
             services.AddTransient<IInvoiceService, InvoiceService>();
             services.AddTransient<ICreditNoteService, CreditNoteService>();
             services.AddTransient<IDebitNoteService, DebitNoteService>();
+            services.AddTransient<IProductRepository, ProductRepository>();
             services.AddScoped<IViewRenderService, ViewRenderService>();
             services.AddScoped<IHtmlToPdfConverter, HtmlToPdfConverter>();
             services.AddScoped<HttpContextUserIdExtension>();

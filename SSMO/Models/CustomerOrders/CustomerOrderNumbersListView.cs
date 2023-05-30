@@ -20,6 +20,7 @@ namespace SSMO.Models.CustomerOrders
         public int? Number { get; set; }
         public string TruckNumber { get; set; }
         public string Swb { get; set; }
+        public string DeliveryAddress { get; set; }
         public decimal DeliveryCost { get; set; }
         public decimal GrossWeight { get; set; }
         public decimal NetWeight { get; set; }
@@ -28,6 +29,7 @@ namespace SSMO.Models.CustomerOrders
         public string Comment { get; set; }
         public List<int> SelectedCustomerOrders { get; set; }
         public List<ProductsForInvoiceViewModel> Products { get; set; }
+        public List<ServiceProductForInvoiceFormModel> ServiceProducts { get; set; }
         public int CustomerId { get; set; }
     }
 }

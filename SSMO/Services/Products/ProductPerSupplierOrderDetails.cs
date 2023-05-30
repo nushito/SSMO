@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace SSMO.Services.Products
 {
@@ -15,9 +16,10 @@ namespace SSMO.Services.Products
         public string Grade { get; set; }
         public IEnumerable<string> Grades { get; set; }
         public string FSCClaim { get; set; }
-        public string FSCSertificate { get; set; }
+        public string PurchaseFscCertificate { get; set; }
         public string Unit { get; set; }
         public decimal PurchasePrice { get; set; }
+        [Range(0.0, 9999999999999.99999)]
         public decimal OrderedQuantity { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }

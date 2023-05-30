@@ -13,13 +13,11 @@ namespace SSMO.Models.Products
         public int SizeId { get; set; }
         public string Size { get; set; }
         public IEnumerable<string> SizeNames { get; set; }
-        public int GradeId { get; set; }
-        [Required]
+        public int GradeId { get; set; }       
         public string Grade { get; set; }
         public IEnumerable<string> GradeNames { get; set; }
-        public string FscClaim { get; set; }
-        public string FscCertificate { get; set; }
-        public string SupplierFscCertNumber { get; set; }
+        public string FscClaim { get; set; }        
+        public string PurchaseFscCertificate { get; set; }
         public string Unit { get; set; }
         public ICollection<string> Units { get; set; }
         public int CustomerOrderId { get; set; }
@@ -34,8 +32,7 @@ namespace SSMO.Models.Products
         [Range(0.0, 9999999999999.99999)]
         public decimal OrderedQuantity { get; set; }
         public int SheetsPerPallet { get; set; }
-        public decimal QuantityM3  { get; set; }
-
+      
         public IEnumerable<DescriptionForProductSearchModel> Descriptions { get; set; }
        
         public IEnumerable<SizeForProductSearchModel> Sizes { get; set; }

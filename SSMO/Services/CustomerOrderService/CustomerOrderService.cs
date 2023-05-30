@@ -239,7 +239,6 @@ namespace SSMO.Services.CustomerOrderService
                 .Select(n=>n.OrderConfirmationNumber)
                 .FirstOrDefault();
         }
-
         public List<CustomerOrdersJsonList> CustomerOrderCollection(int customerorderId)
         {
             return dbContext.CustomerOrders
@@ -251,7 +250,6 @@ namespace SSMO.Services.CustomerOrderService
                 })
                 .ToList();
         }
-
         public void CheckCustomerOrderStatus(int id)
         {
             var customerOrderAustandingQuantity = dbContext.CustomerOrderProductDetails

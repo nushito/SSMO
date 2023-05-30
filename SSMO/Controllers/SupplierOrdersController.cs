@@ -149,7 +149,7 @@ namespace SSMO.Controllers
                     Unit = unit,
                     PurchasePrice = decimal.Parse(price.ToString()),
                     FscClaim = fscClaim,
-                    SupplierFscCertNumber = fscCertificate,
+                    PurchaseFscCertificate = fscCertificate,
                     Pallets = int.Parse(pallets.ToString()),
                     SheetsPerPallet = int.Parse(sheetsPerPallet.ToString()),
                     Quantity = decimal.Parse(quantity.ToString())
@@ -165,94 +165,7 @@ namespace SSMO.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        [HttpGet]
-        //public IActionResult AddProducts(int supplierOrderId)
-        //{
-        //    string userId = this.User.UserId();
-        //    var myCompaniesUserId = myCompanyService.GetCompaniesUserId();
-
-        //    if(!myCompaniesUserId.Contains(userId)) return BadRequest();
-
-        //    if (!User.Identity.IsAuthenticated)
-        //    {
-        //        return RedirectToAction("Index", "Home");
-        //    }
-
-        //    if (!ModelState.IsValid)
-        //    {
-        //        new ProductSupplierFormModel
-        //        {
-        //            Descriptions = (IEnumerable<Models.Reports.ProductsStock.DescriptionForProductSearchModel>)productService.GetDescriptions(),
-        //            Grades = (IEnumerable<Models.Reports.ProductsStock.GradeForProductSearchModel>)productService.GetGrades(),
-        //            Sizes = (IEnumerable<Models.Reports.ProductsStock.SizeForProductSearchModel>)productService.GetSizes(),
-        //            Units = productService.GetUnits()
-        //        };
-        //    }
-        //    var count = int.Parse(TempData["Count"].ToString());
-        //    ViewBag.FscCert = supplierService.GetSupplierFscCertificateByOrderId(supplierOrderId);
-
-        //    var products = new List<ProductSupplierFormModel>();
-        //    for (int i = 0; i < count; i++)
-        //    {
-        //        var product = new ProductSupplierFormModel()
-        //        {
-        //            Descriptions = (IEnumerable<Models.Reports.ProductsStock.DescriptionForProductSearchModel>)productService.GetDescriptions(),
-        //            Grades = (IEnumerable<Models.Reports.ProductsStock.GradeForProductSearchModel>)productService.GetGrades(),
-        //            Sizes = (IEnumerable<Models.Reports.ProductsStock.SizeForProductSearchModel>)productService.GetSizes(),
-        //            Units = productService.GetUnits()
-        //        };
-        //        products.Add(product);
-        //    }
-        //    return View(products);
-        //}
-
-        //[HttpPost]
-        //[Authorize]
-        //public IActionResult AddProducts(
-        //  int supplierOrderId, List<ProductSupplierFormModel> productmodel)
-        //{
-        //    if (!User.Identity.IsAuthenticated)
-        //    {
-        //        return RedirectToAction("Index", "Home");
-        //    }
-
-        //    if (!ModelState.IsValid)
-        //    {
-        //        var products = new List<ProductSupplierFormModel>();
-
-        //        foreach (var item in products)
-        //        {
-        //            var product = new ProductSupplierFormModel()
-        //            {
-        //                Descriptions = (IEnumerable<Models.Reports.ProductsStock.DescriptionForProductSearchModel>)productService.GetDescriptions(),
-        //                Grades = (IEnumerable<Models.Reports.ProductsStock.GradeForProductSearchModel>)productService.GetGrades(),
-        //                Sizes = (IEnumerable<Models.Reports.ProductsStock.SizeForProductSearchModel>)productService.GetSizes(),
-        //                Units = productService.GetUnits()
-        //            };
-        //            products.Add(product);
-        //        }
-        //    }
-
-        //    if (!User.Identity.IsAuthenticated)
-        //    {
-        //        return BadRequest();
-        //    }
-
-        //    //if (!productmodel.Any())
-        //    //{
-        //    //    return RedirectToAction("AddCustomerOrder", "CustomerOrdersController", customerorderId);
-        //    //}
-        //    foreach (var product in productmodel)
-        //    {
-        //        productService.CreateProduct(product, supplierOrderId);
-        //        //product.SupplierFscCertNumber = supplierFscCert;              
-        //    }
-
-        //    supplierOrderService.TotalAmountAndQuantitySum(supplierOrderId);
-        //    return RedirectToAction("PrintSupplierOrder", supplierOrderId);
-        //}
-
-
+        
         public IActionResult PrintSupplierOrder(int supplierOrderId)
         {
 

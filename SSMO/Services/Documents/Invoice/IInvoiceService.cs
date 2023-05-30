@@ -10,11 +10,12 @@ namespace SSMO.Services.Documents.Invoice
     public interface IInvoiceService
     {
         public InvoicePrintViewModel CreateInvoice(
-            List<int> selectedCustomerOrderNumbers, List<ProductsForInvoiceViewModel> products, 
+            List<int> selectedCustomerOrderNumbers, List<ProductsForInvoiceViewModel> products,
+             List<ServiceProductForInvoiceFormModel> serviceProducts,
             DateTime date, decimal currencyExchangeRateUsdToBGN,
             int number,string myCompanyName, string truckNumber, decimal deliveryCost, string swb, 
             decimal netWeight, decimal grossWeight,string incoterms, int customerId, int currencyId, int vat, 
-            int myCompanyId, string comment);
+            int myCompanyId, string comment, string deliveryAddress);
         public bool CheckFirstInvoice(int myCompanyId);
         public EditInvoicePaymentModel InvoiceForEditByNumber(int documentNumber);
         public bool EditInvoicePayment(int documentNumber, bool paidStatus, decimal paidAdvance, DateTime datePaidAmount);

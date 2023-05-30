@@ -68,6 +68,7 @@ namespace SSMO.Data.Models
         public decimal TotalAmount { get; set; }
         public decimal TotalQuantity { get; set; }
         public string Comment { get; set; }
+        public string DeliveryAddress { get; set; }
         public ICollection<CustomerOrder> CustomerOrders { get; set; }
         public ICollection<PurchaseProductDetails> PurchaseProducts { get; set; }
         public ICollection<CustomerOrderProductDetails> CustomerOrderProducts { get; set; }

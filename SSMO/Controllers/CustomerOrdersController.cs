@@ -155,7 +155,7 @@ namespace SSMO.Controllers
                                  (List<int>)customermodel.SelectedSupplierOrders);
                 ViewBag.NumberExist = 1;
             }
-            return RedirectToAction("AddOrderProducts", new { selectedSupplierOrders = customermodel.SelectedSupplierOrders, customerorderId = customerorderId });
+            return RedirectToAction("AddOrderProducts", new { selectedSupplierOrders = customermodel.SelectedSupplierOrders, customerorderId = customerorderId }) ;
         }
 
         public IActionResult AddOrderProducts(List<int> selectedSupplierOrders, int customerorderId)
@@ -184,7 +184,7 @@ namespace SSMO.Controllers
                     DescriptionId = product.DescriptionId,
                     GradeId = product.GradeId,
                     SizeId = product.SizeId,
-                    FSCSertificate = product.FSCSertificate,
+                    FSCSertificate = product.PurchaseFscCertificate,
                     FSCClaim = product.FSCClaim,                    
                     Pallets = product.Pallets,
                     SheetsPerPallet = product.SheetsPerPallet,
@@ -193,7 +193,8 @@ namespace SSMO.Controllers
                     Sizes = productService.GetSizes(),
                     SupplierOrderId = product.SupplierOrderId,
                     Quantity = product.OrderedQuantity,
-                    Unit = product.Unit
+                    Unit = product.Unit,
+                    CustomerOrderId = customerorderId
                 };
                 listProducts.Add(productSupp);
             };
@@ -226,10 +227,11 @@ namespace SSMO.Controllers
             {
                 return View(model);
             }
+
             foreach (var product in model)
             {       
                 if(product.Quantity == 0) { continue; }
-                var check = productService.EditProduct(product.Id, customerorderId, product.SupplierOrderId, product.Description,
+                var check = productService.CreateCustomerOrderProduct(product.Id, customerorderId, product.SupplierOrderId, product.Description,
                              product.Grade, product.Size, product.FSCSertificate, product.FSCClaim, product.Pallets,
                              product.SheetsPerPallet, product.SellPrice, product.Quantity, product.Unit);
 

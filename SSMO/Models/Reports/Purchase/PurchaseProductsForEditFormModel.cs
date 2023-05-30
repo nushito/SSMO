@@ -20,5 +20,6 @@
         public decimal CostPrice { get; set; }
         public int TotalSheets { get; set; }
         public string VehicleNumber { get; set; }
+        public bool ProductOrNot { get; set; }
     }
 }

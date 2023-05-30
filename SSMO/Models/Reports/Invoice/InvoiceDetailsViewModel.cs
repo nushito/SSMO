@@ -7,12 +7,13 @@ namespace SSMO.Models.Reports.Invoice
     public class InvoiceDetailsViewModel
     {
         public int DocumentNumber { get; set; }
-
+        public string DocumentType { get; set; }
         public int MyCompanyId { get; set; }
         public MyCompanyInvoiceDetailsModel Seller { get; set; }
         public ICollection<CustomerOrderForInvoiceViewModel> CustomerOrders { get; set; }
         public int CustomerOrderId { get; set; }
-        public int OrderConfirmationNumber { get; set; }
+        public ICollection<int> OrderConfirmationNumber { get; set; }
+        public ICollection<string> CustomerPoNumbers { get; set; }
         public int CustomerId { get; set; }
         public InvoiceCustomerDetailsModel Customer { get; set; }
         public int SupplierOrderId { get; set; }
@@ -33,9 +34,11 @@ namespace SSMO.Models.Reports.Invoice
         public int? VAT { get; set; }
         public decimal VatAmount { get; set; }
         public decimal TotalAmount { get; set; }
-        public int CreditToInvoiceNumber { get; set; }
+        public int CreditToInvoiceNumber { get; set; }       
+        public decimal CreditNoteTotalAmount { get; set; }
         public DateTime CreditToInvoiceDate { get; set; }
-        public int DebitToInvoiceNumber { get; set; }
+        public int DebitToInvoiceNumber { get; set; }       
+        public decimal DebitNoteTotalAmount { get; set; }
         public DateTime DebitToInvoiceDate { get; set; }
         public ICollection<InvoiceBankDetailsModel> CompanyBankDetails { get; set; }
         public IEnumerable<InvoiceProductsDetailsViewModel> Products { get; set; }

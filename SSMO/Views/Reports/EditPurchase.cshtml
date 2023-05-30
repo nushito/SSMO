@@ -106,6 +106,9 @@
        <thead class="thead-light">
         <tr>
             <th>
+               Check if it's a Product
+            </th>
+            <th>
                 Description
             </th>
             <th>
@@ -146,6 +149,11 @@
                 <tr>
                     <input type="hidden" asp-for="@Model.PurchaseProducts[i].Id">
                           <input type="hidden" asp-for="@Model.PurchaseProducts[i].ProductId">
+                              <td class="col-sm-1">
+                       <input class="form-check-input" type="checkbox" asp-for="@Model.PurchaseProducts[i].ProductOrNot">
+                       <label class="form-check-label" > </label> 
+
+                          </td>
                           <td class="col-sm-1">
                                     <div class="editor-field">
                                             <select asp-for="@Model.PurchaseProducts[i].Description">

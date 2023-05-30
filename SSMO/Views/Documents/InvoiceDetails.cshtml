@@ -1,4 +1,7 @@
 ﻿@model CustomerOrderNumbersForInvoiceListView
+@using SSMO.Services.MyCompany
+@inject IProductService service;
+@inject IMycompanyService mycompanyService;
 
 @{
     ViewBag.Title = "Select Customer Order";    
@@ -49,6 +52,10 @@
      <div class="row col-md-4">
         <label asp-for="Incoterms">Incoterms</label>
         <input asp-for="Incoterms" type="text" class="form-control">
+    </div>
+      <div class="row col-md-4">
+        <label asp-for="DeliveryAddress">Delivery Address</label>
+        <input asp-for="DeliveryAddress" type="text" class="form-control">
     </div>
      <div class="row col-md-4">
         <label asp-for="NetWeight">Net Weight</label>
@@ -219,6 +226,91 @@
             }
         </tbody>
     </table>
+     <div  class="table-responsive-sm">
+            <table id="clientTable" class="table-striped">
+                <thead>
+                    <tr>                       
+                        <th>Description</th>
+                        <th>Size</th>
+                        <th>Grade</th>                        
+                        <th>Unit</th>
+                        <th>Unit Price</th>    
+                        <th class="center">Quantity</th>                        
+                    </tr>
+                </thead>
+                <tbody>
+                @for (int i = 0; i < Model.ServiceProducts.Count(); i++)
+                {
+                            <tr id="tablerow0">      
+                                <td>
+                                    <div class="editor-field">
+                                                <select name="DescriptionId[0]" asp-for="ServiceProducts.ElementAt(i).DescriptionId" class="text-box single-line">
+                                            <option value="0">All</option>
+                                    @foreach (var description in Model.ServiceProducts.ElementAt(i).Descriptions)
+                                    {
+                                        <option value="@description.Id">@description.Name</option>
+                                    }
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="editor-field">
+                                          <select name="SizeId[0]" asp-for="ServiceProducts.ElementAt(i).SizeId" class="text-box single-line">
+                                            <option value="">All</option>
+                                    @foreach (var size in Model.ServiceProducts.ElementAt(i).Sizes)
+                                    {
+                                          <option value="@size">@size</option>
+                                    }
+                                        </select>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="editor-field">
+                                                <select name="GradeId[0]" asp-for="ServiceProducts.ElementAt(i).GradeId" class="text-box single-line">
+                                            <option value="">All</option>
+                                    @foreach (var grade in Model.ServiceProducts.ElementAt(i).Grades)
+                                    {
+                                         <option value="@grade">@grade</option>
+                                    }
+                                        </select>
+                                    </div>
+                                </td>                          
+                                
+                                 <td class="col-sm-1">
+                                            <div class="editor-field">
+                                                <select name="Unit" asp-for="ServiceProducts.ElementAt(i).Unit" class="text-box single-line">
+                                    @foreach (var unit in service.GetUnits())
+                                    {
+                                          <option value="@unit">@unit</option>
+                                    }
+                                                </select>
+                                        </div>
+                                    </td>
+                                <td>
+                                    <div class="editor-field">
+                                                <input asp-for="ServiceProducts.ElementAt(i).SellPrice" class="text-box single-line" name="SellPrice[0]" value="" required="required">
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="editor-field">
+                                                <input asp-for="ServiceProducts.ElementAt(i).InvoicedQuantity" class="text-box single-line" name="InvoicedQuantity[0]" value="" required="required">
+                                    </div>
+                                </td>                            
+                                <td>
+                                    <button type="button" class="btn-danger" onclick="removeTr(0);">Delete</button>
+                                </td>
+                           </tr>
+                            <tr>
+
+                            </tr>
+
+                }                  
+                </tbody>                 
+            </table>
+            <div class="row p-3">
+                <button id="addrow" type="button" class="btn btn-outline-success">Add</button>
+            </div>
+        </div> 
     <input type="submit" value="Create Invoice" class="btn btn-primary mt-3" />
 
    @* <input type="submit" value="Create Invoice" class="btn btn-primary mt-3"  
@@ -241,9 +333,52 @@
     </div>*@
    <hr />
 </form>
-
+@section Scripts{
         <script type="text/javascript">
-    $(function () {
-        $("#datepicker").datepicker();
-    });
-</script>
+        $(function () {
+            $("#datepicker").datepicker();
+        });
+
+        var counter = 1;
+                        $(function products () {
+                            $('#addrow').click(function () {
+                                $('<tr id="tablerow' + counter + '"><td>' +
+                                       ' <select class="text-box single-line" name="DescriptionId[' + counter + ']" asp-for="DescriptionId" ><option value="">All</option>@foreach (var desc in service.DescriptionIdAndNameList()){<option value="@desc.Id">@desc.Name</option>}</select>' +
+                                    '</td>' +
+                                    '<td>' +
+                                        '<select class="text-box single-line" name="SizeId[' + counter + ']" asp-for="SizeId" ><option value="">All</option>@foreach (var size in service.SizeIdAndNameList()){<option value="@size.Id">@size.Name</option>}</select>' +
+                                    '</td>' +
+                                    '<td>' +
+                                        '<select class="text-box single-line" name="GradeId[' + counter + ']" asp-for="GradeId" ><option value="">All</option>@foreach (var grade in service.GradeIdAndNameList()){<option value="@grade.Id">@grade.Name</option>}</select>' +
+                                    '</td>' + 
+                                   
+                                    '<td>' +
+                                            '<select class="text-box single-line" name ="Unit[' + counter +']" asp-for = "Unit"><option value="">All</option> @foreach (var unit in service.GetUnits()){<option value="@unit">@unit</option>}</select>' +
+                                    '</td>'+                              
+
+                                    '<td>' +
+                                    '<input class="text-box single-line" name="SellPrice[' + counter + ']" value="" required="required" />' +
+                                    '</td>' +
+                                    
+                                    '<td>' +
+                                    '<input class="text-box single-line" name="InvoicedQuantity[' + counter + ']" value="" required="required" />' +
+                                    '</td>' +
+                                    '<td>' +
+                                     '<button type="button" class="btn btn-primary" onclick="removeTr(' + counter + ');">Delete</button>' +
+                                    '</td>' +
+                                    '</tr>').appendTo('#clientTable');
+                                counter++;
+                                return false;
+                            });
+                        });
+
+                        function removeTr(index) {
+                            if (counter > 1) {
+                                $('#tablerow' + index).remove();
+                                counter--;
+                            }
+                            return false;
+                        }
+    </script>
+}
+        

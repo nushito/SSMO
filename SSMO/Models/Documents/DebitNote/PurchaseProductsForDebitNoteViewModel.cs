@@ -4,10 +4,12 @@ using System.Collections.Generic;
 
 namespace SSMO.Models.Documents.DebitNote
 {
-    public class EditProductForDebitNoteViewModel
+    public class PurchaseProductsForDebitNoteViewModel
     {
         public int Id { get; set; }
+        public int PurchaseInvoicelId { get; set; }
         public int ProductId { get; set; }
+        public bool Checked { get; set; }
         public int DescriptionId { get; set; }
         public string Description { get; set; }
         public IEnumerable<DescriptionForProductSearchModel> Descriptions { get; set; }
@@ -17,24 +19,16 @@ namespace SSMO.Models.Documents.DebitNote
         public int GradeId { get; set; }
         public string Grade { get; set; }
         public IEnumerable<GradeForProductSearchModel> Grades { get; set; }
+        public string ProductFullDescription { get; set; }
         public Unit Unit { get; set; }
         public string FscClaim { get; set; }
         public string FscSertificate { get; set; }
-        public int TotalSheets { get; set; }
-        public decimal DeliveryCost { get; set; }
-        public decimal Profit { get; set; }
-        public string VehicleNumber { get; set; }
-        public decimal InvoicedQuantity { get; set; }       
+        public decimal AvailableQuantity { get; set; }
         public decimal DebitNoteQuantity { get; set; }
-        public decimal DebitNotePrice { get; set; }
-        public decimal DebitNoteAmount { get; set; }
-        public decimal DebitNoteBgPrice { get; set; }
-        public decimal DebitNoteBgAmount { get; set; }
-        public int DebitNotePallets { get; set; }
-        public int DebitNoteSheetsPerPallet { get; set; }
+        public int Pallets { get; set; }
+        public int SheetsPerPallet { get; set; }
+        public decimal Price { get; set; }
+        public decimal Amount { get; set; }
         public ICollection<string> FscCertificates { get; set; }
-        public int PurchaseProductDetailsId { get; set; }
-        public int? DebitNoteId { get; set; }
-        public int CustomerProductDetailId { get; set; }
     }
 }

@@ -80,7 +80,23 @@
         <div class="row">
              <div class="col-xl-8">
             <ul class="list-unstyled">
-              <li class="text-muted">O/C No: <span style="color:#5d9fc5 ;">@Model.OrderConfirmationNumber</span></li>
+                 <li class="text-muted">O/C No: 
+                     <span style="color:#5d9fc5 ;">
+                        @foreach (var num in Model.OrderConfirmationNumber)
+                        {
+                                @num; 
+                        }   
+                    </span> 
+                 </li>   
+                 <li class="text-muted">Customer PO No: 
+                     <span style="color:#5d9fc5 ;">
+                        @foreach (var num in Model.CustomerPoNumbers)
+                        {
+                            @num
+                            ;
+                        }   
+                    </span> 
+                 </li>  
               <li class="text-muted">Delivery Terms: <span style="color:#5d9fc5 ;">@Model.Incoterms</span></li>
               <li class="text-muted">Truck Number: <span style="color:#5d9fc5 ;">@Model.TruckNumber</span></li>
               <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;">@Model.NetWeight kg</span></li>
@@ -116,8 +132,8 @@
                                     <td>@product.Description</td>
                                     <td>@product.Grade</td>
                                     <td>@product.Size</td>
-                                    <td>@product.FSCClaim</td>
-                                    <td>@product.FSCSertificate</td>
+                                    <td>@product.FscClaim</td>
+                                    <td>@product.FscCertificate</td>
                                     @if(product.CreditNotePrice != 0)
                                     {
                                         <td>@product.Unit</td>
@@ -145,16 +161,30 @@
           </table>
         </div>
         <div class="row">
-          
           <div class="col-xl-3">
             <ul class="list-unstyled">
-              <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
-              <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
-            <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.TotalAmount.ToString("N2")</span></li>
-          </ul>
+                    @if(Model.CreditToInvoiceNumber != 0)
+                    {
+                        <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
+                        <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
+                        <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.CreditNoteTotalAmount.ToString("N2")</span></li>
+                                
+                    }
+                    else if(Model.DebitToInvoiceNumber != 0)
+                    {
+                        <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
+                        <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
+                        <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.DebitNoteTotalAmount.ToString("N2")</span></li>
+                    }
+                    else
+                    {
+                        <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
+                        <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
+                        <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.TotalAmount.ToString("N2")</span></li>
+                    }    
+            </ul>
           </div>
         </div>
-      
         <table class="table-borderless">
             <tr>
                 @foreach (var bank in Model.CompanyBankDetails)
@@ -174,7 +204,6 @@
                 <input type="hidden" name="exportData" id="exportData" />  
                 <input type="submit" id="btnSubmit" value="Export" class="btn btn-primary" />
          </form>
-
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
        <script type="text/javascript">  

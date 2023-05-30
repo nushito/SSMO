@@ -26,14 +26,14 @@
                                 <option value="">All</option>
             @foreach (var description in Model[i].Descriptions)
             {
-                                                <option value="@description.Id">@description.Name</option>
+                                 <option value="@description.Id">@description.Name</option>
             }
                                 </select>                                        
                             </div>
                         </td>
                         <td class="col-sm-1">
                             <div class="editor-field">
-                                            <select asp-for="@Model[i].GradeId" value="@Model[i].GradeId">
+                                     <select asp-for="@Model[i].GradeId" value="@Model[i].GradeId">
                                     <option value="">All</option>
             @foreach (var grade in Model[i].Grades)
             {

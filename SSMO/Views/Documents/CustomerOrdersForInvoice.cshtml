@@ -8,7 +8,7 @@
                 <option value="">Choose Company</option>
                 @foreach (var item in Model.MyCompanies)
                 {
-                                <option value="@item.Id">@item.Name</option>                        
+                      <option value="@item.Id">@item.Name</option>                        
                 }
                     <span asp-validation-for="MyCompanyId" class="small text-danger"></span>
                 </select>

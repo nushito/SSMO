@@ -29,13 +29,14 @@ namespace SSMO.Models.Documents.Purchase
         public decimal Factoring { get; set; }
         public decimal FiscalAgentExpenses { get; set; }
         public string TruckNumber { get; set; }
+        public string DeliveryAddress { get; set; }
         public string Swb { get; set; }
         public int Vat { get; set; }
         public decimal ProcentComission { get; set; }
         public decimal OtherExpenses { get; set; }
         public decimal PurchaseTransportCost { get; set; }
         public decimal BankExpenses { get; set; }
-        public string Incoterms { get; set; }
+        public string Incoterms { get; set; }       
         public List<PurchaseProductAsSupplierOrderViewModel> ProductDetails { get; set; }
 
     }

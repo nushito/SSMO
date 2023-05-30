@@ -227,7 +227,7 @@ namespace SSMO.Services.Reports
             string loadingPlace, string deliveryAddress,
             int currencyId, int status, string fscClaim,
             string fscCertificate, decimal paidAdvance, bool paidStatus,
-             List<ProductCustomerFormModel> products)
+             IList<ProductCustomerFormModel> products)
         {
             var order = dbcontext.CustomerOrders.Find(id);
 
@@ -250,7 +250,7 @@ namespace SSMO.Services.Reports
             order.PaidAmountStatus = paidStatus;
             order.Amount = 0;
 
-            if (products.Count != 0)
+            if (products != null)
             {
                 foreach (var product in products)
                 {
@@ -583,14 +583,36 @@ namespace SSMO.Services.Reports
             var invoice = dbcontext.Documents
                 .Where(i => i.Id == id);
 
-            var invoiceDetails = invoice.ProjectTo<InvoiceDetailsViewModel>(mapper).FirstOrDefault();
-          
             if (invoice == null) return null;
 
-            var products = dbcontext.InvoiceProductDetails
-                .Where(inv => inv.InvoiceId == id);
+            var invoiceDetails = invoice.ProjectTo<InvoiceDetailsViewModel>(mapper).FirstOrDefault();
+            var productsDetails = new List<InvoiceProductsDetailsViewModel>();
 
-            var productsDetails = products.ProjectTo<InvoiceProductsDetailsViewModel>(mapper).ToList();
+            if (invoiceDetails.DocumentType == Data.Enums.DocumentTypes.Invoice.ToString())
+            {
+                var products = dbcontext.InvoiceProductDetails
+                .Where(inv => inv.InvoiceId == id)
+                .ProjectTo<InvoiceProductsDetailsViewModel>(mapper).ToList();
+
+                productsDetails.AddRange(products);
+            }
+            else if(invoiceDetails.DocumentType == Data.Enums.DocumentTypes.CreditNote.ToString())
+            {
+                var products = dbcontext.InvoiceProductDetails
+               .Where(inv => inv.CreditNoteId == id)
+               .ProjectTo<InvoiceProductsDetailsViewModel>(mapper).ToList();
+
+                productsDetails.AddRange(products) ;
+
+            }
+            else if(invoiceDetails.DocumentType == Data.Enums.DocumentTypes.DebitNote.ToString())
+            {
+                var products = dbcontext.InvoiceProductDetails
+               .Where(inv => inv.DebitNoteId == id)
+               .ProjectTo<InvoiceProductsDetailsViewModel>(mapper).ToList();
+
+                productsDetails.AddRange(products);
+            }
 
             foreach (var product in productsDetails)
             {
@@ -646,6 +668,14 @@ namespace SSMO.Services.Reports
             invoiceDetails.Customer.Street = customerAddress.Street;
             invoiceDetails.Customer.City = customerAddress.City;
             invoiceDetails.Customer.Country = customerAddress.Country;
+                       
+            var customerOrders = dbcontext.CustomerOrders
+                .Where(i=>i.Documents.Select(i=>i.Id).Contains(id))
+                .ToList();
+           
+            invoiceDetails.OrderConfirmationNumber = customerOrders.Select(a => a.OrderConfirmationNumber).ToList();
+
+            invoiceDetails.CustomerPoNumbers = customerOrders.Select(a => a.CustomerPoNumber).ToList();
 
             return invoiceDetails;
         }

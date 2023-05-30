@@ -219,7 +219,7 @@ namespace SSMO.Controllers
 			}
 			if(command == "Add More Products")
 			{
-                return RedirectToAction("AddOrderProducts", "CustomerOrders", new {id = id, selectedSupplierOrders = model.SelectedSupplierOrders});
+                return RedirectToAction("AddOrderProducts", "CustomerOrders", new { customerorderId = id, selectedSupplierOrders = model.SelectedSupplierOrders});
             }
 			return RedirectToAction("Index", "Home");
 		}
@@ -892,7 +892,6 @@ namespace SSMO.Controllers
 
             return RedirectToAction("InvoiceDetails", new { Id = id });
         }
-
 		public IActionResult EditCreditNote(int id, string documentType)
 		{
             string userId = this.User.UserId();
@@ -1017,7 +1016,7 @@ namespace SSMO.Controllers
 
             foreach (var key in collection.Keys)
             {
-                if (key.StartsWith("Quantity"))
+                if (key.StartsWith("CreditNoteQuantity"))
                 {
                     loopsNum++;
                 }
@@ -1077,18 +1076,63 @@ namespace SSMO.Controllers
                 new EditDebitNoteViewModel
                 {
                     DocumentType = documentType,
-                    Products = new List<EditProductForDebitNoteViewModel>()
+                    Products = new List<EditProductForDebitNoteViewModel>(),
+					DebitNoteInvoicenumbers = new List<InvoiceNumbersForEditedDebitNoteViewModel>()
                 };
             }
             var invoiceToEdit = debitNoteService.ViewDebitNoteForEdit(id);
+			invoiceToEdit.DebitNoteInvoicenumbers = debitNoteService.GetInvoiceNumbers();
             return View(invoiceToEdit);
         }
 
         [HttpPost]
-        public IActionResult EditDebitNote()
+        public IActionResult EditDebitNote(EditDebitNoteViewModel model, string documentType, string command, int id)
         {
+            string userId = this.User.UserId();
+            var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+            if (!mycompaniesUserId.Contains(userId))
+            {
+                return BadRequest();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                new EditDebitNoteViewModel
+                {
+                    DocumentType = documentType,
+                    Products = new List<EditProductForDebitNoteViewModel>(),
+                    DebitNoteInvoicenumbers = new List<InvoiceNumbersForEditedDebitNoteViewModel>()
+                };
+            }
+
+            //var editcreditnote = creditNoteService.EditCreditNote
+            //    (id, model.Date, model.Incoterms, model.TruckNumber, model.NetWeight,
+            //    model.GrossWeight, model.DeliveryCost, model.CurrencyExchangeRate, model.Comment, model.Products);
+
+            //if (editcreditnote == false)
+            //{
+            //    return BadRequest();
+            //}
+
+            if (command == "Add New/More Products")
+            {
+                return RedirectToAction("AddMoreProductsToDebitNote", new { id = id, invoiceNumberId = model.DebitToInvoiceNumberId });
+            }
+
             return View();
         }
+
+		public IActionResult AddMoreProductsToDebitNote(int id, int invoiceNumberId)
+        {
+            string userId = this.User.UserId();
+            var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+            if (!mycompaniesUserId.Contains(userId))
+            {
+                return BadRequest();
+            }
+
+            return View();
+		}
 
         public IActionResult InvoiceDetails(int id)
         {
@@ -1301,8 +1345,16 @@ namespace SSMO.Controllers
                 worksheet.Cell(7, 9).Value = invoice.Seller.City;
                 worksheet.Cell(7, 10).Value = invoice.Seller.Street;
 
+                int i = 2;
+                worksheet.Cell(9, 1).Value = "Order confirmation No";
+                foreach (var product in invoice.OrderConfirmationNumber)
+                {                    
+                    worksheet.Cell(9, i).Value = product;
+                    i++;
+                }
+
                 worksheet.Cell(9, 1).Value = "Order confirmation No"; 
-				worksheet.Cell(9, 2).Value = invoice.OrderConfirmationNumber;
+				worksheet.Cell(9, 2).Value = invoice.OrderConfirmationNumber.ToString();
 
 				worksheet.Cell(10, 1).Value = "Delivery Terms";
                 worksheet.Cell(10, 2).Value = invoice.Incoterms;
@@ -1330,7 +1382,7 @@ namespace SSMO.Controllers
 				range.Style.Fill.SetBackgroundColor(XLColor.TurquoiseGreen);
 
 				int row = 15;
-				int i = 1;
+				i = 1;
 
                 foreach (var product in invoice.Products)
 				{
@@ -1338,9 +1390,9 @@ namespace SSMO.Controllers
                     worksheet.Cell(row, 2).Value = product.Description;
                     worksheet.Cell(row, 3).Value = product.Grade;
                     worksheet.Cell(row, 4).Value = product.Size;
-                    worksheet.Cell(row, 5).Value = product.FSCClaim;
-                    worksheet.Cell(row, 6).Value = product.FSCSertificate;
-                    worksheet.Cell(row, 7).Value = product.Unit;
+                    worksheet.Cell(row, 5).Value = product.FscClaim;
+                    worksheet.Cell(row, 6).Value = product.FscCertificate;
+                    worksheet.Cell(row, 7).Value = product.Unit.ToString();
                     worksheet.Cell(row, 8).Value = product.InvoicedQuantity;
                     worksheet.Cell(row, 9).Value = product.SellPrice;
                     worksheet.Cell(row, 10).Value = product.Amount;

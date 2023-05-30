@@ -12,6 +12,7 @@ namespace SSMO.Data.Models
         public int SupplierOrderId { get; set; }
         public SupplierOrder SupplierOrder { get; set; }
         public decimal Quantity { get; set; }
+        public decimal? QuantityM3 { get; set; }
         public Unit Unit { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }

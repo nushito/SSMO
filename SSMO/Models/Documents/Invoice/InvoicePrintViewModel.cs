@@ -13,6 +13,7 @@ namespace SSMO.Models.Documents.Invoice
         public MyCompanyForInvoicePrint Seller { get; set; }
         public int CustomerOrderId { get; set; }
         public List<int> OrderConfirmationNumbers { get; set; }
+        public List<string> CustomerPoNumbers { get; set; }
         public CustomerForInvoicePrint Customer { get; set; }
         public int SupplierOrderId { get; set; }
         [Required]
@@ -35,5 +36,6 @@ namespace SSMO.Models.Documents.Invoice
         public string Comment { get; set; }
         public ICollection<InvoiceBankDetailsViewModel> CompanyBankDetails { get; set; }
         public IEnumerable<ProductsForInvoiceModel> Products { get; set; }
+        public IEnumerable<ServiceProductForInvoiceFormModel> ServiceProducts { get; set; }
     }
 }

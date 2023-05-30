@@ -1,4 +1,5 @@
-﻿using SSMO.Models.Documents.CreditNote;
+﻿using SSMO.Data.Enums;
+using SSMO.Models.Documents.CreditNote;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.CreditNote;
@@ -14,7 +15,7 @@ namespace SSMO.Services.Products
     public interface IProductService
     {
         public void CreateProduct(ProductSupplierFormModel model, int supplierOrderId);
-        public void CreateNewProductOnEditSupplierOrder(NewProductsForSupplierOrderModel products);
+        public void CreateNewProductOnEditSupplierOrder(NewProductsForSupplierOrderModel products);    
         public bool DescriptionExist(string name);
         public void AddDescription(string name, string bgName);
         public void AddGrade(string name);
@@ -26,7 +27,7 @@ namespace SSMO.Services.Products
         public IEnumerable<string> GetGrades();
         public ICollection<string> GetUnits();
         public IEnumerable<ProductPerSupplierOrderDetails> Details(List<int> supplierOrderserId);
-        public bool EditProduct(int id, int customerorderId,
+        public bool CreateCustomerOrderProduct(int id, int customerorderId,
             int supplierOrderId, string description, string grade,
             string size, string fscCert, string fscClaim,
             int pallets, int sheetsPerPallet, decimal price, decimal orderedQuantity, string unit);
@@ -36,7 +37,8 @@ namespace SSMO.Services.Products
         public string GetDescriptionName(int id);
         public string GetGradeName(int id);
         public string GetSizeName(int id);
-        public decimal CalculateDeliveryCostOfTheProductInCo(decimal quantity, decimal totalQuantity, decimal deliveryCost);
+        public decimal CalculateDeliveryCostOfTheProductInCo
+            (decimal quantity, decimal quantityM3, decimal totalQuantity, decimal deliveryCost, Unit unit, string size);
         public void ClearProductQuantityWhenDealIsFinished(int productId, decimal quantity, decimal oldQuantity);
         public ProductsAvailabilityCollectionViewModel ProductsOnStock
             (int? descriptionId, int? gradeId, int? sizeId, int currentPage, int productsPerPage);
@@ -50,5 +52,7 @@ namespace SSMO.Services.Products
         public bool AddNewProductsToEditedInvoice(int id, List<ProductsForInvoiceViewModel> products);
        // public List<EditProductForCompanyInvoicesViewModel> NewProductsForEditInvoice(List<int> customerOrders);
        public List<ProductForCreditNoteViewModelPerInvoice> ProductsForCreditNotePerInvoice(int invoiceId);
+        public decimal ConvertStringSizeToQubicMeters(string size);
+        
     }
 }
