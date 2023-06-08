@@ -260,7 +260,7 @@ namespace SSMO.Services.Documents
 
             if(creditOrDebitNote.DocumentType == Data.Enums.DocumentTypes.CreditNote) 
             {
-                creditOrDebitNoteForPrint.InvoiceNumber = invoice.CreditToInvoiceNumber;
+                creditOrDebitNoteForPrint.InvoiceNumber = invoice.DocumentNumber;
                 creditOrDebitNoteForPrint.InvoiceDate = creditOrDebitNote.CreditToInvoiceDate;
                 creditOrDebitNoteForPrint.Total = creditOrDebitNote.CreditNoteTotalAmount;
             }

@@ -109,6 +109,11 @@ namespace SSMO.Services.Documents.Credit_Note
                     if (quantityBack == true)
                     {  
                         mainProduct.QuantityAvailableForCustomerOrder += product.Quantity;
+                        var customerOrderProduct = dbContext.CustomerOrderProductDetails
+                            .Where(i => i.ProductId == mainProduct.Id && i.CustomerOrderId == existProduct.CustomerOrderId)
+                            .FirstOrDefault();
+                        //TODO dali se vrashta v austanding ili nie rachno pravim edit na CO. moje da ne se vrashta nishto ???
+                      //  customerOrderProduct.AutstandingQuantity += product.Quantity;
                     }                    
                 }
                 else
@@ -230,16 +235,21 @@ namespace SSMO.Services.Documents.Credit_Note
             List<ProductForCreditNoteViewModelPerInvoice> productsFromInvoice, 
             List<NewProductsForCreditNoteViewModel> newPoducts)
         {
-            if (id == 0) { return false; }
-
             var creditNote = dbContext.Documents
                 .Find(id);
+
+            if (creditNote == null) {return false; }
 
             var invoice = dbContext.Documents
                 .Where(i=>i.Id== invoiceId)
                 .FirstOrDefault();
 
-            invoice.CreditToInvoiceNumber= invoiceId;
+           if(creditNote.CustomerId != invoice.CustomerId)
+            {
+                creditNote.CustomerId = invoice.CustomerId;
+            }
+
+            creditNote.CreditToInvoiceNumber= invoiceId;
 
             var customerOrders = dbContext.CustomerOrders
                 .Where(a=>a.Documents.Select(i=>i.Id).Contains(invoiceId)).ToList();
@@ -316,9 +326,10 @@ namespace SSMO.Services.Documents.Credit_Note
                     newProduct.InvoiceProductDetails.Add(invoiceProduct);
                 }
             }
-
             creditNote.VatAmount = creditNote.Amount * creditNote.Vat;
-            creditNote.TotalAmount = creditNote.Amount + creditNote.VatAmount ?? 0; 
+            creditNote.TotalAmount = creditNote.Amount + creditNote.VatAmount ?? 0;
+
+            invoice.CreditNoteTotalAmount = creditNote.TotalAmount;
             
             dbContext.SaveChanges();    
 

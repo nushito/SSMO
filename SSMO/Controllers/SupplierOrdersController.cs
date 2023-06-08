@@ -137,7 +137,7 @@ namespace SSMO.Controllers
                 var unit = collections["Unit[" + i + "]"];
                 var price = collections["Price[" + i + "]"].ToString();
                 var fscClaim = collections["FscClaim[" + i + "]"];
-                var fscCertificate = collections["FscCertificate[" + i + "]"];
+                var fscCertificate = collections["PurchaseFscCertificate[" + i + "]"];
                 var pallets = collections["Pallets["+i+ "]"];   
                 var sheetsPerPallet = collections["SheetsPerPallet[" + i+ "]"];
                 var quantity = collections["Quantity[" + i + "]"].ToString();

@@ -53,6 +53,7 @@ namespace SSMO.Services.Products
        // public List<EditProductForCompanyInvoicesViewModel> NewProductsForEditInvoice(List<int> customerOrders);
        public List<ProductForCreditNoteViewModelPerInvoice> ProductsForCreditNotePerInvoice(int invoiceId);
         public decimal ConvertStringSizeToQubicMeters(string size);
+        public void ReviseAutstandingQuantity(int customerOrderDetailId, decimal quantity); 
         
     }
 }

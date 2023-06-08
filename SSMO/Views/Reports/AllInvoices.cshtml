@@ -119,10 +119,10 @@
                         @order.TotalAmount
                             </th>
                             <th>
-                        @order.CreditToInvoiceNumber
+                        @order.CreditToInvoiceDocumentNumber
                             </th>
                             <th>
-                        @order.DebitToInvoiceNumber
+                        @order.DebitToInvoiceDocumentNumber
                             </th>
                             <th><a asp-controller="Reports" asp-action="InvoiceDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a></th>
                     @if(order.DocumentType == "Invoice")

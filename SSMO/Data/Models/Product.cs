@@ -10,6 +10,12 @@ namespace SSMO.Data.Models
 {
    public class Product
     {
+        public Product()
+        {
+            InvoiceProductDetails = new List<InvoiceProductDetails>();
+            PurchaseProductDetails = new List<PurchaseProductDetails>();
+            CustomerOrderProductDetails = new List<CustomerOrderProductDetails>();
+        }
         public int Id { get; init; }
         [Required]
         public int DescriptionId { get; set; }

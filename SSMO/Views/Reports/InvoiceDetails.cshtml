@@ -12,7 +12,7 @@
                 {
                       <div class="col-xl-9">
                          <p style="color: #7e8d9f;font-size: 20px;">Credit Invoice No: <strong>@Model.DocumentNumber</strong></p>
-                       <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.CreditToInvoiceNumber/@Model.CreditToInvoiceDate.Date.ToString("dd-MM-yyyy")</p>
+                       <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.CreditToInvoiceNumber, date: @Model.CreditToInvoiceDate.Date.ToString("dd-MM-yyyy")</p>
                        </div>
                 }else if(Model.DebitToInvoiceNumber != 0)
                 {

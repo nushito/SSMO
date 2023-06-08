@@ -1,4 +1,6 @@
-﻿using SSMO.Models.Reports.ProductsStock;
+﻿using SSMO.Models.Documents.DebitNote;
+using SSMO.Models.Reports.Invoice;
+using SSMO.Models.Reports.ProductsStock;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -24,5 +26,7 @@ namespace SSMO.Models.Documents
         public decimal Price { get; set; }
         public decimal Amount { get; set; }
         public ICollection<string> FscCertificates { get; set; }
+        public int CustomerOrderId { get; set; }
+        public ICollection<CustomerOrderNumbersByCustomerViewModel> CustomerOrderNumbers { get; set; }
     }
 }

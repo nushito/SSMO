@@ -33,7 +33,8 @@ namespace SSMO.Services.Documents.DebitNote
     
         public CreditAndDebitNoteViewModel CreateDebitNote
             (int invoiceId, DateTime date,bool moreQuantity,string deliveryAddress, 
-            List<AddProductsToCreditAndDebitNoteFormModel> products, List<PurchaseProductsForDebitNoteViewModel> availableProducts)
+            List<AddProductsToCreditAndDebitNoteFormModel> products, 
+            List<PurchaseProductsForDebitNoteViewModel> availableProducts)
         {
             var invoiceForDebit = dbContext.Documents
                .Where(n => n.Id == invoiceId && n.DocumentType == Data.Enums.DocumentTypes.Invoice)
@@ -56,7 +57,8 @@ namespace SSMO.Services.Documents.DebitNote
                 MyCompanyId = invoiceForDebit.MyCompanyId,
                 Vat = invoiceForDebit.Vat,
                 DebitNoteProducts = new List<InvoiceProductDetails>(),
-                CreditAndDebitNoteProducts = new List<Product>()
+                CreditAndDebitNoteProducts = new List<Product>(),
+                InvoiceProducts = new List<InvoiceProductDetails>()
             };
 
             dbContext.Documents.Add(debitNote);
@@ -69,41 +71,52 @@ namespace SSMO.Services.Documents.DebitNote
                     var mainProduct = dbContext.Products
                         .Where(a => a.DescriptionId == product.DescriptionId
                         && a.GradeId == product.GradeId
-                        && a.SizeId == product.SizeId
-                        && a.InvoiceProductDetails.Select(i => i.InvoiceId)
-                                                  .ToList()
-                                                  .Contains(invoiceForDebit.Id))
-                        .FirstOrDefault();
+                        && a.SizeId == product.SizeId).FirstOrDefault(); 
 
-                    if (mainProduct != null)
+                    if (mainProduct != null)  
                     {
-                        var productForDebit = dbContext.InvoiceProductDetails
+                        if (mainProduct.InvoiceProductDetails.Select(i => i.InvoiceId).Contains(invoiceForDebit.Id))
+                        {
+                            var productForDebit = dbContext.InvoiceProductDetails
                              .Where(co => co.ProductId == mainProduct.Id)
                              .FirstOrDefault();
 
-                        productForDebit.DebitNoteId = debitNote.Id;
-                        productForDebit.DebitNotePrice = product.Price;
-                        if(moreQuantity == true) 
-                        { productForDebit.DebitNoteQuantity = product.Quantity; }
-                        else
-                        { productForDebit.DebitNoteQuantity = 0; }
+                            productForDebit.DebitNoteId = debitNote.Id;
+                            productForDebit.DebitNotePrice = product.Price;
+                            if (moreQuantity == true)
+                            { productForDebit.DebitNoteQuantity = product.Quantity; }
+                            else
+                            { productForDebit.DebitNoteQuantity = 0; }
 
-                        productForDebit.DebitNoteAmount = product.Quantity * product.Price;
-                        productForDebit.DebitNoteBgAmount = product.Price * debitNote.CurrencyExchangeRateUsdToBGN * product.Quantity;
-                        productForDebit.DebitNoteBgPrice = product.Price * debitNote.CurrencyExchangeRateUsdToBGN;
-                        productForDebit.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                            productForDebit.DebitNoteAmount = product.Quantity * product.Price;
+                            productForDebit.DebitNoteBgAmount = product.Price * debitNote.CurrencyExchangeRateUsdToBGN * product.Quantity;
+                            productForDebit.DebitNoteBgPrice = product.Price * debitNote.CurrencyExchangeRateUsdToBGN;
+                            productForDebit.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                        }
+                        else
+                        {
+                            var debitProduct = new InvoiceProductDetails
+                            {
+                                Unit = (Data.Enums.Unit)Enum.Parse(typeof(Data.Enums.Unit), product.Unit, true),
+                                DebitNotePrice = product.Price,
+                                DebitNoteQuantity = product.Quantity,
+                                FscClaim = product.FscClaim,
+                                FscCertificate = product.FscSertificate,
+                                DebitNoteAmount = product.Price * product.Quantity,
+                                DebitNoteBgPrice = product.Price * debitNote.CurrencyExchangeRateUsdToBGN,
+                                DebitNoteBgAmount = product.Price * debitNote.CurrencyExchangeRateUsdToBGN * product.Quantity,
+                                DebitNoteId = debitNote.Id,
+                                CustomerOrderId = invoiceForDebit.CustomerOrders.Select(i => i.Id).First()
+                            };
+
+                            debitProduct.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                            debitNote.InvoiceProducts.Add(debitProduct);   
+                        }
+                        
                     }
                     else
                     {
-                        var newProduct = dbContext.Products
-                        .Where(a => a.DescriptionId == product.DescriptionId
-                        && a.GradeId == product.GradeId
-                        && a.SizeId == product.SizeId)
-                        .FirstOrDefault();
-
-                        if (newProduct == null)
-                        {
-                            newProduct = new Product
+                       var  newProduct = new Product
                             {
                                 DescriptionId = product.DescriptionId,
                                 GradeId = product.GradeId,
@@ -111,7 +124,6 @@ namespace SSMO.Services.Documents.DebitNote
                                 InvoiceProductDetails = new List<InvoiceProductDetails>(),
                                 DocumentId = debitNote.Id
                             };
-                        }
 
                         var debitProduct = new InvoiceProductDetails
                         {
@@ -123,13 +135,13 @@ namespace SSMO.Services.Documents.DebitNote
                             DebitNoteAmount = product.Price * product.Quantity,
                             DebitNoteBgPrice = product.Price * debitNote.CurrencyExchangeRateUsdToBGN,
                             DebitNoteBgAmount = product.Price * debitNote.CurrencyExchangeRateUsdToBGN * product.Quantity,
-                            DebitNoteId = debitNote.Id
+                            DebitNoteId = debitNote.Id,
+                            CustomerOrderId = invoiceForDebit.CustomerOrders.Select(i=>i.Id).First()
                         };
 
                         debitProduct.TotalSheets = product.Pallets * product.SheetsPerPallet;
-                        newProduct.InvoiceProductDetails.Add(debitProduct);
-                        dbContext.Products.Add(newProduct);
-
+                        debitNote.DebitNoteProducts.Add(debitProduct);
+                        debitNote.CreditAndDebitNoteProducts.Add(newProduct);
                     }
                     debitNote.Amount += product.Price * product.Quantity;
                 }
@@ -153,12 +165,24 @@ namespace SSMO.Services.Documents.DebitNote
                         DebitNoteAmount = product.Price * product.DebitNoteQuantity,
                         DebitNoteBgPrice = product.Price * debitNote.CurrencyExchangeRateUsdToBGN,
                         DebitNoteBgAmount = product.Price * debitNote.CurrencyExchangeRateUsdToBGN * product.DebitNoteQuantity,
-                        DebitNoteId = debitNote.Id
+                        DebitNoteId = debitNote.Id,
+                        InvoiceId = debitNote.Id,
+                        ProductId = mainProduct.Id,
+                        CustomerOrderProductDetailsId = product.CustomerOrderDetailsId
                     };
 
+                    if (product.CustomerOrderDetail != null)
+                    {
+                        debitNoteDetails.CustomerOrderId = product.CustomerOrderDetail.Id;
+                    }
+
+                   // productService.ReviseAutstandingQuantity(product.CustomerOrderDetailsId, product.DebitNoteQuantity);
+
                     mainProduct.SoldQuantity += product.DebitNoteQuantity;
+                    mainProduct.QuantityAvailableForCustomerOrder-= product.DebitNoteQuantity;
 
                     debitNote.Amount += product.Price * product.DebitNoteQuantity;
+                    debitNote.DebitNoteProducts.Add(debitNoteDetails);
                     mainProduct.InvoiceProductDetails.Add(debitNoteDetails);
                 }
             }
@@ -174,6 +198,43 @@ namespace SSMO.Services.Documents.DebitNote
             documentService.CreateBgInvoice(debitNote.Id);
 
             return debitNoteForPrint;
+        }
+
+        public bool EditDebitNote
+            (int id, DateTime date, string incoterms,string comment, List<EditProductForDebitNoteViewModel> products)
+        {
+            var debitNoteForEdit = dbContext.Documents.Find(id);
+
+            debitNoteForEdit.Date = date;
+            debitNoteForEdit.Incoterms= incoterms;
+          
+        if(products != null)
+            {
+                foreach (var product in products)
+                {
+                    if(product.DebitNoteQuantity == 0) { continue; }
+
+                    var invoicedProduct = dbContext.InvoiceProductDetails
+                        .Where(i=>i.Id == product.Id)
+                        .FirstOrDefault();
+
+                    invoicedProduct.DebitNoteQuantity = product.DebitNoteQuantity;
+                    invoicedProduct.DebitNotePrice= product.DebitNotePrice;
+                    invoicedProduct.DebitNoteAmount= product.DebitNoteQuantity * product.DebitNotePrice;
+                    invoicedProduct.DebitNoteBgPrice = product.DebitNoteBgPrice * debitNoteForEdit.CurrencyExchangeRateUsdToBGN;
+                    invoicedProduct.DebitNoteBgAmount = invoicedProduct.DebitNoteBgPrice * product.DebitNoteQuantity;
+                    invoicedProduct.DeditNotePallets = product.DebitNotePallets;
+                    invoicedProduct.DeditNoteSheetsPerPallet = product.DebitNoteSheetsPerPallet;
+                    invoicedProduct.TotalSheets = product.DebitNotePallets * product.DebitNoteSheetsPerPallet;
+                    debitNoteForEdit.Amount += invoicedProduct.DebitNoteAmount;
+                }
+            }
+
+            debitNoteForEdit.VatAmount = debitNoteForEdit.Amount * debitNoteForEdit.Vat / 100;
+            debitNoteForEdit.DebitNoteTotalAmount = debitNoteForEdit.Amount + debitNoteForEdit.VatAmount ?? 0;
+
+            dbContext.SaveChanges();
+            return true;
         }
 
         public ICollection<InvoiceNumbersForEditedDebitNoteViewModel> GetInvoiceNumbers()
@@ -211,13 +272,14 @@ namespace SSMO.Services.Documents.DebitNote
                 Comment = debitNote.Comment,                     
                 CurrencyId = debitNote.CurrencyId,
                 Date = debitNote.Date,
+                Vat = debitNote.Vat,
                 //  CustomerOrders = creditNote.CustomerOrders
-                DeliveryCost = debitNote.DeliveryTrasnportCost,
+             //   DeliveryCost = debitNote.DeliveryTrasnportCost,
                 Incoterms =debitNote.Incoterms,
-                TruckNumber = debitNote.TruckNumber,
+              //  TruckNumber = debitNote.TruckNumber,
                 CurrencyExchangeRate = debitNote.CurrencyExchangeRateUsdToBGN,
-                GrossWeight = debitNote.GrossWeight,
-                NetWeight = debitNote.NetWeight,
+              //  GrossWeight = debitNote.GrossWeight,
+              //  NetWeight = debitNote.NetWeight,
                 Products = new List<EditProductForDebitNoteViewModel>(),
                 DebitToInvoiceNumberId = invoice.Id,
                 InvoiceNumber = invoice.DocumentNumber,

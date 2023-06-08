@@ -111,7 +111,7 @@ namespace SSMO.Services.Documents.Purchase
                 var quantityM3 = productService.ConvertStringSizeToQubicMeters(size);
                purchaseProduct.QuantityM3 = quantityM3 * product.Pallets * product.SheetsPerPallet;
 
-                //  mainProduct.PurchaseProductDetails.Add(purchaseProduct);
+                mainProduct.PurchaseProductDetails.Add(purchaseProduct);
                 mainProduct.LoadedQuantityM3 += purchaseProduct.Quantity;
                 mainProduct.QuantityLeftForPurchaseLoading = mainProduct.OrderedQuantity - purchaseProduct.Quantity;
                 purchase.PurchaseProducts.Add(purchaseProduct);
@@ -590,6 +590,19 @@ namespace SSMO.Services.Documents.Purchase
             {
                 var mainProduct = productRepository.GetMainProduct(product.ProductId);
 
+                var customerOrderDetails = dbContext.CustomerOrderProductDetails
+                    .Where(i=>i.ProductId == product.ProductId && i.SupplierOrderId == product.SupplierOrderId)                    
+                    .FirstOrDefault();
+
+                //var customerOrder = dbContext.CustomerOrders
+                //    .Where(i=>i.Id == customerOrderDetails.CustomerOrderId)
+                //    .Select(n=> new CustomerOrderNumbersByCustomerViewModel
+                //    {
+                //        Id= n.Id,
+                //        OrderConfirmationNumber = n.OrderConfirmationNumber,
+                //    })
+                //    .FirstOrDefault();
+
                 var productForDebit = new PurchaseProductsForDebitNoteViewModel
                 {
                     Id = product.Id,
@@ -604,8 +617,11 @@ namespace SSMO.Services.Documents.Purchase
                     PurchaseInvoicelId = product.PurchaseInvoiceId,
                     Unit = product.Unit,
                     FscSertificate = product.FscCertificate,
-                    FscClaim = product.FscClaim                    
+                    FscClaim = product.FscClaim,     
+                   // CustomerOrderDetail = customerOrder,
+                   // CustomerOrderDetailsId = customerOrderDetails.Id
                 };
+
                 productForDebit.ProductFullDescription = String.Join
                     (", ", productForDebit.Description,productForDebit.Size,productForDebit.Grade, productForDebit.AvailableQuantity);
                 purchaseProducts.Add(productForDebit);

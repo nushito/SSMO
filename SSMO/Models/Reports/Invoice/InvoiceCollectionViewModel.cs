@@ -20,8 +20,10 @@ namespace SSMO.Models.Reports.Invoice
        // public int OrderConfirmationNumber { get; set; }
         public ICollection<CustomerOrderForInvoiceViewModel> CustomerOrders { get; set; }
         public int CreditToInvoiceNumber { get; set; }
+        public int CreditToInvoiceDocumentNumber { get; set; }
         public DateTime CreditToInvoiceDate { get; set; }
         public int DebitToInvoiceNumber { get; set; }
+        public int DebitToInvoiceDocumentNumber { get; set; }
         public DateTime DebitToInvoiceDate { get; set; }
     }
 }

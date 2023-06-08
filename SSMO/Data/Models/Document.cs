@@ -12,6 +12,17 @@ namespace SSMO.Data.Models
 {
     public class Document
     {
+        public Document()
+        {
+            CustomerOrders = new List<CustomerOrder>();
+            PurchaseProducts = new List<PurchaseProductDetails>();
+            CustomerOrderProducts = new List<CustomerOrderProductDetails> ();
+            InvoiceProducts = new List<InvoiceProductDetails>();
+            CreditAndDebitNoteProducts = new List<Product>();
+            DebitNoteProducts = new List<InvoiceProductDetails>();
+            CreditNoteProducts = new List<InvoiceProductDetails>();
+        }
+
         public int Id { get; init; }      
         [Required]
         public DocumentTypes DocumentType { get; set; }

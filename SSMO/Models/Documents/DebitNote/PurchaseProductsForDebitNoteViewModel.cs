@@ -30,5 +30,7 @@ namespace SSMO.Models.Documents.DebitNote
         public decimal Price { get; set; }
         public decimal Amount { get; set; }
         public ICollection<string> FscCertificates { get; set; }
+        public int CustomerOrderDetailsId { get; set; }
+        public CustomerOrderNumbersByCustomerViewModel CustomerOrderDetail { get; set; }
     }
 }

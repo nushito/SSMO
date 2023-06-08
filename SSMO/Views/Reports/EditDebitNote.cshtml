@@ -7,34 +7,20 @@
     </div>
     <div class="row col-md-4">
         <label asp-for="Date">Date of the Invoice</label>
-        <input asp-for="Date" type="date" class="form-control" id="datepicker" >
+        <input asp-for="Date" type="date" class="form-control" id="datepicker" value="@Model.Date">
     </div>
      <div class="row col-md-4">
         <label asp-for="Incoterms">Delivery Terms</label>
-        <input asp-for="Incoterms" type="text" class="form-control">
+        <input asp-for="Incoterms" type="text" class="form-control" value="@Model.Incoterms">
     </div>
      <div class="row col-md-4">
-        <label asp-for="TruckNumber">Truck Number</label>
-        <input asp-for="TruckNumber" type="text" class="form-control">
-    </div>
-
-     <div class="row col-md-4">
-        <label asp-for="NetWeight">Net Weight</label>
-        <input asp-for="NetWeight" type="number" class="form-control">
+        <label asp-for="Vat">Vat</label>
+        <input asp-for="Vat" type="number" class="form-control" value="@Model.Vat">
     </div>
      <div class="row col-md-4">
-        <label asp-for="GrossWeight">Gross Weight</label>
-        <input asp-for="GrossWeight" type="number" class="form-control">
+        <label asp-for="CurrencyExchangeRate">Currency Exchange Rate</label>
+        <input asp-for="CurrencyExchangeRate" type="number" class="form-control" value="@Model.CurrencyExchangeRate">
     </div>
-   <div class="row col-md-4">
-        <label asp-for="DeliveryCost">Delivery Cost</label>
-        <input asp-for="DeliveryCost" type="number" min="0" step="0.00001" class="form-control">
-    </div>
-    
-    <div class="row col-md-4">
-        <label asp-for="CurrencyExchangeRate">Currency Exchange Rate to BGN</label>
-        <input asp-for="CurrencyExchangeRate" type="number"  min="0.00000" step="0.00001" class="form-control" >
-    </div>   
       <div class="row col-md-4">
         <label asp-for="Comment">Comment</label>
         <input asp-for="Comment" type="text" class="form-control">

@@ -14,6 +14,8 @@ namespace SSMO.Services.Documents.DebitNote
 
         public EditDebitNoteViewModel ViewDebitNoteForEdit(int id);
 
+        public bool EditDebitNote(int id, DateTime date, string incoterms, string comment, List<EditProductForDebitNoteViewModel> products);
+
         public ICollection<InvoiceNumbersForEditedDebitNoteViewModel> GetInvoiceNumbers();
     }
 }

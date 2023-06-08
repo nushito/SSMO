@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Models.Documents.DebitNote;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.Invoice;
@@ -268,6 +269,18 @@ namespace SSMO.Services.CustomerOrderService
                     .FirstOrDefault();
             }
 
+        }
+
+        public ICollection<CustomerOrderNumbersByCustomerViewModel> CustomerOrderNumbersPerInvoice(int id)
+        {
+            return dbContext.Documents
+               .Where(c => c.Id == id)
+               .Select(i => new CustomerOrderNumbersByCustomerViewModel
+               {
+                   Id = i.CustomerOrders.Select(i=>i.Id).FirstOrDefault(),
+                   OrderConfirmationNumber = i.CustomerOrders.Select(i => i.OrderConfirmationNumber).FirstOrDefault(),
+               })
+               .ToList();
         }
     }
 }

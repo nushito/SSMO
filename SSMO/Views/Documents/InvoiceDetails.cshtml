@@ -213,13 +213,14 @@
                     </td>
                     <td class="col-sm-1">
                     <div class="editor-field">                            
-                            <select asp-for="@Model.Products[i].PurchaseCostPriceId" >
+                            <select asp-for="@Model.Products[i].PurchaseCostPriceId" required>
                             <option value="">Choose cost price</option>
                                 @foreach (var costPrice in Model.Products[i].PurchaseCostPrice)
                                 {
                                     <option value="@costPrice.PurchaseCostPriceId">@costPrice.CostPrice</option>
                                 }
                             </select>
+                            <span asp-validation-for="@Model.Products[i].PurchaseCostPriceId" class="small text-danger"></span>
                     </div>
                     </td>
                 </tr>

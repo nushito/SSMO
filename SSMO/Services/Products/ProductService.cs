@@ -51,10 +51,11 @@ namespace SSMO.Services.Products
                 SheetsPerPallet = model.SheetsPerPallet,
                 SupplierOrderId = supplierOrderId,               
                 Unit = Enum.Parse<Unit>(model.Unit),
-                TotalSheets = model.Pallets*model.SheetsPerPallet
-            };
-
-            
+                TotalSheets = model.Pallets*model.SheetsPerPallet,
+                CustomerOrderProductDetails = new List<CustomerOrderProductDetails>(),
+                InvoiceProductDetails = new List<InvoiceProductDetails>(),
+                PurchaseProductDetails = new List<PurchaseProductDetails>()
+            };                        
 
             if(model.Quantity == 0)
             {
@@ -749,5 +750,15 @@ namespace SSMO.Services.Products
 
             return sum;
         }
+
+        public void ReviseAutstandingQuantity(int customerOrderDetailId, decimal quantity)
+        {
+            var productFromCustomerOrder = dbContext.CustomerOrderProductDetails
+                .Where(i => i.Id == customerOrderDetailId)
+                .FirstOrDefault();
+
+            productFromCustomerOrder.AutstandingQuantity -= quantity;
+        }
     }
 }
+

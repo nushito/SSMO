@@ -188,6 +188,7 @@ namespace SSMO.Services.Documents.Invoice
                 invoiceProduct.Amount = invoiceProduct.SellPrice * invoiceProduct.InvoicedQuantity;
                 invoiceProduct.BgAmount = invoiceProduct.BgPrice * invoiceProduct.InvoicedQuantity;               
                 invoiceCreate.SupplierOrderId = supplierOrder.Id;
+                mainProduct.InvoiceProductDetails.Add(invoiceProduct);
                 invoiceCreate.InvoiceProducts.Add(invoiceProduct);                
             }
             dbContext.SaveChanges();

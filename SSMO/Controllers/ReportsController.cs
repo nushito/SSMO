@@ -1105,16 +1105,15 @@ namespace SSMO.Controllers
                 };
             }
 
-            //var editcreditnote = creditNoteService.EditCreditNote
-            //    (id, model.Date, model.Incoterms, model.TruckNumber, model.NetWeight,
-            //    model.GrossWeight, model.DeliveryCost, model.CurrencyExchangeRate, model.Comment, model.Products);
+			var editcreditnote = debitNoteService.EditDebitNote
+				(id, model.Date, model.Incoterms, model.Comment, model.Products);
 
-            //if (editcreditnote == false)
-            //{
-            //    return BadRequest();
-            //}
+			//if (editcreditnote == false)
+			//{
+			//    return BadRequest();
+			//}
 
-            if (command == "Add New/More Products")
+			if (command == "Add New/More Products")
             {
                 return RedirectToAction("AddMoreProductsToDebitNote", new { id = id, invoiceNumberId = model.DebitToInvoiceNumberId });
             }

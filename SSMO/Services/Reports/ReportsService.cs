@@ -554,6 +554,23 @@ namespace SSMO.Services.Reports
            
             var invoiceDetailsCollection = invoices.ProjectTo<InvoiceCollectionViewModel>(this.mapper).ToList();
 
+            foreach (var invoice in invoiceDetailsCollection)
+            {
+                if(invoice.CreditToInvoiceNumber != 0)
+                {
+                    invoice.CreditToInvoiceDocumentNumber = dbcontext.Documents
+                        .Where(id=>id.Id == invoice.CreditToInvoiceNumber)
+                        .Select(n=>n.DocumentNumber).FirstOrDefault();
+                }
+                else if(invoice.DebitToInvoiceNumber != 0)
+                {
+                    invoice.DebitToInvoiceDocumentNumber = dbcontext.Documents
+                        .Where(id => id.Id == invoice.DebitToInvoiceNumber)
+                        .Select(n => n.DocumentNumber).FirstOrDefault();
+                }
+                
+            }
+
             var collection = new InvoiceReportModel
             {
                 InvoiceCollection = invoiceDetailsCollection.Skip((currentpage - 1) * invoicesPerPage).Take(invoicesPerPage),
@@ -604,6 +621,13 @@ namespace SSMO.Services.Reports
 
                 productsDetails.AddRange(products) ;
 
+                var invoiceNumber = dbcontext.Documents
+                    .Where(i => i.Id == invoiceDetails.CreditToInvoiceNumber)
+                    .Select(num => num.DocumentNumber)
+                    .FirstOrDefault();
+
+               invoiceDetails.CreditToInvoiceNumber= invoiceNumber;
+
             }
             else if(invoiceDetails.DocumentType == Data.Enums.DocumentTypes.DebitNote.ToString())
             {
@@ -612,6 +636,12 @@ namespace SSMO.Services.Reports
                .ProjectTo<InvoiceProductsDetailsViewModel>(mapper).ToList();
 
                 productsDetails.AddRange(products);
+                var invoiceNumber = dbcontext.Documents
+                    .Where(i => i.Id == invoiceDetails.DebitToInvoiceNumber)
+                    .Select(num => num.DocumentNumber)
+                    .FirstOrDefault();
+
+                invoiceDetails.CreditToInvoiceNumber = invoiceNumber;
             }
 
             foreach (var product in productsDetails)
