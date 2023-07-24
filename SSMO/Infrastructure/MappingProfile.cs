@@ -81,7 +81,7 @@ namespace SSMO.Infrastructure
             this.CreateMap<Document, InvoiceCollectionViewModel>();
             this.CreateMap<Document, InvoiceDetailsViewModel>();
             this.CreateMap<Document, PurchaseInvoicesViewModel>();
-
+            this.CreateMap<Document, EditPurchasePaymentDetails>();
            
             this.CreateMap<Address, CustomerForEditAddressFormModel>();
             this.CreateMap<Address, EditSupplierAddressFormModel>();

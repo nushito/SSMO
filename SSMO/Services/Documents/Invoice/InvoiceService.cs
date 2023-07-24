@@ -129,6 +129,7 @@ namespace SSMO.Services.Documents.Invoice
                 var mainProduct = productRepository.GetMainProduct(product.ProductId);
                 if (mainProduct == null) continue;
                 mainProduct.SoldQuantity += product.InvoicedQuantity;
+                
                 var size = productService.GetSizeName(mainProduct.SizeId);
 
                 var customerOrderProduct = dbContext.CustomerOrderProductDetails
@@ -397,24 +398,24 @@ namespace SSMO.Services.Documents.Invoice
         {
             if (id == 0) return;
 
-            var invoiceNumber = dbContext.Documents
+            var invoice = dbContext.Documents
                .Where(i => i.Id == id)
                .FirstOrDefault();
 
             var packingList = dbContext.Documents
-                .Where(n => n.DocumentNumber == invoiceNumber.DocumentNumber & n.DocumentType == Data.Enums.DocumentTypes.PackingList)
+                .Where(n => n.DocumentNumber == invoice.DocumentNumber & n.DocumentType == Data.Enums.DocumentTypes.PackingList)
                 .FirstOrDefault();
 
-            packingList.Date = invoiceNumber.Date;
-            packingList.CustomerId = invoiceNumber.CustomerId;
-            packingList.CustomerOrders = invoiceNumber.CustomerOrders;
-            packingList.InvoiceProducts = invoiceNumber.InvoiceProducts;
-            packingList.TruckNumber = invoiceNumber.TruckNumber;
-            packingList.Incoterms = invoiceNumber.Incoterms;
-            packingList.MyCompanyId = invoiceNumber.MyCompanyId;
-            packingList.GrossWeight = invoiceNumber.GrossWeight;
-            packingList.NetWeight = invoiceNumber.NetWeight;
-            packingList.SupplierOrderId = invoiceNumber.SupplierOrderId;
+            packingList.Date = invoice.Date;
+            packingList.CustomerId = invoice.CustomerId;
+            packingList.CustomerOrders = invoice.CustomerOrders;
+            packingList.InvoiceProducts = invoice.InvoiceProducts;
+            packingList.TruckNumber = invoice.TruckNumber;
+            packingList.Incoterms = invoice.Incoterms;
+            packingList.MyCompanyId = invoice.MyCompanyId;
+            packingList.GrossWeight = invoice.GrossWeight;
+            packingList.NetWeight = invoice.NetWeight;
+            packingList.SupplierOrderId = invoice.SupplierOrderId;
 
             dbContext.SaveChanges();
         }
@@ -510,16 +511,15 @@ namespace SSMO.Services.Documents.Invoice
             var bgInvoiceForPrint = new BgInvoiceViewModel
             {
                 DocumentNumber = documentNumber,
-                CreditToInvoiceNumber = invoice.CreditToInvoiceNumber,
+                CreditToInvoiceNumber = invoice.CreditToInvoiceId,
                 CreditToInvoiceDate = invoice.CreditToInvoiceDate,
-                DebitToInvoiceNumber = invoice.DebitToInvoiceNumber,
+                DebitToInvoiceNumber = invoice.DebitToInvoiceId,
                 DebitToInvoiceDate = invoice.DebitToInvoiceDate,
                 DocumentType = invoice.DocumentType.ToString(),
                 Date = invoice.Date,
                 Amount = invoice.Amount * currencyExchange,
                 Vat = invoice.Vat,
-                VatAmount = invoice.Amount * currencyExchange * invoice.Vat / 100 ?? 0,
-                TotalAmount = invoice.TotalAmount * currencyExchange,
+                VatAmount = invoice.Amount * currencyExchange * invoice.Vat / 100 ?? 0,               
                 BgProducts = new List<BGProductsForBGInvoiceViewModel>(),
                 BgCustomer = new BGCustomerForInvoicePrint
                 {
@@ -545,6 +545,19 @@ namespace SSMO.Services.Documents.Invoice
                     BgStreet = mycompanyAddress.BgStreet
                 }
             };
+
+            if(bgInvoiceForPrint.DocumentType == "CreditNote")
+            {
+                bgInvoiceForPrint.TotalAmount = invoice.CreditNoteTotalAmount * currencyExchange;
+            }else if(bgInvoiceForPrint.DocumentType == "DebitNote")
+            {
+                bgInvoiceForPrint.TotalAmount = invoice.DebitNoteTotalAmount * currencyExchange;
+            }
+            else
+            {
+                bgInvoiceForPrint.TotalAmount = invoice.TotalAmount * currencyExchange;
+            }
+
             bgInvoiceForPrint.CompanyBankDetails = new List<InvoiceBankDetailsViewModel>();
 
             var bankList = dbContext.BankDetails
@@ -648,7 +661,7 @@ namespace SSMO.Services.Documents.Invoice
                     Amount = product.Amount,
                     BgAmount = product.BgAmount,
                     BgPrice = product.BgPrice,                    
-                    CustomerOrderId = product.CustomerOrderId,                    
+                    CustomerOrderId = product.CustomerOrderId ?? 0,                    
                     DeliveryCost = product.DeliveryCost,
                     InvoicedQuantity = product.InvoicedQuantity,
                     Pallets = product.Pallets,
@@ -773,106 +786,10 @@ namespace SSMO.Services.Documents.Invoice
                     invoice.TotalAmount = (decimal)(invoice.Amount + invoice.VatAmount);
 
                 EditPackingList(invoice.Id);
+                documentService.EditBgInvoice(invoice.DocumentNumber);
 
                     dbContext.SaveChanges();  
             }
-            else
-            if (invoice.DocumentType == Data.Enums.DocumentTypes.CreditNote)
-            {
-                
-
-               
-                    //        var oldInvoiceForCredit = dbContext.Documents
-                    //            .Where(d=>d.DocumentNumber== invoiceForCreditNote)
-                    //            .FirstOrDefault();
-
-                    //        oldProductList = dbContext.Products
-                    //            .Where(c=>c.DocumentId == oldInvoiceForCredit.Id)
-                    //            .ToList();
-
-                    //        //foreach (var oldProduct in oldProductList)
-                    //        //{
-                    //        //    oldProduct.CreditNoteId = 0;
-                    //        //    oldProduct.CreditNoteProductAmount = 0M;
-                    //        //}
-
-                    //        oldInvoiceForCredit.CreditNoteTotalAmount = 0M;
-                    //        invoice.CreditToInvoiceNumber = invoiceForCreditNote;
-                    //        var dateInvoiceForCredit = dbContext.Documents
-                    //            .Where(n => n.DocumentNumber == invoiceForCreditNote)
-                    //            .Select(d => d.Date)
-                    //            .FirstOrDefault();
-                    //        invoice.CreditToInvoiceDate = dateInvoiceForCredit;  
-                    //        checkInvoice = false;
-                    //    }
-
-                    //    foreach (var product in products)
-                    //    {
-                    //        var creditedInvoice = dbContext.Documents
-                    //            .Where(cr=>cr.DocumentNumber == invoiceForCreditNote)                        
-                    //            .FirstOrDefault();
-
-                    //        var productCheck = dbContext.Products
-                    //            .Where(c=>c.CreditNoteId== invoice.Id && c.Id == product.Id)
-                    //            .FirstOrDefault();
-
-                    //        var sumAmount = 0M;
-
-                    //        if (productCheck.DocumentId == null)
-                    //        {
-                    //            productCheck.DescriptionId = product.DescriptionId;
-                    //            productCheck.GradeId = product.GradeId;
-                    //            productCheck.SizeId = product.SizeId;
-                    //            productCheck.Unit = (Data.Enums.Unit) Enum.Parse(typeof(Data.Enums.Unit),product.Unit.ToString());
-                    //            productCheck.FscClaim = product.FscClaim;
-                    //            productCheck.FscSertificate = product.FscSertificate;
-                    //            productCheck.CreditNoteQuantity = product.Quantity;
-                    //            productCheck.CreditNotePrice = product.CreditNotePrice;
-                    //            sumAmount += product.Quantity * product.CreditNotePrice;
-                    //        }
-                    //        else
-                    //        {
-                    //            if (!checkInvoice)
-                    //            {
-                    //               var newProductCheck = dbContext.Products
-                    //              .Where(c => c.DocumentId == creditedInvoice.Id)
-                    //              .ToList();
-
-                    //                foreach (var newProduct in products)
-                    //                {
-                    //                    var productForCredit = dbContext.Products
-                    //                        .Where(a=>a.DescriptionId == newProduct.DescriptionId &&
-                    //                        a.GradeId == newProduct.GradeId && a.SizeId == newProduct.SizeId)
-                    //                        .FirstOrDefault();
-                    //                    //productForCredit.CreditNotePrice = newProduct.CreditNotePrice;
-                    //                    //productForCredit.CreditNoteQuantity = newProduct.Quantity;
-                    //                    productForCredit.FscClaim = newProduct.FscClaim;
-                    //                    productForCredit.FscSertificate = newProduct.FscSertificate;
-                    //                    productForCredit.Unit = (Data.Enums.Unit)Enum.Parse(typeof(Data.Enums.Unit), newProduct.Unit.ToString());
-                    //                    //productForCredit.CreditNoteProductAmount = newProduct.Quantity* newProduct.CreditNotePrice;
-
-                    //                }
-                    //            }
-                    //            else
-                    //            {
-                    //                productCheck.CreditNoteQuantity = product.Quantity;
-                    //                productCheck.CreditNotePrice = product.CreditNotePrice;
-                    //                productCheck.CreditNoteProductAmount = product.Quantity * product.CreditNotePrice;
-
-                    //            }
-                    //            sumAmount += product.Quantity * product.CreditNotePrice;
-                    //        }
-
-                    //        creditedInvoice.Balance += creditedInvoice.CreditNoteTotalAmount;
-                    //        invoice.Amount = sumAmount;
-                    //        invoice.VatAmount = sumAmount * invoice.Vat / 100;
-                    //        invoice.CreditNoteTotalAmount = invoice.Amount + invoice.VatAmount ?? 0;
-                    //        creditedInvoice.CreditNoteTotalAmount = invoice.CreditNoteTotalAmount;
-                    //        creditedInvoice.Balance -= invoice.CreditNoteTotalAmount;
-                    //    }
-
-            }
-
             dbContext.SaveChanges();
             return true;
         }

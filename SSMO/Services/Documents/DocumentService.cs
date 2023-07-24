@@ -222,12 +222,13 @@ namespace SSMO.Services.Documents
                 case Data.Enums.DocumentTypes.Invoice:
                     bgInvoice.TotalAmount = invoice.TotalAmount * currencyExchange; break;
                 case Data.Enums.DocumentTypes.CreditNote: 
-                    bgInvoice.CreditToInvoiceNumber = invoice.CreditToInvoiceNumber; 
+                    bgInvoice.CreditToInvoiceId = invoice.CreditToInvoiceId; 
                     bgInvoice.CreditToInvoiceDate = invoice.CreditToInvoiceDate;
                     bgInvoice.CreditNoteTotalAmount = invoice.CreditNoteTotalAmount * currencyExchange; break;
                 case Data.Enums.DocumentTypes.DebitNote:
-                    bgInvoice.DebitToInvoiceNumber = invoice.DebitToInvoiceNumber;
-                    bgInvoice.DebitToInvoiceDate = invoice.DebitToInvoiceDate;bgInvoice.DebitNoteTotalAmount = invoice.DebitNoteTotalAmount * currencyExchange;  break;
+                    bgInvoice.DebitToInvoiceId = invoice.DebitToInvoiceId;
+                    bgInvoice.DebitToInvoiceDate = invoice.DebitToInvoiceDate;
+                    bgInvoice.DebitNoteTotalAmount = invoice.DebitNoteTotalAmount * currencyExchange;  break;
                 default: break;
             }
 
@@ -241,7 +242,7 @@ namespace SSMO.Services.Documents
                 .Find(id);
 
             var invoice = dbContext.Documents
-                .Where(a => a.Id == creditOrDebitNote.DebitToInvoiceNumber || a.Id == creditOrDebitNote.CreditToInvoiceNumber)
+                .Where(a => a.Id == creditOrDebitNote.DebitToInvoiceId || a.Id == creditOrDebitNote.CreditToInvoiceId)
                 .FirstOrDefault();
 
             var creditOrDebitNoteForPrint = new CreditAndDebitNoteViewModel
@@ -266,7 +267,7 @@ namespace SSMO.Services.Documents
             }
             else if(creditOrDebitNote.DocumentType == Data.Enums.DocumentTypes.DebitNote) 
             {
-                creditOrDebitNoteForPrint.InvoiceNumber = invoice.DebitToInvoiceNumber;
+                creditOrDebitNoteForPrint.InvoiceNumber = invoice.DebitToInvoiceId;
                 creditOrDebitNoteForPrint.InvoiceDate = creditOrDebitNote.DebitToInvoiceDate;
                 creditOrDebitNoteForPrint.Total = creditOrDebitNote.DebitNoteTotalAmount;
             }   
@@ -374,6 +375,56 @@ namespace SSMO.Services.Documents
                 });
             }
             return creditOrDebitNoteForPrint;
+        }
+
+        public void EditBgInvoice(int documentNumber)
+        {
+            var invoice = dbContext.Documents
+                .Where(i => i.DocumentNumber == documentNumber)
+                .FirstOrDefault();
+
+            var bgInvoice = dbContext.Documents
+                .Where(i => i.DocumentNumber == documentNumber && i.DocumentType == Data.Enums.DocumentTypes.BGInvoice)
+                .FirstOrDefault();
+
+            if (invoice == null) return;
+
+            var currencyExchange = invoice.CurrencyExchangeRateUsdToBGN;
+
+            bgInvoice.Amount = invoice.Amount * currencyExchange;
+            bgInvoice.Vat = invoice.Vat;
+            bgInvoice.VatAmount = invoice.VatAmount * currencyExchange;
+            bgInvoice.CustomerId = invoice.CustomerId;
+            bgInvoice.Date = invoice.Date;
+            bgInvoice.FSCClaim = invoice.FSCClaim;
+            bgInvoice.FSCSertificate = invoice.FSCSertificate;
+            bgInvoice.SupplierOrderId = invoice.SupplierOrderId;
+            bgInvoice.SupplierId = invoice.SupplierId;
+            bgInvoice.TruckNumber = invoice.TruckNumber;
+            bgInvoice.NetWeight = invoice.NetWeight;
+            bgInvoice.GrossWeight = invoice.GrossWeight;
+            bgInvoice.Incoterms = invoice.Incoterms;
+            bgInvoice.Swb = invoice.Swb;
+            bgInvoice.CurrencyExchangeRateUsdToBGN = currencyExchange;
+            bgInvoice.CurrencyId = invoice.CurrencyId;
+            bgInvoice.TotalQuantity = invoice.TotalQuantity;
+
+            switch (invoice.DocumentType)
+            {
+                case Data.Enums.DocumentTypes.Invoice:
+                    bgInvoice.TotalAmount = invoice.TotalAmount * currencyExchange; break;
+                case Data.Enums.DocumentTypes.CreditNote:
+                    bgInvoice.CreditToInvoiceId = invoice.CreditToInvoiceId;
+                    bgInvoice.CreditToInvoiceDate = invoice.CreditToInvoiceDate;
+                    bgInvoice.CreditNoteTotalAmount = invoice.CreditNoteTotalAmount * currencyExchange; break;
+                case Data.Enums.DocumentTypes.DebitNote:
+                    bgInvoice.DebitToInvoiceId = invoice.DebitToInvoiceId;
+                    bgInvoice.DebitToInvoiceDate = invoice.DebitToInvoiceDate;
+                    bgInvoice.DebitNoteTotalAmount = invoice.DebitNoteTotalAmount * currencyExchange; break;
+                default: break;
+            }
+
+            dbContext.SaveChanges();            
         }
     }
 }

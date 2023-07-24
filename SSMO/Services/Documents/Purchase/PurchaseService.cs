@@ -52,6 +52,7 @@ namespace SSMO.Services.Documents.Purchase
                 PurchaseNumber = number,
                 Date = date,
                 DocumentType = Data.Enums.DocumentTypes.Purchase,
+                DeliveryAddress= deliveryAddress,
                 SupplierOrder = supplierOrder,
                 SupplierOrderId = supplierOrder.Id,
                 PaidStatus = paidStatus,
@@ -104,7 +105,7 @@ namespace SSMO.Services.Documents.Purchase
                     FscCertificate = product.PurchaseFscCertificate,
                     FscClaim = product.PurchaseFscClaim,
                     Quantity = (decimal) product.OrderedQuantity,
-                    VehicleNumber = product.VehicleNumber
+                    VehicleNumber = product.VehicleNumber                    
                 };
                 purchaseProduct.Amount = purchaseProduct.Quantity*purchaseProduct.PurchasePrice;
                 purchaseProduct.TotalSheets = purchaseProduct.Pallets*purchaseProduct.SheetsPerPallet;
@@ -143,8 +144,7 @@ namespace SSMO.Services.Documents.Purchase
                     {                                            
                         purchase.TotalQuantity += (decimal)purchaseProduct.QuantityM3;
                     }                    
-                }
-            
+                }            
             }
             
             purchase.VatAmount = purchase.Amount * purchase.Vat / 100;
@@ -230,7 +230,7 @@ namespace SSMO.Services.Documents.Purchase
             int vat, decimal netWeight, decimal grossWeight, string truckNumber, string swb, 
             decimal purchaseTransportCost, decimal bankExpenses, decimal duty, decimal customsExpenses, 
             decimal factoring, decimal fiscalAgentExpenses, decimal procentComission, decimal otherExpenses, 
-            List<PurchaseProductsForEditFormModel> purchaseProducts)
+            List<PurchaseProductsForEditFormModel> purchaseProducts, string deliveryAddress)
         {
             if(id == 0) { return false; }   
 
@@ -256,6 +256,8 @@ namespace SSMO.Services.Documents.Purchase
             purchaseInvoiceForEdit.ProcentComission= procentComission;
             purchaseInvoiceForEdit.OtherExpenses= otherExpenses;
             purchaseInvoiceForEdit.TotalQuantity = 0;
+            purchaseInvoiceForEdit.Amount = 0;
+            purchaseInvoiceForEdit.DeliveryAddress= deliveryAddress;
         
             foreach (var product in purchaseProducts)
             {
@@ -281,8 +283,9 @@ namespace SSMO.Services.Documents.Purchase
                 productForEdit.FscClaim = product.FscClaim;
                 productForEdit.Quantity = product.Quantity;
                 productForEdit.Amount = product.Quantity * product.PurchasePrice;
+                purchaseInvoiceForEdit.Amount += productForEdit.Amount;
 
-                if(purchaseProducts.All(u=>u.Unit == Unit.m3.ToString()) || purchaseProducts.All(u => u.Unit == Unit.m2.ToString())
+                if (purchaseProducts.All(u=>u.Unit == Unit.m3.ToString()) || purchaseProducts.All(u => u.Unit == Unit.m2.ToString())
                     || purchaseProducts.All(u => u.Unit == Unit.pcs.ToString()) || purchaseProducts.All(u => u.Unit == Unit.sheets.ToString())
                     || purchaseProducts.All(u => u.Unit == Unit.m.ToString()))
                 {
@@ -314,7 +317,9 @@ namespace SSMO.Services.Documents.Purchase
                     productForEdit.QuantityM3 = quantityM3 * productForEdit.Pallets * productForEdit.SheetsPerPallet;
                 }                
             }
-           
+
+            purchaseInvoiceForEdit.VatAmount = purchaseInvoiceForEdit.Vat * purchaseInvoiceForEdit.Amount / 100;
+            purchaseInvoiceForEdit.TotalAmount = purchaseInvoiceForEdit.VatAmount ?? 0 + purchaseInvoiceForEdit.Amount;
 
             dbContext.SaveChanges();
 
@@ -426,7 +431,7 @@ namespace SSMO.Services.Documents.Purchase
                 .Select(a => a.Id).FirstOrDefault();
 
             var queryOrders = dbContext.SupplierOrders.
-                Where(a => a.SupplierId == supplierId).OrderByDescending(a => a.Date);
+                Where(a => a.SupplierId == supplierId && a.Products.Any(a=>a.QuantityLeftForPurchaseLoading>0)).OrderByDescending(a => a.Date);
 
             var totalOrders = queryOrders.Count();
 
@@ -479,6 +484,7 @@ namespace SSMO.Services.Documents.Purchase
                 GrossWeight = purchaseInvoice.GrossWeight,
                 Incoterms = purchaseInvoice.Incoterms,
                 NetWeight = purchaseInvoice.NetWeight,
+                DeliveryAddress = purchaseInvoice.DeliveryAddress,
                 PurchaseNumber = purchaseInvoice.PurchaseNumber,
                 OtherExpenses = purchaseInvoice.OtherExpenses,
                 ProcentComission = purchaseInvoice.ProcentComission,
@@ -487,6 +493,7 @@ namespace SSMO.Services.Documents.Purchase
                 TruckNumber = purchaseInvoice.TruckNumber,
                 Swb = purchaseInvoice.Swb,
                 Vat = purchaseInvoice.Vat ?? 0,
+                TotalAmount = purchaseInvoice.TotalAmount,
                 Products = new List<PurchaseProductsDetailsViewModel>()
             };
 
@@ -549,6 +556,7 @@ namespace SSMO.Services.Documents.Purchase
                 GrossWeight = purchaseInvoice.GrossWeight,
                 Incoterms = purchaseInvoice.Incoterms,
                 NetWeight = purchaseInvoice.NetWeight,
+                DeliveryAddress = purchaseInvoice.DeliveryAddress,
                 PurchaseNumber = purchaseInvoice.PurchaseNumber,
                 OtherExpenses = purchaseInvoice.OtherExpenses,
                 ProcentComission = purchaseInvoice.ProcentComission,
@@ -584,24 +592,32 @@ namespace SSMO.Services.Documents.Purchase
                 .Where(a=>a.LoadedQuantityM3 > 0 && a.SoldQuantity < a.LoadedQuantityM3)
                 .SelectMany(p=>p.PurchaseProductDetails)
                 .ToList();
+
             var purchaseProducts = new List<PurchaseProductsForDebitNoteViewModel>();
 
             foreach (var product in productsForSale)
             {
                 var mainProduct = productRepository.GetMainProduct(product.ProductId);
 
-                var customerOrderDetails = dbContext.CustomerOrderProductDetails
-                    .Where(i=>i.ProductId == product.ProductId && i.SupplierOrderId == product.SupplierOrderId)                    
-                    .FirstOrDefault();
+                var customerOrderIdList = dbContext.CustomerOrderProductDetails
+                    .Where(i=>i.ProductId == product.ProductId && i.SupplierOrderId == product.SupplierOrderId)
+                    .Select(i=>i.CustomerOrderId)
+                    .ToList();
 
-                //var customerOrder = dbContext.CustomerOrders
-                //    .Where(i=>i.Id == customerOrderDetails.CustomerOrderId)
-                //    .Select(n=> new CustomerOrderNumbersByCustomerViewModel
-                //    {
-                //        Id= n.Id,
-                //        OrderConfirmationNumber = n.OrderConfirmationNumber,
-                //    })
-                //    .FirstOrDefault();
+                var customerOrder = new List<CustomerOrderNumbersByCustomerViewModel>();
+
+                if (customerOrderIdList != null)
+                {                   
+                    customerOrder = dbContext.CustomerOrders
+                    .Where(i => customerOrderIdList.Contains(i.Id))
+                    .Select(n => new CustomerOrderNumbersByCustomerViewModel
+                    {
+                        Id = n.Id,
+                        OrderConfirmationNumber = n.OrderConfirmationNumber,
+                        CustomerOrderProductId = n.CustomerOrderProducts.FirstOrDefault().Id,
+                    })
+                    .ToList();
+                }
 
                 var productForDebit = new PurchaseProductsForDebitNoteViewModel
                 {
@@ -618,10 +634,14 @@ namespace SSMO.Services.Documents.Purchase
                     Unit = product.Unit,
                     FscSertificate = product.FscCertificate,
                     FscClaim = product.FscClaim,     
-                   // CustomerOrderDetail = customerOrder,
-                   // CustomerOrderDetailsId = customerOrderDetails.Id
+                    CustomerOrderDetail = new List<CustomerOrderNumbersByCustomerViewModel>()                                     
                 };
 
+                if(customerOrder != null)
+                {
+                    productForDebit.CustomerOrderDetail = customerOrder;
+                }                
+                
                 productForDebit.ProductFullDescription = String.Join
                     (", ", productForDebit.Description,productForDebit.Size,productForDebit.Grade, productForDebit.AvailableQuantity);
                 purchaseProducts.Add(productForDebit);

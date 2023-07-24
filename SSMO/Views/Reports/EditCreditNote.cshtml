@@ -138,7 +138,7 @@
         <div class="editor-field">
            <label>Choose New Invoice No For Credit</label>
            <select  asp-for="InvoiceNumberId" type="number" >
-            <option value="@Model.InvoiceNumberId">@Model.CreditToInvoiceNumber</option>
+            <option value="@Model.CreditToInvoiceNumber">@Model.CreditToInvoiceNumber</option>
                 @foreach (var invoice in Model.InvoiceNumbers)
                 {
                         <option value="@invoice.Id">@invoice.DocumentNumber</option>

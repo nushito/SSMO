@@ -35,6 +35,7 @@ namespace SSMO.Models.Products
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
         public int SupplierOrderId { get; set; }
+        public decimal QuantityAvailableForCustomerOrder { get; set; }
 
     }
 }

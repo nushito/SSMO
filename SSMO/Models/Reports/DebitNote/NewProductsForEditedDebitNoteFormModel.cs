@@ -2,9 +2,9 @@
 using SSMO.Models.Reports.ProductsStock;
 using System.Collections.Generic;
 
-namespace SSMO.Models.Documents.DebitNote
+namespace SSMO.Models.Reports.DebitNote
 {
-    public class EditProductForDebitNoteViewModel
+    public class NewProductsForEditedDebitNoteFormModel
     {
         public int Id { get; set; }
         public int ProductId { get; set; }
@@ -19,12 +19,11 @@ namespace SSMO.Models.Documents.DebitNote
         public IEnumerable<GradeForProductSearchModel> Grades { get; set; }
         public Unit Unit { get; set; }
         public string FscClaim { get; set; }
-        public string FscSertificate { get; set; }
+        public string FscCertificate { get; set; }
         public int TotalSheets { get; set; }
         public decimal DeliveryCost { get; set; }
         public decimal Profit { get; set; }
         public string VehicleNumber { get; set; }
-        public decimal InvoicedQuantity { get; set; }       
         public decimal DebitNoteQuantity { get; set; }
         public decimal DebitNotePrice { get; set; }
         public decimal DebitNoteAmount { get; set; }
@@ -33,9 +32,10 @@ namespace SSMO.Models.Documents.DebitNote
         public int DebitNotePallets { get; set; }
         public int DebitNoteSheetsPerPallet { get; set; }
         public ICollection<string> FscCertificates { get; set; }
+        public int CustomerOrderId { get; set; }
         public int PurchaseProductDetailsId { get; set; }
         public int? DebitNoteId { get; set; }
-        public int CustomerProductDetailId { get; set; }
+        public int? CustomerProductDetailId { get; set; }
         public bool ServiceOrProductQuantity { get; set; }
     }
 }

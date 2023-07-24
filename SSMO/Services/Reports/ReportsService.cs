@@ -254,26 +254,27 @@ namespace SSMO.Services.Reports
             {
                 foreach (var product in products)
                 {
-                    var productsPerCorder = dbcontext.CustomerOrderProductDetails
+                    var productPerCorder = dbcontext.CustomerOrderProductDetails
                                        .Where(co => co.Id == product.Id)
                                        .FirstOrDefault();
 
                     if (product.Quantity == 0)
                     {
-                        productsPerCorder.Quantity = 0;
-                        productsPerCorder.AutstandingQuantity = 0;
+                        productPerCorder.Quantity = 0;
+                        productPerCorder.AutstandingQuantity = 0;
                         continue;
                     }
                     else
                     {
-                        productsPerCorder.Pallets = product.Pallets;
-                        productsPerCorder.SheetsPerPallet = product.SheetsPerPallet;
-                        productsPerCorder.Unit = Enum.Parse<Unit>(product.Unit.ToString());
-                        productsPerCorder.Quantity = product.Quantity;
-                        productsPerCorder.TotalSheets = product.Pallets * product.SheetsPerPallet;
-                        productsPerCorder.Amount = Math.Round(product.SellPrice * product.Quantity, 4);
+                        productPerCorder.Pallets = product.Pallets;
+                        productPerCorder.SellPrice = product.SellPrice;
+                        productPerCorder.SheetsPerPallet = product.SheetsPerPallet;
+                        productPerCorder.Unit = Enum.Parse<Unit>(product.Unit.ToString());
+                        productPerCorder.Quantity = product.Quantity;
+                        productPerCorder.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                        productPerCorder.Amount = Math.Round(product.SellPrice * product.Quantity, 4);
                     }
-                    order.Amount += productsPerCorder.Amount;
+                    order.Amount += productPerCorder.Amount;
                 }
             }
 
@@ -442,7 +443,6 @@ namespace SSMO.Services.Reports
 
                     if(item.OrderedQuantity == 0)
                     {
-                        product.OrderedQuantity = 0;
                         product.QuantityAvailableForCustomerOrder = 0;
                         product.QuantityLeftForPurchaseLoading = 0;
                         continue;
@@ -457,7 +457,13 @@ namespace SSMO.Services.Reports
                     product.Unit = Enum.Parse<Unit>(item.Unit);
                     product.TotalSheets = item.Pallets * item.SheetsPerPallet;
                     product.Amount = item.OrderedQuantity * item.PurchasePrice;
-               
+                    product.OrderedQuantity = item.OrderedQuantity;
+                    product.QuantityLeftForPurchaseLoading = item.OrderedQuantity - product.LoadedQuantityM3;
+
+                    var sumProductInCustomerOrders = dbcontext.CustomerOrderProductDetails
+                        .Where(p => p.ProductId == item.Id)
+                        .Sum(q => q.Quantity);
+                    product.QuantityAvailableForCustomerOrder = item.OrderedQuantity - sumProductInCustomerOrders;
                     supplierOrder.Amount += product.Amount;
                 }
 
@@ -556,17 +562,19 @@ namespace SSMO.Services.Reports
 
             foreach (var invoice in invoiceDetailsCollection)
             {
-                if(invoice.CreditToInvoiceNumber != 0)
+                if(invoice.CreditToInvoiceId != 0)
                 {
                     invoice.CreditToInvoiceDocumentNumber = dbcontext.Documents
-                        .Where(id=>id.Id == invoice.CreditToInvoiceNumber)
+                        .Where(id=>id.Id == invoice.CreditToInvoiceId)
                         .Select(n=>n.DocumentNumber).FirstOrDefault();
+                    invoice.TotalAmount = invoice.CreditNoteTotalAmount;
                 }
-                else if(invoice.DebitToInvoiceNumber != 0)
+                else if(invoice.DebitToInvoiceId != 0)
                 {
                     invoice.DebitToInvoiceDocumentNumber = dbcontext.Documents
-                        .Where(id => id.Id == invoice.DebitToInvoiceNumber)
+                        .Where(id => id.Id == invoice.DebitToInvoiceId)
                         .Select(n => n.DocumentNumber).FirstOrDefault();
+                    invoice.TotalAmount = invoice.DebitNoteTotalAmount;
                 }
                 
             }
@@ -622,11 +630,11 @@ namespace SSMO.Services.Reports
                 productsDetails.AddRange(products) ;
 
                 var invoiceNumber = dbcontext.Documents
-                    .Where(i => i.Id == invoiceDetails.CreditToInvoiceNumber)
+                    .Where(i => i.Id == invoiceDetails.CreditToInvoiceId)
                     .Select(num => num.DocumentNumber)
                     .FirstOrDefault();
 
-               invoiceDetails.CreditToInvoiceNumber= invoiceNumber;
+               invoiceDetails.CreditToInvoiceId= invoiceNumber;
 
             }
             else if(invoiceDetails.DocumentType == Data.Enums.DocumentTypes.DebitNote.ToString())
@@ -637,11 +645,11 @@ namespace SSMO.Services.Reports
 
                 productsDetails.AddRange(products);
                 var invoiceNumber = dbcontext.Documents
-                    .Where(i => i.Id == invoiceDetails.DebitToInvoiceNumber)
+                    .Where(i => i.Id == invoiceDetails.DebitToInvoiceId)
                     .Select(num => num.DocumentNumber)
                     .FirstOrDefault();
 
-                invoiceDetails.CreditToInvoiceNumber = invoiceNumber;
+                invoiceDetails.DebitToInvoiceId = invoiceNumber;
             }
 
             foreach (var product in productsDetails)

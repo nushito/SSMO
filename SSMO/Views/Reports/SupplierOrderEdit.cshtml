@@ -125,11 +125,11 @@
                               </div>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <select asp-for="@Model.Products[i].Description">
+                                    <select asp-for="@Model.Products[i].DescriptionId">
                                         <option value="">All</option>
-                                    @foreach (var type in service.GetDescriptions())
+                                    @foreach (var description in Model.Products[i].Descriptions)
                                     {
-                                                <option value="@type">@type</option>
+                                                <option value="@description.Id">@description.Name</option>
                                     }
                                     </select>
                                 </div>
@@ -137,11 +137,11 @@
                             <br>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <select id="Size" asp-for="@Model.Products[i].Size">
+                                    <select id="Size" asp-for="@Model.Products[i].SizeId">
                                         <option value="">All</option>
-                                    @foreach (var size in service.GetSizes())
+                                    @foreach (var size in Model.Products[i].Sizes)
                                     {
-                                                <option value="@size">@size</option>
+                                                <option value="@size.Id">@size.Name</option>
                                     }
                                     </select>
                                 </div>
@@ -149,11 +149,11 @@
                             <br>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <select asp-for="@Model.Products[i].Grade">
+                                    <select asp-for="@Model.Products[i].GradeId">
                                         <option value="">All</option>
-                                    @foreach (var grade in service.GetGrades())
+                                    @foreach (var grade in Model.Products[i].Grades)
                                     {
-                                                <option value="@grade">@grade</option>
+                                                <option value="@grade.Id">@grade.Name</option>
                                     }
                                     </select>
                                 </div>

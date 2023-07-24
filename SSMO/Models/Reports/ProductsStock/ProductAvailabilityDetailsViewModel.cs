@@ -1,26 +1,22 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using System;
+using System.Collections.Generic;
 
 namespace SSMO.Models.Reports.ProductsStock
 {
     public class ProductAvailabilityDetailsViewModel
     {
-        public string FSCClaim { get; set; }
-        public string FSCSertificate { get; set; }
-        public int? CustomerOrderId { get; set; }
-        public int CustomerOrderNumber { get; set; }
-        public DateTime OrderDate { get; set; }
-        public string CustomerName { get; set; }
-        public string SupplierName { get; set; }
-        public string PurchaseNumber { get; set; }
-        public DateTime PurchaseDate { get; set; }
+        public string Description { get; set; }
+        public string Size { get; set; }
+        public string Grade { get; set; }
+        public List<ProductDetailsForEachCustomerOrderViewModel> CustomerProductsDetails { get; set; }
+        public List<PurchaseProductDetailsListViewModel> PurchaseProductDetails { get; set; }
         public decimal LoadedQuantity { get; set; }
-        public string Unit { get; set; }
-        public int Pallets { get; set; }
-        public int SheetsPerPallet { get; set; }
+        public decimal DeliveredQuantity { get; set; }
+        public decimal QuantityOnStock { get; set; }      
         public decimal OrderedQuantity { get; set; }
-        public string DeliveryAddress { get; set; }
-        public decimal PurchasePrice { get; set; }
-        public decimal Price { get; set; }
-        public decimal CostPrice { get; set; }
+        public string SupplierName { get; set; }
+
+
     }
 }

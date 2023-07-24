@@ -95,7 +95,7 @@
             <input asp-for="Vat"  min="0" step="1" class="form-control" type="number" />
         </td>
       
-             <td><label asp-for="StatusId"></label>
+             <td><label >Status</label>
                 <select  asp-for="StatusId" class="form-control">
                     @foreach (var status in Model.Statuses)
                     {

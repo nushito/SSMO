@@ -1,6 +1,7 @@
 ﻿using SSMO.Models.Documents;
 using SSMO.Models.Documents.CreditNote;
 using SSMO.Models.Documents.DebitNote;
+using SSMO.Models.Reports.DebitNote;
 using System;
 using System.Collections.Generic;
 
@@ -17,5 +18,10 @@ namespace SSMO.Services.Documents.DebitNote
         public bool EditDebitNote(int id, DateTime date, string incoterms, string comment, List<EditProductForDebitNoteViewModel> products);
 
         public ICollection<InvoiceNumbersForEditedDebitNoteViewModel> GetInvoiceNumbers();
+
+        public bool AddNewProductsToDebitNoteWhenEdit(int id, int invoiceId,
+            List<NewProductsFromOrderEditedDebitNoteViewModel> products,
+             List<NewProductsForEditedDebitNoteFormModel> newProducts,
+             IList<PurchaseProductsForDebitNoteViewModel> availableProducts);
     }
 }

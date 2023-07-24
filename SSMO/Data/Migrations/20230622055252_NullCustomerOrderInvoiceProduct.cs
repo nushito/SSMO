@@ -2,12 +2,12 @@
 
 namespace SSMO.Data.Migrations
 {
-    public partial class PurchaseProductsIdNull : Migration
+    public partial class NullCustomerOrderInvoiceProduct : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<int>(
-                name: "PurchaseProductDetailsId",
+                name: "CustomerOrderId",
                 table: "InvoiceProductDetails",
                 type: "int",
                 nullable: true,
@@ -18,7 +18,7 @@ namespace SSMO.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<int>(
-                name: "PurchaseProductDetailsId",
+                name: "CustomerOrderId",
                 table: "InvoiceProductDetails",
                 type: "int",
                 nullable: false,

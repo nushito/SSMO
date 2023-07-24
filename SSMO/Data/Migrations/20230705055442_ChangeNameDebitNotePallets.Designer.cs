@@ -10,8 +10,8 @@ using SSMO.Data;
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230426055412_InvoiceAndCustomerProductConnection")]
-    partial class InvoiceAndCustomerProductConnection
+    [Migration("20230705055442_ChangeNameDebitNotePallets")]
+    partial class ChangeNameDebitNotePallets
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -619,7 +619,7 @@ namespace SSMO.Data.Migrations
                     b.Property<DateTime>("CreditToInvoiceDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreditToInvoiceNumber")
+                    b.Property<int>("CreditToInvoiceId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("CurrencyExchangeRateUsdToBGN")
@@ -649,8 +649,11 @@ namespace SSMO.Data.Migrations
                     b.Property<DateTime>("DebitToInvoiceDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DebitToInvoiceNumber")
+                    b.Property<int>("DebitToInvoiceId")
                         .HasColumnType("int");
+
+                    b.Property<string>("DeliveryAddress")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("DeliveryTrasnportCost")
                         .HasPrecision(18, 5)
@@ -824,7 +827,7 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("CreditNoteSheetsPerPallet")
                         .HasColumnType("int");
 
-                    b.Property<int>("CustomerOrderId")
+                    b.Property<int?>("CustomerOrderId")
                         .HasColumnType("int");
 
                     b.Property<int?>("CustomerOrderProductDetailsId")
@@ -845,6 +848,9 @@ namespace SSMO.Data.Migrations
                     b.Property<int?>("DebitNoteId")
                         .HasColumnType("int");
 
+                    b.Property<int>("DebitNotePallets")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("DebitNotePrice")
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
@@ -852,6 +858,9 @@ namespace SSMO.Data.Migrations
                     b.Property<decimal>("DebitNoteQuantity")
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
+
+                    b.Property<int>("DebitNoteSheetsPerPallet")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("DeliveryCost")
                         .HasPrecision(18, 5)
@@ -880,8 +889,12 @@ namespace SSMO.Data.Migrations
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
 
-                    b.Property<int>("PurchaseProductDetailsId")
+                    b.Property<int?>("PurchaseProductDetailsId")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("QuantityM3ForCalc")
+                        .HasPrecision(18, 5)
+                        .HasColumnType("decimal(18,5)");
 
                     b.Property<decimal>("SellPrice")
                         .HasPrecision(18, 5)
@@ -1154,6 +1167,10 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("decimal(18,4)");
 
                     b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 5)
+                        .HasColumnType("decimal(18,5)");
+
+                    b.Property<decimal?>("QuantityM3")
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
 
@@ -1656,8 +1673,7 @@ namespace SSMO.Data.Migrations
                     b.HasOne("SSMO.Data.Models.CustomerOrder", "CustomerOrder")
                         .WithMany("InvoiceProductDetails")
                         .HasForeignKey("CustomerOrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SSMO.Data.Models.CustomerOrderProductDetails", "CustomerOrderProductDetails")
                         .WithMany("InvoiceProductDetails")
@@ -1684,8 +1700,7 @@ namespace SSMO.Data.Migrations
                     b.HasOne("SSMO.Data.Models.PurchaseProductDetails", "PurchaseProductDetails")
                         .WithMany("InvoiceProductDetails")
                         .HasForeignKey("PurchaseProductDetailsId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("CreditNote");
 

@@ -147,6 +147,67 @@ namespace SSMO.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CustomerOrders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderConfirmationNumber = table.Column<int>(type: "int", nullable: false),
+                    CustomerPoNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LoadingPlace = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeliveryAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeliveryTerms = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CustomerId = table.Column<int>(type: "int", nullable: false),
+                    MyCompanyId = table.Column<int>(type: "int", nullable: false),
+                    FSCClaim = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FSCSertificate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StatusId = table.Column<int>(type: "int", nullable: false),
+                    CurrencyId = table.Column<int>(type: "int", nullable: false),
+                    TotalQuantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    TotalAmount = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    TotalSheets = table.Column<int>(type: "int", nullable: false),
+                    TotalPallets = table.Column<int>(type: "int", nullable: false),
+                    Vat = table.Column<int>(type: "int", nullable: true),
+                    PaidAvance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    PaidAmountStatus = table.Column<bool>(type: "bit", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    SubTotal = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    NetWeight = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
+                    GrossWeight = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
+                    Origin = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerOrders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CustomerOrders_Currencies_CurrencyId",
+                        column: x => x.CurrencyId,
+                        principalTable: "Currencies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CustomerOrders_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CustomerOrders_MyCompanies_MyCompanyId",
+                        column: x => x.MyCompanyId,
+                        principalTable: "MyCompanies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_CustomerOrders_Statuses_StatusId",
+                        column: x => x.StatusId,
+                        principalTable: "Statuses",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Suppliers",
                 columns: table => new
                 {
@@ -270,66 +331,6 @@ namespace SSMO.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "CustomerOrders",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderConfirmationNumber = table.Column<int>(type: "int", nullable: false),
-                    CustomerPoNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LoadingPlace = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeliveryAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeliveryTerms = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CustomerId = table.Column<int>(type: "int", nullable: false),
-                    MyCompanyId = table.Column<int>(type: "int", nullable: false),
-                    FSCClaim = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FSCSertificate = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    StatusId = table.Column<int>(type: "int", nullable: false),
-                    CurrencyId = table.Column<int>(type: "int", nullable: false),
-                    TotalQuantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
-                    TotalAmount = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
-                    Vat = table.Column<int>(type: "int", nullable: true),
-                    PaidAvance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
-                    Balance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
-                    PaidAmountStatus = table.Column<bool>(type: "bit", nullable: false),
-                    Amount = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
-                    SubTotal = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
-                    NetWeight = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
-                    GrossWeight = table.Column<decimal>(type: "decimal(18,3)", precision: 18, scale: 3, nullable: false),
-                    Origin = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DocumentId = table.Column<int>(type: "int", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_CustomerOrders", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_CustomerOrders_Currencies_CurrencyId",
-                        column: x => x.CurrencyId,
-                        principalTable: "Currencies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CustomerOrders_Customers_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Customers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CustomerOrders_MyCompanies_MyCompanyId",
-                        column: x => x.MyCompanyId,
-                        principalTable: "MyCompanies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_CustomerOrders_Statuses_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "Statuses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "CustomerOrderSupplierOrder",
                 columns: table => new
                 {
@@ -362,14 +363,13 @@ namespace SSMO.Data.Migrations
                     DocumentType = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DocumentNumber = table.Column<int>(type: "int", nullable: false),
                     PurchaseNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreditToInvoiceNumber = table.Column<int>(type: "int", nullable: false),
+                    CreditToInvoiceId = table.Column<int>(type: "int", nullable: false),
                     CreditToInvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DebitToInvoiceNumber = table.Column<int>(type: "int", nullable: false),
+                    DebitToInvoiceId = table.Column<int>(type: "int", nullable: false),
                     DebitToInvoiceDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     FSCClaim = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FSCSertificate = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CustomerId = table.Column<int>(type: "int", nullable: true),
-                    CustomerOrderId = table.Column<int>(type: "int", nullable: false),
                     SupplierId = table.Column<int>(type: "int", nullable: true),
                     SupplierOrderId = table.Column<int>(type: "int", nullable: false),
                     MyCompanyId = table.Column<int>(type: "int", nullable: false),
@@ -392,7 +392,7 @@ namespace SSMO.Data.Migrations
                     PaidAvance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     CurrencyId = table.Column<int>(type: "int", nullable: false),
                     Balance = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
-                    DatePaidAmount = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DatePaidAmount = table.Column<DateTime>(type: "datetime2", nullable: true),
                     PaidStatus = table.Column<bool>(type: "bit", nullable: false),
                     CurrencyExchangeRateUsdToBGN = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     Vat = table.Column<int>(type: "int", nullable: true),
@@ -401,6 +401,9 @@ namespace SSMO.Data.Migrations
                     DebitNoteTotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     VatAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     TotalAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    TotalQuantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeliveryAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PurchaseProductDetailsId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -410,12 +413,6 @@ namespace SSMO.Data.Migrations
                         name: "FK_Documents_Currencies_CurrencyId",
                         column: x => x.CurrencyId,
                         principalTable: "Currencies",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Documents_CustomerOrders_CustomerOrderId",
-                        column: x => x.CustomerOrderId,
-                        principalTable: "CustomerOrders",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -442,6 +439,30 @@ namespace SSMO.Data.Migrations
                         principalTable: "Suppliers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CustomerOrderDocument",
+                columns: table => new
+                {
+                    CustomerOrdersId = table.Column<int>(type: "int", nullable: false),
+                    DocumentsId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CustomerOrderDocument", x => new { x.CustomerOrdersId, x.DocumentsId });
+                    table.ForeignKey(
+                        name: "FK_CustomerOrderDocument_CustomerOrders_CustomerOrdersId",
+                        column: x => x.CustomerOrdersId,
+                        principalTable: "CustomerOrders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_CustomerOrderDocument_Documents_DocumentsId",
+                        column: x => x.DocumentsId,
+                        principalTable: "Documents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -628,6 +649,7 @@ namespace SSMO.Data.Migrations
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     SupplierOrderId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    QuantityM3 = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: true),
                     Unit = table.Column<int>(type: "int", nullable: false),
                     Pallets = table.Column<int>(type: "int", nullable: false),
                     SheetsPerPallet = table.Column<int>(type: "int", nullable: false),
@@ -637,7 +659,8 @@ namespace SSMO.Data.Migrations
                     PurchasePrice = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     Amount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     PurchaseInvoiceId = table.Column<int>(type: "int", nullable: false),
-                    StatusId = table.Column<int>(type: "int", nullable: false)
+                    CostPrice = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    VehicleNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -654,12 +677,6 @@ namespace SSMO.Data.Migrations
                         principalTable: "Products",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_PurchaseProductDetails_Statuses_StatusId",
-                        column: x => x.StatusId,
-                        principalTable: "Statuses",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_PurchaseProductDetails_SupplierOrders_SupplierOrderId",
                         column: x => x.SupplierOrderId,
@@ -705,10 +722,19 @@ namespace SSMO.Data.Migrations
                     Pallets = table.Column<int>(type: "int", nullable: false),
                     SheetsPerPallet = table.Column<int>(type: "int", nullable: false),
                     TotalSheets = table.Column<int>(type: "int", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    BgAmount = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    BgPrice = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     FscClaim = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FscCertificate = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SellPrice = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    DeliveryCost = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    Profit = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    VehicleNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     InvoicedQuantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    QuantityM3ForCalc = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    CreditNoteId = table.Column<int>(type: "int", nullable: true),
+                    DebitNoteId = table.Column<int>(type: "int", nullable: true),
                     CreditNoteQuantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     CreditNotePallets = table.Column<int>(type: "int", nullable: false),
                     CreditNoteSheetsPerPallet = table.Column<int>(type: "int", nullable: false),
@@ -717,10 +743,13 @@ namespace SSMO.Data.Migrations
                     CreditNoteBgPrice = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     CreditNoteBgAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     DebitNoteQuantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
+                    DeditNotePallets = table.Column<int>(type: "int", nullable: false),
+                    DeditNoteSheetsPerPallet = table.Column<int>(type: "int", nullable: false),
                     DebitNoteAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     DebitNotePrice = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     DebitNoteBgPrice = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     DebitNoteBgAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
+                    PurchaseProductDetailsId = table.Column<int>(type: "int", nullable: true),
                     CustomerOrderProductDetailsId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -739,6 +768,18 @@ namespace SSMO.Data.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
+                        name: "FK_InvoiceProductDetails_Documents_CreditNoteId",
+                        column: x => x.CreditNoteId,
+                        principalTable: "Documents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_InvoiceProductDetails_Documents_DebitNoteId",
+                        column: x => x.DebitNoteId,
+                        principalTable: "Documents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_InvoiceProductDetails_Documents_InvoiceId",
                         column: x => x.InvoiceId,
                         principalTable: "Documents",
@@ -748,6 +789,12 @@ namespace SSMO.Data.Migrations
                         name: "FK_InvoiceProductDetails_Products_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Products",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_InvoiceProductDetails_PurchaseProductDetails_PurchaseProductDetailsId",
+                        column: x => x.PurchaseProductDetailsId,
+                        principalTable: "PurchaseProductDetails",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -773,6 +820,11 @@ namespace SSMO.Data.Migrations
                 name: "IX_BankDetails_SupplierId",
                 table: "BankDetails",
                 column: "SupplierId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CustomerOrderDocument_DocumentsId",
+                table: "CustomerOrderDocument",
+                column: "DocumentsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_CustomerOrderProductDetails_CustomerOrderId",
@@ -805,11 +857,6 @@ namespace SSMO.Data.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_CustomerOrders_DocumentId",
-                table: "CustomerOrders",
-                column: "DocumentId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_CustomerOrders_MyCompanyId",
                 table: "CustomerOrders",
                 column: "MyCompanyId");
@@ -840,11 +887,6 @@ namespace SSMO.Data.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Documents_CustomerOrderId",
-                table: "Documents",
-                column: "CustomerOrderId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Documents_MyCompanyId",
                 table: "Documents",
                 column: "MyCompanyId");
@@ -865,6 +907,11 @@ namespace SSMO.Data.Migrations
                 column: "SupplierOrderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InvoiceProductDetails_CreditNoteId",
+                table: "InvoiceProductDetails",
+                column: "CreditNoteId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InvoiceProductDetails_CustomerOrderId",
                 table: "InvoiceProductDetails",
                 column: "CustomerOrderId");
@@ -875,6 +922,11 @@ namespace SSMO.Data.Migrations
                 column: "CustomerOrderProductDetailsId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InvoiceProductDetails_DebitNoteId",
+                table: "InvoiceProductDetails",
+                column: "DebitNoteId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InvoiceProductDetails_InvoiceId",
                 table: "InvoiceProductDetails",
                 column: "InvoiceId");
@@ -883,6 +935,11 @@ namespace SSMO.Data.Migrations
                 name: "IX_InvoiceProductDetails_ProductId",
                 table: "InvoiceProductDetails",
                 column: "ProductId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InvoiceProductDetails_PurchaseProductDetailsId",
+                table: "InvoiceProductDetails",
+                column: "PurchaseProductDetailsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_MyCompanies_AddressId",
@@ -933,11 +990,6 @@ namespace SSMO.Data.Migrations
                 name: "IX_PurchaseProductDetails_PurchaseInvoiceId",
                 table: "PurchaseProductDetails",
                 column: "PurchaseInvoiceId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PurchaseProductDetails_StatusId",
-                table: "PurchaseProductDetails",
-                column: "StatusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_PurchaseProductDetails_SupplierOrderId",
@@ -995,14 +1047,6 @@ namespace SSMO.Data.Migrations
                 table: "Suppliers",
                 column: "BankDetailId",
                 principalTable: "BankDetails",
-                principalColumn: "Id",
-                onDelete: ReferentialAction.Restrict);
-
-            migrationBuilder.AddForeignKey(
-                name: "FK_CustomerOrders_Documents_DocumentId",
-                table: "CustomerOrders",
-                column: "DocumentId",
-                principalTable: "Documents",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Restrict);
 
@@ -1066,28 +1110,19 @@ namespace SSMO.Data.Migrations
                 table: "SupplierOrders");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_Documents_CustomerOrders_CustomerOrderId",
-                table: "Documents");
-
-            migrationBuilder.DropForeignKey(
                 name: "FK_Products_CustomerOrders_CustomerOrderId",
                 table: "Products");
 
             migrationBuilder.DropForeignKey(
-                name: "FK_PurchaseProductDetails_Products_ProductId",
-                table: "PurchaseProductDetails");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_Documents_SupplierOrders_SupplierOrderId",
-                table: "Documents");
-
-            migrationBuilder.DropForeignKey(
-                name: "FK_PurchaseProductDetails_SupplierOrders_SupplierOrderId",
-                table: "PurchaseProductDetails");
+                name: "FK_Products_Documents_DocumentId",
+                table: "Products");
 
             migrationBuilder.DropForeignKey(
                 name: "FK_PurchaseProductDetails_Documents_PurchaseInvoiceId",
                 table: "PurchaseProductDetails");
+
+            migrationBuilder.DropTable(
+                name: "CustomerOrderDocument");
 
             migrationBuilder.DropTable(
                 name: "CustomerOrderProductDetailsDocument");
@@ -1120,6 +1155,18 @@ namespace SSMO.Data.Migrations
                 name: "CustomerOrders");
 
             migrationBuilder.DropTable(
+                name: "Documents");
+
+            migrationBuilder.DropTable(
+                name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "PurchaseProductDetails");
+
+            migrationBuilder.DropTable(
+                name: "Addresses");
+
+            migrationBuilder.DropTable(
                 name: "Products");
 
             migrationBuilder.DropTable(
@@ -1133,18 +1180,6 @@ namespace SSMO.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "SupplierOrders");
-
-            migrationBuilder.DropTable(
-                name: "Documents");
-
-            migrationBuilder.DropTable(
-                name: "Customers");
-
-            migrationBuilder.DropTable(
-                name: "PurchaseProductDetails");
-
-            migrationBuilder.DropTable(
-                name: "Addresses");
 
             migrationBuilder.DropTable(
                 name: "Statuses");

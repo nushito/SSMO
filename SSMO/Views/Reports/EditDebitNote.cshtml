@@ -7,19 +7,19 @@
     </div>
     <div class="row col-md-4">
         <label asp-for="Date">Date of the Invoice</label>
-        <input asp-for="Date" type="date" class="form-control" id="datepicker" value="@Model.Date">
+        <input asp-for="Date" type="date" class="form-control" id="datepicker" >
     </div>
      <div class="row col-md-4">
         <label asp-for="Incoterms">Delivery Terms</label>
-        <input asp-for="Incoterms" type="text" class="form-control" value="@Model.Incoterms">
+        <input asp-for="Incoterms" type="text" class="form-control" >
     </div>
      <div class="row col-md-4">
         <label asp-for="Vat">Vat</label>
-        <input asp-for="Vat" type="number" class="form-control" value="@Model.Vat">
+        <input asp-for="Vat" type="number" class="form-control">
     </div>
      <div class="row col-md-4">
         <label asp-for="CurrencyExchangeRate">Currency Exchange Rate</label>
-        <input asp-for="CurrencyExchangeRate" type="number" class="form-control" value="@Model.CurrencyExchangeRate">
+        <input asp-for="CurrencyExchangeRate" type="number" class="form-control">
     </div>
       <div class="row col-md-4">
         <label asp-for="Comment">Comment</label>
@@ -29,104 +29,113 @@
             <p><b>Edit Products</b></p>
         
            @*<partial name="_DebitNoteProductsForEdit" model="Model.Products"/>*@
-          
-  <table>
-        <thead>
-            <tr>                       
-                <th>Description</th>
-                <th>Size</th>
-                <th>Grade</th>
-                <th>FSC Claim</th>
-                <th>FSC Certificate</th>
-                <th>Unit</th>
-                <th>Quantity </th>  
-                <th>Unit Price</th>  
-                <th>Pallets</th>
-                <th>Sheets/Pallet</th>
-            </tr>
-         </thead>
-        <tbody>
-            @for (var i = 0; i < Model.Products.Count; i++)
-            {
-                            <tr>
-                                    <input type="hidden" asp-for="@Model.Products[i].Id"/>
-                                    <input type="hidden" asp-for="@Model.Products[i].ProductId"/>
+
+     @if(Model.Products.Count() >0)
+    {      
+        <div class="row" >
+           <table class="table-striped" >
+             <thead class="thead-light">
+                <tr> 
+                    <th>Physical quantity</th>
+                    <th>Description</th>
+                    <th>Size</th>
+                    <th>Grade</th>
+                    <th>FSC Claim</th>
+                    <th>FSC Certificate</th>
+                    <th>Unit</th>
+                    <th>Quantity </th>  
+                    <th>Unit Price</th>  
+                    <th>Pallets</th>
+                    <th>Sheets/Pallet</th>
+                </tr>
+             </thead>
+            <tbody>
+                @for (var i = 0; i < Model.Products.Count; i++)
+                {
+                    <tr>
+                            <input type="hidden" asp-for="@Model.Products[i].Id"/>
+                            <input type="hidden" asp-for="@Model.Products[i].ProductId"/>
+                            <td>
+                                <input asp-for="@Model.Products[i].ServiceOrProductQuantity" type="checkbox">
+                            </td>
+                        <td class="col-md-1" width="15%">
+                            <div class="editor-field">
+                                <select asp-for="@Model.Products[i].DescriptionId" value="@Model.Products[i].DescriptionId">
+                                <option value="">All</option>
+                            @foreach (var description in Model.Products[i].Descriptions)
+                            {
+                                            <option value="@description.Id">@description.Name</option>
+                            }
+                                </select>                                        
+                            </div>
+                        </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                    <select asp-for="@Model.Products[i].GradeId" value="@Model.Products[i].GradeId">
+                                    <option value="">All</option>
+                            @foreach (var grade in Model.Products[i].Grades)
+                            {
+                                        <option value="@grade.Id">@grade.Name</option>
+                            }
+                                </select>  
+                                    </div>
+                                </td>
                                 <td class="col-sm-1">
-                                    <div class="editor-field">
-                                        <select asp-for="@Model.Products[i].DescriptionId" value="@Model.Products[i].DescriptionId">
-                                        <option value="">All</option>
-                                @foreach (var description in Model.Products[i].Descriptions)
-                                {
-                                           <option value="@description.Id">@description.Name</option>
-                                }
-                                        </select>                                        
-                                    </div>
-                                </td>
+                            <div class="editor-field">
+                                    <select asp-for="@Model.Products[i].SizeId" value="@Model.Products[i].SizeId">
+                                    <option value="">All</option>
+                            @foreach (var size in Model.Products[i].Sizes)
+                            {
+                                        <option value="@size.Id">@size.Name</option>
+                            }
+                                </select>  
+                            </div>
+                        </td>
                                 <td class="col-sm-1">
-                                    <div class="editor-field">
-                                                     <select asp-for="@Model.Products[i].GradeId" value="@Model.Products[i].GradeId">
-                                         <option value="">All</option>
-                                @foreach (var grade in Model.Products[i].Grades)
-                                {
-                                       <option value="@grade.Id">@grade.Name</option>
-                                }
-                                        </select>  
-                                            </div>
-                                        </td>
+                            <div class="editor-field">
+                                                <input asp-for="@Model.Products[i].FscClaim" value="@Model.Products[i].FscClaim" type="text" class="text-box single-line"/>
+                            </div>
+                        </td>
                                 <td class="col-sm-1">
-                                    <div class="editor-field">
-                                                      <select asp-for="@Model.Products[i].SizeId" value="@Model.Products[i].SizeId">
-                                          <option value="">All</option>
-                                @foreach (var size in Model.Products[i].Sizes)
-                                {
-                                                      <option value="@size.Id">@size.Name</option>
-                                }
-                                        </select>  
-                                    </div>
-                                </td>
-                                <td class="col-sm-2">
-                                    <div class="editor-field">
-                                                <input asp-for="@Model.Products[i].FscClaim" value="@Model.Products[i].FscClaim" type="text" class="form-control"/>
-                                    </div>
-                                </td>
-                                <td class="col-sm-2">
-                                    <div class="editor-field">
-                                               <input asp-for="@Model.Products[i].FscSertificate" value="@Model.Products[i].FscSertificate" type="text" class="form-control"/>
-                                    </div>
-                                </td>
-                                        <td class="col-sm-2">
-                                    <div class="editor-field">
-                                                <input asp-for="@Model.Products[i].Unit" value="@Model.Products[i].Unit" type="text" class="form-control"/>
-                                    </div>
-                                </td>
-                            <td class="col-sm-2">
-                                <div class="editor-field">
-                                                 <input asp-for="@Model.Products[i].InvoicedQuantity" value="@Model.Products[i].InvoicedQuantity" type="number" class="form-control"/>
-                                </div>
-                            </td>
-                              <td class="col-sm-2">
-                                <div class="editor-field">
-                                           <input asp-for="@Model.Products[i].DebitNotePrice" value="@Model.Products[i].DebitNotePrice" type="number" class="form-control"/>
-                                        <span asp-validation-for="@Model.Products[i].DebitNotePrice" class="small text-danger"></span>
-                                </div>
-                            </td>
-                            <td class="col-sm-2">
-                                <div class="editor-field">
-                                                <input asp-for="@Model.Products[i].DebitNotePallets" value="@Model.Products[i].DebitNotePallets" type="number" class="form-control"/>
-                                        <span asp-validation-for="@Model.Products[i].DebitNotePallets" class="small text-danger"></span>
-                                </div>
-                            </td>
-                            <td class="col-sm-2">
-                                <div class="editor-field">
-                                                <input asp-for="@Model.Products[i].DebitNoteSheetsPerPallet" value="@Model.Products[i].DebitNoteSheetsPerPallet" type="number" class="form-control"/>
-                                        <span asp-validation-for="@Model.Products[i].DebitNoteSheetsPerPallet" class="small text-danger"></span>
-                                </div>
-                            </td>
-                          </tr>                    
-            }
-          </tbody>
- </table>
-  
+                            <div class="editor-field">
+                                                <input asp-for="@Model.Products[i].FscSertificate" value="@Model.Products[i].FscSertificate" type="text" class="text-box single-line"/>
+                            </div>
+                        </td>
+                                        <td class="col-sm-1">
+                            <div class="editor-field">
+                                                <input asp-for="@Model.Products[i].Unit" value="@Model.Products[i].Unit" type="text" class="text-box single-line"/>
+                            </div>
+                        </td>
+                            <td class="col-sm-1">
+                        <div class="editor-field">
+                                               <input asp-for="@Model.Products[i].DebitNoteQuantity" value="@Model.Products[i].DebitNoteQuantity" type="number" class="text-box single-line"/>
+                        </div>
+                    </td>
+                                <td class="col-sm-1">
+                        <div class="editor-field">
+                                            <input asp-for="@Model.Products[i].DebitNotePrice" value="@Model.Products[i].DebitNotePrice" type="number" class="text-box single-line"/>
+                                <span asp-validation-for="@Model.Products[i].DebitNotePrice" class="small text-danger"></span>
+                        </div>
+                    </td>
+                            <td class="col-sm-1">
+                        <div class="editor-field">
+                                        <input asp-for="@Model.Products[i].DebitNotePallets" value="@Model.Products[i].DebitNotePallets" type="number" class="text-box single-line"/>
+                                <span asp-validation-for="@Model.Products[i].DebitNotePallets" class="small text-danger"></span>
+                        </div>
+                    </td>
+                      <td class="col-sm-1">
+                        <div class="editor-field">
+                                            <input asp-for="@Model.Products[i].DebitNoteSheetsPerPallet" value="@Model.Products[i].DebitNoteSheetsPerPallet" type="number" class="text-box single-line"/>
+                                <span asp-validation-for="@Model.Products[i].DebitNoteSheetsPerPallet" class="small text-danger"></span>
+                        </div>
+                    </td>
+                    </tr>                    
+                }
+              </tbody>
+         </table>
+    </div>
+      
+    }
       <div class="row col-md-4">
         <div class="editor-field">
            <label>Choose New Invoice No For Credit</label>
@@ -142,7 +151,7 @@
   <div class="row">
        <td class="col"> <input type="submit" name="Command" value="Save" class="btn btn-primary mt-3" /></td> 
        <td></td>
-       <td class="col"><input type="submit" name="Command" value="Add New Products" class="btn btn-primary mt-3" /></td> 
+       <td class="col"><input type="submit" name="Command" value="Add New/More Products" class="btn btn-primary mt-3" /></td> 
     </div>
 </form>
 

@@ -20,6 +20,7 @@ namespace SSMO.Services.Documents
         public PackingListForPrintViewModel PackingListForPrint(int packingListNumber);
 
         public void CreateBgInvoice(int documentNumberId);
+        public void EditBgInvoice(int documentNumber);
         public CreditAndDebitNoteViewModel PrintCreditAndDebitNote(int id);
 
     }

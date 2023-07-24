@@ -4,5 +4,6 @@
     {
         public int Id { get; set; }
         public int OrderConfirmationNumber { get; set; }
+        public int CustomerOrderProductId { get; set; }
     }
 }

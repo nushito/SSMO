@@ -8,17 +8,17 @@
   <div class="card-body">
     <div id="PrintPDF" class="container mb-5 mt-3">
       <div class="row d-flex align-items-baseline">
-                @if(Model.CreditToInvoiceNumber != 0)
+                @if(Model.CreditToInvoiceId != 0)
                 {
                       <div class="col-xl-9">
                          <p style="color: #7e8d9f;font-size: 20px;">Credit Invoice No: <strong>@Model.DocumentNumber</strong></p>
-                       <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.CreditToInvoiceNumber, date: @Model.CreditToInvoiceDate.Date.ToString("dd-MM-yyyy")</p>
+                       <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.CreditToInvoiceId, date: @Model.CreditToInvoiceDate.Date.ToString("dd-MM-yyyy")</p>
                        </div>
-                }else if(Model.DebitToInvoiceNumber != 0)
+                }else if(Model.DebitToInvoiceId != 0)
                 {
              <div class="col-xl-9">
               <p style="color: #7e8d9f;font-size: 20px;">Debit Invoice No: <strong>@Model.DocumentNumber</strong></p>
-                           <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.DebitToInvoiceNumber, date: @Model.DebitToInvoiceDate.Date.ToString("dd-MM-yyyy")</p>
+                           <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.DebitToInvoiceId, date: @Model.DebitToInvoiceDate.Date.ToString("dd-MM-yyyy")</p>
             </div>
                 }
                 else
@@ -134,14 +134,14 @@
                                     <td>@product.Size</td>
                                     <td>@product.FscClaim</td>
                                     <td>@product.FscCertificate</td>
-                                    @if(product.CreditNotePrice != 0)
+                                    @if (Model.CreditToInvoiceId != 0)
                                     {
                                         <td>@product.Unit</td>
                                         <td>@product.CreditNoteQuantity</td>
                                         <td>@product.CreditNotePrice</td>
                                         <td>@product.CreditNoteProductAmount.ToString("N2")</td>       
                                     }
-                                    else if(product.DebitNotePrice != 0)
+                                    else if (Model.DebitToInvoiceId != 0)
                                     {
                                         <td>@product.Unit</td>
                                         <td>@product.DebitNoteQuantity</td>
@@ -163,14 +163,14 @@
         <div class="row">
           <div class="col-xl-3">
             <ul class="list-unstyled">
-                    @if(Model.CreditToInvoiceNumber != 0)
+                    @if(Model.CreditToInvoiceId != 0)
                     {
                         <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
                         <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
                         <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.CreditNoteTotalAmount.ToString("N2")</span></li>
                                 
                     }
-                    else if(Model.DebitToInvoiceNumber != 0)
+                    else if(Model.DebitToInvoiceId != 0)
                     {
                         <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
                         <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            

@@ -16,6 +16,7 @@ namespace SSMO.Models.Documents.Purchase
         public decimal NetWeight { get; set; }
         public decimal GrossWeight { get; set; }
         public string TruckNumber { get; set; }
+        public string DeliveryAddress { get; set; }
         public string Swb { get; set; }
         public decimal PurchaseTransportCost { get; set; }      
         public decimal BankExpenses { get; set; }

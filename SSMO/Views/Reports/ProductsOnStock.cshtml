@@ -1,11 +1,13 @@
 ﻿@model ProductAvailabilityViewModel
 @{
     ViewBag.Title = "Products on Stock";
+    var i = 1;
 }
 
 <form method="get">
     <h5>Products on stock</h5>
     <hr />
+   
     <div class="form-group row">
         <div class="form-group col-md-5">
             <div class="form-group">
@@ -44,9 +46,10 @@
             </div>
         </div>
     </div>
-    <br>
+    
     <div>
-        <input type="submit" class="btn btn-info" value="Search" />
+        <input type="submit" class="btn btn-info mr-1" value="Search" /> <a class="btn btn-success text-capitalize border-0" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportProductsToExcel"><i
+              class="fas fa-print text-primary"></i> Download</a>
     </div>
     <hr />
 </form>
@@ -91,110 +94,165 @@
         <thead>
             <tr>
                 <th scope="col">
-                    Customer Order Number
+                    No
                 </th>
                 <th scope="col">
-                    Date
+                    Description
                 </th>
                 <th scope="col">
-                    Customer
+                   Quantity on stock
                 </th>
                 <th scope="col">
-                    Purchase Number
-                </th>
-                <th scope="col">
-                    Date
-                </th>
-                <th scope="col">
-                    Supplier
-                </th>
-                <th scope="col">
-                    Location
-                </th>
-                <th scope="col">
-                    Unit
-                </th>
-                <th scope="col">
-                    LoadedQuantity
-                </th>
-                <th scope="col">
-                    Number of pallets
-                </th>
-                <th scope="col">
-                    Sheets/pallet
-                </th>
-                <th scope="col">
-                    FSC Claim
-                </th>
-                <th scope="col">
-                    FSC Certificate
-                </th>
-                <th scope="col">
-                    Purchase Price
-                </th>
-                <th scope="col">
-                    Cost Price
-                </th>
-                <th scope="col">
-                    Sell Price
-                </th>
+                    Supplier Name
+                </th>               
             </tr>
         </thead>
         <tbody>
         @if(Model.ProductsDetails != null)
-        {
+        {           
             @foreach (var product in Model.ProductsDetails)
             {
-                        <tr>
-                            <td>
-                        @product.CustomerOrderNumber
-                            </td>
-                            <td>
-                        @product.OrderDate
-                            </td>
-                            <td>
-                        @product.CustomerName
-                            </td>
-                            <td>
-                        @product.PurchaseNumber
-                            </td>
-                            <td>
-                        @product.PurchaseDate
-                            </td>
-                            <td>
+                <tr>
+                    <td>
+                        @i
+                    </td>
+                    <td>
+                        @product.Description @product.Size @product.Grade
+                    </td>
+                    <td>
+                        @product.QuantityOnStock
+                    </td>
+                    <td>
                         @product.SupplierName
+                    </td>                           
+                </tr>
+                <tr>                         
+                    <td>
+                        Purchase Details
+                    </td>
+                    <td>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th scope="col">
+                                        Purchase Invoice No
+                                    </th>
+                                    <th scope="col">
+                                        Date
+                                    </th>
+                                    <th scope="col">
+                                        Delivery address
+                                    </th>
+                                    <th scope="col">
+                                        FSC
+                                    </th>  
+                                        <th scope="col">
+                                        Loaded Quantity
+                                    </th>
+                                    <th scope="col">
+                                        Unit
+                                    </th>
+                                    <th scope="col">
+                                        Pallets/Sheets
+                                    </th>
+                                    <th scope="col">
+                                        Purchase Price
+                                    </th>
+                                    <th scope="col">
+                                        Cost Price
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var purchase in product.PurchaseProductDetails)
+                                {
+                                 <tr>
+                                    <td>
+                                        @purchase.PurchaseNumber
+                                    </td>
+                                    <td>
+                                        @purchase.PurchaseDate
+                                    </td>
+                                    <td>
+                                       @purchase.DeliveryAddress
+                                    </td>
+                                    <td>
+                                        @purchase.FSCClaim
+                                    </td>  
+                                    <td>
+                                        @purchase.LoadedQuantity
+                                    </td>
+                                    <td>
+                                        @purchase.Unit
+                                    </td>
+                                    <td>
+                                        @purchase.Pallets x @purchase.SheetsPerPallet
+                                    </td>
+                                    <td>
+                                        @purchase.PurchasePrice
+                                    </td>
+                                    <td>
+                                        @purchase.CostPrice
+                                    </td>
+                                </tr>
+                                }    
+                            </tbody>
+                        </table>
+                    </td>
+                </tr>
+                        <tr>
+                            
+                            <td>
+                                Customer Orders
                             </td>
                             <td>
-                        @product.DeliveryAddress
-                            </td>
-                             <td>
-                        @product.Unit
-                             </td>
-                            <td>
-                        @product.LoadedQuantity
-                            </td>
-                            <td>
-                        @product.Pallets
-                            </td>
-                            <td>
-                        @product.SheetsPerPallet
-                            </td>
-                            <td>
-                        @product.FSCClaim
-                            </td>
-                            <td>
-                        @product.FSCSertificate
-                            </td>
-                            <td>
-                        @product.PurchasePrice
-                            </td>
-                            <td>
-                        @product.CostPrice
-                            </td>
-                            <td>
-                        @product.Price
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">
+                                                Customer Name
+                                            </th>
+                                            <th scope="col">
+                                                Order Confirmation No
+                                            </th>
+                                            <th scope="col">
+                                                Customer PO No
+                                            </th>
+                                            <th scope="col">
+                                                Delivery address
+                                            </th>  
+                                            <th scope="col">
+                                                Price
+                                            </th>                                           
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                @foreach (var order in product.CustomerProductsDetails)
+                                {
+                                                 <tr>
+                                                <td>
+                                            @order.CustomerName
+                                                </td>
+                                                <td>
+                                            @order.CustomerOrderNumber
+                                                </td>
+                                                <td>
+                                            @order.CustomerPoNumber
+                                                </td>
+                                                <td>
+                                            @order.DeliveryAddress
+                                                </td>  
+                                                <td>
+                                            @order.Price
+                                                </td>
+                                                
+                                            </tr>
+                                }    
+                                    </tbody>
+                                </table>
                             </td>
                         </tr>
+                i++;
             }  
         }
         </tbody>

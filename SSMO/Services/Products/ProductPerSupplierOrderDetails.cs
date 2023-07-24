@@ -21,6 +21,7 @@ namespace SSMO.Services.Products
         public decimal PurchasePrice { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal OrderedQuantity { get; set; }
+        public decimal QuantityAvailableForCustomerOrder { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
         public int SupplierOrderId { get; set; }

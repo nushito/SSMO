@@ -30,9 +30,9 @@ namespace SSMO.Data.Models
         public int DocumentNumber { get; set; }
         [DisplayName("Purchase Invoice Number")]
         public string PurchaseNumber { get; set; }
-        public int CreditToInvoiceNumber { get; set; }
+        public int CreditToInvoiceId { get; set; }
         public DateTime CreditToInvoiceDate { get; set; }
-        public int DebitToInvoiceNumber { get; set; }
+        public int DebitToInvoiceId { get; set; }
         public DateTime DebitToInvoiceDate { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }

@@ -599,7 +599,8 @@ namespace SSMO.Controllers
 
             model.Products = new List<AddProductsToCreditAndDebitNoteFormModel>();
             
-            TempData["availableProducts"] = JsonConvert.SerializeObject(model.PurchaseProducts.Where(a=>a.Checked == true).ToList());
+            TempData["availableProducts"] = JsonConvert.SerializeObject(model.PurchaseProducts
+                                                                        .Where(a=>a.Checked == true).ToList());
             int loopsNum = 0;
 
             foreach (var key in collections.Keys)

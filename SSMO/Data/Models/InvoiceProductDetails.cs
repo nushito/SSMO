@@ -9,7 +9,7 @@ namespace SSMO.Data.Models
         public int Id { get; set;}
         public int InvoiceId { get; set; }
         public Document Invoice { get; set; }
-        public int CustomerOrderId { get; set; }
+        public int? CustomerOrderId { get; set; }
         public CustomerOrder CustomerOrder { get; set; }
         public int ProductId { get; set; }
         public Product Product { get; set; }
@@ -41,8 +41,8 @@ namespace SSMO.Data.Models
         public decimal CreditNoteBgPrice { get; set; }
         public decimal CreditNoteBgAmount { get; set; }
         public decimal DebitNoteQuantity { get; set; }
-        public int DeditNotePallets { get; set; }
-        public int DeditNoteSheetsPerPallet { get; set; }
+        public int DebitNotePallets { get; set; }
+        public int DebitNoteSheetsPerPallet { get; set; }
         public decimal DebitNoteAmount { get; set; }
         public decimal DebitNotePrice { get; set; }
         public decimal DebitNoteBgPrice { get; set; }

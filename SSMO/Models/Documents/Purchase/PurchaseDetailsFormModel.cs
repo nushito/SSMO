@@ -38,6 +38,7 @@ namespace SSMO.Models.Documents.Purchase
         public decimal BankExpenses { get; set; }
         public string Incoterms { get; set; }       
         public List<PurchaseProductAsSupplierOrderViewModel> ProductDetails { get; set; }
+        public List<PurchaseServiceProductsFormModel> ServiceProducts { get; set; }
 
     }
 }

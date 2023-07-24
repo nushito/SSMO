@@ -194,13 +194,12 @@ namespace SSMO.Controllers
                     SupplierOrderId = product.SupplierOrderId,
                     Quantity = product.OrderedQuantity,
                     Unit = product.Unit,
-                    CustomerOrderId = customerorderId
+                    CustomerOrderId = customerorderId,
+                    QuantityAvailableForCustomerOrder = product.QuantityAvailableForCustomerOrder
                 };
                 listProducts.Add(productSupp);
             };
-
             return View(listProducts);
-
         }
 
         [HttpPost]
@@ -230,7 +229,9 @@ namespace SSMO.Controllers
 
             foreach (var product in model)
             {       
-                if(product.Quantity == 0) { continue; }
+                if(product.QuantityAvailableForCustomerOrder == 0) { continue; }
+                else { product.Quantity = product.QuantityAvailableForCustomerOrder; }
+
                 var check = productService.CreateCustomerOrderProduct(product.Id, customerorderId, product.SupplierOrderId, product.Description,
                              product.Grade, product.Size, product.FSCSertificate, product.FSCClaim, product.Pallets,
                              product.SheetsPerPallet, product.SellPrice, product.Quantity, product.Unit);

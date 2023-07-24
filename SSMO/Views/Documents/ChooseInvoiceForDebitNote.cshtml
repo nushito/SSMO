@@ -58,10 +58,7 @@
                      </div>
                     <div>
                            <input type="hidden" value="@Model.PurchaseProducts[i].ProductId" asp-for="@Model.PurchaseProducts[i].ProductId">
-                    </div>
-                         <div>
-                               <input type="hidden" value="@Model.PurchaseProducts[i].CustomerOrderDetailsId" asp-for="@Model.PurchaseProducts[i].CustomerOrderDetailsId">
-                        </div>
+                    </div>                     
 
                     <tr>   
                         <td>
@@ -116,8 +113,8 @@
 
                         <td class="col-sm-1">
                             <div class="editor-field">
-                                           <input asp-for="@Model.PurchaseProducts[i].Price"  type="number" min="0.0000" step="0.0001" required="required">
-                                           <span asp-validation-for="@Model.PurchaseProducts[i].Price" class="small text-danger"></span>
+                                 <input asp-for="@Model.PurchaseProducts[i].Price"  type="number" min="0.0000" step="0.0001" required="required">
+                                  <span asp-validation-for="@Model.PurchaseProducts[i].Price" class="small text-danger"></span>
                             </div>
                         </td>   
                             <td class="col-sm-1">
@@ -127,11 +124,19 @@
                                 }
                                 else
                                 {
-                                  <input asp-for="@Model.PurchaseProducts[i].CustomerOrderDetail.Id" class="text-box single-line"  value="@Model.PurchaseProducts[i].CustomerOrderDetail.OrderConfirmationNumber"> 
+                                    <div class="form-group">
+                                    <label>Customer Order</label>
+                                      <select  asp-for="@Model.PurchaseProducts[i].ChoosenCustomerOrderProductDetailsId" class="form-select">
+                                      <option value="">-</option>
+                                     @foreach (var purchaseProduct in Model.PurchaseProducts[i].CustomerOrderDetail)
+                                       {
+                                        <option value="@purchaseProduct.CustomerOrderProductId">@purchaseProduct.OrderConfirmationNumber</option>
+                                        <br />
+                                       }  
+                                    </select>
+                                </div>
                                 }
-                               
                             </td>   
-                       
                     </tr>
                     }
         </tbody>
@@ -139,7 +144,7 @@
         </div>
          <div class="row col-md-4">         
          <input id="moreQuantity" class="form-check-input" type="checkbox" asp-for="MoreQuantity" name="moreQuantity">
-         <label asp-for="MoreQuantity">Update Quantity on Existing Product from the Invoice</label>
+         <label asp-for="MoreQuantity">Update Quantity on Existing Product from the Invoice:</label>
         </div>
         <div class="table-responsive-sm">
             <table id="productTable" class="table-striped">

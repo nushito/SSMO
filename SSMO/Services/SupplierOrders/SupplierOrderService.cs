@@ -148,7 +148,7 @@ namespace SSMO.Services.SupplierOrders
         {
            return dbContext.SupplierOrders
                 .Where(s=>s.SupplierId == id)
-                .Select(l=>new SupplierOrdersNumbersListViewModel
+                .Select(l=>new SupplierOrdersNumbersListViewModel   
                 {
                     SupplierOrderId = l.Id,  
                     SupplierOrderNumber = l.Number
@@ -159,7 +159,7 @@ namespace SSMO.Services.SupplierOrders
         public ICollection<SupplierOrdersBySupplier> SuppliersAndOrders()
         {
             var supplierOrders = dbContext.SupplierOrders
-                .Where(a=>a.StatusId == 3)
+                .Where(a=> a.Products.Any(i=>i.SupplierOrderId == a.Id && i.QuantityAvailableForCustomerOrder > 0m))
                 .Select(a=> new SupplierOrdersBySupplier
                 {
                     SupplierId= a.SupplierId,

@@ -617,7 +617,7 @@ namespace SSMO.Data.Migrations
                     b.Property<DateTime>("CreditToInvoiceDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("CreditToInvoiceNumber")
+                    b.Property<int>("CreditToInvoiceId")
                         .HasColumnType("int");
 
                     b.Property<decimal>("CurrencyExchangeRateUsdToBGN")
@@ -647,7 +647,7 @@ namespace SSMO.Data.Migrations
                     b.Property<DateTime>("DebitToInvoiceDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DebitToInvoiceNumber")
+                    b.Property<int>("DebitToInvoiceId")
                         .HasColumnType("int");
 
                     b.Property<string>("DeliveryAddress")
@@ -825,7 +825,7 @@ namespace SSMO.Data.Migrations
                     b.Property<int>("CreditNoteSheetsPerPallet")
                         .HasColumnType("int");
 
-                    b.Property<int>("CustomerOrderId")
+                    b.Property<int?>("CustomerOrderId")
                         .HasColumnType("int");
 
                     b.Property<int?>("CustomerOrderProductDetailsId")
@@ -846,6 +846,9 @@ namespace SSMO.Data.Migrations
                     b.Property<int?>("DebitNoteId")
                         .HasColumnType("int");
 
+                    b.Property<int>("DebitNotePallets")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("DebitNotePrice")
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
@@ -854,10 +857,7 @@ namespace SSMO.Data.Migrations
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
 
-                    b.Property<int>("DeditNotePallets")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DeditNoteSheetsPerPallet")
+                    b.Property<int>("DebitNoteSheetsPerPallet")
                         .HasColumnType("int");
 
                     b.Property<decimal>("DeliveryCost")
@@ -1671,8 +1671,7 @@ namespace SSMO.Data.Migrations
                     b.HasOne("SSMO.Data.Models.CustomerOrder", "CustomerOrder")
                         .WithMany("InvoiceProductDetails")
                         .HasForeignKey("CustomerOrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SSMO.Data.Models.CustomerOrderProductDetails", "CustomerOrderProductDetails")
                         .WithMany("InvoiceProductDetails")

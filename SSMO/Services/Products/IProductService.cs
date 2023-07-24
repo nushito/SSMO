@@ -1,10 +1,14 @@
 ﻿using SSMO.Data.Enums;
+using SSMO.Models.Descriptions;
 using SSMO.Models.Documents.CreditNote;
 using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Grades;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.CreditNote;
+using SSMO.Models.Reports.DebitNote;
 using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
+using SSMO.Models.Sizes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,7 +57,12 @@ namespace SSMO.Services.Products
        // public List<EditProductForCompanyInvoicesViewModel> NewProductsForEditInvoice(List<int> customerOrders);
        public List<ProductForCreditNoteViewModelPerInvoice> ProductsForCreditNotePerInvoice(int invoiceId);
         public decimal ConvertStringSizeToQubicMeters(string size);
-        public void ReviseAutstandingQuantity(int customerOrderDetailId, decimal quantity); 
+        public void ReviseAutstandingQuantity(int customerOrderDetailId, decimal quantity);
+        public List<NewProductsFromOrderEditedDebitNoteViewModel> ProductsForDebitNotePerInvoice(int invoiceId);
+
+        public List<DescriptionsViewModel> DescriptionCollection();
+        public List<SizeViewModel> SizeCollection();
+        public List<GradeViewModel> GradeCollection();  
         
     }
 }

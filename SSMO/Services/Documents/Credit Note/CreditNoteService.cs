@@ -49,7 +49,7 @@ namespace SSMO.Services.Documents.Credit_Note
                 Date = date,
                 DocumentType = Data.Enums.DocumentTypes.CreditNote,
                 CreditToInvoiceDate = invoiceForCredit.Date,
-                CreditToInvoiceNumber = invoiceForCredit.Id,
+                CreditToInvoiceId = invoiceForCredit.Id,
                 SupplierId = invoiceForCredit.SupplierId,
                 SupplierOrderId = invoiceForCredit.SupplierOrderId,
                 CurrencyId = invoiceForCredit.CurrencyId,
@@ -84,12 +84,10 @@ namespace SSMO.Services.Documents.Credit_Note
                     .Where(a=> mainProductList.Select(a=>a.Id).Contains(a.ProductId) && a.InvoiceId == invoiceForCredit.Id)
                     .FirstOrDefault();
 
-                var mainProduct = productRepository.GetMainProduct(existProduct.ProductId);                  
-
-
                 if(existProduct != null)
                 {
-                   
+                    var mainProduct = productRepository.GetMainProduct(existProduct.ProductId);
+
                     if (product.Quantity > existProduct.InvoicedQuantity)
                     {
                         return null;
@@ -226,6 +224,7 @@ namespace SSMO.Services.Documents.Credit_Note
             }
             creditNote.VatAmount = creditNote.Amount * creditNote.Vat / 100;
             creditNote.CreditNoteTotalAmount = creditNote.Amount + creditNote.VatAmount ?? 0;
+            documentService.EditBgInvoice(creditNote.DocumentNumber);
 
             dbContext.SaveChanges();
             return true;
@@ -248,8 +247,11 @@ namespace SSMO.Services.Documents.Credit_Note
             {
                 creditNote.CustomerId = invoice.CustomerId;
             }
-
-            creditNote.CreditToInvoiceNumber= invoiceId;
+            if (creditNote.CreditToInvoiceId != invoiceId)
+            {
+                creditNote.CreditToInvoiceId = invoiceId;
+            }
+            creditNote.CreditToInvoiceId= invoiceId;
 
             var customerOrders = dbContext.CustomerOrders
                 .Where(a=>a.Documents.Select(i=>i.Id).Contains(invoiceId)).ToList();
@@ -270,13 +272,11 @@ namespace SSMO.Services.Documents.Credit_Note
                         productFromInvoice.CreditNoteSheetsPerPallet = product.SheetsPerPallet;
                         productFromInvoice.CreditNotePrice = product.SellPrice;
                         productFromInvoice.FscCertificate= product.FscCertificate;
-                        productFromInvoice.FscClaim = product.FscClaim;
-                        productFromInvoice.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                        productFromInvoice.FscClaim = product.FscClaim;                      
                         productFromInvoice.CreditNoteProductAmount = productFromInvoice.CreditNotePrice * productFromInvoice.CreditNoteQuantity;
                         productFromInvoice.CreditNoteBgPrice = productFromInvoice.CreditNotePrice * creditNote.CurrencyExchangeRateUsdToBGN;
                         productFromInvoice.CreditNoteBgAmount = productFromInvoice.CreditNoteProductAmount* creditNote.CurrencyExchangeRateUsdToBGN;
-                        creditNote.Amount += productFromInvoice.CreditNoteProductAmount;
-                        creditNote.TotalQuantity += productFromInvoice.CreditNoteQuantity;
+                        creditNote.Amount += productFromInvoice.CreditNoteProductAmount;                       
                     }                    
                 }
             };
@@ -327,7 +327,7 @@ namespace SSMO.Services.Documents.Credit_Note
                 }
             }
             creditNote.VatAmount = creditNote.Amount * creditNote.Vat;
-            creditNote.TotalAmount = creditNote.Amount + creditNote.VatAmount ?? 0;
+            creditNote.TotalAmount = creditNote.Amount + creditNote.VatAmount ?? 0;         
 
             invoice.CreditNoteTotalAmount = creditNote.TotalAmount;
             
@@ -360,16 +360,15 @@ namespace SSMO.Services.Documents.Credit_Note
                 .Where(i=>i.Id == id)
                 .FirstOrDefault();
 
-            var invoiceId = dbContext.Documents
-                .Where(i=>i.DocumentNumber == creditNote.CreditToInvoiceNumber)
-                .Select(i=>i.Id)
+            var invoice = dbContext.Documents
+                .Where(i=>i.Id == creditNote.CreditToInvoiceId)                
                 .FirstOrDefault();  
 
             var creditNoteForEdit = new EditCreditNoteViewModel
             {
                 Comment = creditNote.Comment,
-                CreditToInvoiceNumber = creditNote.CreditToInvoiceNumber,    
-                InvoiceNumberId = invoiceId,
+                CreditToInvoiceNumber =invoice.DocumentNumber,    
+                InvoiceNumberId = invoice.Id,
                 CurrencyId = creditNote.CurrencyId,
                 Date = creditNote.Date,
                 //  CustomerOrders = creditNote.CustomerOrders
@@ -411,7 +410,7 @@ namespace SSMO.Services.Documents.Credit_Note
                         CreditNoteId = product.CreditNoteId,
                         CreditNotePrice = product.CreditNotePrice,
                         CreditNoteQuantity = product.CreditNoteQuantity,
-                        CustomerOrderId = product.CustomerOrderId,
+                        CustomerOrderId = product.CustomerOrderId ?? 0,
                         CustomerProductDetailId = product.CustomerOrderProductDetailsId ?? 0,
                         FscClaim = product.FscClaim,
                         FscSertificate = product.FscCertificate,

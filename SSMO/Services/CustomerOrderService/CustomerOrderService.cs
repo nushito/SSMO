@@ -240,10 +240,10 @@ namespace SSMO.Services.CustomerOrderService
                 .Select(n=>n.OrderConfirmationNumber)
                 .FirstOrDefault();
         }
-        public List<CustomerOrdersJsonList> CustomerOrderCollection(int customerorderId)
+        public List<CustomerOrdersJsonList> CustomerOrderCollection(int customerId)
         {
             return dbContext.CustomerOrders
-                .Where(c=>c.CustomerId == customerorderId)
+                .Where(c=>c.CustomerId == customerId && c.CustomerOrderProducts.Where(a=>a.AutstandingQuantity > 0.01M).Count() > 0)
                 .Select(i=> new CustomerOrdersJsonList
                 {
                     CustomerOrderId = i.Id,

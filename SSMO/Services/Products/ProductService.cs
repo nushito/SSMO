@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using DocumentFormat.OpenXml.Presentation;
 using Microsoft.AspNetCore.Mvc;
@@ -13,13 +14,16 @@ using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Grades;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.CreditNote;
+using SSMO.Models.Reports.DebitNote;
 using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using SSMO.Models.Sizes;
+using SSMO.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Description = SSMO.Data.Models.Description;
+using Size = SSMO.Data.Models.Size;
 
 namespace SSMO.Services.Products
 {
@@ -27,17 +31,24 @@ namespace SSMO.Services.Products
     {
         private readonly ApplicationDbContext dbContext;
         private readonly IConfigurationProvider mapper;
+        private readonly IProductRepository productRepository;
 
-        public ProductService(ApplicationDbContext dbContext, IMapper mapper)
+        public ProductService(ApplicationDbContext dbContext, IMapper mapper, IProductRepository productRepository)
         {
             this.dbContext = dbContext;
             this.mapper = mapper.ConfigurationProvider;
+            this.productRepository = productRepository;
         }
         public void CreateProduct(ProductSupplierFormModel model, int supplierOrderId)
         {
             var description = dbContext.Descriptions.Where(a => a.Id == model.DescriptionId).Select(n=>n.Name).FirstOrDefault();
             var size = dbContext.Sizes.Where(a => a.Id == model.SizeId).Select(n=>n.Name).FirstOrDefault();
             var grade = dbContext.Grades.Where(a => a.Id == model.GradeId).Select(n=>n.Name).FirstOrDefault();
+
+            if (String.IsNullOrEmpty(model.PurchaseFscCertificate))
+            {
+                model.PurchaseFscCertificate = null;
+            }
 
             var product = new Product
             {
@@ -196,7 +207,7 @@ namespace SSMO.Services.Products
             {
               purchase.CustomerOrderProducts.Add(customerOrderProduct);
             }
-
+           
             dbContext.SaveChanges();
 
             return true;
@@ -334,7 +345,7 @@ namespace SSMO.Services.Products
             (int? descriptionId, int? gradeId, int? sizeId, int currentPage = 1, int productsPerPage = int.MaxValue)
         {
             var products = dbContext.Products
-               .Where(d => d.LoadedQuantityM3 != 0);
+               .Where(d => d.LoadedQuantityM3 != 0 && d.SoldQuantity < d.OrderedQuantity);
                
 
             if (descriptionId != null)
@@ -356,8 +367,7 @@ namespace SSMO.Services.Products
 
             }
 
-            var productsOnStok = new List<ProductAvailabilityDetailsViewModel>();
-            string supplierOrderDeliveryAddress = null;
+            var productsOnStok = new List<ProductAvailabilityDetailsViewModel>();          
 
             foreach (var product in products.ToList())
             {
@@ -366,55 +376,82 @@ namespace SSMO.Services.Products
                     .Select(id=>id.Id)
                     .FirstOrDefault();
 
-                var order = dbContext.CustomerOrders
-                    .Where(pr => pr.Id == product.CustomerOrderId && pr.StatusId == statusId)
-                    .FirstOrDefault();
-
-                if(order == null) continue;
-
-                //var purchase = dbContext.Documents
-                //    .Where(p=>p.Id == product.PurchaseDocumentId)
-                //    .FirstOrDefault();
-
-                //if (purchase != null)
-                //{
-                //     supplierOrderDeliveryAddress = dbContext.SupplierOrders
-                //        .Where(dI => dI.Documents.Any(p => p.Id == purchase.Id))
-                //        .Select(ad => ad.DeliveryAddress)
-                //        .FirstOrDefault();
-                //}
-
-                var customerName = dbContext.Customers
-                    .Where(o => o.Id == order.CustomerId)
-                    .Select(n=>n.Name)
-                    .FirstOrDefault();
+                var supplierOrder = dbContext.SupplierOrders
+                       .Where(s => s.Id == product.SupplierOrderId)
+                       .FirstOrDefault();
 
                 var supplierName = dbContext.Suppliers
-                    .Where(d => d.Documents.Any(o => o.CustomerOrderProducts.Select(a=>a.CustomerOrderId).FirstOrDefault() == order.Id))
-                    .Select(n => n.Name)
+                    .Where(i=>i.Id == supplierOrder.SupplierId)
+                    .Select(n=>n.Name)
                     .FirstOrDefault();
 
                 var availableProduct = new ProductAvailabilityDetailsViewModel
                 {
-                    CostPrice = product.CostPrice,
-                    CustomerOrderId = product.CustomerOrderId,
+                    Description = GetDescriptionName(product.DescriptionId),
+                    Size = GetSizeName(product.SizeId),
+                    Grade = GetGradeName(product.GradeId),
                     LoadedQuantity = product.LoadedQuantityM3,
-                    OrderedQuantity = product.OrderedQuantity,
-                    FSCClaim = product.FscClaim,
-                    FSCSertificate = product.FscSertificate,
-                    DeliveryAddress = supplierOrderDeliveryAddress,
-                    CustomerOrderNumber = order.OrderConfirmationNumber,
-                    CustomerName = customerName,
-                    PurchasePrice = product.PurchasePrice,
-                    Pallets = product.Pallets,
-                    SheetsPerPallet = product.SheetsPerPallet,
-                    OrderDate = order.Date,
-                   // PurchaseDate = purchase.Date,
-                    //PurchaseNumber = purchase.PurchaseNumber,
-                    Price = product.Price,
+                    QuantityOnStock = product.LoadedQuantityM3 - product.SoldQuantity,        
                     SupplierName = supplierName,
-                    Unit = product.Unit.ToString()
+                    CustomerProductsDetails = new List<ProductDetailsForEachCustomerOrderViewModel>(),
+                    PurchaseProductDetails = new List<PurchaseProductDetailsListViewModel>()
                 };
+               
+                var purchaseProduct = dbContext.PurchaseProductDetails
+                      .Where(p => p.ProductId == product.Id                       
+                       && p.SupplierOrderId == supplierOrder.Id)
+                      .ToList();
+               
+                var customerProducts = dbContext.CustomerOrderProductDetails
+                      .Where(pr => pr.SupplierOrderId == supplierOrder.Id && 
+                      pr.ProductId == product.Id)
+                      .ToList();               
+
+                foreach (var purchaseDetail in purchaseProduct)
+                {                   
+                    var purchase = dbContext.Documents
+                        .Where(i => i.Id == purchaseDetail.PurchaseInvoiceId)
+                        .FirstOrDefault();
+                   
+                    var productDetail = new PurchaseProductDetailsListViewModel
+                    {
+                        CostPrice = purchaseDetail.CostPrice,                       
+                        FSCClaim = purchaseDetail.FscClaim,
+                        FSCSertificate = purchaseDetail.FscCertificate,
+                        DeliveryAddress = purchase.DeliveryAddress,                     
+                        PurchasePrice = product.PurchasePrice,
+                        Pallets = product.Pallets,
+                        SheetsPerPallet = product.SheetsPerPallet,                       
+                        PurchaseDate = purchase.Date,
+                        PurchaseNumber = purchase.PurchaseNumber,                       
+                        Unit = product.Unit.ToString(),
+                        LoadedQuantity = purchaseDetail.Quantity
+                    };
+                    
+                    availableProduct.PurchaseProductDetails.Add(productDetail);
+                }
+
+                foreach (var order in customerProducts)
+                {
+                    var customerOrder = dbContext.CustomerOrders
+                    .Where(i => i.Id == order.CustomerOrderId)
+                    .FirstOrDefault();
+
+                    var customerName = dbContext.Customers
+                      .Where(o => o.Id == customerOrder.CustomerId)
+                      .Select(n => n.Name)
+                      .FirstOrDefault();
+
+                    var customerDetail = new ProductDetailsForEachCustomerOrderViewModel
+                    { CustomerName= customerName,
+                     CustomerOrderNumber = customerOrder.OrderConfirmationNumber,
+                     CustomerPoNumber = customerOrder.CustomerPoNumber,
+                     DeliveryAddress= customerOrder.DeliveryAddress,
+                      Price= order.SellPrice
+                    };
+
+                    availableProduct.CustomerProductsDetails.Add(customerDetail);
+                }
                 productsOnStok.Add(availableProduct);
             }
 
@@ -510,7 +547,7 @@ namespace SSMO.Services.Products
                         Unit = product.Unit,
                         Pallets = product.Pallets,
                         SheetsPerPallet = product.SheetsPerPallet,
-                        InvoicedQuantity = product.Quantity,
+                        InvoicedQuantity = mainProduct.LoadedQuantityM3 - mainProduct.SoldQuantity,
                         SellPrice = product.SellPrice,
                         FscCertificate = product.FscCertificate,
                         FscClaim = product.FscClaim,
@@ -758,6 +795,83 @@ namespace SSMO.Services.Products
                 .FirstOrDefault();
 
             productFromCustomerOrder.AutstandingQuantity -= quantity;
+        }
+
+        public List<NewProductsFromOrderEditedDebitNoteViewModel> ProductsForDebitNotePerInvoice(int invoiceId)
+        {
+            var productsFromInvoice = dbContext.InvoiceProductDetails
+                .Where(i => i.InvoiceId == invoiceId)
+                .ToList();
+
+            if(productsFromInvoice == null)
+            {
+                return new List<NewProductsFromOrderEditedDebitNoteViewModel>();
+            }
+
+            var products = new List<NewProductsFromOrderEditedDebitNoteViewModel>();
+
+            foreach (var product in productsFromInvoice)
+            {
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
+
+                var invoicedProduct = new NewProductsFromOrderEditedDebitNoteViewModel
+                {
+                    ProductId = product.ProductId,
+                    Id = product.Id,
+                    CustomerOrderId = product.CustomerOrderId ?? 0,
+                    DebitNoteId = product.DebitNoteId,
+                    InvoicedQuantity = product.InvoicedQuantity,
+                    DeliveryCost = product.DeliveryCost,
+                    DescriptionId = mainProduct.DescriptionId,
+                    Description = GetDescriptionName(mainProduct.DescriptionId),
+                    SizeId = mainProduct.SizeId,
+                    Size = GetSizeName(mainProduct.SizeId),
+                    GradeId = mainProduct.GradeId,
+                    Grade = GetGradeName(mainProduct.GradeId),
+                    FscCertificate = product.FscCertificate,
+                    FscClaim = product.FscClaim,
+                    Pallets = product.Pallets,
+                    SheetsPerPallet = product.SheetsPerPallet,
+                    SellPrice = product.SellPrice,
+                    Unit = product.Unit,
+                    Profit = product.Profit,
+                    PurchaseProductDetailsId = product.PurchaseProductDetailsId ?? 0
+                };
+
+                products.Add(invoicedProduct); 
+            }
+
+            return products;
+        }
+
+        public List<DescriptionsViewModel> DescriptionCollection()
+        {
+            return dbContext.Descriptions
+                .Select(n => new DescriptionsViewModel
+                {
+                    Id = n.Id,
+                    Name = n.Name
+                }).ToList();
+        }
+
+        public List<SizeViewModel> SizeCollection()
+        {
+            return dbContext.Sizes
+                .Select(n => new SizeViewModel
+                {
+                    Id = n.Id,
+                    Name = n.Name
+                }).ToList();
+        }
+
+        public List<GradeViewModel> GradeCollection()
+        {
+            return dbContext.Grades
+                .Select(n => new GradeViewModel
+                {
+                    Id = n.Id,
+                    Name = n.Name
+                }).ToList();
         }
     }
 }
