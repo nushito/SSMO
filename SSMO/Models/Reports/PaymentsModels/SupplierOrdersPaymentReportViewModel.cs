@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace SSMO.Models.Reports.PaymentsModels
 {
@@ -10,5 +11,7 @@ namespace SSMO.Models.Reports.PaymentsModels
         public int TotalSupplierOrders { get; set; }
         public IEnumerable<string> SupplierNames { get; set; }
         public IEnumerable<SupplierOrdersPaymentDetailsModel> SupplierOrderPaymentCollection { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

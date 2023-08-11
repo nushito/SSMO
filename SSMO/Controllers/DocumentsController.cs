@@ -182,7 +182,7 @@ namespace SSMO.Controllers
             var customers = new CustomerOrdersForInvoice
             {
                 Customers = customerService.GetCustomerNamesAndId(),
-                MyCompanies = mycompanyService.GetCompaniesForInvoice()
+                MyCompanies = mycompanyService.GetCompaniesNameAndId()
             };
 
             return View(customers);

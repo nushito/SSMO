@@ -172,7 +172,7 @@ namespace SSMO.Services.MyCompany
                 .ToList();            
         }
 
-        public ICollection<MyCompanyViewModel> GetCompaniesForInvoice()
+        public ICollection<MyCompanyViewModel> GetCompaniesNameAndId()
         {
             return dbContext.MyCompanies
                 .Select(a=> new MyCompanyViewModel
@@ -180,6 +180,14 @@ namespace SSMO.Services.MyCompany
                     Id= a.Id,
                     Name= a.Name,
                 }).ToList();
+        }
+
+        public string GetCompanyName(int id)
+        {
+            return dbContext.MyCompanies
+                .Where(i=>i.Id == id)
+                .Select(n=>n.Name) 
+                .FirstOrDefault();
         }
     }
 }

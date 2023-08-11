@@ -47,6 +47,6 @@ namespace SSMO.Data.Models
         public decimal TotalQuantity { get; set; }
         public ICollection<PurchaseProductDetails> PurchaseProductDetails { get; set; }
         public ICollection<CustomerOrderProductDetails> CustomerOrderProductDetails { get; set; }
-
+        public ICollection<Payment> Payments { get; set; }
     }
 }

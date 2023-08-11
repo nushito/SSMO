@@ -1,5 +1,8 @@
-﻿using SSMO.Models.Documents.Invoice;
+﻿using ImageMagick;
+using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Reports.FSC;
 using SSMO.Models.Reports.Invoice;
+using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.ProductsStock;
 using System.Collections.Generic;
 
@@ -9,6 +12,8 @@ namespace SSMO.Services
     {
         private static InvoiceDetailsViewModel _clientModel;
         private static IEnumerable<ProductAvailabilityDetailsViewModel> _productOnStock;
+        private static ProductsFscCollectionViewModel _fscReport;
+        private static SupplierOrdersPaymentReportViewModel _payments;
         public static void AddClient(InvoiceDetailsViewModel clientModel)
         {
             _clientModel = clientModel;
@@ -26,6 +31,26 @@ namespace SSMO.Services
         public static IEnumerable<ProductAvailabilityDetailsViewModel> GetProductOnStock()
         {
             return _productOnStock;
+        }
+
+        public static void AddFscReport( ProductsFscCollectionViewModel fscReport)
+        {
+            _fscReport = fscReport;
+        }
+
+        public static ProductsFscCollectionViewModel GetFscReport()
+        {
+            return _fscReport;  
+        }
+
+        public static void AddPurchasePayments(SupplierOrdersPaymentReportViewModel payments)
+        {
+            _payments= payments;
+        }
+
+        public static SupplierOrdersPaymentReportViewModel GetPurchasePayments()
+        {
+            return _payments;
         }
     }
 }

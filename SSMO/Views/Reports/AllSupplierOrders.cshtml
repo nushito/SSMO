@@ -14,6 +14,20 @@
                 }
             </select>
         </div>
+        <div class="form-group col-3" >
+             <label asp-for="StartDate" >Start Date</label>
+             <div class="input-group date" id="datepicker1">
+                 <input asp-for="StartDate" type="date" class="form-control" data-date-format="dd-mm-yyyy" value="@DateTime.Now.ToString("dd-MM-yyyy")"/> 
+                 <span asp-validation-for="StartDate" class="glyphicon glyphicon-calendar"></span>
+             </div>            
+        </div>
+         <div class="form-group col-3"  >
+             <label asp-for="EndDate" >End Date</label>
+             <div class="input-group date" id="datepicker2">
+                <input asp-for="EndDate"  type="date" class="form-control" data-date-format="dd-mm-yyyy" value="@DateTime.Now.ToString("dd-MM-yyyy")"/> 
+                <span asp-validation-for="EndDate" class="glyphicon glyphicon-calendar"></span>
+             </div>
+        </div>
     </div>
     <div class="row">
         <input type="submit" class="btn btn-info" value="Search" />
@@ -53,51 +67,52 @@
     </div>
 </div>
 
-<div class="container">
-    <div class="row">
-        <div class="col">
+<table class="table">
+    <thead class="row">
+        <tr>
+            <th >
             Supplier Order Number
-        </div>
-        <div class="col m-0">
+        </th>
+        <th >
             Date
-        </div>
-        <div class="col">
+        </th>
+        <th >
             Loading Address
-        </div>
-        <div class="col">
+        </th>
+        <th >
             Delivery Address
-        </div>
-        <div class="col">
+        </th>
+        <th >
             Order Status
-        </div>
-    </div>
-</div>
-<hr />
-<div class="container">
-    @if(Model.SupplierOrderCollection != null)
-    {
-        @foreach (var order in Model.SupplierOrderCollection)
+        </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.SupplierOrderCollection != null)
         {
-                <div class="row">
-                    <div class="col">
-                    @order.SupplierOrderNumber
-                    </div>
-                    <div class="col">
-                    @order.Date
-                    </div>
-                    <div class="col">
-                    @order.LoadingAddress
-                    </div>
-                    <div class="col">
-                    @order.DeliveryAddress
-                    </div>
-                    <div class="col">
-                    @order.StatusName
-                    </div>
-                    <a asp-controller="Reports" asp-action="SupplierOrderDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
-                    <a asp-controller="Reports" asp-action="SupplierOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
-                </div>
-                <hr />
-        }
-    }    
-</div>
+            @foreach (var order in Model.SupplierOrderCollection)
+            {
+                        <tr class="row">
+                            <td >
+                        @order.SupplierOrderNumber
+                            </td>
+                            <td >
+                        @order.Date
+                            </td>
+                            <td >
+                        @order.LoadingAddress
+                            </td>
+                            <td >
+                        @order.DeliveryAddress
+                            </td>
+                            <td >
+                        @order.StatusName
+                            </td>
+                            <a asp-controller="Reports" asp-action="SupplierOrderDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
+                            <a asp-controller="Reports" asp-action="SupplierOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
+                        </tr>                       
+            }
+        }    
+    </tbody>
+</table>
+<hr />

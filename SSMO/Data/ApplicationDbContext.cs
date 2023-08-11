@@ -35,6 +35,7 @@ namespace SSMO.Data
         public DbSet<InvoiceProductDetails> InvoiceProductDetails { get; set; }
         public DbSet<CustomerOrderProductDetails> CustomerOrderProductDetails { get; set; }
         public DbSet<PurchaseProductDetails> PurchaseProductDetails { get; set; }
+        public DbSet<Payment> Payments { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -619,6 +620,32 @@ namespace SSMO.Data
               .WithMany(a => a.DebitNoteProducts)
               .HasForeignKey(a => a.DebitNoteId)
               .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Payment>()
+                .HasOne(s=>s.SupplierOrder)
+                .WithMany(p=>p.Payments)
+                .HasForeignKey(k=>k.SupplierOrderId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false);
+
+            builder.Entity<Payment>()
+          .HasOne(s => s.Document)
+          .WithMany(p => p.Payments)
+          .HasForeignKey(k => k.DocumentId)
+          .OnDelete(DeleteBehavior.Restrict)
+          .IsRequired(false);
+
+            builder.Entity<Payment>()
+          .HasOne(s => s.CustomerOrder)
+          .WithMany(p => p.Payments)
+          .HasForeignKey(k => k.CustomerOrderId)
+          .OnDelete(DeleteBehavior.Restrict)         
+          .IsRequired(false);
+
+            builder.Entity<Payment>()
+               .Property(a => a.PaidAmount)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 2);
 
             base.OnModelCreating(builder);
         }

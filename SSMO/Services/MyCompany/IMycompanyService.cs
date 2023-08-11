@@ -25,6 +25,7 @@ namespace SSMO.Services.MyCompany
         public int GetMyCompanyId(string name);
         public ICollection<string> MyCompaniesFscList();
 
-        public ICollection<MyCompanyViewModel> GetCompaniesForInvoice();
+        public string GetCompanyName(int id);
+        public ICollection<MyCompanyViewModel> GetCompaniesNameAndId();
     }
 }

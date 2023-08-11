@@ -1,5 +1,8 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using DocumentFormat.OpenXml.Drawing;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using Microsoft.AspNetCore.Mvc;
 using SSMO.Data;
 using SSMO.Data.Models;
 using SSMO.Models.CustomerOrders;
@@ -10,6 +13,7 @@ using SSMO.Services.Documents.Purchase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading.Tasks;
 
 namespace SSMO.Services.SupplierOrders
@@ -64,50 +68,119 @@ namespace SSMO.Services.SupplierOrders
             return supplierSpec.Id;
         }
 
-        public bool EditSupplierOrderPayment
-            (string supplierOrderNumber, decimal paidAdvance, DateTime date, bool paidStatus)
-        {
-            if (supplierOrderNumber == null) return false;
-
+        public bool EditSupplierOrderPurchasePayment
+            (int id, decimal? paidAdvance, DateTime? date,
+             ICollection<PurchaseNewpaymentsPerOrderFormModel> purchasePayments)
+        {           
             var supplierOrder = dbContext.SupplierOrders
-                .Where(num => num.Number.ToLower() == supplierOrderNumber.ToLower())
+                .Where(i=>i.Id == id)
                 .FirstOrDefault();
+
+            var purchaseInvoices = dbContext.Documents
+                .Where(s => s.SupplierOrderId == id && s.DocumentType == Data.Enums.DocumentTypes.Purchase)
+                .ToList();
+
             if(supplierOrder.Balance < paidAdvance)
             {
                 return false;
             }
 
-            supplierOrder.PaidAvance = paidAdvance;
-            supplierOrder.PaidStatus = paidStatus;
-            supplierOrder.DatePaidAmount = date.ToString();
-            supplierOrder.Balance = supplierOrder.TotalAmount - supplierOrder.PaidAvance;
-
-           if(supplierOrder.Balance > 0)
+            if(paidAdvance > 0.001m)
             {
-                supplierOrder.PaidStatus = false;
+                var orderPayment = new Payment
+                {
+                    PaidAmount = (decimal)paidAdvance,
+                    Date = (DateTime)date,
+                    SupplierOrderId = id
+                };
+                supplierOrder.Balance -= paidAdvance ?? 0;
+                dbContext.Payments.Add(orderPayment);
+                supplierOrder.Payments.Add(orderPayment);
+
+                dbContext.SaveChanges();
+            }
+
+            
+            if(supplierOrder.Balance <= 0.001m)
+            {
+                supplierOrder.PaidStatus = true;
+                purchaseInvoices.ToList().ForEach(t=>t.PaidStatus = true);
+                return true;
             }
             else
             {
-                supplierOrder.PaidStatus = true;
+                supplierOrder.PaidStatus = false;
             }
+
+
+            foreach (var payment in purchasePayments)
+            {
+                if(payment.NewPaidAmount > 0.001m)
+                {
+                    var invoice = dbContext.Documents.Find(payment.Id);
+                    DateTime newDate = (DateTime)payment.NewDatePaidAmount;
+
+                    var invoicePayment = new Payment
+                    {
+                        PaidAmount = payment.NewPaidAmount,
+                        Date = newDate,
+                        DocumentId = payment.Id
+                    };
+
+                    dbContext.Payments.Add(invoicePayment);
+                    invoice.Payments.Add(invoicePayment);
+
+                    supplierOrder.Balance -= payment.NewPaidAmount;
+                    invoice.Balance -= payment.NewPaidAmount;
+
+                    if (invoice.Balance <= 0.001m)
+                    {
+                        invoice.PaidStatus = true;
+                    }
+                    if (supplierOrder.Balance <= 0.001m)
+                    {
+                        supplierOrder.PaidStatus = true;                       
+                        return true;
+                    }
+                }
+            }
+
+            dbContext.SaveChanges();
 
             return true;
         }
 
-        public EditSupplierOrderPaymentModel GetSupplierOrderForEdit(string supplierOrderNumber)
+        public EditSupplierOrderPaymentModel GetPaymentsPerOrderForEdit(int id)
         {
-            if (supplierOrderNumber == null) return null;
-
-           
             var supplierOrder = dbContext.SupplierOrders
-                .Where(num=>num.Number.ToLower() == supplierOrderNumber.ToLower());
+                .Where(i=>i.Id == id)
+                .FirstOrDefault();
 
-            var supplierOrderForEdit = supplierOrder.ProjectTo<EditSupplierOrderPaymentModel>(mapper).FirstOrDefault();
+            var supplierOrderForEdit = new EditSupplierOrderPaymentModel
+            { Number = supplierOrder.Number,
+                PurchasePaymentsCollection = new List<PurchaseNewpaymentsPerOrderFormModel>()
+            };
+           
+            var purchases = dbContext.Documents
+                .Where(s=>s.SupplierOrderId == id && s.DocumentType == Data.Enums.DocumentTypes.Purchase)
+                .ToList();
+
+            foreach (var purchase in purchases)
+            {
+                var purchasePayment = new PurchaseNewpaymentsPerOrderFormModel
+                {
+                    Id= purchase.Id,
+                    PurchaseNumber = purchase.PurchaseNumber   
+                };
+
+                supplierOrderForEdit.PurchasePaymentsCollection.Add(purchasePayment);
+            }
+           
             return supplierOrderForEdit;
         }
 
         public SupplierOrderPaymentCollectionModel GetSupplierOrders
-            (string supplierName, int currentpage, int supplierOrdersPerPage)
+            (string supplierName, DateTime startDate, DateTime endDate, int currentpage, int supplierOrdersPerPage)
         {
             if(String.IsNullOrEmpty(supplierName))
             {
@@ -120,7 +193,7 @@ namespace SSMO.Services.SupplierOrders
                 .FirstOrDefault();
 
             var supplierOrders = dbContext.SupplierOrders
-                .Where(sup=>sup.SupplierId == supplierId);
+                .Where(sup=>sup.SupplierId == supplierId && sup.Date >= startDate && sup.Date <= endDate);
 
             var supplierOrdersCollection = supplierOrders.ProjectTo<SupplierOrdersPaymentDetailsModel>(mapper).ToList();
 
@@ -129,6 +202,69 @@ namespace SSMO.Services.SupplierOrders
                 TotalSupplierOrders = supplierOrders.Count(),
                 SupplierOrderPaymentCollection = supplierOrdersCollection.Skip((currentpage - 1) * supplierOrdersPerPage).Take(supplierOrdersPerPage)
             };
+
+            foreach (var order in supplierOrderPaymentCollection.SupplierOrderPaymentCollection.ToList())
+            {
+                order.PurchaseCurrency = dbContext.Currencies
+                    .Where(i => i.Id == order.CurrencyId)
+                    .Select(n=>n.Name)
+                    .FirstOrDefault();                   
+
+                order.Payments = new List<SupplierPaymentDetailsViewModel>();
+                order.PurchasePaymentsCollection = new List<PurchasePerOrderPaymentsViewModel>();
+
+                var payments = dbContext.Payments
+               .Where(s => s.SupplierOrderId == order.Id)
+               .ToList();
+
+                if (payments != null)
+                {
+                    foreach (var payment in payments)
+                    {
+                        var supplierPayment = new SupplierPaymentDetailsViewModel
+                        {
+                            Date = payment.Date,
+                            PaidAmount = payment.PaidAmount,
+                        };
+                        order.Payments.Add(supplierPayment);
+                    }
+                }
+                var purchases = dbContext.Documents
+                    .Where(s => s.SupplierOrderId == order.Id && s.DocumentType == Data.Enums.DocumentTypes.Purchase)
+                    .ToList();
+
+                foreach (var purchase in purchases)
+                {
+                    var purchasePayment = new PurchasePerOrderPaymentsViewModel
+                    {
+                        Id = purchase.Id,
+                        Balance = purchase.Balance,
+                        DatePaidAmount = purchase.DatePaidAmount,
+                        PaidAdvance = purchase.PaidAvance,
+                        PurchaseNumber = purchase.PurchaseNumber,                       
+                        PurchasePaymentsDetails = new List<PurchaseAllPaymentsViewModel>()
+                    };
+
+                    var purchasePayments = dbContext.Payments
+                    .Where(s => s.DocumentId == purchase.Id)
+                    .ToList();
+
+                    if (purchasePayments != null)
+                    {
+                        foreach (var payment in purchasePayments)
+                        {
+                            purchasePayment.PurchasePaymentsDetails.Add(new PurchaseAllPaymentsViewModel
+                            {
+                                Date = payment.Date,
+                                PaidAmount = payment.PaidAmount
+                            });
+                        }
+                    }
+
+                    order.PurchasePaymentsCollection.Add(purchasePayment);
+                }
+
+            }
 
             return supplierOrderPaymentCollection;    
         }

@@ -20,11 +20,14 @@ namespace SSMO.Services.SupplierOrders
                 string loadingAddress, string deliveryAddress, string deliveryTerms);
         void TotalAmountAndQuantitySum(int supplierOrderId);
 
-        public SupplierOrderPaymentCollectionModel GetSupplierOrders(string supplierName, int currentpage, int supplierOrdersPerPage);
+        public SupplierOrderPaymentCollectionModel GetSupplierOrders
+            (string supplierName,DateTime startDate, DateTime endDate, int currentpage, int supplierOrdersPerPage);
 
-        public EditSupplierOrderPaymentModel GetSupplierOrderForEdit(string supplierOrderNumber);
+        public EditSupplierOrderPaymentModel GetPaymentsPerOrderForEdit(int id);
 
-        public bool EditSupplierOrderPayment(string supplierOrderNumber, decimal paidAdvance, DateTime date, bool paidStatus);
+        public bool EditSupplierOrderPurchasePayment
+            (int id, decimal? paidAdvance, DateTime? date, 
+           ICollection<PurchaseNewpaymentsPerOrderFormModel> PurchasePayments);
 
         public ICollection<SupplierOrdersListForPurchaseEditModel> GetSupplierOrdersNumbers();
         public ICollection<SupplierOrdersNumbersListViewModel> GetSupplierOrdersNumbersJsonList(int id);

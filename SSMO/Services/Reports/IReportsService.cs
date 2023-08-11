@@ -12,8 +12,10 @@ namespace SSMO.Services.Reports
 {
     public interface IReportsService
     {
-        CustomerOrdersQueryModel AllCustomerOrders(string name, int currentpage, int customerOrdersPerPage);
-        SupplierOrdersQueryModel AllSupplierOrders(string name, int currentpage, int supplierOrdersPerPage);
+        CustomerOrdersQueryModel AllCustomerOrders(string name, DateTime startDate, DateTime endDate,
+            int currentpage, int customerOrdersPerPage);
+        SupplierOrdersQueryModel AllSupplierOrders(string name,DateTime startDate, DateTime endDate,
+            int currentpage, int supplierOrdersPerPage);
         SupplierOrderDetailsModel SupplierOrderDetail(int id);
         CustomerOrderDetailsModel CustomerOrderDetails(int id);
         bool EditCustomerOrder(int id, string number,
@@ -46,7 +48,7 @@ namespace SSMO.Services.Reports
               decimal paidAdvance, bool paidStatus, int? vat,
               List<ProductsForEditSupplierOrder> products, List<NewProductsForSupplierOrderModel> newProducts);
 
-        public InvoiceReportModel InvoiceCollection(string myCompanyName, int currentpage, int invoicesPerPage);
+        public InvoiceReportModel InvoiceCollection(string myCompanyName, DateTime startDate, DateTime endDate, int currentpage, int invoicesPerPage);
         public InvoiceDetailsViewModel InvoiceDetails(int id);
 
         public PurchaseCollectionQueryModel PurchaseInvoices

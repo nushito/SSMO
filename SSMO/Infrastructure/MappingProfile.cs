@@ -73,6 +73,7 @@ namespace SSMO.Infrastructure
             this.CreateMap<SupplierOrder, SupplierOrderDetailsModel>()
                 .ForMember(a => a.SupplierOrderNumber, b => b.MapFrom(a => a.Number));
             this.CreateMap<SupplierOrder, SupplierOrdersListForPurchaseEditModel>();
+            this.CreateMap<SupplierOrder, EditSupplierOrderPaymentModel>();
 
             this.CreateMap<Document, InvoicePrintViewModel>();
             this.CreateMap<Document, EditInvoicePaymentModel>();
@@ -89,7 +90,11 @@ namespace SSMO.Infrastructure
             this.CreateMap<Supplier, EditSupplierFormModel>();
 
             this.CreateMap<BankDetails, InvoiceBankDetailsModel>();
-           
+
+            this.CreateMap<Payment, SupplierPaymentDetailsViewModel>();
+            this.CreateMap<Payment, PurchaseAllPaymentsViewModel>();
+
+
         }
     }
 }

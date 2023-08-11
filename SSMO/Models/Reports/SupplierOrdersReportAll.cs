@@ -1,4 +1,5 @@
 ﻿using SSMO.Models.Reports.SupplierOrderReportForEdit;
+using System;
 using System.Collections.Generic;
 
 namespace SSMO.Models.Reports
@@ -11,5 +12,7 @@ namespace SSMO.Models.Reports
         public string SupplierName { get; set; }
         public IEnumerable<string> SupplierNames { get; set; }
         public IEnumerable<SupplierOrderDetailsModel> SupplierOrderCollection { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
     }
 }

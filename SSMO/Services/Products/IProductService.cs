@@ -6,6 +6,7 @@ using SSMO.Models.Grades;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.CreditNote;
 using SSMO.Models.Reports.DebitNote;
+using SSMO.Models.Reports.FSC;
 using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using SSMO.Models.Sizes;
@@ -59,10 +60,12 @@ namespace SSMO.Services.Products
         public decimal ConvertStringSizeToQubicMeters(string size);
         public void ReviseAutstandingQuantity(int customerOrderDetailId, decimal quantity);
         public List<NewProductsFromOrderEditedDebitNoteViewModel> ProductsForDebitNotePerInvoice(int invoiceId);
-
         public List<DescriptionsViewModel> DescriptionCollection();
         public List<SizeViewModel> SizeCollection();
         public List<GradeViewModel> GradeCollection();  
-        
+        public ICollection<PurchaseProductFscCollectionViewModel> PurchaseProductFscCollection
+            (int myCompanyId, DateTime startDate, DateTime EndDate, string fscClaim);
+        public ICollection<SoldProductsFscCollectionViewModel> SoldProductFscCollection
+            (int myCompanyId, DateTime startDate, DateTime EndDate, string fscClaim);
     }
 }

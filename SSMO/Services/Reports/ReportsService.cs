@@ -50,7 +50,8 @@ namespace SSMO.Services.Reports
             this.supplierService = supplierService;
         }
         public CustomerOrdersQueryModel AllCustomerOrders
-            (string customerName, int currentpage, int customerOrdersPerPage)
+            (string customerName, DateTime startDate, DateTime endDate,
+            int currentpage, int customerOrdersPerPage)
         {
 
             if (String.IsNullOrEmpty(customerName))
@@ -64,7 +65,7 @@ namespace SSMO.Services.Reports
                                 .FirstOrDefault();
 
             var queryOrders = dbcontext.CustomerOrders
-                     .Where(a => a.CustomerId == customerId);
+                     .Where(a => a.CustomerId == customerId && a.Date >= startDate && a.Date <= endDate);
 
             // var totalOrders = queryOrders.Count();  
 
@@ -344,7 +345,7 @@ namespace SSMO.Services.Reports
         }
 
         public SupplierOrdersQueryModel AllSupplierOrders
-            (string name, int currentpage, int supplierOrdersPerPage)
+            (string name, DateTime startDate, DateTime endDate, int currentpage, int supplierOrdersPerPage)
         {
             if (String.IsNullOrEmpty(name))
             {
@@ -356,7 +357,7 @@ namespace SSMO.Services.Reports
                                 .FirstOrDefault();
 
             var queryOrders = dbcontext.SupplierOrders
-                    .Where(a => a.SupplierId == supplierId);
+                    .Where(a => a.SupplierId == supplierId && a.Date >= startDate && a.Date <= endDate);
 
             var supplierOrders = queryOrders.ProjectTo<SupplierOrderDetailsModel>(this.mapper).ToList();
             
@@ -546,7 +547,7 @@ namespace SSMO.Services.Reports
         }
 
         public InvoiceReportModel InvoiceCollection
-            (string myCompanyName, int currentpage =1, int invoicesPerPage = int.MaxValue)
+            (string myCompanyName, DateTime startDate, DateTime endDate, int currentpage =1, int invoicesPerPage = int.MaxValue)
         {
             if (myCompanyName == null) return new InvoiceReportModel();
 
@@ -555,7 +556,8 @@ namespace SSMO.Services.Reports
             var invoices = dbcontext.Documents
                 .Where(type => type.DocumentType == DocumentTypes.Invoice || 
                        type.DocumentType == DocumentTypes.CreditNote || 
-                       type.DocumentType == DocumentTypes.DebitNote)
+                       type.DocumentType == DocumentTypes.DebitNote &&
+                       type.Date >= startDate && type.Date <= endDate)
                 .Where(m => m.MyCompanyId == companyId).OrderByDescending(d=>d.DocumentNumber);
            
             var invoiceDetailsCollection = invoices.ProjectTo<InvoiceCollectionViewModel>(this.mapper).ToList();

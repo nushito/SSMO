@@ -87,6 +87,6 @@ namespace SSMO.Data.Models
         public ICollection<Product> CreditAndDebitNoteProducts { get; set; }
         public ICollection<InvoiceProductDetails> DebitNoteProducts { get; set; }
         public ICollection<InvoiceProductDetails> CreditNoteProducts { get; set; }
-
+        public ICollection<Payment> Payments { get; set; }
     }
 }

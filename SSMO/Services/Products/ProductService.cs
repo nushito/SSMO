@@ -15,6 +15,7 @@ using SSMO.Models.Grades;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.CreditNote;
 using SSMO.Models.Reports.DebitNote;
+using SSMO.Models.Reports.FSC;
 using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using SSMO.Models.Sizes;
@@ -514,7 +515,8 @@ namespace SSMO.Services.Products
         }
         public ICollection<string> FscClaimList()
         {
-           return dbContext.Products
+
+           return dbContext.PurchaseProductDetails
                 .Select(f=>f.FscClaim)
                 .Distinct()
                 .ToList();
@@ -872,6 +874,126 @@ namespace SSMO.Services.Products
                     Id = n.Id,
                     Name = n.Name
                 }).ToList();
+        }
+
+        public ICollection<PurchaseProductFscCollectionViewModel> PurchaseProductFscCollection
+            (int myCompany, DateTime startDate, DateTime endDate, string fscClaim)
+        {
+            var purchaseInvoices = dbContext.Documents
+                .Where(m => m.MyCompanyId == myCompany 
+                && m.DocumentType == DocumentTypes.Purchase
+                && m.Date >= startDate
+                && m.Date <= endDate)
+                .Select(i => i.Id)
+                .ToList();
+
+            var products = dbContext.PurchaseProductDetails
+                .Where(p=> purchaseInvoices.Contains(p.PurchaseInvoiceId) && !String.IsNullOrEmpty(p.FscClaim) && p.FscClaim != "-");
+
+            if (fscClaim != "-")
+            {
+                if (!String.IsNullOrEmpty(fscClaim))
+                    products = products.Where(f=>f.FscClaim == fscClaim);
+            }
+
+
+            var productsCollection = products.ToList();
+
+            var purchaseProducts = new List<PurchaseProductFscCollectionViewModel>();    
+
+            foreach (var product in productsCollection)
+            {
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
+                var document = dbContext.Documents
+                    .Where(i => i.Id == product.PurchaseInvoiceId)
+                    .FirstOrDefault();
+
+                var supplierName = dbContext.Suppliers
+                    .Where(i => i.Id == document.SupplierId)
+                    .Select(n => n.Name)
+                    .FirstOrDefault();
+
+                var purchaseProduct = new PurchaseProductFscCollectionViewModel
+                {
+                    DescriptionId = mainProduct.DescriptionId,
+                    FscClaim = product.FscClaim,
+                    PurchaseInvoice = document.PurchaseNumber,
+                    PurchaseDate = document.Date,
+                    Quantity = product.Quantity,
+                    SupplierName = supplierName,
+                    Transport = document.TruckNumber,
+                    Unit = product.Unit.ToString()
+                };
+                purchaseProduct.Description = GetDescriptionName(mainProduct.DescriptionId);
+                purchaseProducts.Add(purchaseProduct);
+            }
+
+           return purchaseProducts;
+        }
+
+        public ICollection<SoldProductsFscCollectionViewModel> SoldProductFscCollection
+            (int myCompany, DateTime startDate, DateTime endDate, string fscClaim)
+        {
+            var invoices = dbContext.Documents
+                .Where(m=>m.MyCompanyId == myCompany 
+                && m.DocumentType != DocumentTypes.Purchase
+                && m.Date >= startDate 
+                && m.Date <= endDate)
+                .Select(i=>i.Id)
+                .ToList();
+
+            var products = dbContext.InvoiceProductDetails           
+                .Where(i=> invoices.Contains(i.InvoiceId)
+                && !String.IsNullOrEmpty(i.FscClaim) && i.FscClaim != "-");
+
+            if (fscClaim != "-")
+            { if(!String.IsNullOrEmpty(fscClaim))
+                products = products.Where(f => f.FscClaim == fscClaim);
+            }
+
+            var soldProducts = new List<SoldProductsFscCollectionViewModel>();  
+
+            foreach (var product in products.ToList())
+            {
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
+                var invoice = dbContext.Documents
+                    .Where(i => i.Id == product.InvoiceId || i.Id == product.CreditNoteId || i.Id == product.DebitNoteId)
+                    .FirstOrDefault();
+
+                var customerName = dbContext.Customers
+                    .Where(i=>i.Id == invoice.CustomerId)
+                    .Select(n=>n.Name)
+                    .FirstOrDefault();
+
+                var soldProduct = new SoldProductsFscCollectionViewModel
+                {
+                    DescriptionId = mainProduct.DescriptionId,
+                    CustomerName = customerName,
+                    Date = invoice.Date,
+                    Description = GetDescriptionName(mainProduct.DescriptionId),
+                    FscClaim = product.FscClaim,
+                    InvoiceNumber = invoice.DocumentNumber,
+                    Transport = invoice.TruckNumber,
+                    Unit = product.Unit.ToString(),
+                };
+
+                if(invoice.DocumentType == DocumentTypes.Invoice)
+                {
+                    soldProduct.Quantity = product.InvoicedQuantity;
+                }
+                else if(invoice.DocumentType == DocumentTypes.CreditNote)
+                {
+                    soldProduct.Quantity = product.CreditNoteQuantity;
+                }
+                else if(invoice.DocumentType == DocumentTypes.DebitNote)
+                {
+                    soldProduct.Quantity = product.DebitNoteQuantity;
+                }
+                soldProduct.Description = GetDescriptionName(mainProduct.DescriptionId);    
+                soldProducts.Add(soldProduct);
+            }
+
+            return soldProducts;
         }
     }
 }

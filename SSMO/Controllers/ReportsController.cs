@@ -49,6 +49,8 @@ using SSMO.Models.Documents.DebitNote;
 using SSMO.Models.Reports.CreditNote;
 using DocumentFormat.OpenXml.Wordprocessing;
 using SSMO.Models.Reports.DebitNote;
+using SSMO.Data.Models;
+using DocumentFormat.OpenXml.Spreadsheet;
 
 namespace SSMO.Controllers
 {
@@ -112,7 +114,7 @@ namespace SSMO.Controllers
 			var customerNames = customerService.GetCustomerNames();
 
 			var customerOrderCollection = reportService.AllCustomerOrders(
-				model.CustomerName,
+				model.CustomerName, model.StartDate, model.EndDate,
 				model.CurrentPage, CustomerOrderReportAll.CustomerOrdersPerPage);
 
 			model.CustomerOrderCollection = customerOrderCollection.CustomerOrders;
@@ -316,7 +318,8 @@ namespace SSMO.Controllers
 			model.SupplierNames = supplierService.GetSupplierNames();
 
 			var supplierOrdersCollection = reportService.AllSupplierOrders
-				(model.SupplierName, model.CurrentPage, SupplierOrdersReportAll.SupplierOrdersPerPage);
+				(model.SupplierName,model.StartDate,model.EndDate,
+				model.CurrentPage, SupplierOrdersReportAll.SupplierOrdersPerPage);
 
 			model.SupplierOrderCollection = supplierOrdersCollection.SupplierOrders;
 			model.TotalSupplierOrders = supplierOrdersCollection.TotalSupplierOrders;
@@ -677,17 +680,18 @@ namespace SSMO.Controllers
 			var supplierNames = supplierService.GetSupplierNames();
 			model.SupplierNames = supplierNames;
 
-			var supplierOrdersPaymentCollection = supplierOrderService.GetSupplierOrders(model.SupplierName, model.CurrentPage,
+			var supplierOrdersPaymentCollection = supplierOrderService.GetSupplierOrders
+				(model.SupplierName,model.StartDate,model.EndDate, model.CurrentPage,
 				SupplierInvoicePaymentReportViewModel.SupplierInvoicePerPage);
 
 			model.SupplierOrderPaymentCollection = supplierOrdersPaymentCollection.SupplierOrderPaymentCollection;
 			model.TotalSupplierOrders = supplierOrdersPaymentCollection.TotalSupplierOrders;
-
-			return View(model);
+            ClientService.AddPurchasePayments(model);
+            return View(model);
 		}
 		[HttpGet]
 		[Authorize]
-		public IActionResult EditSupplierOrderPayment(string supplierOrderNumber)
+		public IActionResult DetailsSupplierAndPurchasePayment(int id)
 		{
 			string userId = this.User.UserId();
 			var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
@@ -697,13 +701,13 @@ namespace SSMO.Controllers
 			{
 				return BadRequest();
 			}
-
-			var supplierOrder = supplierOrderService.GetSupplierOrderForEdit(supplierOrderNumber);
-			return View(supplierOrder);
+			var supplierOrder = supplierOrderService.GetPaymentsPerOrderForEdit(id);
+			ViewBag.Count = supplierOrder.PurchasePaymentsCollection.Count;           
+            return View(supplierOrder);
 		}
 		[HttpPost]
 		[Authorize]
-		public IActionResult EditSupplierOrderPayment(string supplierOrderNumber, EditSupplierOrderPaymentModel model)
+		public IActionResult DetailsSupplierAndPurchasePayment(int id, EditSupplierOrderPaymentModel model)
 		{
 			string userId = this.User.UserId();
 			var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
@@ -717,11 +721,10 @@ namespace SSMO.Controllers
 			{
 				return BadRequest();
 			}
-			var isSupplierOrderPaymentEdit = supplierOrderService.EditSupplierOrderPayment
-				(supplierOrderNumber, model.PaidAvance, model.DatePaidAmount, model.PaidStatus);
+			var isSupplierOrderPaymentEdit = supplierOrderService.EditSupplierOrderPurchasePayment
+                (id, model.NewPaidAmount??0m, model.NewDateOfPayment ?? null, model.PurchasePaymentsCollection);
 
 			if (!isSupplierOrderPaymentEdit) return BadRequest();
-
 			return View();
 		}
 		public IActionResult ProductsOnStock(ProductAvailabilityViewModel model)
@@ -766,15 +769,34 @@ namespace SSMO.Controllers
 				return View(model);
 			}
 
-			var fscClaims = productService.FscClaimList();
-			var fscCertificates = myCompanyService.MyCompaniesFscList();
-			var myCompanies = myCompanyService.GetCompaniesNames();
-
-			model.FSCCertificates = fscCertificates;
+			var fscClaims = productService.FscClaimList();		
+			
 			model.FscClaims = fscClaims;
-			model.MyCompanies = myCompanies;
+			model.MyCompanies = myCompanyService.GetCompaniesNameAndId();
+			model.MyCompany = myCompanyService.GetCompanyName(model.MyCompanyId);
 
-			return View();
+			if(model.PurchaseOrSell == "Purchase")
+			{
+                var purchaseProductsCollection = productService.PurchaseProductFscCollection
+                (model.MyCompanyId, model.StartDate, model.EndDate, model.FSCClaim);
+
+                model.PurchaseProducts = purchaseProductsCollection;
+                model.TotalProducts = purchaseProductsCollection.Count();
+                model.SoldProducts = new List<SoldProductsFscCollectionViewModel>();
+            }
+			else if(model.PurchaseOrSell == "Sell")
+			{
+                var soldProductsCollection = productService.SoldProductFscCollection
+                                (model.MyCompanyId, model.StartDate, model.EndDate, model.FSCClaim);
+
+                model.SoldProducts = soldProductsCollection;
+                model.TotalProducts = soldProductsCollection.Count();
+				
+				model.PurchaseProducts = new List<PurchaseProductFscCollectionViewModel>();
+            }
+			
+			ClientService.AddFscReport(model);
+            return View(model);
 		}
 		public IActionResult AllInvoices([FromQuery] InvoicesViewModel model)
 		{
@@ -789,8 +811,8 @@ namespace SSMO.Controllers
 			model.MyCompanyNames = myCompanyNames;
 
 			var invoiceCollection = reportService.InvoiceCollection
-				(model.MyCompanyName,
-				 model.CurrentPage,
+				(model.MyCompanyName, model.StartDate, model.EndDate,
+                 model.CurrentPage,
 				 InvoicesViewModel.InvoicesPerPage);
 
 			model.InvoiceCollection = invoiceCollection.InvoiceCollection;
@@ -1317,11 +1339,6 @@ namespace SSMO.Controllers
 			return RedirectToAction("AllPurchases");
 		}
 
-		public IActionResult FscReport()
-		{
-			return View();
-		}
-
 		[HttpGet]
 		public async Task<IActionResult> ExportInvoiceToPdf()
 		{
@@ -1638,5 +1655,182 @@ namespace SSMO.Controllers
 			}
 
 		}
-	} 
+
+		public FileResult ExportFscToExcel()
+		{
+            ProductsFscCollectionViewModel fscReport = ClientService.GetFscReport();
+
+            using (var excelDocument = new XLWorkbook())
+            {
+                IXLWorksheet worksheet = excelDocument.Worksheets.Add("FscReport");
+
+                worksheet.Cell(1, 1).Value = "Company Name";
+                worksheet.Cell(1, 2).Value = "From";
+                worksheet.Cell(1, 3).Value = "To";
+                worksheet.Cell(1, 4).Value = "Fsc claim";
+				worksheet.Cell(1, 5).Value = "Subject";
+                worksheet.Cell(2, 1).Value = fscReport.MyCompany;
+                worksheet.Cell(2, 2).Value = fscReport.StartDate;
+                worksheet.Cell(2, 3).Value = fscReport.EndDate;
+                worksheet.Cell(2, 4).Value = fscReport.FSCClaim;
+                worksheet.Cell(2, 5).Value = fscReport.PurchaseOrSell;
+                int i = 4;
+				
+				if(fscReport.PurchaseOrSell == "Purchase")
+				{
+					worksheet.Cell(i, 1).Value = "Supplier Name";
+					worksheet.Cell(i, 2).Value = "Invoice No";
+					worksheet.Cell(i, 3).Value = "Date";
+					worksheet.Cell(i, 4).Value = "Fsc Claim";
+					worksheet.Cell(i, 5).Value = "Description";
+					worksheet.Cell(i, 6).Value = "Purchase Quantity";
+					worksheet.Cell(i, 7).Value = "Unit";
+					worksheet.Cell(i, 8).Value = "Trasnport";
+                    
+                    foreach (var fsc in fscReport.PurchaseProducts)
+					{
+                        i++;
+                        worksheet.Cell(i, 1).Value = fsc.SupplierName;
+                        worksheet.Cell(i, 2).Value = fsc.PurchaseInvoice;
+                        worksheet.Cell(i, 3).Value = fsc.PurchaseDate;
+                        worksheet.Cell(i, 4).Value = fsc.FscClaim;
+                        worksheet.Cell(i, 5).Value = fsc.Description;
+                        worksheet.Cell(i, 6).Value = fsc.Quantity;
+                        worksheet.Cell(i, 7).Value = fsc.Unit;
+                        worksheet.Cell(i, 8).Value = fsc.Transport;
+
+                    }
+					
+				}
+				else if (fscReport.PurchaseOrSell == "Sell")
+				{
+                   
+                    worksheet.Cell(i, 1).Value = "Customer Name";
+                    worksheet.Cell(i, 2).Value = "Invoice No";
+                    worksheet.Cell(i, 3).Value = "Date";
+                    worksheet.Cell(i, 4).Value = "Fsc Claim";
+                    worksheet.Cell(i, 5).Value = "Description";
+                    worksheet.Cell(i, 6).Value = "Quantity";
+                    worksheet.Cell(i, 7).Value = "Unit";
+                    worksheet.Cell(i, 8).Value = "Trasnport";
+
+                    foreach (var fsc in fscReport.SoldProducts)
+                    {
+                        i++;
+                        worksheet.Cell(i, 1).Value = fsc.CustomerName;
+                        worksheet.Cell(i, 2).Value = fsc.InvoiceNumber;
+                        worksheet.Cell(i, 3).Value = fsc.Date;
+                        worksheet.Cell(i, 4).Value = fsc.FscClaim;
+                        worksheet.Cell(i, 5).Value = fsc.Description;
+                        worksheet.Cell(i, 6).Value = fsc.Quantity;
+                        worksheet.Cell(i, 7).Value = fsc.Unit;
+                        worksheet.Cell(i, 8).Value = fsc.Transport;
+                    }
+                }
+               
+                IXLRange range = worksheet.Range(worksheet.Cell(1, 1).Address, worksheet.Cell(1, 5).Address);
+                range.Style.Fill.SetBackgroundColor(XLColor.TurquoiseGreen);
+
+                IXLRange rangeOne = worksheet.Range(worksheet.Cell(4, 1).Address, worksheet.Cell(4, 8).Address);
+                rangeOne.Style.Fill.SetBackgroundColor(XLColor.Alizarin);
+
+                using (var stream = new MemoryStream())
+                {
+                    excelDocument.SaveAs(stream);
+                    var content = stream.ToArray();
+                    string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                    var strDate = DateTime.Now.ToString("yyyyMMdd");
+                    string filename = string.Format($"FscReport_{strDate}.xlsx");
+
+                    return File(content, contentType, filename);
+                }
+            }
+        }
+
+        public FileResult ExportPurchasePaymentToExcel()
+        {
+            SupplierOrdersPaymentReportViewModel payments = ClientService.GetPurchasePayments();
+
+            using (var excelDocument = new XLWorkbook())
+            {
+                IXLWorksheet worksheet = excelDocument.Worksheets.Add("PaymentsToSuppliers");
+                int row = 1;
+                for (int i = 0; i < payments.SupplierOrderPaymentCollection.Count(); i++)
+				{
+                    worksheet.Cell(row, 1).Value = "Supplier Order";
+                    worksheet.Cell(row, 2).Value = "Date";
+                    worksheet.Cell(row, 3).Value = "Payment status";
+                    worksheet.Cell(row, 4).Value = "Amount";
+                    worksheet.Cell(row, 5).Value = "Currency";
+                    worksheet.Cell(row, 6).Value = "Balance";
+                    worksheet.Cell(row, 7).Value = "Advance Payment";
+                    worksheet.Cell(row, 8).Value = "Date Paid advance";
+					row++;
+					worksheet.Cell(row, 1).Value = payments.SupplierOrderPaymentCollection.ElementAt(i).SupplierOrderNumber;
+                    worksheet.Cell(row, 2).Value = payments.SupplierOrderPaymentCollection.ElementAt(i).Date;
+                    worksheet.Cell(row, 3).Value = payments.SupplierOrderPaymentCollection.ElementAt(i).PaidStatus;
+                    worksheet.Cell(row, 4).Value = payments.SupplierOrderPaymentCollection.ElementAt(i).TotalAmount;
+                    worksheet.Cell(row, 5).Value = payments.SupplierOrderPaymentCollection.ElementAt(i).PurchaseCurrency;
+                    worksheet.Cell(row, 6).Value = payments.SupplierOrderPaymentCollection.ElementAt(i).Balance;
+                    worksheet.Cell(row, 7).Value = payments.SupplierOrderPaymentCollection.ElementAt(i).PaidAvance;
+                    worksheet.Cell(row, 8).Value = payments.SupplierOrderPaymentCollection.ElementAt(i).DatePaidAmount;
+					row++;
+					worksheet.Cell(row, 1).Value = "Payments";
+                    row++;
+                    for (int j = 0; j < payments.SupplierOrderPaymentCollection.ElementAt(i).Payments.Count(); j++)
+					{
+                        worksheet.Cell(row, 1).Value = "Paid amount";
+                        worksheet.Cell(row, 2).Value = "Date";
+                        row++;
+                        worksheet.Cell(row, 1).Value = payments.SupplierOrderPaymentCollection.ElementAt(i).Payments.ElementAt(j).PaidAmount;
+                        worksheet.Cell(row, 2).Value = payments.SupplierOrderPaymentCollection.ElementAt(i).Payments.ElementAt(j).Date;
+						row++;
+                    }
+                    worksheet.Cell(row,1).Value = "Purchase payments";
+                    foreach (var payment in payments.SupplierOrderPaymentCollection.ElementAt(i).PurchasePaymentsCollection)
+                    {
+                        row++;
+                        worksheet.Cell(row, 1).Value = "Purchase invoice";
+                        worksheet.Cell(row, 2).Value = "Balance";
+                        worksheet.Cell(row, 3).Value = "Advance payment";
+                        worksheet.Cell(row, 4).Value = "Date";
+                        row++;
+                        worksheet.Cell(row, 1).Value = payment.PurchaseNumber;
+                        worksheet.Cell(row, 2).Value = payment.Balance;
+                        worksheet.Cell(row, 3).Value = payment.PaidAdvance;
+                        worksheet.Cell(row, 4).Value = payment.DatePaidAmount;
+
+                        foreach (var item in payment.PurchasePaymentsDetails)
+                        {
+                            row++;
+                            worksheet.Cell(row, 1).Value = "Paid amount";
+                            worksheet.Cell(row, 2).Value = "Date";
+                            row++;
+                            worksheet.Cell(row, 1).Value = item.PaidAmount;
+                            worksheet.Cell(row, 2).Value = item.Date;
+                        }
+                    }
+                }
+
+                IXLRange range = worksheet.Range(worksheet.Cell(1, 1).Address, worksheet.Cell(1, 8).Address);
+                range.Style.Fill.SetBackgroundColor(XLColor.BlueGreen);
+                
+                using (var stream = new MemoryStream())
+                {
+                    excelDocument.SaveAs(stream);
+                    var content = stream.ToArray();
+                    string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                    var strDate = DateTime.Now.ToString("yyyyMMdd");
+                    string filename = string.Format($"PaymentsToSuppliers_{strDate}.xlsx");
+
+                    return File(content, contentType, filename);
+                }
+
+            }
+
+        }
+
+    }
 }
