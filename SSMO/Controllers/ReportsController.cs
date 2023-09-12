@@ -517,7 +517,7 @@ namespace SSMO.Controllers
 			}
 
 			var updatedInvoicePayment = invoiceService.EditInvoicePayment
-				(documentNumber, model.PaidStatus, model.PaidAvance, model.DatePaidAmount);
+				(documentNumber, model.PaidStatus, model.PaidAvance, model.DatePaidAmount, model.CustomerOrderId);
 
 			if (updatedInvoicePayment == false)
 			{
@@ -595,6 +595,7 @@ namespace SSMO.Controllers
 			}
 			return RedirectToAction("Index", "Home");
 		}
+		
 		public IActionResult CustomerOrdersPaymentReport(CustomerOrderPaymentReportViewModel model)
 		{
 			if (model.CustomerName != null)
@@ -620,7 +621,6 @@ namespace SSMO.Controllers
 			model.TotalCustomerOrders = customerOrdersPaymentCollection.TotalCustomerOrders;
 			return View(model);
 		}
-
 		[HttpGet]
 		[Authorize]
 		public IActionResult EditCustomerOrderPayment(int orderConfirmationNumber)
@@ -657,7 +657,7 @@ namespace SSMO.Controllers
 			}
 
 			var updatedCustomerOrderPayment = customerOrderService.EditCustomerOrdersPayment
-				(orderConfirmationNumber, model.PaidStatus, model.PaidAvance);
+				(orderConfirmationNumber, model.PaidStatus, model.Payment, model.Date);
 
 			if (updatedCustomerOrderPayment == false)
 			{
@@ -1445,7 +1445,23 @@ namespace SSMO.Controllers
 				worksheet.Cell(2, 1).Value = "Date";
 				worksheet.Cell(2, 2).Value = invoice.Date;
 
-				worksheet.Cell(4, 1).Value = "Customer";
+                if (invoice.DocumentType == Data.Enums.DocumentTypes.CreditNote.ToString())
+                {				
+
+                    worksheet.Cell(3, 1).Value = "Към фактура";
+                    worksheet.Cell(3, 2).Value = invoice.CreditToInvoice;
+                    worksheet.Cell(3, 3).Value = "Дата";
+                    worksheet.Cell(3, 4).Value = invoice.CreditToInvoiceDate;
+                }
+                else if (invoice.DocumentType == Data.Enums.DocumentTypes.DebitNote.ToString())
+                {
+                    worksheet.Cell(3, 1).Value = "Към фактура";
+                    worksheet.Cell(3, 2).Value = invoice.DebitToInvoice;
+                    worksheet.Cell(3, 3).Value = "Дата";
+                    worksheet.Cell(3, 4).Value = invoice.DebitToInvoiceDate;
+                }
+
+                worksheet.Cell(4, 1).Value = "Customer";
 				worksheet.Cell(4, 2).Value = invoice.Customer.Name;
 				worksheet.Cell(4, 7).Value = "Seller";
 				worksheet.Cell(4, 8).Value = invoice.Seller.Name;
@@ -1536,6 +1552,15 @@ namespace SSMO.Controllers
 				worksheet.Cell(row, 2).Value = invoice.TotalAmount;
 				row++;
 
+				worksheet.Cell(row, 1).Value = "Deal Type";
+				worksheet.Cell(row, 2).Value = invoice.DealTypeEng;
+				row++;
+				worksheet.Cell(row, 1).Value = "Description of the deal";
+				worksheet.Cell(row, 2).Value = invoice.DealDescriptionEng;
+				row++;
+				worksheet.Cell(row, 1).Value = "Event date";
+				worksheet.Cell(row,2).Value = invoice.Date.ToShortTimeString();
+
 				foreach (var bank in invoice.CompanyBankDetails)
 				{
 					row++;
@@ -1563,7 +1588,138 @@ namespace SSMO.Controllers
 			}
 		}
 
-		public FileResult ExportProductsToExcel()
+        public FileResult ExportToExcelBg()
+        {
+            BgInvoiceViewModel invoice = ClientService.GetBgInvoice();
+
+            using (var excelDocument = new XLWorkbook())
+            {
+                IXLWorksheet worksheet = excelDocument.Worksheets.Add("Фактура");
+                worksheet.Cell(1, 1).Value = "Фактура No";
+                worksheet.Cell(1, 2).Value = invoice.DocumentNumber;
+                worksheet.Cell(2, 1).Value = "Дата";
+                worksheet.Cell(2, 2).Value = invoice.Date;
+
+				if(invoice.DocumentType == Data.Enums.DocumentTypes.CreditNote.ToString())
+				{
+					worksheet.Cell(3, 1).Value = "Към фактура";
+					worksheet.Cell(3, 2).Value = invoice.CreditToInvoiceNumber;
+					worksheet.Cell(3, 3).Value = "Дата";
+					worksheet.Cell(3, 4).Value = invoice.CreditToInvoiceDate;
+				}
+                else if (invoice.DocumentType ==  Data.Enums.DocumentTypes.DebitNote.ToString())
+                {
+                    worksheet.Cell(3, 1).Value = "Към фактура";
+                    worksheet.Cell(3, 2).Value = invoice.DebitToInvoiceNumber;
+                    worksheet.Cell(3, 3).Value = "Дата";
+                    worksheet.Cell(3, 4).Value = invoice.DebitToInvoiceDate;
+                }
+
+                worksheet.Cell(4, 1).Value = "Клиент";
+                worksheet.Cell(4, 2).Value = invoice.BgCustomer.BgName;
+                worksheet.Cell(4, 7).Value = "Доставчик";
+                worksheet.Cell(4, 8).Value = invoice.BgMyCompany.BgName;
+
+                worksheet.Cell(5, 1).Value = "EИК No";
+                worksheet.Cell(5, 2).Value = invoice.BgCustomer.EIK;
+                worksheet.Cell(5, 7).Value = "ЕИК No";
+                worksheet.Cell(5, 8).Value = invoice.BgMyCompany.EIK;
+
+                worksheet.Cell(6, 1).Value = "ДДС No";
+                worksheet.Cell(6, 2).Value = invoice.BgCustomer.VAT;
+                worksheet.Cell(6, 7).Value = "ДДС No";
+                worksheet.Cell(6, 8).Value = invoice.BgMyCompany.VAT;
+
+                worksheet.Cell(7, 1).Value = "Адрес";
+                worksheet.Cell(7, 2).Value = invoice.BgCustomer.ClientAddress.BgCountry;
+                worksheet.Cell(7, 3).Value = invoice.BgCustomer.ClientAddress.BgCity;
+                worksheet.Cell(7, 4).Value = invoice.BgCustomer.ClientAddress.BgStreet;
+                worksheet.Cell(7, 7).Value = "Адрес";
+                worksheet.Cell(7, 8).Value = invoice.BgMyCompany.BgCountry;
+                worksheet.Cell(7, 9).Value = invoice.BgMyCompany.BgCity;
+                worksheet.Cell(7, 10).Value = invoice.BgMyCompany.BgStreet;
+             
+                worksheet.Cell(9, 1).Value = "No";
+                worksheet.Cell(9, 2).Value = "Description";
+                worksheet.Cell(9, 3).Value = "Grade";
+                worksheet.Cell(9, 4).Value = "Size";
+                worksheet.Cell(9, 5).Value = "FSC Claim";
+                worksheet.Cell(9, 6).Value = "FSC Certificate";
+                worksheet.Cell(9, 7).Value = "Unit";
+                worksheet.Cell(9, 8).Value = "Quantity";
+                worksheet.Cell(9, 9).Value = "Unit Price";
+                worksheet.Cell(9, 10).Value = "Amount";
+
+                IXLRange range = worksheet.Range(worksheet.Cell(9, 1).Address, worksheet.Cell(9, 10).Address);
+                range.Style.Fill.SetBackgroundColor(XLColor.TurquoiseGreen);
+
+                int row = 10;
+               int i = 1;
+
+                foreach (var product in invoice.BgProducts)
+                {
+                    worksheet.Cell(row, 1).Value = i;
+                    worksheet.Cell(row, 2).Value = product.BgDescription;
+                    worksheet.Cell(row, 3).Value = product.Grade;
+                    worksheet.Cell(row, 4).Value = product.Size;
+                    worksheet.Cell(row, 5).Value = product.FSCClaim;
+                    worksheet.Cell(row, 6).Value = product.FSCSertificate;
+                    worksheet.Cell(row, 7).Value = product.Unit.ToString();
+                    worksheet.Cell(row, 8).Value = product.InvoicedQuantity;
+                    worksheet.Cell(row, 9).Value = product.BgPrice;
+                    worksheet.Cell(row, 10).Value = product.BgAmount;
+
+                    row++;
+                    i++;
+                }
+
+                row++;
+                worksheet.Cell(row, 1).Value = "Сума без ДДС";
+                worksheet.Cell(row, 2).Value = invoice.Amount;
+                row++;
+                worksheet.Cell(row, 1).Value = "ДДС %";
+                worksheet.Cell(row, 2).Value = invoice.VatAmount;
+                row++;
+                worksheet.Cell(row, 1).Value = "Обща сума";
+                worksheet.Cell(row, 2).Value = invoice.TotalAmount;
+                row++;
+
+                worksheet.Cell(row, 1).Value = "Основание на сделката";
+                worksheet.Cell(row, 2).Value = invoice.DealTypeBg;
+                row++;
+                worksheet.Cell(row, 1).Value = "Описание на сделката";
+                worksheet.Cell(row, 2).Value = invoice.DealDescriptionBg;
+                row++;
+                worksheet.Cell(row, 1).Value = "Дата на данъчно събитие";
+                worksheet.Cell(row, 2).Value = invoice.Date.ToShortTimeString();
+
+                foreach (var bank in invoice.CompanyBankDetails)
+                {
+                    row++;
+                    worksheet.Cell(row, 1).Value = "Currency";
+                    worksheet.Cell(row, 2).Value = bank.Currency;
+                    worksheet.Cell(row, 3).Value = "Bank";
+                    worksheet.Cell(row, 4).Value = bank.BankName;
+                    worksheet.Cell(row, 5).Value = "IBAN";
+                    worksheet.Cell(row, 6).Value = bank.Iban;
+                    worksheet.Cell(row, 7).Value = "Swift";
+                    worksheet.Cell(row, 8).Value = bank.Swift;
+                }
+
+                using (var stream = new MemoryStream())
+                {
+                    excelDocument.SaveAs(stream);
+                    var content = stream.ToArray();
+                    string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                    var strDate = DateTime.Now.ToString("yyyyMMdd");
+                    string filename = string.Format($"Invoice_{strDate}.xlsx");
+
+                    return File(content, contentType, filename);
+                }
+            }
+        }
+        public FileResult ExportProductsToExcel()
 		{
 			IEnumerable<ProductAvailabilityDetailsViewModel> products = ClientService.GetProductOnStock();
 

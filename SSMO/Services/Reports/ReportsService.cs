@@ -135,6 +135,32 @@ namespace SSMO.Services.Reports
 
             var invoices = queryInvoices.ProjectTo<CustomerInvoicePaymentDetailsModel>(this.mapper).ToList();
 
+            foreach (var invoice in invoices)
+            {
+                invoice.CustomerOrders = dbcontext.CustomerOrders
+                               .Where(i => invoice.Id == i.Documents.Select(a => a.Id).FirstOrDefault())
+                               .Select(i => new CustomerOrdersPaymentDetailsPerInvoice
+                               {
+                                   Id = i.Id,
+                                   OrderConfirmationNumber = i.OrderConfirmationNumber,
+                                   PaidAvance = i.PaidAvance,    
+                                   Payments = i.Payments.Select(a=> new PaymentViewModel
+                                   {
+                                       PaidAmount = a.PaidAmount,
+                                       Date = a.Date
+                                   }).ToList()
+                               })
+                               .ToList();   
+                
+                invoice.Payments = dbcontext.Payments
+                    .Where(i=>i.DocumentId == invoice.Id)
+                    .Select(i=> new PaymentViewModel
+                    {
+                        PaidAmount = i.PaidAmount,
+                        Date = i.Date
+                    }).ToList();
+             }
+
             var customerPaymentList = invoices.Skip((currentpage - 1) * customerInvoicePerPage).Take(customerInvoicePerPage);
 
             var custpmerOrdersPayments = new CustomerInvoicesPaymentCollectionViewModel
@@ -334,6 +360,58 @@ namespace SSMO.Services.Reports
             var incustomerOrdersCollectionvoices = customerOrders.ProjectTo<CustomerOrderDetailsPaymentModel>(this.mapper).ToList();
 
             var customerOrdersPaymentList = incustomerOrdersCollectionvoices.Skip((currentpage - 1) * customerOrdersPerPage).Take(customerOrdersPerPage);
+
+            foreach (var customerOrder in customerOrdersPaymentList)
+            {
+                var customerOrderPayments = dbcontext.Payments
+                    .Where(i => i.CustomerOrderId == customerOrder.Id)
+                    .Select(i => new CustomerOrderPaymentsDetailsViewModel
+                    {
+                        PaidAmount= i.PaidAmount,
+                        DatePaidAmount = i.Date,
+                    }).ToList();
+
+                customerOrder.CustomerOrderPayments= customerOrderPayments;
+
+                var invoices = dbcontext.CustomerOrders
+                    .Where(i=>i.Id == customerOrder.Id)
+                    .Select(i=>i.Documents)
+                    .FirstOrDefault();
+
+                if (invoices != null)
+                {
+                    var invoicesPaymentDetailsCollection = new List<CustomerOrderInvoicesPaymentDetailsViewModel>();
+                    foreach (var invoice in invoices)
+                    {
+                        var detail = new CustomerOrderInvoicesPaymentDetailsViewModel
+                        {
+                            AdvancePayment = invoice.PaidAvance,
+                            DateAdvancePayment = invoice.DatePaidAmount,
+                            DocumentNumber = invoice.DocumentNumber,
+                            Date = invoice.Date,
+                            Payments = new List<CustomerOrderInvoicesPaymentCollectionViewModel>()
+                        };
+
+                       var payments = dbcontext.Payments
+                            .Where(i=>i.DocumentId == invoice.Id)
+                            .ToList();  
+                        if(payments != null)
+                        {
+                            detail.Payments = payments
+                                .Select(i=> new CustomerOrderInvoicesPaymentCollectionViewModel
+                            {
+                                Date = i.Date,
+                                Payment = i.PaidAmount
+                            })
+                                .ToList();
+                        }
+
+                        invoicesPaymentDetailsCollection.Add(detail);
+                    }
+
+                    customerOrder.InvoicesDetails = invoicesPaymentDetailsCollection;
+                }
+            }
             
             var customerOrdersPayments = new CustomerOrderPaymentCollectionViewModel
             {
@@ -636,7 +714,7 @@ namespace SSMO.Services.Reports
                     .Select(num => num.DocumentNumber)
                     .FirstOrDefault();
 
-               invoiceDetails.CreditToInvoiceId= invoiceNumber;
+               invoiceDetails.CreditToInvoice= invoiceNumber;
 
             }
             else if(invoiceDetails.DocumentType == Data.Enums.DocumentTypes.DebitNote.ToString())
@@ -651,7 +729,7 @@ namespace SSMO.Services.Reports
                     .Select(num => num.DocumentNumber)
                     .FirstOrDefault();
 
-                invoiceDetails.DebitToInvoiceId = invoiceNumber;
+                invoiceDetails.DebitToInvoice = invoiceNumber;
             }
 
             foreach (var product in productsDetails)

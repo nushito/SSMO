@@ -38,6 +38,7 @@ namespace SSMO.Infrastructure
             this.CreateMap<CustomerOrder, CustomerOrderDetailsPaymentModel>();
             this.CreateMap<CustomerOrder, EditCustomerOrderPaymentModel>();
             this.CreateMap<CustomerOrder, CustomerOrderForInvoiceViewModel>();
+            this.CreateMap<CustomerOrder, CustomerOrdersPaymentDetailsPerInvoice>();
 
             this.CreateMap<Product, ProductCustomerFormModel>()
                 .ForMember(a=>a.Quantity, b=>b.MapFrom(a=>a.OrderedQuantity))
@@ -93,7 +94,7 @@ namespace SSMO.Infrastructure
 
             this.CreateMap<Payment, SupplierPaymentDetailsViewModel>();
             this.CreateMap<Payment, PurchaseAllPaymentsViewModel>();
-
+            this.CreateMap<Payment, PaymentViewModel>();
 
         }
     }

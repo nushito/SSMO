@@ -34,12 +34,16 @@ namespace SSMO.Models.Reports.Invoice
         public int? VAT { get; set; }
         public decimal VatAmount { get; set; }
         public decimal TotalAmount { get; set; }
+        public int CreditToInvoice { get; set; }
         public int CreditToInvoiceId { get; set; }       
         public decimal CreditNoteTotalAmount { get; set; }
         public DateTime CreditToInvoiceDate { get; set; }
+        public int DebitToInvoice { get; set; }
         public int DebitToInvoiceId { get; set; }       
         public decimal DebitNoteTotalAmount { get; set; }
         public DateTime DebitToInvoiceDate { get; set; }
+        public string DealTypeEng { get; set; }
+        public string DealDescriptionEng { get; set; }
         public ICollection<InvoiceBankDetailsModel> CompanyBankDetails { get; set; }
         public IEnumerable<InvoiceProductsDetailsViewModel> Products { get; set; }
     }

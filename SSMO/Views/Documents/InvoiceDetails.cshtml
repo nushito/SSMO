@@ -84,6 +84,48 @@
         <label asp-for="CurrencyExchangeRateUsdToBGN">Currency Exchange Rate to BGN</label>
         <input asp-for="CurrencyExchangeRateUsdToBGN" type="number"  min="0.00000" step="0.00001" class="form-control" >
     </div>
+     <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="DealTypeEng">Deal Type Eng</label>
+            <select asp-for="DealTypeEng" class="form-control">
+            <option value="-">-</option>
+            <option value="0% VAT according to article 21, p.2 from Bulgarian VAT Law">0% VAT according to article 21, p.2 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article.69, p.2 from Bulgarian VAT Law">0% VAT according to article.69, p.2 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article 53, p.1 from Bulgarian VAT Law">0% VAT according to article 53, p.1 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article 141 2006/112/ЕО from Bulgarian VAT Law">0% VAT according to article 141 2006/112/ЕО from Bulgarian VAT Law</option>    
+         </select>
+    </div>
+        <div class="form-group col-md-4">
+            <label asp-for="DealDescriptionEng">Deal Description</label>
+            <select asp-for="DealDescriptionEng" class="form-control">
+            <option value="-">-</option>
+            <option value="Participates in a VIES declaration">Participates in a VIES declaration</option>
+           <option value=" 	Agent in Third party"> 	Agent in Third party</option>
+            <option value="Participates in a VIES declaration, but not in Intrastat Declaration">Participates in a VIES declaration, but not in Intrastat Declaration</option>
+          </select>
+        </div>
+    </div>
+     <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="DealTypeBg">Deal Type Bg</label>
+            <select asp-for="DealTypeBg" class="form-control">
+            <option value="-">-</option>
+            <option value="0% ДДС съгласно чл.21, т.2 от ЗДДС">0% ДДС съгласно чл.21, т.2 от ЗДДС</option>
+           <option value="0% ДДС съгласно чл.69, т.2 от ЗДДС">0% ДДС съгласно чл.69, т.2 от ЗДДС</option>
+           <option value="0% ДДС съгласно чл.53, т.1 от ЗДДС">0% ДДС съгласно чл.53, т.1 от ЗДДС</option>
+           <option value="0% ДДС съгласно чл.141 2006/112/ЕО от ЗДДС ">0% ДДС съгласно чл.141 2006/112/ЕО от ЗДДС </option>    
+         </select>
+    </div>
+        <div class="form-group col-md-4">
+            <label asp-for="DealDescriptionBg">Deal Description</label>
+            <select asp-for="DealDescriptionBg" class="form-control">
+            <option value="-">-</option>
+            <option value="Участва във ВИЕС декларация">Участва във ВИЕС декларация</option>
+           <option value="Агент в тристранна операция"> Агент в тристранна операция</option>
+            <option value="Участва във ВИЕС декларация, но не и в Интрастат Декларация">Участва във ВИЕС декларация, но не и в Интрастат Декларация</option>
+          </select>
+        </div>
+    </div>
      <div class="row col-md-4">        
                <label asp-for="Comment">Comment</label>
         <input asp-for="Comment" type="text"  class="form-control" />

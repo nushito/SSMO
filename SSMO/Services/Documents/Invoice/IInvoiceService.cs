@@ -15,10 +15,12 @@ namespace SSMO.Services.Documents.Invoice
             DateTime date, decimal currencyExchangeRateUsdToBGN,
             int number,string myCompanyName, string truckNumber, decimal deliveryCost, string swb, 
             decimal netWeight, decimal grossWeight,string incoterms, int customerId, int currencyId, int vat, 
-            int myCompanyId, string comment, string deliveryAddress);
+            int myCompanyId, string comment, string deliveryAddress, 
+            string dealTypeEng, string dealTypeBg, string descriptionEng, string descriptionBg);
         public bool CheckFirstInvoice(int myCompanyId);
         public EditInvoicePaymentModel InvoiceForEditByNumber(int documentNumber);
-        public bool EditInvoicePayment(int documentNumber, bool paidStatus, decimal paidAdvance, DateTime datePaidAmount);
+        public bool EditInvoicePayment(int documentNumber, bool paidStatus, decimal paidAdvance, 
+            DateTime? datePaidAmount, int customerOrderId);
         public ICollection<InvoiceNumbersJsonList> GetInvoiceDocumentNumbers(int id);
         public BgInvoiceViewModel CreateBgInvoiceForPrint
             (int documentNumber);       

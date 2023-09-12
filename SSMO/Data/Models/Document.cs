@@ -80,6 +80,10 @@ namespace SSMO.Data.Models
         public decimal TotalQuantity { get; set; }
         public string Comment { get; set; }
         public string DeliveryAddress { get; set; }
+        public string DealTypeEng { get; set; }
+        public string DealDescriptionEng { get; set; }
+        public string DealTypeBg { get; set; }
+        public string DealDescriptionBg { get; set; }
         public ICollection<CustomerOrder> CustomerOrders { get; set; }
         public ICollection<PurchaseProductDetails> PurchaseProducts { get; set; }
         public ICollection<CustomerOrderProductDetails> CustomerOrderProducts { get; set; }

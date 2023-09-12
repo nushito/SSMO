@@ -11,5 +11,6 @@ namespace SSMO.Models.Reports.PaymentsModels
         public string CustomerName { get; set; }
         public IEnumerable<string> CustomerNames { get; set; }
         public IEnumerable<CustomerOrderDetailsPaymentModel> CustomerOrdersPaymentCollection { get; set; }
+       
     }
 }

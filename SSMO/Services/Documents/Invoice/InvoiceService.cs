@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using SSMO.Data;
 using SSMO.Data.Enums;
-using SSMO.Data.Migrations;
 using SSMO.Data.Models;
 using SSMO.Infrastructure;
 using SSMO.Models.Documents.CreditNote;
@@ -60,7 +59,8 @@ namespace SSMO.Services.Documents.Invoice
             DateTime date, decimal currencyExchangeRateUsdToBGN,
             int number, string myCompanyName, string truckNumber, decimal deliveryCost, string swb,
             decimal netWeight, decimal grossWeight, string incoterms,int customerId, int currencyId, int vat, 
-            int myCompanyId, string comment, string deliveryAddress)
+            int myCompanyId, string comment, string deliveryAddress,
+            string dealTypeEng, string dealTypeBg, string descriptionEng, string descriptionBg)
         {
             var loggedUser = httpContextAccessor.ContextAccessUserId();
             var myCompany = dbContext.MyCompanies
@@ -96,8 +96,18 @@ namespace SSMO.Services.Documents.Invoice
                 Swb = swb,
                 CustomerOrders = customerOrders,
                 Comment = comment,
-                DeliveryAddress = deliveryAddress
+                DeliveryAddress = deliveryAddress,
+                Payments = new List<Payment>(),
+                DealTypeEng = dealTypeEng,
+                DealTypeBg = dealTypeBg,
+                DealDescriptionEng = descriptionEng,
+                DealDescriptionBg = descriptionBg
             };
+
+            foreach (var item in customerOrders)
+            {
+                item.Documents.Add(invoiceCreate);
+            }
          
             invoiceCreate.Amount = products.Where(q=>q.InvoicedQuantity > 0).Sum(o => o.Amount);
             invoiceCreate.VatAmount = invoiceCreate.Amount * vat / 100;
@@ -421,20 +431,41 @@ namespace SSMO.Services.Documents.Invoice
         }
         public EditInvoicePaymentModel InvoiceForEditByNumber(int documentNumber)
         {
-            return dbContext.Documents
-                .Where(i => i.DocumentNumber == documentNumber)
+            var invoice = dbContext.Documents
+                .Where(i => i.DocumentNumber == documentNumber && i.DocumentType == DocumentTypes.Invoice);
+            if (invoice == null) { return null; }
+
+            var invoiceForPayment = invoice
                 .Select(n => new EditInvoicePaymentModel
-                {
+                {   
+                    Id = n.Id,
                     DocumentNumber = n.DocumentNumber,
                     Date = n.Date,
                     PaidAvance = n.PaidAvance,
                     Balance = n.Balance,
-                    DatePaidAmount = (DateTime)(n.DatePaidAmount),
+                    DatePaidAmount = (DateTime)n.DatePaidAmount,
                     PaidStatus = n.PaidStatus
                 }).FirstOrDefault();
+
+            var checkOrder = dbContext.Documents
+                .Where(a=>a.Id == invoiceForPayment.Id)
+                .Select(c=>c.CustomerOrders)
+                .FirstOrDefault();
+
+            var customerOrders = checkOrder
+                .Select(i=> new CustomerOrdersNumbersCollection
+                {
+                    Id= i.Id,
+                    OrderConfirmationNumber= i.OrderConfirmationNumber
+                })
+                .ToList();
+
+            invoiceForPayment.CustomerOrders = customerOrders;
+
+            return invoiceForPayment;
         }
         public bool EditInvoicePayment
-            (int documentNumber, bool paidStatus, decimal paidAdvance, DateTime datePaidAmount)
+            (int documentNumber, bool paidStatus, decimal paidAdvance, DateTime? datePaidAmount, int customerOrderId)
         {
             if (documentNumber == 0)
             {
@@ -442,17 +473,37 @@ namespace SSMO.Services.Documents.Invoice
             }
 
             var invoice = dbContext.Documents
-                .Where(i => i.DocumentNumber == documentNumber)
+                .Where(i => i.DocumentNumber == documentNumber && i.DocumentType == DocumentTypes.Invoice)
                 .FirstOrDefault();
 
-            invoice.PaidAvance = paidAdvance;
-            invoice.DatePaidAmount = datePaidAmount;
-            invoice.PaidStatus = paidStatus;
+            var customerOrder = dbContext.CustomerOrders
+                .Where(i => i.Id == customerOrderId)
+                .FirstOrDefault();
 
+            if(customerOrder != null )
+            {
+                customerOrder.Balance -= paidAdvance;
+                if(customerOrder.Balance < 0.001m)
+                {
+                    customerOrder.PaidAmountStatus = true;
+                }
+            }
+
+            var payment = new Payment
+            {
+                DocumentId = invoice.Id,
+                Date = (DateTime)datePaidAmount,
+                PaidAmount = paidAdvance
+            };
+
+            dbContext.Payments.Add(payment);
+            invoice.Payments.Add(payment);
+
+            invoice.PaidStatus = paidStatus;
 
             invoice.Balance = invoice.TotalAmount - paidAdvance;
 
-            if (invoice.Balance > 0)
+            if (invoice.Balance > 0.001m)
             {
                 invoice.PaidStatus = false;
             }
@@ -519,7 +570,9 @@ namespace SSMO.Services.Documents.Invoice
                 Date = invoice.Date,
                 Amount = invoice.Amount * currencyExchange,
                 Vat = invoice.Vat,
-                VatAmount = invoice.Amount * currencyExchange * invoice.Vat / 100 ?? 0,               
+                VatAmount = invoice.Amount * currencyExchange * invoice.Vat / 100 ?? 0,    
+                DealTypeBg= invoice.DealTypeBg,
+                DealDescriptionBg= invoice.DealDescriptionBg,
                 BgProducts = new List<BGProductsForBGInvoiceViewModel>(),
                 BgCustomer = new BGCustomerForInvoicePrint
                 {

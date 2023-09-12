@@ -45,9 +45,9 @@
                 }       
         <div class="col-xl-3 float-end">
           <a class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark"><i
-              class="fas fa-print text-primary"></i> Print</a>
-          <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark"><i
-              class="far fa-file-pdf text-danger"></i> Export</a>
+              class="fas fa-print text-primary"></i> Print</a>            
+          <a class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportToExcelBg"><i
+              class="fas fa-print text-primary"></i> Excel</a>
         </div>
         <hr>
       </div>
@@ -149,15 +149,22 @@
         <hr>
          <table class="table-borderless">
             <tr>
-                        @foreach (var bank in Model.CompanyBankDetails)
-                        {
-                      <td class="px-3 mr-5">
-                            Currency:@bank.Currency<br>
-                            Bank:@bank.BankName<br>
-                            IBAN:@bank.Iban<br>
-                            SWIFT:@bank.Swift
-                        </td>
-                        }
+                <td class="px-3 mr-5">
+                    Дата на данъчно събитие: @Model.Date.ToShortDateString() <br />
+                    Основание на сделката: @Model.DealTypeBg <br />
+                    Описание на сделката: @Model.DealDescriptionBg
+                </td>
+                <td>
+                            @foreach (var bank in Model.CompanyBankDetails)
+                            {
+                             <td class="px-3 mr-5">
+                                Currency:@bank.Currency<br>
+                                Bank:@bank.BankName<br>
+                                IBAN:@bank.Iban<br/>
+                                SWIFT:@bank.Swift
+                            </td>
+                          }
+                </td>                       
             </tr>
         </table>
 

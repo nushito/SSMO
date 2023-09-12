@@ -7,6 +7,7 @@ namespace SSMO.Models.Reports.PaymentsModels
     public class PurchasePerOrderPaymentsViewModel
     {
         public int Id { get; set; }
+        public decimal Amount { get; set; }
         public decimal PaidAdvance { get; set; }
         public DateTime? DatePaidAmount { get; set; }
         public decimal Balance { get; set; }

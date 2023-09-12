@@ -55,8 +55,11 @@
 <table class="table">   
     <thead>
         <tr>
+            <th>
+                No
+            </th>
                 <th>
-                Invoice Number
+                Order Number
                 </th>
                 <th>
                     Date
@@ -76,14 +79,20 @@
                 <th>
                     Balance
                 </th>
+                <th>Following payments</th>
         </tr>
     </thead>
     <tbody>
+        @{
+            int i = 1;
+            int j = 1;
+        }
         @if(Model.CustomerOrdersPaymentCollection != null)
         {
             @foreach (var order in Model.CustomerOrdersPaymentCollection)
             {
-                <tr>
+                <tr style="background-color:lightyellow">
+                    <th>@i.</th>
                     <th> @order.OrderConfirmationNumber</th>
                     <th> @order.Date</th>
                     @if (@order.PaidStatus == true)
@@ -98,8 +107,74 @@
                     <th> @order.PaidAvance</th>
                     <th> @order.DatePaidAmount</th>
                     <th> @order.Balance</th>
+                            <th>@if (order.CustomerOrderPayments != null)
+                        {
+                            foreach (var payment in order.CustomerOrderPayments)
+                            {
+                                @payment.PaidAmount <p>-</p> @payment.DatePaidAmount <br />
+                            }
+                        }</th>
+                    
                    <th><a asp-controller="Reports" asp-action="EditCustomerOrderPayment" asp-route-orderConfirmationNumber="@order.OrderConfirmationNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
                 </tr>
+               
+                <tr>
+                     <th colspan="9">
+                       <p>Invoices issued to this CO:</p>
+                        @if (order.InvoicesDetails != null)
+                        {
+                        <table>
+                            <thead>
+                                <tr style="background-color:lightgreen">
+                                    <th>
+                                        #
+                                    </th>
+                                    <th>
+                                        Invoice No
+                                    </th>
+                                    <th>
+                                        Date
+                                    </th>
+                                    <th>
+                                        Advance Payment
+                                    </th>
+                                    <th>
+                                        Date 
+                                    </th>                                      
+                                    <th>
+                                        Following payments
+                                    </th>
+                                </tr> 
+                            </thead>
+                            <tbody>
+                            @foreach (var invoice in order.InvoicesDetails)
+                            {
+                                <tr>
+                                    <td>@i.@j</td>
+                                    <td>
+                                @invoice.DocumentNumber
+                                    </td>
+                                    <td>@invoice.Date</td>
+                                    <td>@invoice.AdvancePayment</td>
+                                    <td>@invoice.DateAdvancePayment</td>
+                                    <td>
+                                @if (invoice.Payments != null)
+                                {
+                                    foreach (var payment in invoice.Payments)
+                                    {
+                                        @payment.Payment <p>-</p> @payment.Date <br />
+                                    }
+                                }
+                                    </td>                                      
+                                 </tr>
+                                j++;
+                            }
+                                    </tbody>
+                                </table>
+                        }
+                        </th>                  
+                </tr>
+                i++;
             }
         }        
     </tbody>

@@ -239,6 +239,7 @@ namespace SSMO.Services.SupplierOrders
                     {
                         Id = purchase.Id,
                         Balance = purchase.Balance,
+                        Amount = purchase.Amount,
                         DatePaidAmount = purchase.DatePaidAmount,
                         PaidAdvance = purchase.PaidAvance,
                         PurchaseNumber = purchase.PurchaseNumber,                       

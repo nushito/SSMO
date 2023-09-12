@@ -1,4 +1,6 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using System;
+using System.Collections.Generic;
 
 namespace SSMO.Models.Reports.PaymentsModels
 {
@@ -13,5 +15,7 @@ namespace SSMO.Models.Reports.PaymentsModels
         public DateTime DatePaidAmount { get; set; }
         public bool PaidStatus { get; set; }
         public string CustomerName { get; set; }
+        public ICollection<PaymentViewModel> Payments { get; set; }
+        public ICollection<CustomerOrdersPaymentDetailsPerInvoice> CustomerOrders { get; set; }
     }
 }

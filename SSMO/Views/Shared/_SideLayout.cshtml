@@ -88,21 +88,20 @@
                     </li>
 
                     <!-- Heading -->
-                    <div class="sidebar-heading text-capitalize">
+                    <li class="sidebar-heading text-capitalize">
                         <br />
                         <h3>Reports</h3>
                         <br />
-                    </div>
+                    </li>
                      <li>
                         <div class="dropdown ">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                Payment Reports
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="InvoicePaymentReport">Invoice</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="PurchasePaymentReport">Purchase</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="InvoicePaymentReport">Invoice</a>                                
                                 <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="CustomerOrdersPaymentReport">Customer Order</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="SupplierOrdersPaymentReport">Supplier Order</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="SupplierOrdersPaymentReport">Debit to Suppliers</a>
                             </div>
                         </div>
                      </li>

@@ -36,8 +36,7 @@ namespace SSMO.Models.Documents.Invoice
         public int SizeId { get; set; }
         public string Size { get; set; }
         public List<SizeForInvoiceViewModel> Sizes { get; set; }
-        public int GradeId { get; set; }
-        [Required]
+        public int GradeId { get; set; }   
         public string Grade { get; set; }
         public List<GradeForInvoiceViewModel> Grades { get; set; }
 

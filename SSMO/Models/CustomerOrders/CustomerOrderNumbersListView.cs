@@ -31,5 +31,9 @@ namespace SSMO.Models.CustomerOrders
         public List<ProductsForInvoiceViewModel> Products { get; set; }
         public List<ServiceProductForInvoiceFormModel> ServiceProducts { get; set; }
         public int CustomerId { get; set; }
+        public string DealTypeEng { get; set; }
+        public string DealDescriptionEng { get; set; }
+        public string DealTypeBg { get; set; }
+        public string DealDescriptionBg { get; set; }
     }
 }

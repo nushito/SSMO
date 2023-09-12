@@ -17,6 +17,8 @@ namespace SSMO.Services.Documents.Invoice
         public int? Vat { get; set; }
         public decimal VatAmount { get; set; }
         public decimal TotalAmount { get; set; }
+        public string DealTypeBg { get; set; }
+        public string DealDescriptionBg { get; set; }
         public BGMyCompanyInvoicePrintViewModel BgMyCompany { get; set; }
         public BGCustomerForInvoicePrint BgCustomer { get; set; }
         public ICollection<BGProductsForBGInvoiceViewModel> BgProducts { get; set; }

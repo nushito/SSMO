@@ -56,7 +56,8 @@
 </div>
 <table class="table">   
     <thead>
-        <tr>
+        <tr style="background-color:lightgreen;position:relative">
+            <th> No</th>
                 <th>
                 Invoice Number
                 </th>
@@ -78,17 +79,23 @@
                 <th>
                     Balance
                 </th>
+                <th>Following Payments</th>
         </tr>
     </thead>
     <tbody>
-        @if(Model.CustomerPaymentCollection != null)
-        {
-            @foreach (var order in Model.CustomerPaymentCollection)
+        @{
+            int i = 1;
+            int j = 1;
+        }
+        @if(Model.CustomerPaymentCollection != null)        
+        {            
+            @foreach (var invoice in Model.CustomerPaymentCollection)
             {
                 <tr>
-                    <th> @order.DocumentNumber</th>
-                    <th> @order.Date</th>
-                    @if (@order.PaidStatus == true)
+                    <th>@i</th>
+                            <th> @invoice.DocumentNumber</th>
+                            <th> @invoice.Date</th>
+                    @if (@invoice.PaidStatus == true)
                     {
                         <th>Paid</th>
                     }
@@ -96,12 +103,62 @@
                     {
                         <th>Not Paid</th>
                     }
-                    <th> @order.TotalAmount</th>
-                    <th> @order.PaidAvance</th>
-                    <th> @order.DatePaidAmount</th>
-                    <th> @order.Balance</th>
-                   <th><a asp-controller="Reports" asp-action="EditInvoicePayment" asp-route-documentNumber="@order.DocumentNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
+                            <th> @invoice.TotalAmount</th>
+                            <th> @invoice.PaidAvance</th>
+                            <th> @invoice.DatePaidAmount.ToShortDateString()</th>
+                            <th> @invoice.Balance</th>
+                            <th style="display:inline"> @foreach (var payment in invoice.Payments)
+                        {
+                            @payment.PaidAmount <p>-</p> @payment.Date.ToShortDateString()
+                        }</th>
+                           <th><a asp-controller="Reports" asp-action="EditInvoicePayment" asp-route-documentNumber="@invoice.DocumentNumber" class="btn btn-outline-info mr-1">Edit</a></th> 
                 </tr>
+                <tr>
+                   <th colspan="10">
+                        <table>
+                            <thead>
+                                    <tr style="background-color:aquamarine">
+                                        <th>
+                                            #
+                                        </th>
+                                        <th>
+                                            Customer Order N
+                                        </th>
+                                        <th>
+                                            Balance
+                                        </th>
+                                        <th>
+                                            Advance Payment
+                                        </th>
+                                        <th>
+                                            Date
+                                        </th>
+                                        <th>
+                                            Following Payments
+                                        </th>
+                                    </tr>
+                            </thead>
+                                    <tbody>
+                        @foreach (var order in invoice.CustomerOrders)
+                        {
+                            <tr>
+                                <th>@i.@j</th>
+                                <th>@order.OrderConfirmationNumber</th>
+                                <th>@order.Balance</th>
+                                <th>@order.PaidAvance</th>
+                                <th>@order.DateAdvancePayment.ToShortDateString()</th>
+                        @foreach (var payment in order.Payments)
+                        {
+                                <th style="display:block">@payment.PaidAmount - @payment.Date.ToShortDateString()</th>
+                        }
+                            </tr>
+                            
+                        }
+                         </tbody>
+                      </table>
+                   </th>                    
+                </tr>
+                i++;
             }   
         }        
     </tbody>

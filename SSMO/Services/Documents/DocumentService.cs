@@ -214,7 +214,9 @@ namespace SSMO.Services.Documents
                 Swb = invoice.Swb,
                 CurrencyExchangeRateUsdToBGN = currencyExchange,
                 CurrencyId = invoice.CurrencyId,
-                TotalQuantity= invoice.TotalQuantity               
+                TotalQuantity= invoice.TotalQuantity,
+                DealDescriptionBg = invoice.DealDescriptionBg,
+                DealTypeBg= invoice.DealTypeBg
             };
 
             switch (invoice.DocumentType)

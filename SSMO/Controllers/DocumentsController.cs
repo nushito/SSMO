@@ -357,7 +357,11 @@ namespace SSMO.Controllers
                     vat = model.Vat,
                     myCompanyId = myCompanyId,
                     comment = model.Comment,
-                    deliveryAddress = model.DeliveryAddress
+                    deliveryAddress = model.DeliveryAddress,
+                    dealTypeEng = model.DealTypeEng,
+                    dealTypeBg = model.DealTypeBg,
+                    descriptionEng = model.DealDescriptionEng,
+                    descriptionBg = model.DealDescriptionBg
                 });
         }
 
@@ -365,7 +369,8 @@ namespace SSMO.Controllers
             DateTime date, decimal currencyExchangeRateUsdToBGN,
           int number, string mycompanyname, string truckNumber, decimal deliveryCost, 
           string swb, decimal netWeight, decimal grossWeight, string incoterms, 
-          int customerId, int currencyId, int vat, int myCompanyId, string comment, string deliveryAddress)
+          int customerId, int currencyId, int vat, int myCompanyId, string comment, string deliveryAddress,
+          string dealTypeEng, string dealTypeBg, string descriptionEng, string descriptionBg)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(mycompanyname);
@@ -394,7 +399,8 @@ namespace SSMO.Controllers
             var invoiceForPrint = invoiceService.CreateInvoice
                 (orders, products, serviceProducts, date, currencyExchangeRateUsdToBGN, number, 
                 mycompanyname, truckNumber, deliveryCost, swb, netWeight, grossWeight, incoterms, 
-                customerId, currencyId, vat, myCompanyId, comment, deliveryAddress);
+                customerId, currencyId, vat, myCompanyId, comment, deliveryAddress, 
+                dealTypeEng, dealTypeBg, descriptionEng, descriptionBg);
          
             if (invoiceForPrint == null)
             {
@@ -444,6 +450,7 @@ namespace SSMO.Controllers
             var bgInvoice = invoiceService.CreateBgInvoiceForPrint(documentNumber);
 
             if (bgInvoice == null) return View();
+            ClientService.AddBgInvoice(bgInvoice);
 
             return View(bgInvoice);
         }

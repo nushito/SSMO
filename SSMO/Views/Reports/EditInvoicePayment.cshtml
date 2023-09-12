@@ -19,6 +19,16 @@
             <label class="form-check-label" asp-for="PaidStatus"> Pyment Status </label>
             <span asp-validation-for="PaidStatus" class="small text-danger"></span>
         </div>
+        <div class="form-group">
+            <label >Customer Orders</label>
+            <select asp-for="CustomerOrderId" class="form-control">
+                <option value="">-</option>
+                @foreach (var order in Model.CustomerOrders)
+                {
+                    <option value="@order.Id">@order.OrderConfirmationNumber</option>
+                }
+            </select>
+        </div>
 
         <button type="submit" class="btn btn-primary mt-3">Submit</button>
     </form>

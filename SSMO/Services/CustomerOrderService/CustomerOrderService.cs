@@ -64,7 +64,8 @@ namespace SSMO.Services.CustomerOrderService
                 Origin = origin,
                 PaidAmountStatus = paidStatus,
                 Vat = vat,
-                SupplierOrders = new List<SupplierOrder>()
+                SupplierOrders = new List<SupplierOrder>(),
+                Payments = new List<Payment>()
             };
 
            
@@ -192,7 +193,7 @@ namespace SSMO.Services.CustomerOrderService
             return customerOrderforEdit;
         }
 
-        public bool EditCustomerOrdersPayment(int orderConfirmationNumber, bool paidStatus, decimal paidAdvance)
+        public bool EditCustomerOrdersPayment(int orderConfirmationNumber, bool paidStatus, decimal paidAdvance, DateTime date)
         {
             if (orderConfirmationNumber == 0)
             {
@@ -203,9 +204,16 @@ namespace SSMO.Services.CustomerOrderService
                 .Where(num => num.OrderConfirmationNumber == orderConfirmationNumber)
                 .FirstOrDefault();
            
-            customerOrder.PaidAmountStatus = paidStatus;
-            customerOrder.PaidAvance = paidAdvance;
+            customerOrder.PaidAmountStatus = paidStatus;            
             customerOrder.Balance = customerOrder.TotalAmount - customerOrder.PaidAvance;
+
+            var newPayment = new Payment
+            {
+                 PaidAmount = paidAdvance,
+                 Date= DateTime.Now,
+                 CustomerOrderId = customerOrder.Id
+            };
+                       
             if (customerOrder.Balance == 0)
             {
                 customerOrder.PaidAmountStatus = true;
@@ -214,6 +222,10 @@ namespace SSMO.Services.CustomerOrderService
             {
                 customerOrder.PaidAmountStatus = false;
             }
+
+            dbContext.Payments.Add(newPayment);
+            customerOrder.Payments.Add(newPayment);
+            dbContext.SaveChanges();
 
             return true;
         }

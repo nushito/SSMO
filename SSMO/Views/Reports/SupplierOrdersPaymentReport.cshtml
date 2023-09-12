@@ -32,7 +32,7 @@
         </div>
     </div>
     <div class="row">
-        <input type="submit" class="btn btn-info" value="Search" />
+        <input type="submit" class="btn btn-info mr-1" value="Search" /> 
         <a class="btn btn-success text-capitalize border-0" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportPurchasePaymentToExcel"> Download</a>
     </div>
     <br />
@@ -73,7 +73,10 @@
 </div>
 <table class="table">   
     <thead>
-        <tr>
+        <tr >
+                 <th>
+                No:
+                  </th>
                 <th>
                 Supplier Order No
                 </th>
@@ -98,12 +101,17 @@
         </tr>
     </thead>
     <tbody>
+        @{
+            int r = 1;            
+        }
         @if(Model.SupplierOrderPaymentCollection != null)
         {
             @foreach (var order in Model.SupplierOrderPaymentCollection)
             {
-                <tr>
+                int c = 1;
+                <tr style="background-color:lightyellow">
                     <input type="hidden" value="@order.Id" asp-for="@order.Id">
+                    <th>@r</th>
                     <th> @order.SupplierOrderNumber</th>
                     <th> @order.Date</th>
                     @if (@order.PaidStatus == true)
@@ -116,72 +124,84 @@
                     }
                     <th> @order.TotalAmount @order.PurchaseCurrency.ToUpper()</th>
                     <th> @order.Balance</th>
-                   <th>@order.PaidAvance</th>
+                    <th>@order.PaidAvance</th>
                     <th> @order.DatePaidAmount</th>
-                    <th class="align-self-auto"> @foreach(var payment in order.Payments)
+                    <th class="align-self-auto"> @foreach (var payment in order.Payments)
                         {
-                          @payment.PaidAmount<p>-</p>@payment.Date.Date.ToShortDateString()   
-                          <br />
+                            @payment.PaidAmount<p>-</p>@payment.Date.Date.ToShortDateString()   
+                            <br />
                         }        
-                     </th>
-                       
-                   <th><a asp-controller="Reports" asp-action="DetailsSupplierAndPurchasePayment" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Add new payment</a></th> 
+                    </th>
+
+                    <th><a asp-controller="Reports" asp-action="DetailsSupplierAndPurchasePayment" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Add new payment</a></th> 
                 </tr>               
                 <tr>
                     <th colspan="8">
-                       <table>
-                           <thead>
-                              <tr>
-                                 <th>
-                                     Purchase Invoice No:
-                                 </th>
-                                 <th>
-                                     Balance
-                                 </th>
-                                 <th>
-                                     Paid advance
-                                 </th>
-                                 <th>
-                                     Date
-                                 </th>
-                                 <th>
-                                     Made payments
-                                 </th>
-                              </tr>
-                           </thead>
-                           <tbody>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>
+                                    #
+                                   </th>
+                                    <th>
+                                        Purchase Invoice No:
+                                    </th>
+                                    <th>
+                                        Amount
+                                    </th>
+                                    <th>
+                                        Balance
+                                    </th>
+                                    <th>
+                                        Paid advance
+                                    </th>
+                                    <th>
+                                        Date
+                                    </th>
+                                    <th>
+                                        Made payments
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 @foreach (var purchase in order.PurchasePaymentsCollection)
                                 {
                                     <tr>
                                         <td>
+                                            @r.@c
+                                        </td>
+                                        <td>
                                             @purchase.PurchaseNumber
-                                         </td> 
-                                         <td>
-                                             @purchase.Balance
-                                         </td>
-                                         <td>
-                                             @purchase.PaidAdvance
-                                         </td>
-                                         <td>
-                                             @purchase.DatePaidAmount
-                                         </td>
-                                         <td>
-                                            @foreach(var payment in purchase.PurchasePaymentsDetails)
+                                        </td> 
+                                        <td>
+                                            @purchase.Amount
+                                        </td> 
+                                        <td>
+                                            @purchase.Balance
+                                        </td>
+                                        <td>
+                                            @purchase.PaidAdvance
+                                        </td>
+                                        <td>
+                                            @purchase.DatePaidAmount
+                                        </td>
+                                        <td>
+                                            @foreach (var payment in purchase.PurchasePaymentsDetails)
                                             {
                                                 @payment.PaidAmount @payment.Date <br />
                                             }
                                         </td>
 
                                     </tr>
-                                  
+                                    c++;
                                 }    
-                           </tbody>
-                      </table>
-                   
-                     </th>
+                            </tbody>
+                        </table>
+                    </th>
                 </tr>
+                r++;
             }
-            
+           
         }        
     </tbody>
 
