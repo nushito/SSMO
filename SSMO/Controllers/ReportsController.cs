@@ -482,6 +482,7 @@ namespace SSMO.Controllers
 			model.CustomerPaymentCollection = customerPaymentCollection.CustomerInvoices;
 			model.CustomerNames = customerNames;
 			model.TotalCustomerInvoices = customerPaymentCollection.TotalInvoices;
+			ClientService.AddCustomerInvoicePayments(model);
 			return View(model);
 		}
 		[HttpGet]
@@ -1640,15 +1641,15 @@ namespace SSMO.Controllers
                 worksheet.Cell(7, 10).Value = invoice.BgMyCompany.BgStreet;
              
                 worksheet.Cell(9, 1).Value = "No";
-                worksheet.Cell(9, 2).Value = "Description";
-                worksheet.Cell(9, 3).Value = "Grade";
-                worksheet.Cell(9, 4).Value = "Size";
+                worksheet.Cell(9, 2).Value = "Oписание";
+                worksheet.Cell(9, 3).Value = "Качество";
+                worksheet.Cell(9, 4).Value = "Размер";
                 worksheet.Cell(9, 5).Value = "FSC Claim";
                 worksheet.Cell(9, 6).Value = "FSC Certificate";
-                worksheet.Cell(9, 7).Value = "Unit";
-                worksheet.Cell(9, 8).Value = "Quantity";
-                worksheet.Cell(9, 9).Value = "Unit Price";
-                worksheet.Cell(9, 10).Value = "Amount";
+                worksheet.Cell(9, 7).Value = "Мер.ед.";
+                worksheet.Cell(9, 8).Value = "Количество";
+                worksheet.Cell(9, 9).Value = "Цена лв.";
+                worksheet.Cell(9, 10).Value = "Сума лв.";
 
                 IXLRange range = worksheet.Range(worksheet.Cell(9, 1).Address, worksheet.Cell(9, 10).Address);
                 range.Style.Fill.SetBackgroundColor(XLColor.TurquoiseGreen);
@@ -1696,9 +1697,9 @@ namespace SSMO.Controllers
                 foreach (var bank in invoice.CompanyBankDetails)
                 {
                     row++;
-                    worksheet.Cell(row, 1).Value = "Currency";
+                    worksheet.Cell(row, 1).Value = "Валута";
                     worksheet.Cell(row, 2).Value = bank.Currency;
-                    worksheet.Cell(row, 3).Value = "Bank";
+                    worksheet.Cell(row, 3).Value = "Банка";
                     worksheet.Cell(row, 4).Value = bank.BankName;
                     worksheet.Cell(row, 5).Value = "IBAN";
                     worksheet.Cell(row, 6).Value = bank.Iban;
@@ -1988,5 +1989,92 @@ namespace SSMO.Controllers
 
         }
 
+        public FileResult ExportCustomerInvoicePaymentsToExcel()
+        {
+            CustomerInvoicePaymentsReportsViewModel payments = ClientService.GetCustomerInvoicePayments();
+
+            using (var excelDocument = new XLWorkbook())
+            {
+                IXLWorksheet worksheet = excelDocument.Worksheets.Add("PaymentsFromCustomers");
+
+                worksheet.Cell(1, 1).Value = "Customer Name";
+				worksheet.Cell(1, 2).Value = payments.CustomerName;
+                int row = 2;
+
+                for (int i = 0; i < payments.CustomerPaymentCollection.Count(); i++)
+                {
+                    worksheet.Cell(row, 1).Value = "Invoice No";
+                    worksheet.Cell(row, 2).Value = "Date";
+                    worksheet.Cell(row, 3).Value = "Payment status";
+                    worksheet.Cell(row, 4).Value = "Total amount";
+                    worksheet.Cell(row, 5).Value = "Paid advance";
+                    worksheet.Cell(row, 6).Value = "Date paid amount";
+                    worksheet.Cell(row, 7).Value = "Balance";
+                    
+                    row++;
+                    worksheet.Cell(row, 1).Value = payments.CustomerPaymentCollection.ElementAt(i).DocumentNumber;
+                    worksheet.Cell(row, 2).Value = payments.CustomerPaymentCollection.ElementAt(i).Date;
+                    worksheet.Cell(row, 3).Value = payments.CustomerPaymentCollection.ElementAt(i).PaidStatus;
+					worksheet.Cell(row, 4).Value = payments.CustomerPaymentCollection.ElementAt(i).TotalAmount;
+                    worksheet.Cell(row, 5).Value = payments.CustomerPaymentCollection.ElementAt(i).PaidAvance;
+                    worksheet.Cell(row, 6).Value = payments.CustomerPaymentCollection.ElementAt(i).DatePaidAmount;
+                    worksheet.Cell(row, 7).Value = payments.CustomerPaymentCollection.ElementAt(i).Balance;
+                    
+                    row++;
+                    worksheet.Cell(row, 1).Value = "Payments";
+                    row++;
+                    for (int j = 0; j < payments.CustomerPaymentCollection.ElementAt(i).Payments.Count(); j++)
+                    {
+                        worksheet.Cell(row, 1).Value = "Paid amount";
+                        worksheet.Cell(row, 2).Value = "Date";
+                        row++;
+                        worksheet.Cell(row, 1).Value = payments.CustomerPaymentCollection.ElementAt(i).Payments.ElementAt(j).PaidAmount;
+                        worksheet.Cell(row, 2).Value = payments.CustomerPaymentCollection.ElementAt(i).Payments.ElementAt(j).Date;
+                        row++;
+                    }
+                    worksheet.Cell(row, 1).Value = "Customer order payments Details";
+                    foreach (var payment in payments.CustomerPaymentCollection.ElementAt(i).CustomerOrders)
+                    {
+                        row++;
+                        worksheet.Cell(row, 1).Value = "Customer Order N";
+                        worksheet.Cell(row, 2).Value = "Balance";
+                        worksheet.Cell(row, 3).Value = "Advance payment";
+                        worksheet.Cell(row, 4).Value = "Date";
+                        row++;
+                        worksheet.Cell(row, 1).Value = payment.OrderConfirmationNumber;
+                        worksheet.Cell(row, 2).Value = payment.Balance;
+                        worksheet.Cell(row, 3).Value = payment.PaidAvance;
+                        worksheet.Cell(row, 4).Value = payment.DateAdvancePayment;
+
+                        foreach (var item in payment.Payments)
+                        {
+                            row++;
+                            worksheet.Cell(row, 1).Value = "Paid amount";
+                            worksheet.Cell(row, 2).Value = "Date";
+                            row++;
+                            worksheet.Cell(row, 1).Value = item.PaidAmount;
+                            worksheet.Cell(row, 2).Value = item.Date;
+                        }
+                    }
+                }
+
+                IXLRange range = worksheet.Range(worksheet.Cell(2, 1).Address, worksheet.Cell(2, 7).Address);
+                range.Style.Fill.SetBackgroundColor(XLColor.BlueGreen);
+
+                using (var stream = new MemoryStream())
+                {
+                    excelDocument.SaveAs(stream);
+                    var content = stream.ToArray();
+                    string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                    var strDate = DateTime.Now.ToString("yyyyMMdd");
+                    string filename = string.Format($"PaymentsFromCustomers_{strDate}.xlsx");
+
+                    return File(content, contentType, filename);
+                }
+
+            }
+
+        }
     }
 }

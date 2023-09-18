@@ -16,6 +16,7 @@ namespace SSMO.Services
         private static ProductsFscCollectionViewModel _fscReport;
         private static SupplierOrdersPaymentReportViewModel _payments;
         private static BgInvoiceViewModel _bgInvoice;
+        private static CustomerInvoicePaymentsReportsViewModel _customerInvoicePayments;
         public static void AddClient(InvoiceDetailsViewModel clientModel)
         {
             _clientModel = clientModel;
@@ -63,6 +64,16 @@ namespace SSMO.Services
         public static BgInvoiceViewModel GetBgInvoice()
         {
             return _bgInvoice;
+        }
+
+        public static void AddCustomerInvoicePayments(CustomerInvoicePaymentsReportsViewModel customerInvoice)
+        {
+            _customerInvoicePayments = customerInvoice;
+        }
+
+        public static CustomerInvoicePaymentsReportsViewModel GetCustomerInvoicePayments()
+        {
+            return _customerInvoicePayments;
         }
 
     }

@@ -20,6 +20,11 @@
         <input type="submit" class="btn btn-info" value="Search" />
     </div>
     <br />
+    <div class="row">
+        <input type="submit" class="btn btn-info mr-1" value="Search" /> 
+        <a class="btn btn-success text-capitalize border-0" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportCustomerInvoicePaymentsToExcel"> Download</a>
+    </div>
+    <br />
 </form>
 
 @{
@@ -107,7 +112,8 @@
                             <th> @invoice.PaidAvance</th>
                             <th> @invoice.DatePaidAmount.ToShortDateString()</th>
                             <th> @invoice.Balance</th>
-                            <th style="display:inline"> @foreach (var payment in invoice.Payments)
+                            <th style="display:inline"> 
+                          @foreach (var payment in invoice.Payments)
                         {
                             @payment.PaidAmount <p>-</p> @payment.Date.ToShortDateString()
                         }</th>
