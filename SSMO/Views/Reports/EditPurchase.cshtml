@@ -48,6 +48,16 @@
         <span asp-validation-for="Swb" class="small text-danger"></span>
     </div>
     <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="ShippingLine">Shipping Line</label>
+        <input asp-for="ShippingLine" type="text" class="form-control" >
+        <span asp-validation-for="ShippingLine" class="small text-danger"></span>
+    </div>
+    <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="Eta">ETA</label>
+        <input asp-for="Eta" type="text" class="form-control" >
+        <span asp-validation-for="Eta" class="small text-danger"></span>
+    </div>
+    <div class="form-group  offset-3 mb-2 col-md-3">
         <label asp-for="NetWeight">Net Weight</label>
         <input asp-for="NetWeight"min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="NetWeight" class="small text-danger"></span>

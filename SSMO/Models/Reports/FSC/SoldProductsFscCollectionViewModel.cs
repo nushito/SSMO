@@ -13,5 +13,7 @@ namespace SSMO.Models.Reports.FSC
         public string FscClaim { get; set; }        
         public decimal Quantity { get; set; }
         public string Unit { get; set; }
+        public string Supplier { get; set; }
+        public string PurchaseInvoice { get; set; }
     }
 }

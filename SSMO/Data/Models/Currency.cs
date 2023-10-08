@@ -12,5 +12,8 @@ namespace SSMO.Data.Models
         public IEnumerable<CustomerOrder> CustomerOrders { get; set; }
         public IEnumerable<SupplierOrder> SupplierOrders { get; set; }
         public ICollection<Document> Documents { get; set; }
+        public ICollection<Document> DocumentsNewCurrencyForCostPrice { get; set; }
+        public ICollection<Payment> Payments { get; set; }
+        public ICollection<Payment> PaymentsWithExchangeRate { get; set; }
     }
 }

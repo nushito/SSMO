@@ -143,7 +143,7 @@ namespace SSMO.Data.Migrations
                         column: x => x.AddressId,
                         principalTable: "Addresses",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -404,6 +404,10 @@ namespace SSMO.Data.Migrations
                     TotalQuantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DeliveryAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DealTypeEng = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DealDescriptionEng = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DealTypeBg = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DealDescriptionBg = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PurchaseProductDetailsId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -463,6 +467,41 @@ namespace SSMO.Data.Migrations
                         principalTable: "Documents",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Payments",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PaidAmount = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    SupplierOrderId = table.Column<int>(type: "int", nullable: true),
+                    DocumentId = table.Column<int>(type: "int", nullable: true),
+                    CustomerOrderId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Payments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Payments_CustomerOrders_CustomerOrderId",
+                        column: x => x.CustomerOrderId,
+                        principalTable: "CustomerOrders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Payments_Documents_DocumentId",
+                        column: x => x.DocumentId,
+                        principalTable: "Documents",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Payments_SupplierOrders_SupplierOrderId",
+                        column: x => x.SupplierOrderId,
+                        principalTable: "SupplierOrders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -716,7 +755,7 @@ namespace SSMO.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     InvoiceId = table.Column<int>(type: "int", nullable: false),
-                    CustomerOrderId = table.Column<int>(type: "int", nullable: false),
+                    CustomerOrderId = table.Column<int>(type: "int", nullable: true),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Unit = table.Column<int>(type: "int", nullable: false),
                     Pallets = table.Column<int>(type: "int", nullable: false),
@@ -743,8 +782,8 @@ namespace SSMO.Data.Migrations
                     CreditNoteBgPrice = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     CreditNoteBgAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     DebitNoteQuantity = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
-                    DeditNotePallets = table.Column<int>(type: "int", nullable: false),
-                    DeditNoteSheetsPerPallet = table.Column<int>(type: "int", nullable: false),
+                    DebitNotePallets = table.Column<int>(type: "int", nullable: false),
+                    DebitNoteSheetsPerPallet = table.Column<int>(type: "int", nullable: false),
                     DebitNoteAmount = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
                     DebitNotePrice = table.Column<decimal>(type: "decimal(18,5)", precision: 18, scale: 5, nullable: false),
                     DebitNoteBgPrice = table.Column<decimal>(type: "decimal(18,4)", precision: 18, scale: 4, nullable: false),
@@ -874,7 +913,8 @@ namespace SSMO.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Customers_AddressId",
                 table: "Customers",
-                column: "AddressId");
+                column: "AddressId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Documents_CurrencyId",
@@ -944,7 +984,23 @@ namespace SSMO.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_MyCompanies_AddressId",
                 table: "MyCompanies",
-                column: "AddressId");
+                column: "AddressId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_CustomerOrderId",
+                table: "Payments",
+                column: "CustomerOrderId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_DocumentId",
+                table: "Payments",
+                column: "DocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Payments_SupplierOrderId",
+                table: "Payments",
+                column: "SupplierOrderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_CustomerOrderId",
@@ -1035,7 +1091,8 @@ namespace SSMO.Data.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Suppliers_AddressId",
                 table: "Suppliers",
-                column: "AddressId");
+                column: "AddressId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Suppliers_BankDetailId",
@@ -1132,6 +1189,9 @@ namespace SSMO.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "InvoiceProductDetails");
+
+            migrationBuilder.DropTable(
+                name: "Payments");
 
             migrationBuilder.DropTable(
                 name: "ServiceOrders");

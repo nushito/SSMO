@@ -2,6 +2,7 @@
 using AutoMapper.QueryableExtensions;
 using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.DebitNote;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Products;
@@ -34,7 +35,8 @@ namespace SSMO.Services.CustomerOrderService
 
         public int CreateOrder(string num, DateTime date, int customerId, int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,int currency,string origin, 
-            bool paidStatus, int vat, int statusId, List<int> supplierOrders)
+            bool paidStatus, int vat, int statusId, List<int> supplierOrders, string comment, 
+            List<int> banks, string type, int fiscalAgentId, string dealType, string dealDescription)
         {
            
             var fscClaim = dbContext.MyCompanies
@@ -44,6 +46,9 @@ namespace SSMO.Services.CustomerOrderService
             var fscCertificate = dbContext.MyCompanies
                .Where(a => a.Id == company)
                .Select(a => a.FSCSertificate).FirstOrDefault();
+
+            var banksForOrder = dbContext.BankDetails
+                .Where(i=>banks.Contains(i.Id)).ToList();
 
             var lastConfirmationNumber = dbContext.CustomerOrders.OrderBy(a=>a.OrderConfirmationNumber).Select(oc=>oc.OrderConfirmationNumber).LastOrDefault();
 
@@ -65,9 +70,18 @@ namespace SSMO.Services.CustomerOrderService
                 PaidAmountStatus = paidStatus,
                 Vat = vat,
                 SupplierOrders = new List<SupplierOrder>(),
-                Payments = new List<Payment>()
+                Payments = new List<Payment>(),
+                Comment = comment,
+                BankDetails= banksForOrder,
+                Type= type,
+                DealType= dealType,
+                DealDescription= dealDescription,
             };
 
+            if(fiscalAgentId != 0)
+            {
+                order.FiscalAgentId = fiscalAgentId;
+            }
            
             var supplierOrdersList = dbContext.SupplierOrders
                 .Where(i => supplierOrders.Contains(i.Id))
@@ -130,7 +144,8 @@ namespace SSMO.Services.CustomerOrderService
         public int CreateFirstOrder(int number, string num, DateTime date, 
             int customerId, int company, string deliveryTerms, string loadingAddress, 
             string deliveryAddress, int currency, string origin, bool paidStatus, 
-           int vat, int statusId, List<int> supplierOrders)
+           int vat, int statusId, List<int> supplierOrders, string comment, 
+           List<int> banks, string type, int fiscalAgentId, string dealType, string dealDescription)
         {
             var fscClaim = dbContext.MyCompanies
                  .Where(a => a.Id == company)
@@ -139,6 +154,9 @@ namespace SSMO.Services.CustomerOrderService
             var fscCertificate = dbContext.MyCompanies
                .Where(a => a.Id == company)
                .Select(a => a.FSCSertificate).FirstOrDefault();
+
+            var banksForOrder = dbContext.BankDetails
+               .Where(i => banks.Contains(i.Id)).ToList();
 
             var order = new SSMO.Data.Models.CustomerOrder
             {
@@ -157,8 +175,18 @@ namespace SSMO.Services.CustomerOrderService
                 Origin = origin,
                 PaidAmountStatus = paidStatus,
                 Vat = vat,
-                SupplierOrders = new List<SupplierOrder>()
+                SupplierOrders = new List<SupplierOrder>(),
+                Comment = comment,
+                BankDetails = banksForOrder,
+                Type = type,
+                DealType = dealType,
+                DealDescription = dealDescription,
             };
+
+            if (fiscalAgentId != 0)
+            {
+                order.FiscalAgentId = fiscalAgentId;
+            }
 
             var supplierOrdersList = dbContext.SupplierOrders
                 .Where(i => supplierOrders.Contains(i.Id))
@@ -293,6 +321,101 @@ namespace SSMO.Services.CustomerOrderService
                    OrderConfirmationNumber = i.CustomerOrders.Select(i => i.OrderConfirmationNumber).FirstOrDefault(),
                })
                .ToList();
+        }
+
+        public ICollection<BankDetailsViewModel> GetBanks()
+        {
+            var banks = dbContext.BankDetails
+                .Select(a => new BankDetailsViewModel
+                {
+                    BankName = a.BankName,
+                    Iban = a.Iban,
+                    Id = a.Id,
+                    CurrencyId = a.CurrencyId,
+                }).ToList();
+
+            foreach (var bank in banks)
+            {
+                bank.CurrencyName = dbContext.Currencies
+                    .Where(i=>i.Id == bank.CurrencyId)
+                    .Select(i=>i.Name) .FirstOrDefault();
+            }
+
+            return banks;
+        }
+
+        public CustomerOrderPrintViewModel GetCustomerOrderPrint(int id)
+        {
+            var order = dbContext.CustomerOrders.Find(id);
+            if (order == null)
+            {
+                return null;
+            }
+
+            var model = new CustomerOrderPrintViewModel()
+            {
+                Amount = order.Amount,
+                Comment = order.Comment,
+                CustomerPoNumber = order.CustomerPoNumber,
+                Date = order.Date,
+                DeliveryAddress = order.DeliveryAddress,
+                DeliveryTerms = order.DeliveryTerms,
+                LoadingPlace = order.LoadingPlace,
+                OrderConfirmationNumber = order.OrderConfirmationNumber,
+                Origin = order.Origin,
+                SubTotal = order.SubTotal,
+                TotalAmount = order.TotalAmount,
+                Type = order.Type,
+                TotalQuantity = order.TotalQuantity,
+                Vat = order.Vat,
+                DealType = order.DealType,
+                DealDescription = order.DealDescription
+            };
+
+            var myCompany = dbContext.MyCompanies
+                .Where(i=>i.Id == order.MyCompanyId)
+                .FirstOrDefault();
+            var companyAddress = dbContext.Addresses
+                .Where(I => I.Id == myCompany.AddressId)
+                .FirstOrDefault();
+
+            var customer = dbContext.Customers
+                .Where(i=>i.Id== order.CustomerId) .FirstOrDefault();
+
+            var bankDetails = dbContext.BankDetails
+                .Where(i => order.BankDetails.Select(a=>a.Id).Contains(i.Id))
+                .ToList();
+
+            model.MyCompany = new MyCompanyDetailsPrintViewModel
+            {
+                MyCompanyName = myCompany.Name,
+                Eik = myCompany.Eik,
+                RepresentativePerson = myCompany.RepresentativePerson,
+                Vat = myCompany.VAT,
+                City = companyAddress.City,
+                Country= companyAddress.Country,
+                Street= companyAddress.Street
+            };
+
+            foreach (var bankDetail in bankDetails)
+            {
+                model.BankDetails.Add(new BankDetailsViewModel
+                {
+                    BankName = bankDetail.BankName,
+                    Iban = bankDetail.Iban,
+                    Swift = bankDetail.Swift,
+                    CurrencyName = dbContext.Currencies
+                    .Where(i=>i.Id == bankDetail.CurrencyId)
+                    .Select(n=>n.Name).FirstOrDefault()
+                });
+            }
+
+            model.Products = dbContext.CustomerOrderProductDetails
+                .Where(i=>i.CustomerOrderId == order.Id)
+                .ProjectTo< ProductCustomerFormModel >(mapper)
+                .ToList();
+
+           return model;
         }
     }
 }

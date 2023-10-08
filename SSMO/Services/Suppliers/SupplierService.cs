@@ -33,37 +33,28 @@ namespace SSMO.Services
             (string name, string vat, string eik, string email, string city, 
             string street, string country, string manager, string fscCertificate)
         {
-            var newSupplier = new SSMO.Data.Models.Supplier
+
+           var address = new Address
             {
-                Name = name,
-                VAT = vat,
-                Eik = eik,
-                Email = email,
-                Address = new Address
-                {
-                    City = city,
-                    Street = street,
-                    Country = country
-                },
-                RepresentativePerson = manager,
-                FSCSertificate = fscCertificate
-            };
+                City = city,
+                Street = street,
+                Country = country,
+                Suppliers = new SSMO.Data.Models.Supplier
+               {
+                   Name = name,
+                   VAT = vat,
+                   Eik = eik,
+                   Email = email,
+                   RepresentativePerson = manager,
+                   FSCSertificate = fscCertificate
+               }
+           };
 
-            //var bankDetail = new BankDetails
-            //{
-            //    BankName = model.BankName,
-            //    Iban = model.Iban,
-            //    Address = model.BankAddress,
-            //    Swift = model.Swift,
-            //    Currency = new InvoiceAndStockModels.Currency { AccountCurrency = (AccountCurrency)Enum.Parse(typeof(AccountCurrency), model.Currency) }  //(AccountCurrency)Enum.Parse(typeof(AccountCurrency),model.Currency)              
-            //};
+            if(address == null) { return false; }
+           
+            this.dbContext.Addresses.Add(address);
+            this.dbContext.SaveChanges();                       
 
-            //supplier.BankDetails.Add(bankDetail);
-
-            if (newSupplier == null) return false;
-
-            this.dbContext.Suppliers.Add(newSupplier);
-            this.dbContext.SaveChanges();
 
             return true;
         }
@@ -100,14 +91,14 @@ namespace SSMO.Services
             {
                 return null;
             }
-            var suuplier = dbContext.Suppliers.Where(a => a.Name.ToLower() == supplierName.ToLower()).FirstOrDefault();
-            if (suuplier == null)
+            var suplier = dbContext.Suppliers.Where(a => a.Name.ToLower() == supplierName.ToLower()).FirstOrDefault();
+            if (suplier == null)
             {
                 return null;
             }
-            var address = dbContext.Addresses.Where(a => a.Id == suuplier.AddressId).FirstOrDefault();
+            var address = dbContext.Addresses.Where(a => a.Id == suplier.AddressId).FirstOrDefault();
             var addressForEdit = mapper.Map<EditSupplierAddressFormModel>(address);
-            var getSupplier = mapper.Map<EditSupplierFormModel>(suuplier);
+            var getSupplier = mapper.Map<EditSupplierFormModel>(suplier);
             getSupplier.SupplierAddress = new EditSupplierAddressFormModel
             {
                 City = addressForEdit.City,

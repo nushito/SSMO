@@ -3,6 +3,10 @@
     ViewBag.Title = "Purchase details";
 }
 
+<div class="" style="margin-bottom:10px">
+    <h3>Purchase Details/Edit </h3>
+</div>
+
 <dl class="row">
      <dt class="col-sm-3">
         Invoice No:
@@ -53,10 +57,16 @@
 </dl>
 <dl class="row">
      <dt class="col-sm-3">
-       SWB:
+       SWB/Shipping Line:
     </dt>
     <dd class="col-sm-5">
-        @Model.Swb
+        @Model.Swb - @Model.ShippingLine
+    </dd>
+    <dt class="col-sm-3">
+       ETA:
+    </dt>
+    <dd class="col-sm-5">
+        @Model.Eta
     </dd>
 </dl>
 <dl class="row">

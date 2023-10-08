@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using SSMO.Services.Curruncies;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 
@@ -9,14 +10,13 @@ namespace SSMO.Models.MyCompany
     {
         public AddBankDetailsFormModel()
         {
-           Currency = new List<string>();
+           Currency = new List<GetCurrencyModel>();
           CompanyNames = new List<string>();
         }
         public int Id { get; init; }
 
         [Required]      
-        public int CurrencyId { get; set; }
-        public string CurrencyName { get; set; }
+        public int CurrencyId { get; set; }      
 
         [Required]
         public string BankName { get; set; }
@@ -29,7 +29,7 @@ namespace SSMO.Models.MyCompany
         public int CompanyId { get; set; }
         public string CompanyName { get; set; }
         public ICollection<string> CompanyNames { get; set; }
-        public ICollection<string> Currency { get; set; }
+        public ICollection<GetCurrencyModel> Currency { get; set; }
 
 
         //  public ICollection<MyCompanyGetNameModel> Company { get; set; } = new List<MyCompanyGetNameModel>();

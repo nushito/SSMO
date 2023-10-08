@@ -16,7 +16,7 @@ namespace SSMO.Services
             this.dbContext = dbContext;
         }
 
-        public IEnumerable<GetCurrencyModel> AllCurrency()
+        public ICollection<GetCurrencyModel> AllCurrency()
         {
             return this.dbContext
                  .Currencies
@@ -28,13 +28,26 @@ namespace SSMO.Services
                  .ToList();
         }
 
-        ICollection<string> ICurrency.GetCurrency()
+       public ICollection<string> GetCurrencyList()
         {
             return this.dbContext
                 .Currencies
                 .Select(a => a.Name)
                 .ToList();
 
+        }
+
+        public string GetCurrency(int id)
+        {
+            var currencyId = dbContext.SupplierOrders
+                .Where(i => i.Id == id)
+                .Select(c => c.CurrencyId)
+                .FirstOrDefault();
+
+            return dbContext.Currencies
+                .Where(a => a.Id == currencyId)
+                .Select(n => n.Name)
+                .FirstOrDefault();
         }
 
 

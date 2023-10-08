@@ -21,12 +21,11 @@
 
 
     <div class="form-group">
-        <label asp-for="CurrencyName">Currency</label>
-        <select asp-for="CurrencyName" asp-items="@(new SelectList(Model.Currency).Distinct())">
-
+        <label >Currency</label>
+        <select asp-for="CurrencyId" asp-items="@(new SelectList(Model.Currency).Distinct())">
             @foreach (var currency in Model.Currency)
             {
-                <option value="@currency.ToString()">@currency.ToString()</option>
+                <option value="@currency.Id">@currency.Name</option>
             }
         </select>
     </div>

@@ -27,7 +27,7 @@ namespace SSMO.Services.Reports
                int currencyId, int status,
                string fscClaim, string fscCertificate,
                decimal paidAdvance, bool paidStatus,
-               IList<ProductCustomerFormModel> products);
+               IList<ProductCustomerFormModel> products, List<int> banks);
         public IEnumerable<CustomerOrderListViewBySupplier> GetCustomerOrdersBySupplier(int customerId, string supplierId);
         public CustomerInvoicesPaymentCollectionViewModel CustomersInvoicesPaymentDetails(string customerName, int currentpage, int customerInvoicePerPage);
         public SupplierInvoiceCollectionViewModel SuppliersInvoicesPaymentDetails(string supplierName, int currentpage, int supplierInvoicePerPage);

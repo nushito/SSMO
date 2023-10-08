@@ -1,5 +1,4 @@
 ﻿using SSMO.Data.Enums;
-using SSMO.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -40,7 +39,7 @@ namespace SSMO.Data.Models
         public Customer Customer { get; set; }
         public int? SupplierId { get; set; }
         public Supplier Supplier { get; set; }
-        public int SupplierOrderId { get; set; }
+        public int? SupplierOrderId { get; set; }
         public SupplierOrder SupplierOrder { get; set; }
         public int MyCompanyId { get; set; }
         public MyCompany MyCompany { get; set; }
@@ -53,6 +52,8 @@ namespace SSMO.Data.Models
         public decimal GrossWeight { get; set; }
         public string TruckNumber { get; set; }
         public string Swb { get; set; }
+        public string ShippingLine { get; set; }
+        public string Eta { get; set; }
         public decimal PurchaseTransportCost { get; set; }
         public decimal DeliveryTrasnportCost { get; set; }
         public decimal BankExpenses { get; set; }
@@ -65,6 +66,8 @@ namespace SSMO.Data.Models
         public decimal PaidAvance { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
+        public int? CostPriceCurrencyId { get; set; }
+        public Currency CostPriceCurrency { get; set; }
         public decimal Balance { get; set; }
         [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime? DatePaidAmount { get; set; }
@@ -84,6 +87,9 @@ namespace SSMO.Data.Models
         public string DealDescriptionEng { get; set; }
         public string DealTypeBg { get; set; }
         public string DealDescriptionBg { get; set; }
+        public int? FiscalAgentId { get; set; }
+        public FiscalAgent Fiscalagent { get; set; }
+        public ICollection<BankDetails> BankDetails { get; set; }        
         public ICollection<CustomerOrder> CustomerOrders { get; set; }
         public ICollection<PurchaseProductDetails> PurchaseProducts { get; set; }
         public ICollection<CustomerOrderProductDetails> CustomerOrderProducts { get; set; }

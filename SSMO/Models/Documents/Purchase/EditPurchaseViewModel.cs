@@ -18,6 +18,8 @@ namespace SSMO.Models.Documents.Purchase
         public string TruckNumber { get; set; }
         public string DeliveryAddress { get; set; }
         public string Swb { get; set; }
+        public string ShippingLine { get; set; }
+        public string Eta { get; set; }
         public decimal PurchaseTransportCost { get; set; }      
         public decimal BankExpenses { get; set; }
         public decimal Duty { get; set; }

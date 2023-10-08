@@ -1,4 +1,5 @@
-﻿using SSMO.Models.Customers;
+﻿using SSMO.Models.CustomerOrders;
+using SSMO.Models.Customers;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Reports;
 using SSMO.Services.Documents.Invoice;
@@ -19,6 +20,6 @@ namespace SSMO.Models.Documents.CreditNote
         public ICollection<int> InvoiceNumbers { get; set; }
         public string CreditNoteDeliveryAddress { get; set; }
         public bool QuantityBack { get; set; }
-        public ICollection<AddProductsToCreditAndDebitNoteFormModel> Products { get; set; }
+        public ICollection<AddProductsToCreditAndDebitNoteFormModel> Products { get; set; }        
     }
 }

@@ -31,5 +31,6 @@ namespace SSMO.Models.Documents
         public decimal Amount { get; set; }
         public bool QuantityBack { get; set; }
         public string CreditNoteDeliveryAddress { get; set; }
+        public ICollection<InvoiceBankDetailsViewModel> BankDetails { get; set; }
     }
 }

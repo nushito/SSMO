@@ -22,9 +22,8 @@ namespace SSMO.Data.Models
         public string VAT { get; set; }
         public string BgCustomerRepresentativePerson { get; set; }
         public string RepresentativePerson { get; set; }
-        public int AddressId { get; set; }
-        [Required]
-        public Address ClientAddress { get; set; }
+        public int AddressId { get; set; }       
+        public Address Address { get; set; }
 
         [DataType(DataType.EmailAddress)]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]

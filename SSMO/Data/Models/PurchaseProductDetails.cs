@@ -23,7 +23,7 @@ namespace SSMO.Data.Models
         public decimal Amount { get; set; }
         public int PurchaseInvoiceId { get; set; }
         public Document PurchaseInvoice { get; set; }
-        public decimal CostPrice { get; set; }
+        public decimal CostPrice { get; set; }        
         public string VehicleNumber { get; set; }
         public ICollection<Document> InvoicesToCustomer { get; set; }
         public ICollection<InvoiceProductDetails> InvoiceProductDetails { get; set; }

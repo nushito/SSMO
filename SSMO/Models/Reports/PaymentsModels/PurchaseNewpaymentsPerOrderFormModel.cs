@@ -9,5 +9,7 @@ namespace SSMO.Models.Reports.PaymentsModels
         public string PurchaseNumber { get; set; }       
         public decimal NewPaidAmount { get; set; }
         public DateTime? NewDatePaidAmount { get; set; }
+        public decimal? CurrencyExchangeRate { get; set; }
+        public string ActionCalc { get; set; }        
     }
 }

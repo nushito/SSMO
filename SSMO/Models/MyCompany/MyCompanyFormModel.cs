@@ -13,7 +13,6 @@ namespace SSMO.Models.MyCompany
         public int Id { get; init; }
         public string BgName { get; set; }
         public string Name { get; set; }
-
         [Required]
         [StringLength(9, MinimumLength = 9, ErrorMessage = "EIK number should be 9 symbols long.")]
         public string EIK { get; set; }

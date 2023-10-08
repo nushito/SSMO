@@ -1,6 +1,5 @@
 ﻿
 using SSMO.Data.Enums;
-using SSMO.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

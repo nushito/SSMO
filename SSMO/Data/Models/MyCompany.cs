@@ -24,8 +24,7 @@ namespace SSMO.Data.Models
         [Required]
         [StringLength(VatLength, MinimumLength = VatLength, ErrorMessage = "VAT number should be 11 symbols long.")]
         public string VAT { get; set; }
-        public int AddressId { get; set; }
-        [Required]
+        public int AddressId { get; set; }     
         public Address Address { get; set; }
         public string BgRepresentativePerson { get; set; }
         [Required]

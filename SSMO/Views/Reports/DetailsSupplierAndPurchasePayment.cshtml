@@ -6,6 +6,7 @@
 <div>
 </div>
     <form method="post">
+        <h2>Add new payment for Supplier Specification/Purchase Invoice</h2>
         <table class="table-bordered">
             <thead>
                 <tr>
@@ -25,8 +26,27 @@
             </tbody>
         </table>
         <hr />
-        <div>           
-            <hr />          
+        <dv>
+            
+          <input type="hidden" value="@Model.ConvertToThatCurrency" asp-for="@Model.ConvertToThatCurrency">
+               
+        </dv>
+        <h6 style="font-style:italic;color:red">Fill only if you need the payment to be re-calculated in different currency!</h6>
+         <div>
+            <span>from @Model.Currency to @Model.ConvertToThatCurrency</span>
+            <select asp-for="ActionCalc">
+                <option value="/">/</option>
+                <option value="*">*</option>
+            </select>
+         </div>
+       
+         <div class="mt-1">
+             <label asp-for="CurrencyExchangeRate">Exchange rate</label>
+             <input asp-for="CurrencyExchangeRate" type="number" min="0.000001" step="0.000001"/>
+         </div>
+        <hr />
+        <div>          
+                
               <div class="form-group">
                     <label asp-for="@Model.NewPaidAmount">Add Amount</label>
                     <input type="number" min="0.00" step="0.00001"class="form-control col-sm-3" asp-for="@Model.NewPaidAmount" value="@Model.NewPaidAmount">
@@ -37,6 +57,7 @@
                    <input type="date" class="form-control col-sm-3" asp-for="@Model.NewDateOfPayment" value="@Model.NewDateOfPayment">
                   <span asp-validation-for="@Model.NewDateOfPayment" class="small text-danger"></span>
                 </div>
+                
         </div>
        <hr />
         <b>Purchase Invoices:</b>

@@ -40,7 +40,7 @@ namespace SSMO.Services.Documents.Credit_Note
         {
             var invoiceForCredit = dbContext.Documents
                 .Where(n => n.Id == invoiceId && n.DocumentType == Data.Enums.DocumentTypes.Invoice)
-                .FirstOrDefault();            
+                .FirstOrDefault();  
 
             var creditNote = new Document
             {
@@ -59,7 +59,8 @@ namespace SSMO.Services.Documents.Credit_Note
                 Vat = invoiceForCredit.Vat,
                 InvoiceProducts = new List<InvoiceProductDetails>(),
                 CreditNoteDeliveryAddress = deliveryAddress,               
-                CreditAndDebitNoteProducts = new List<Product>()
+                CreditAndDebitNoteProducts = new List<Product>(),
+                BankDetails = invoiceForCredit.BankDetails
             };
 
             var customerOrdersByInvoice = dbContext.CustomerOrders

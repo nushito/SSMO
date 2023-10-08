@@ -2,30 +2,38 @@
 
 namespace SSMO.Data.Migrations
 {
-    public partial class Deal : Migration
+    public partial class UpdatePaymentAndFiscal : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AddColumn<decimal>(
+                name: "CurruncyRateExchange",
+                table: "Payments",
+                type: "decimal(18,6)",
+                precision: 18,
+                scale: 6,
+                nullable: true);
+
             migrationBuilder.AddColumn<string>(
-                name: "DealDescriptionBg",
+                name: "FirstCurrency",
+                table: "Payments",
+                type: "nvarchar(max)",
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "SecondCurrency",
+                table: "Payments",
+                type: "nvarchar(max)",
+                nullable: true);
+
+            migrationBuilder.AddColumn<string>(
+                name: "Eta",
                 table: "Documents",
                 type: "nvarchar(max)",
                 nullable: true);
 
             migrationBuilder.AddColumn<string>(
-                name: "DealDescriptionEng",
-                table: "Documents",
-                type: "nvarchar(max)",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "DealTypeBg",
-                table: "Documents",
-                type: "nvarchar(max)",
-                nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "DealTypeEng",
+                name: "ShippingLine",
                 table: "Documents",
                 type: "nvarchar(max)",
                 nullable: true);
@@ -34,19 +42,23 @@ namespace SSMO.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "DealDescriptionBg",
+                name: "CurruncyRateExchange",
+                table: "Payments");
+
+            migrationBuilder.DropColumn(
+                name: "FirstCurrency",
+                table: "Payments");
+
+            migrationBuilder.DropColumn(
+                name: "SecondCurrency",
+                table: "Payments");
+
+            migrationBuilder.DropColumn(
+                name: "Eta",
                 table: "Documents");
 
             migrationBuilder.DropColumn(
-                name: "DealDescriptionEng",
-                table: "Documents");
-
-            migrationBuilder.DropColumn(
-                name: "DealTypeBg",
-                table: "Documents");
-
-            migrationBuilder.DropColumn(
-                name: "DealTypeEng",
+                name: "ShippingLine",
                 table: "Documents");
         }
     }

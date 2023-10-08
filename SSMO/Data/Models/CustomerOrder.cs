@@ -11,6 +11,7 @@ namespace SSMO.Data.Models
         [Required]
         public int OrderConfirmationNumber { get; set; }
         public string CustomerPoNumber { get; set; }
+        public string Type { get; set; }
         [Required]
         [DisplayFormat(DataFormatString ="{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
         public DateTime Date { get; set; }
@@ -28,6 +29,7 @@ namespace SSMO.Data.Models
         public Status Status { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
+        public string Comment { get; set; }
         public ICollection<CustomerOrderProductDetails> CustomerOrderProducts { get; set; }        
         public decimal TotalQuantity { get; set; }
         public decimal TotalAmount { get; set; }
@@ -42,10 +44,15 @@ namespace SSMO.Data.Models
         public decimal NetWeight { get; set; }
         public decimal GrossWeight { get; set; }
         public string Origin { get; set; }
+        public int? FiscalAgentId { get; set; }
+        public FiscalAgent Fiscalagent { get; set; }
+        public string DealType { get; set; }
+        public string DealDescription { get; set; }
         public ICollection<Document> Documents { get; set;}
         public IEnumerable<SupplierOrder> SupplierOrders { get; set; }
         public ICollection<InvoiceProductDetails> InvoiceProductDetails { get; set; }
         public ICollection<Payment> Payments { get; set; }
+        public ICollection<BankDetails> BankDetails { get; set; }
 
     }
 }

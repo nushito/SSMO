@@ -15,7 +15,7 @@ namespace SSMO.Services.Products
         public int GradeId { get; set; }
         public string Grade { get; set; }
         public IEnumerable<string> Grades { get; set; }
-        public string FSCClaim { get; set; }
+        public string PurchaseFscClaim { get; set; }
         public string PurchaseFscCertificate { get; set; }
         public string Unit { get; set; }
         public decimal PurchasePrice { get; set; }

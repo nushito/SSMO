@@ -1,0 +1,95 @@
+﻿@model EditCompanyViewModel
+
+<form method="get">
+    <div class="container">
+    <label>Choose company for edit</label>
+    <select asp-for="Id" typeof="number">
+        <option value="-"> Choose company </option>
+        @foreach (var company in Model.MyCompanies)
+        {
+            <option value="@company.Id">@company.Name</option>
+        }
+    </select>
+    </div>
+    <div class="container">
+    <input type="submit" class="btn btn-info" value="Search"/></div>
+<br />
+</form>
+
+<form method="post">
+    <div class="form-group">
+                <label asp-for="Company.Name">Company name</label>
+                <input class="form-control" asp-for="Company.Name" placeholder="Enter company name">
+                <span asp-validation-for="Company.Name" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company.EIK">Company EIK</label>
+                <input class="form-control" asp-for="Company.EIK" placeholder="write company EIK">
+                <span asp-validation-for="Company.EIK" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company.VAT">Company VAT</label>
+                <input type="text" class="form-control" asp-for="Company.VAT" placeholder="write company VAT">
+                <span asp-validation-for="Company.VAT" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company.Country">Country</label>
+                <input type="text" class="form-control" asp-for="Company.Country" placeholder="Country">
+                <span asp-validation-for="Company.Country" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company.City">City</label>
+                <input type="text" class="form-control" asp-for="Company.City" placeholder="City">
+                <span asp-validation-for="Company.City" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company.Street">Street</label>
+                <input type="text" class="form-control" asp-for="Company.Street" placeholder="Street">
+                <span asp-validation-for="Company.Street" class="small text-danger"></span>
+            </div>
+    @* <div class="form-group">
+                <label asp-for="FSCClaim">FSC Claim</label>
+                <input type="text" class="form-control" asp-for="FSCClaim" placeholder="Street">
+                <span asp-validation-for="FSCClaim" class="small text-danger"></span>
+            </div>*@
+             <div class="form-group">
+                <label asp-for="Company.FSCSertificate">FSC Certificate code</label>
+                <input type="text" class="form-control" asp-for="Company.FSCSertificate" placeholder="FSC Certificate code">
+                <span asp-validation-for="Company.FSCSertificate" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company.RepresentativePerson">Representative</label>
+                <input type="text" class="form-control" asp-for="Company.RepresentativePerson" placeholder="RepresentativePerson">
+                <span asp-validation-for="Company.RepresentativePerson" class="small text-danger"></span>
+            </div>
+
+            <h5>БГ Данни</h5>
+            <hr/>
+            <div class="form-group">
+                <label asp-for="Company.BgName">Фирма</label>
+                <input class="form-control" asp-for="Company.BgName" placeholder="Име">
+                <span asp-validation-for="Company.BgName" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company.BgCountry">Държава</label>
+                <input type="text" class="form-control" asp-for="Company.BgCountry" placeholder="Държава">
+                <span asp-validation-for="Company.BgCountry" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company.BgCity">Град</label>
+                <input type="text" class="form-control" asp-for="Company.BgCity" placeholder="Град">
+                <span asp-validation-for="Company.BgCity" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company.BgStreet">Адрес</label>
+                <input type="text" class="form-control" asp-for="Company.BgStreet" placeholder="Улица">
+                <span asp-validation-for="Company.BgStreet" class="small text-danger"></span>
+            </div>
+             <div class="form-group">
+                <label asp-for="Company.BgRepresentativePerson">Управител</label>
+                <input type="text" class="form-control" asp-for="Company.BgRepresentativePerson" placeholder="Управител">
+                <span asp-validation-for="Company.BgRepresentativePerson" class="small text-danger"></span>
+            </div>
+            <hr />
+            <button type="submit" class="btn btn-primary mb-2" style="padding-bottom: 10px">Submit</button>
+</form>

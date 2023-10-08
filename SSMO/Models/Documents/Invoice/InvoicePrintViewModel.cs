@@ -36,6 +36,8 @@ namespace SSMO.Models.Documents.Invoice
         public string Comment { get; set; }
         public string DealTypeEng { get; set; }
         public string DealDescriptionEng { get; set; }
+        public string FiscalAgentName { get; set; }
+        public string FiscalAgentDetail { get; set; }
         public ICollection<InvoiceBankDetailsViewModel> CompanyBankDetails { get; set; }
         public IEnumerable<ProductsForInvoiceModel> Products { get; set; }
         public IEnumerable<ServiceProductForInvoiceFormModel> ServiceProducts { get; set; }

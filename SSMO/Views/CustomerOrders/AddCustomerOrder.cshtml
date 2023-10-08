@@ -10,7 +10,14 @@
 }
 
  <form enctype="multipart/form-data" method="post" >
-    <p>New Customer Order</p>     
+    <h4>New Customer Order</h4>    
+     <div class="form-group row col-md-4">
+        <label asp-for="Type">Choose type</label>
+        <select asp-for="Type">
+          <option value="Order Confirmation">Order Confirmation</option>
+           <option value="Proforma Invoice">Proforma Invoice</option>
+        </select>
+    </div>
         @if(checkNumber == 0)
         {
               <div class="row col-md-4">
@@ -50,11 +57,18 @@
             @foreach (var item in Model.Currencies )
             {
                 <option value="@item.Id">@item.Name</option>
-            }   
-
+            }
         </select>
     </div>
-
+    <div class="form-group row col-md-4">
+        <label asp-for="ChosenBanks">Choose Banks</label>
+        <select asp-for="ChosenBanks" class="form-control" multiple>
+            @foreach (var item in Model.BankDetails)
+            {
+               <option value="@item.Id">@item.CurrencyName:@item.BankName - @item.Iban</option>
+            } 
+        </select>
+    </div>
     <div class="form-group row col-md-4">
         <div class="form-group col-md-4">
             <div class="form-group">
@@ -85,6 +99,17 @@
         </div>    
     </div>
     <div class="form-group row col-md-4">
+       
+        <label>Choose Fiscal Agent</label>
+        <select asp-for="@Model.FiscalAgentId" class="form-control">
+            <option value="">-</option>
+                @foreach (var agent in Model.FiscalAgents)
+                {
+                    <option value="@agent.Id">@agent.Name</option>
+                }
+        </select> 
+    </div>
+    <div class="form-group row col-md-4">
         <label asp-for="Origin"></label>
         <input asp-for="Origin" type="text" class="form-control" />
         <span asp-validation-for="Origin" class="small text-danger"></span>
@@ -104,6 +129,31 @@
                     <span asp-validation-for="StatusId" class="small text-danger"></span>
                 </select>
              </td>          
+    </div>
+    <div class="form-group row col-md-4">
+        <label asp-for="Comment"></label>
+            <input asp-for="Comment" class="form-control" type="text" />
+    </div>
+     <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="DealType">Deal Type Eng</label>
+            <select asp-for="DealType" class="form-control">
+            <option value="-">-</option>
+            <option value="0% VAT according to article 21, p.2 from Bulgarian VAT Law">0% VAT according to article 21, p.2 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article.69, p.2 from Bulgarian VAT Law">0% VAT according to article.69, p.2 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article 53, p.1 from Bulgarian VAT Law">0% VAT according to article 53, p.1 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article 141 2006/112/ЕО from Bulgarian VAT Law">0% VAT according to article 141 2006/112/ЕО from Bulgarian VAT Law</option>    
+         </select>
+    </div>
+        <div class="form-group col-md-4">
+            <label asp-for="DealDescription">Deal Description</label>
+            <select asp-for="DealDescription" class="form-control">
+            <option value="-">-</option>
+            <option value="Participates in a VIES declaration">Participates in a VIES declaration</option>
+           <option value=" 	Agent in Third party"> 	Agent in Third party</option>
+            <option value="Participates in a VIES declaration, but not in Intrastat Declaration">Participates in a VIES declaration, but not in Intrastat Declaration</option>
+          </select>
+        </div>
     </div>
     
     @if(Model.SupplierOrdersBySupplier.Count() > 0)

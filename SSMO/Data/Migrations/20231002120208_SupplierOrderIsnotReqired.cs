@@ -2,13 +2,13 @@
 
 namespace SSMO.Data.Migrations
 {
-    public partial class NullCustomerOrderInvoiceProduct : Migration
+    public partial class SupplierOrderIsnotReqired : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<int>(
-                name: "CustomerOrderId",
-                table: "InvoiceProductDetails",
+                name: "SupplierOrderId",
+                table: "Documents",
                 type: "int",
                 nullable: true,
                 oldClrType: typeof(int),
@@ -18,8 +18,8 @@ namespace SSMO.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterColumn<int>(
-                name: "CustomerOrderId",
-                table: "InvoiceProductDetails",
+                name: "SupplierOrderId",
+                table: "Documents",
                 type: "int",
                 nullable: false,
                 defaultValue: 0,

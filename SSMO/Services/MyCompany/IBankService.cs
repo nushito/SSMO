@@ -4,8 +4,7 @@ namespace SSMO.Services.MyCompany
    public interface IBankService
     {
         public int Create(
-            int currencyId, 
-            string currencyName, 
+            int currencyId,            
             string bankName, 
             string iban, 
             string swift, 

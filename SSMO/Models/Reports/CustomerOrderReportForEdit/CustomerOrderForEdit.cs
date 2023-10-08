@@ -42,6 +42,8 @@ namespace SSMO.Models.Reports.CustomerOrderReportForEdit
         public IEnumerable<AllSuppliers> Suppliers { get; set; }
         public IEnumerable<SupplierOrdersBySupplier> SupplierOrdersBySupplier { get; set; }
         public IEnumerable<int> SelectedSupplierOrders { get; set; }
+        public List<int> ChosenBanks { get; set; }
+        public ICollection<BankDetailsViewModel> BankDetails { get; set; }       
 
     }
 }

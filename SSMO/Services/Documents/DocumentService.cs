@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using SSMO.Models.CustomerOrders;
+using AutoMapper.QueryableExtensions;
 
 namespace SSMO.Services.Documents
 {
@@ -189,6 +191,7 @@ namespace SSMO.Services.Documents
             var customer = dbContext.Customers
                 .Where(c => c.Id == customerId)
                 .FirstOrDefault();
+
             var customerAdress = dbContext.Addresses.
                 Where(id => id.Id == customer.AddressId)
                 .FirstOrDefault();
@@ -216,7 +219,8 @@ namespace SSMO.Services.Documents
                 CurrencyId = invoice.CurrencyId,
                 TotalQuantity= invoice.TotalQuantity,
                 DealDescriptionBg = invoice.DealDescriptionBg,
-                DealTypeBg= invoice.DealTypeBg
+                DealTypeBg= invoice.DealTypeBg,
+                FiscalAgentId = invoice.FiscalAgentId
             };
 
             switch (invoice.DocumentType)
@@ -283,7 +287,7 @@ namespace SSMO.Services.Documents
                 .FirstOrDefault();
 
             var bankDetails = dbContext.BankDetails
-                .Where(i => i.CompanyId == seller.Id)
+                .Where(i => invoice.BankDetails.Select(i=>i.Id).Contains(i.Id))
                 .ToList();
 
             var productsFromInvoice = new List<InvoiceProductDetails>();
@@ -410,6 +414,7 @@ namespace SSMO.Services.Documents
             bgInvoice.CurrencyExchangeRateUsdToBGN = currencyExchange;
             bgInvoice.CurrencyId = invoice.CurrencyId;
             bgInvoice.TotalQuantity = invoice.TotalQuantity;
+            bgInvoice.FiscalAgentId = invoice.FiscalAgentId;
 
             switch (invoice.DocumentType)
             {
@@ -427,6 +432,58 @@ namespace SSMO.Services.Documents
             }
 
             dbContext.SaveChanges();            
+        }
+
+        public List<InvoiceBankDetailsViewModel> BankDetails(int id)
+        {
+            var bankList = dbContext.BankDetails
+                .Where(c => c.CompanyId == id)
+                .ToList();
+
+            var bankDetails = new List<InvoiceBankDetailsViewModel>();
+
+            foreach (var bank in bankList)
+            {
+                var currency = dbContext.Currencies
+                    .Where(i => i.Id == bank.CurrencyId)
+                    .Select(n => n.Name)
+                    .FirstOrDefault();
+
+                bankDetails.Add(new InvoiceBankDetailsViewModel
+                {
+                    Id= bank.Id,
+                    BankName = bank.BankName,
+                    Currency = currency,
+                    CurrencyId = bank.CurrencyId,
+                    Iban = bank.Iban,
+                    Swift = bank.Swift,
+                });
+            }
+
+            return bankDetails;
+        }
+
+        public void AddFiscalAgent(string name, string bgName, string details, string bgDetails)
+        {
+            var agent = new FiscalAgent
+            {
+                Name = name,
+                BgName = bgName,
+                Details = details,
+                BgDetails = bgDetails
+            };
+
+           dbContext.FiscalAgents.Add(agent);
+           dbContext.SaveChanges();           
+        }
+
+        public ICollection<FiscalAgentViewModel> GetFiscalAgents()
+        {
+            var agents  = dbContext.FiscalAgents
+                .ProjectTo<FiscalAgentViewModel>(mapper.ConfigurationProvider)
+                .ToList();
+            return agents;
+            
         }
     }
 }

@@ -27,30 +27,30 @@ namespace SSMO.Services.Customer
         {
             if (customerName == null) return false;
 
-            var customer = new Data.Models.Customer
+            var address = new Address
             {
-                ClientAddress = new Address
+                Country = country,
+                City = city,
+                Street = street,
+                BgCity = bgCity,
+                BgStreet = bgStreet,
+                Bgcountry = bgCountry,
+                Customers = new Data.Models.Customer
                 {
-                    Country = country,
-                    City = city,
-                    Street = street,
-                    BgCity = bgCity,
-                    BgStreet = bgStreet,
-                    Bgcountry = bgCountry
-                },
-                Email = email,
-                Name = customerName,
-                VAT = vat,
-                EIK = eik,
-                RepresentativePerson =representativePerson,
-                BgCustomerName = bgName,
-                BgCustomerRepresentativePerson=bgRepresentativePerson,
-                PhoneNumber = phoneNumber
-            };
+                    Email = email,
+                    Name = customerName,
+                    VAT = vat,
+                    EIK = eik,
+                    RepresentativePerson = representativePerson,
+                    BgCustomerName = bgName,
+                    BgCustomerRepresentativePerson = bgRepresentativePerson,
+                    PhoneNumber = phoneNumber,
+                }
+            };                      
 
-            this.dbContext.Customers.Add(customer);
+            this.dbContext.Addresses.Add(address);
             this.dbContext.SaveChanges();
-
+           
             return true;
         }
 

@@ -18,9 +18,9 @@ namespace SSMO.Services.Documents.Purchase
             decimal duty, decimal factoring, decimal customsExpenses, decimal fiscalAgentExpenses,
             decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses,
             int vat, string truckNumber, string swb, List<PurchaseProductAsSupplierOrderViewModel> products,
-            string incoterms, decimal paidAdvance, DateTime? dateOfPayment,string deliveryAddress);
-        public EditPurchasePaymentDetails GetPurchaseForPaymentEdit(string number);
-        public bool EditPurchasePayment(string number, bool paidStatus, decimal paidAvance, DateTime datePaidAmount);
+            string incoterms, decimal paidAdvance, DateTime? dateOfPayment,string deliveryAddress, 
+            string shippingLine, string eta, bool delayCostCalc, int costPriceCurrencyId);
+       
 
         public PurchaseInvoiceDetailsViewModel PurchaseDetails(int id);
 
@@ -29,7 +29,7 @@ namespace SSMO.Services.Documents.Purchase
             int vat, decimal netWeight, decimal grossWeight, string truckNumber, string swb, decimal purchaseTransportCost,
             decimal bankExpenses, decimal duty, decimal customsExpenses, decimal factoring, decimal fiscalAgentExpenses, 
             decimal procentComission, decimal otherExpenses, List<PurchaseProductsForEditFormModel> purchaseProducts,
-            string deliveryAddress);
+            string deliveryAddress, string shippingLine, string eta);
 
         public List<PurchaseProductAsSupplierOrderViewModel> Products(int id);
         public IList<PurchaseProductsForDebitNoteViewModel> PurchaseProducts();

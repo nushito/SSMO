@@ -21,6 +21,7 @@ using iTextSharp.text;
 using SSMO.Infrastructure;
 using SSMO.Services.SupplierOrders;
 using System.Text.Json;
+using SSMO.Services.Documents;
 
 namespace SSMO.Controllers
 {
@@ -36,13 +37,16 @@ namespace SSMO.Controllers
         private readonly IReportsService reportService;
         private readonly IStatusService statusService;
         private readonly ISupplierOrderService supplierOrderService;
+        private readonly IDocumentService documentService;
         public CustomerOrdersController(ISupplierService supplierService,
            ICurrency currency,
            IMycompanyService myCompanyService,
            ICustomerService customerService,
            IProductService productService, IMapper mapper,
- ApplicationDbContext dbContext, ICustomerOrderService cusomerOrderService,
- IReportsService reportService, IStatusService statusService, ISupplierOrderService supplierOrderService)
+            ApplicationDbContext dbContext, ICustomerOrderService cusomerOrderService,
+            IReportsService reportService, IStatusService statusService,
+            ISupplierOrderService supplierOrderService, IDocumentService
+             documentService)
         {
             this.supplierService = supplierService;
             this.currency = currency;
@@ -53,7 +57,8 @@ namespace SSMO.Controllers
             this.customerOrderService = cusomerOrderService;
             this.reportService = reportService;
             this.statusService = statusService;
-            this.supplierOrderService = supplierOrderService;   
+            this.supplierOrderService = supplierOrderService;
+            this.documentService = documentService;
         }
 
         [HttpGet]
@@ -75,14 +80,17 @@ namespace SSMO.Controllers
             }
 
             var customerOrderDetails = new CustomerOrderViewModel
-            {
+             {
                 Currencies = currency.AllCurrency(),
                 Customers = customerService.CustomersData(),
                 MyCompanies = myCompanyService.GetAllCompanies(),
                 Products = new List<ProductCustomerFormModel>(),
                 Statuses = statusService.GetAllStatus(),
-                SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders()
-        };
+                BankDetails = customerOrderService.GetBanks(),
+                SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders(),
+                FiscalAgents = documentService.GetFiscalAgents()
+             };
+
             return View(customerOrderDetails);
         }
       
@@ -105,10 +113,11 @@ namespace SSMO.Controllers
                     Currencies = currency.AllCurrency(),
                     Customers = customerService.CustomersData(),
                     MyCompanies = myCompanyService.GetAllCompanies(),
-                   // Suppliers = supplierService.GetSuppliers(),
+                    BankDetails = customerOrderService.GetBanks(),
                     Products = new List<ProductCustomerFormModel>(),
                     Statuses = statusService.GetAllStatus(),
-                    SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders()
+                    SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders(),
+                    FiscalAgents = documentService.GetFiscalAgents()
                 };
 
                 new ProductCustomerFormModel
@@ -135,7 +144,10 @@ namespace SSMO.Controllers
                                  customermodel.Origin,
                                  customermodel.PaidAmountStatus,
                                  customermodel.Vat ?? 0, customermodel.StatusId, 
-                                 (List<int>)customermodel.SelectedSupplierOrders);
+                                 (List<int>)customermodel.SelectedSupplierOrders,
+                                 customermodel.Comment, customermodel.ChosenBanks, 
+                                 customermodel.Type, customermodel.FiscalAgentId,
+                                 customermodel.DealType, customermodel.DealDescription);
                 ViewBag.NumberExist = 0;
             }
             else
@@ -152,10 +164,15 @@ namespace SSMO.Controllers
                                  customermodel.Origin,
                                  customermodel.PaidAmountStatus,
                                  customermodel.Vat ?? 0, customermodel.StatusId, 
-                                 (List<int>)customermodel.SelectedSupplierOrders);
+                                 (List<int>)customermodel.SelectedSupplierOrders,
+                                 customermodel.Comment,customermodel.ChosenBanks, 
+                                 customermodel.Type, customermodel.FiscalAgentId,
+                                  customermodel.DealType, customermodel.DealDescription);
                 ViewBag.NumberExist = 1;
             }
-            return RedirectToAction("AddOrderProducts", new { selectedSupplierOrders = customermodel.SelectedSupplierOrders, customerorderId = customerorderId }) ;
+            return RedirectToAction("AddOrderProducts", 
+                new { selectedSupplierOrders = customermodel.SelectedSupplierOrders, 
+                      customerorderId = customerorderId}) ;
         }
 
         public IActionResult AddOrderProducts(List<int> selectedSupplierOrders, int customerorderId)
@@ -185,7 +202,7 @@ namespace SSMO.Controllers
                     GradeId = product.GradeId,
                     SizeId = product.SizeId,
                     FSCSertificate = product.PurchaseFscCertificate,
-                    FSCClaim = product.FSCClaim,                    
+                    FSCClaim = product.PurchaseFscClaim,                    
                     Pallets = product.Pallets,
                     SheetsPerPallet = product.SheetsPerPallet,
                     Descriptions = productService.GetDescriptions(),
@@ -244,12 +261,14 @@ namespace SSMO.Controllers
             }
             customerOrderService.CustomerOrderCounting(customerorderId);
 
-            return RedirectToAction("PrintCustomerOrder");
+            return RedirectToAction("PrintCustomerOrder", customerorderId);
         }
 
-        public IActionResult PrintCustomerOrder()
+        public IActionResult PrintCustomerOrder(int customerorderId)
         {
-            return RedirectToAction("Index", "Home");
+            var printModel = customerOrderService.GetCustomerOrderPrint(customerorderId);
+            ClientService.AddCustomerOrderPrint(printModel);    
+            return View(printModel);
         }
 
     }

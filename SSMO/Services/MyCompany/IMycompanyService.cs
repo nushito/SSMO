@@ -27,5 +27,11 @@ namespace SSMO.Services.MyCompany
 
         public string GetCompanyName(int id);
         public ICollection<MyCompanyViewModel> GetCompaniesNameAndId();
+
+        public MyCompanyEditFormModel CompanyForEditById(int id);
+
+        public bool EditCompany(int id, string name, string bgname, string eik, string vat,string fscClaim, string fscCertificate, 
+            string representativeName, string representativeNameBg, string street, string bgStreet, 
+            string city, string bgCity, string country, string bgCountry);
     }
 }

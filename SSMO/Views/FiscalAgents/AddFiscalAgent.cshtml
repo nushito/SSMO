@@ -1,0 +1,30 @@
+﻿@model AddFiscalAgentFormModel
+
+<form method="post">
+    <h2 class="mb-2">Add new Fiscal Agent</h2>
+ <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="Name">Description</label>
+        <input asp-for="Name" type="text" class="form-control" placeholder="Name">
+        <span asp-validation-for="Name" class="small text-danger"></span>
+    </div>
+    <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="BgName">БГ Име</label>
+        <input asp-for="BgName" type="text" class="form-control" placeholder="БГ Име">
+        <span asp-validation-for="BgName" class="small text-danger"></span>
+    </div>
+     <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="Details">Company details</label>
+        <input asp-for="Details" type="text" class="form-control" placeholder="Address, phone ...">
+        <span asp-validation-for="Details" class="small text-danger"></span>
+    </div>
+     <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="BgDetails">Данни на фирмата</label>
+        <input asp-for="BgDetails" type="text" class="form-control" placeholder="Адрес, тел ...">
+        <span asp-validation-for="BgDetails" class="small text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Save</button>
+</form>
+
+@section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+}

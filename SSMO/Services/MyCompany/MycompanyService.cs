@@ -119,30 +119,47 @@ namespace SSMO.Services.MyCompany
         {
             if (userId == null) return false;
 
-            var company = new Data.Models.MyCompany
+            var address = new Address
             {
-                Name = name,
-                BgName = bgName,
-                Eik = eik,
-                VAT = vat,
-                Address = new Address
+                City = city,
+                Country = country,
+                Street = addres,
+                BgCity = bgCity,
+                Bgcountry = bgCountry,
+                BgStreet = bgAddress,
+                MyCompany = new Data.Models.MyCompany
                 {
-                    City = city,
-                    Country = country,
-                    Street = addres,
-                    BgCity = bgCity,
-                    Bgcountry = bgCountry,
-                    BgStreet = bgAddress
-                },
-                RepresentativePerson = representativePerson,
-                BgRepresentativePerson = bgRepresentative,
-                FSCSertificate = fsc,
-                UserId = userId
-            };
+                    Name = name,
+                    BgName = bgName,
+                    Eik = eik,
+                    VAT = vat,
+                    RepresentativePerson = representativePerson,
+                    BgRepresentativePerson = bgRepresentative,
+                    FSCSertificate = fsc,
+                    UserId = userId,
+                    
+                }
+        };
 
-            dbContext.MyCompanies.Add(company);
+            dbContext.Addresses.Add(address);   
             dbContext.SaveChanges();
 
+            //var company = new Data.Models.MyCompany
+            //{
+            //    Name = name,
+            //    BgName = bgName,
+            //    Eik = eik,
+            //    VAT = vat,                
+            //    RepresentativePerson = representativePerson,
+            //    BgRepresentativePerson = bgRepresentative,
+            //    FSCSertificate = fsc,
+            //    UserId = userId,
+            //    AddressId = address.Id
+            //};
+
+            //dbContext.MyCompanies.Add(company);
+            //dbContext.SaveChanges();
+           
             return true;
         }
 
@@ -188,6 +205,60 @@ namespace SSMO.Services.MyCompany
                 .Where(i=>i.Id == id)
                 .Select(n=>n.Name) 
                 .FirstOrDefault();
+        }
+
+        public MyCompanyEditFormModel CompanyForEditById(int id)
+        {
+            var company = dbContext.MyCompanies
+                .Where(i=>i.Id == id);
+           
+            if (company.FirstOrDefault() == null) 
+            {
+                return null;
+            }
+
+            var companyForEdit = mapper.ProjectTo<MyCompanyEditFormModel>(company).FirstOrDefault();
+
+            var address = dbContext.Addresses.
+                Where(i=>i.Id == companyForEdit.AddressId)
+                .FirstOrDefault();
+
+            companyForEdit.Street = address.Street;
+            companyForEdit.City = address.City;
+            companyForEdit.BgCity = address.BgCity;
+            companyForEdit.BgStreet = address.BgStreet; 
+            companyForEdit.Country = address.Country;
+            companyForEdit.BgCountry = address.Country;          
+
+            return companyForEdit;
+        }
+
+        public bool EditCompany(int id, string name, string bgname, string eik, string vat, string fscClaim, 
+            string fscCertificate, string representativeName, string representativeNameBg, string street, string bgStreet, 
+            string city, string bgCity, string country, string bgCountry)
+        {
+            var company = dbContext.MyCompanies.Find(id);
+            if (company == null) { return false; }
+
+            company.Name = name;    
+            company.BgName= bgname; 
+            company.Eik = eik;
+            company.VAT= vat;
+            company.FSCClaim= fscClaim; 
+            company.FSCSertificate = fscCertificate;
+            company.RepresentativePerson= representativeName;
+            company.BgRepresentativePerson = representativeNameBg;  
+
+            var address = dbContext.Addresses.Find(company.AddressId);
+
+            address.Street = street;
+            address.City = city;
+            address.Country = country;  
+            address.BgCity= bgCity;
+            address.BgStreet= bgStreet; 
+            address.Bgcountry= bgCountry;
+
+            return true;
         }
     }
 }

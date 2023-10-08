@@ -14,15 +14,14 @@ namespace SSMO.Controllers
 {
     public class MyCompanyController : Controller
     {
-        private readonly ApplicationDbContext dbContext;
+        
         private readonly ICurrency icurrency;
         private readonly IBankService bankService;
         private readonly IMycompanyService mycompany;
+       
    
-        public MyCompanyController (ApplicationDbContext dbContext
-            ,ICurrency icurrency, IBankService bankService, IMycompanyService mycompany)
-        {
-            this.dbContext = dbContext;
+        public MyCompanyController (ICurrency icurrency, IBankService bankService, IMycompanyService mycompany)
+        {           
             this.icurrency = icurrency;
             this.bankService = bankService;
             this.mycompany = mycompany;
@@ -49,7 +48,8 @@ namespace SSMO.Controllers
             string userId = this.User.UserId();//this.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var isCompanyRegistered = mycompany.RegisterMyCompany(
-                model.Name, model.EIK, model.VAT, model.FSCSertificate, userId, model.City, model.Street, model.Country, model.RepresentativePerson, model.BgName,
+                model.Name, model.EIK, model.VAT, model.FSCSertificate, userId, model.City, 
+                model.Street, model.Country, model.RepresentativePerson, model.BgName,
                 model.BgCity, model.BgStreet, model.BgCountry, model.RepresentativePerson);
 
             if (!isCompanyRegistered) return View();
@@ -62,8 +62,8 @@ namespace SSMO.Controllers
             return View(new AddBankDetailsFormModel
             { 
                 CompanyNames = mycompany.GetCompaniesNames(),
-                Currency = icurrency.GetCurrency()
-            }); 
+                Currency = this.icurrency.AllCurrency().ToList()
+        }); 
         }
               
         [Authorize]
@@ -72,7 +72,7 @@ namespace SSMO.Controllers
         {
             if (!ModelState.IsValid)
             {
-                bankmodel.Currency = this.icurrency.GetCurrency().ToList();
+                bankmodel.Currency = this.icurrency.AllCurrency().ToList();
                 bankmodel.CompanyNames = this.mycompany.GetCompaniesNames();
             }
                 
@@ -90,8 +90,7 @@ namespace SSMO.Controllers
             }
 
             bankService.Create(
-                bankmodel.CurrencyId,
-                bankmodel.CurrencyName,
+                bankmodel.CurrencyId,              
                 bankmodel.BankName,
                 bankmodel.Iban,
                 bankmodel.Swift,
@@ -103,8 +102,40 @@ namespace SSMO.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-       //TODO Edit Mycompany
-       
+        [HttpGet]
+       public IActionResult EditCompany(EditCompanyViewModel model)
+        {
+            var userId = this.User.UserId();
+            var myuserId = mycompany.GetCompaniesUserId();
+            if (!myuserId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid) { return BadRequest(); }
+
+            model.MyCompanies = mycompany.GetCompaniesNameAndId();
+            model.Company = mycompany.CompanyForEditById(model.Id);
+
+            return View(model);
+        }
+
+        [HttpPost]
+        public IActionResult EditCompany(int id, EditCompanyViewModel model)
+        {
+            var userId = this.User.UserId();
+            var myuserId = mycompany.GetCompaniesUserId();
+            if (!myuserId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid) { return BadRequest(); }
+
+            var isEdited = mycompany.EditCompany(id, model.Company.Name, model.Company.BgName, model.Company.EIK, model.Company.VAT,
+                model.Company.FSCClaim, model.Company.FSCSertificate, model.Company.RepresentativePerson, 
+                model.Company.BgRepresentativePerson, model.Company.Street, model.Company.BgStreet, 
+                model.Company.City, model.Company.BgCity, model.Company.Country, model.Company.BgCountry);
+
+            if(!isEdited) { return BadRequest(); }
+
+            return RedirectToAction("Index", "Home");
+
+        }
 
     }
 }

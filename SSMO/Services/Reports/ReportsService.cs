@@ -20,6 +20,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SSMO.Models.Reports.Purchase;
 using SSMO.Data.Enums;
+using SSMO.Models.CustomerOrders;
 
 namespace SSMO.Services.Reports
 {
@@ -110,9 +111,9 @@ namespace SSMO.Services.Reports
                 PaidAmountStatus = corder.PaidAmountStatus,
                 Origin = corder.Origin,
                 StatusId = corder.StatusId,
-                Vat = corder.Vat
+                Vat = corder.Vat                
             };
-
+           
             orderForEdit.Products = (List<ProductCustomerFormModel>)productService.DetailsPerCustomerOrder(id);
 
             return orderForEdit;
@@ -254,7 +255,7 @@ namespace SSMO.Services.Reports
             string loadingPlace, string deliveryAddress,
             int currencyId, int status, string fscClaim,
             string fscCertificate, decimal paidAdvance, bool paidStatus,
-             IList<ProductCustomerFormModel> products)
+             IList<ProductCustomerFormModel> products, List<int> banks)
         {
             var order = dbcontext.CustomerOrders.Find(id);
 
@@ -276,6 +277,10 @@ namespace SSMO.Services.Reports
             order.PaidAvance = paidAdvance;
             order.PaidAmountStatus = paidStatus;
             order.Amount = 0;
+
+            order.BankDetails = dbcontext.BankDetails
+                .Where(i=> banks.Contains(i.Id))
+                .ToList();
 
             if (products != null)
             {

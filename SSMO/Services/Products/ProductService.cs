@@ -3,6 +3,7 @@ using AutoMapper.QueryableExtensions;
 using DocumentFormat.OpenXml.Drawing.Charts;
 using DocumentFormat.OpenXml.Drawing.Diagrams;
 using DocumentFormat.OpenXml.Presentation;
+using Humanizer.DateTimeHumanizeStrategy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SSMO.Data;
@@ -217,7 +218,7 @@ namespace SSMO.Services.Products
         public IEnumerable<ProductPerSupplierOrderDetails> Details(List<int> supplierOrderserId)
         {
             var products = dbContext.Products
-                .Where(a => supplierOrderserId.Contains(a.SupplierOrderId ?? 0))
+                .Where(a => supplierOrderserId.Contains(a.SupplierOrderId ?? 0) && a.QuantityAvailableForCustomerOrder > 0.0001m)
                 .ProjectTo<ProductPerSupplierOrderDetails>(mapper)
                 .ToList();
 
@@ -226,6 +227,16 @@ namespace SSMO.Services.Products
                 item.Description = GetDescriptionName(item.DescriptionId);
                 item.Grade = GetGradeName(item.GradeId);
                 item.Size = GetSizeName(item.SizeId);
+
+                if(item.QuantityAvailableForCustomerOrder < item.OrderedQuantity)
+                {
+                    var pallets = dbContext.CustomerOrderProductDetails
+                        .Where(i => i.ProductId == item.Id)
+                        .Select(p => p.Pallets)
+                        .FirstOrDefault();
+
+                    item.Pallets -= pallets;
+                }
             }
 
             return products;
@@ -965,6 +976,20 @@ namespace SSMO.Services.Products
                     .Select(n=>n.Name)
                     .FirstOrDefault();
 
+                var purchaseInvoiceId = dbContext.PurchaseProductDetails
+                    .Where(i=>i.Id == product.PurchaseProductDetailsId)
+                    .Select(n=>n.PurchaseInvoiceId)
+                    .FirstOrDefault();
+
+                var purchaseInvoice = dbContext.Documents
+                    .Where(i => i.Id == purchaseInvoiceId)
+                    .FirstOrDefault();
+
+                var supplier = dbContext.Suppliers
+                    .Where(a => a.Id == purchaseInvoice.SupplierId)
+                    .Select(a => a.Name)
+                    .FirstOrDefault();
+
                 var soldProduct = new SoldProductsFscCollectionViewModel
                 {
                     DescriptionId = mainProduct.DescriptionId,
@@ -975,6 +1000,8 @@ namespace SSMO.Services.Products
                     InvoiceNumber = invoice.DocumentNumber,
                     Transport = invoice.TruckNumber,
                     Unit = product.Unit.ToString(),
+                    PurchaseInvoice = purchaseInvoice.PurchaseNumber,
+                    Supplier = supplier
                 };
 
                 if(invoice.DocumentType == DocumentTypes.Invoice)
@@ -994,6 +1021,75 @@ namespace SSMO.Services.Products
             }
 
             return soldProducts;
+        }
+
+        public void CalculateCostPriceInDiffCurrency(int purchaseId, string action)
+        {
+            var purchase = dbContext.Documents.Find(purchaseId);
+            if(purchase == null) { return; }    
+
+           var payments = dbContext.Payments
+                .Where(d=>d.DocumentId == purchaseId)
+                .ToList();
+
+            var purchaseProducts = dbContext.PurchaseProductDetails
+                .Where(i => i.PurchaseInvoiceId == purchaseId)
+                .ToList();
+          
+            var paymentsSum = payments.Select(a=>a.NewAmountPerExchangeRate).Sum();
+            decimal calcNumber = 0.0m;
+            
+            var expenses = purchase.Duty + purchase.Factoring * purchase.Amount / 100 +
+                      purchase.CustomsExpenses + purchase.FiscalAgentExpenses +
+                      purchase.ProcentComission * purchase.Amount / 100 + purchase.PurchaseTransportCost +
+                      purchase.BankExpenses + purchase.OtherExpenses;
+
+            foreach (var product in purchaseProducts)
+            {
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
+
+                var size = GetSizeName(mainProduct.SizeId);
+                var dimensionArray = size.Split('/').ToArray();
+                decimal sum = 1M;
+                decimal thickness = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5);
+                decimal calcMeter = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5) * Math.Round(decimal.Parse(dimensionArray[2]) / 1000, 5); ;
+                decimal feetTom3 = product.Quantity * 0.0929m * thickness;
+
+                switch (action)
+                {
+                    case "/": calcNumber = 1 / (paymentsSum / purchase.Amount ?? 0);product.Amount /= calcNumber; break;
+                    case "*": calcNumber = paymentsSum / purchase.Amount ?? 0;product.Amount *= calcNumber; break;
+                    default: break;
+                }
+
+
+                for (int i = 0; i < dimensionArray.Count(); i++)
+                {
+                    sum *= Math.Round(decimal.Parse(dimensionArray[i]) / 1000, 5);
+                }
+
+                if (product.Unit == Data.Enums.Unit.m3)
+                {
+                    product.CostPrice = (product.Amount + (expenses / purchase.TotalQuantity * product.Quantity)) / product.Quantity;
+                }
+                else
+                if (product.Unit == Data.Enums.Unit.m2)
+                {
+                    product.CostPrice = ((product.Amount + (expenses / purchase.TotalQuantity * product.QuantityM3)) / product.QuantityM3 ?? 0) * thickness;
+                }
+                else if (product.Unit == Data.Enums.Unit.pcs || product.Unit == Data.Enums.Unit.sheets)
+                {
+                    product.CostPrice = ((product.Amount + (expenses / purchase.TotalQuantity * product.QuantityM3)) / product.QuantityM3 ?? 0) * sum;
+                }
+                else if (product.Unit == Data.Enums.Unit.sqfeet)
+                {
+                    product.CostPrice = ((product.Amount + (expenses / purchase.TotalQuantity * product.QuantityM3)) / product.QuantityM3 ?? 0) / feetTom3;
+                }
+                else
+                {
+                    product.CostPrice = ((product.Amount + (expenses / purchase.TotalQuantity * product.QuantityM3)) / product.QuantityM3 ?? 0) * calcMeter;
+                }
+            }
         }
     }
 }

@@ -22,6 +22,8 @@ namespace SSMO.Models.Reports.Purchase
         public decimal FiscalAgentExpenses { get; set; }
         public string TruckNumber { get; set; }
         public string Swb { get; set; }
+        public string ShippingLine { get; set; }
+        public string Eta { get; set; }
         public string DeliveryAddress { get; set; }
         public int Vat { get; set; }
         public decimal ProcentComission { get; set; }

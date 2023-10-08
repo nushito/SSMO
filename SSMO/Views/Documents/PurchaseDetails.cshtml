@@ -4,6 +4,9 @@
 }
 
 <form method="post">
+    <div>
+        <p>Choose Supplier Specification to create Purchase Invoice</p>
+    </div>
     <table class="col-sm-auto">         
         <tr>
             <td class="col-sm-auto">
@@ -34,7 +37,7 @@
         </tr>
         <tr>
               <td class="col-sm-auto">
-              <label class="form-check-label" asp-for="Incoterms"> Delivery terms </label>    
+              <label class="form-check-label" asp-for="Incoterms"> Incoterms </label>    
        <input class="form-control" type="text" asp-for="Incoterms">
             </td>
             <td class="col-sm-auto">
@@ -59,6 +62,18 @@
             </td>
         </tr>
         <tr>
+            <td class="col-sm-auto">
+                 <label asp-for="ShippingLine">Shipping Line</label>
+        <input asp-for="ShippingLine" type="text" class="form-control" >
+        <span asp-validation-for="ShippingLine" class="small text-danger"></span>
+            </td>
+             <td class="col-sm-auto">
+                  <label asp-for="Eta">ETA</label>
+        <input asp-for="Eta" type="text" class="form-control" >
+        <span asp-validation-for="Eta" class="small text-danger"></span>
+            </td>
+        </tr>
+        <tr>
            <td class="col-sm-auto">
                  <label asp-for="NetWeight">Net Weight</label>
         <input asp-for="NetWeight"min="0.0000" step="0.0001" type="number" class="form-control" >
@@ -70,7 +85,21 @@
         <span asp-validation-for="GrossWeight" class="small text-danger"></span>
             </td>
         </tr>
-          <tr>
+        <tr>
+            <p style="font-style:italic;color:red;font-size:12px">*All expenses should be in the cost price currency </p>
+        </tr>
+        <tr>
+            <td>
+                <label>Choose different currency for cost calculation</label>
+                <select asp-for="CostPriceCurrency" class="form-control">
+                    @foreach (var currency in Model.Currencies)
+                    {
+                        <option value="@currency.Id">@currency.Name</option>                        
+                    }
+                </select>
+            </td>
+        </tr>
+         <tr>
            <td class="col-sm-auto">
                    <label asp-for="Duty">Duty</label>
         <input asp-for="Duty" min="0.0000" step="0.0001" type="number" class="form-control" >
@@ -117,8 +146,15 @@
         <input asp-for="OtherExpenses" min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="OtherExpenses" class="small text-danger"></span>
             </td>
-        </tr>
-    </table>
+        </tr> 
+        <tr class="flex-lg-wrap">
+            <td >
+                <label style="color:darkred">Calculate cost later</label>
+                <input asp-for="@Model.DelayCostCalculation"  type="checkbox"/>
+            </td> 
+        </tr> 
+ </table>    
+   
  <p class="font-weight-bold">Products</p>
     <table class="table table-bordered">
         <thead class="thead-light">
@@ -133,7 +169,7 @@
                 <td>Pallets</td>
                 <td>Sheets/pallet</td>
                 <td>Quantity</td>
-                <td>Price</td>
+                <td>Price @Model.Currency</td>
                 <td>Truck/Container No</td>
             </tr>
         </thead>
@@ -149,7 +185,7 @@
             </div>
             <tr>
                  <td  class="col-sm-1">
-                 <div class="editor-field">
+                 <div class="editor-field flex-md-wrap">
                       <input class="form-check-input" type="checkbox" asp-for="@Model.ProductDetails[i].ProductOrNot">
                        <label class="form-check-label" > </label>  
                    </div>                         

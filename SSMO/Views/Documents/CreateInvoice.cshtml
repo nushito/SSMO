@@ -74,6 +74,11 @@
                <li class="text-muted">Gross Weight: <span style="color:#5d9fc5 ;">@Model.GrossWeight kg</span></li>
             </ul>
           </div>
+          <div class="col-xl-4">
+              @if(Model.FiscalAgentName != "-")
+              @Model.FiscalAgentName <br />
+              @Model.FiscalAgentDetail
+          </div>
         </div>
 
         <div>

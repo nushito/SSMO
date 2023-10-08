@@ -67,5 +67,8 @@ namespace SSMO.Services.Products
             (int myCompanyId, DateTime startDate, DateTime EndDate, string fscClaim);
         public ICollection<SoldProductsFscCollectionViewModel> SoldProductFscCollection
             (int myCompanyId, DateTime startDate, DateTime EndDate, string fscClaim);
+
+        public void CalculateCostPriceInDiffCurrency(int purchaseId, string action);
+
     }
 }

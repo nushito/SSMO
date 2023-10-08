@@ -18,6 +18,7 @@ using SSMO.Services.Documents.Invoice;
 using SSMO.Services.Documents.Purchase;
 using SSMO.Services.Products;
 using SSMO.Services.Reports;
+using System.Threading;
 
 namespace SSMO.Infrastructure
 {
@@ -32,6 +33,7 @@ namespace SSMO.Infrastructure
             this.CreateMap<MyCompany, MyCompanyFormModel>();
             this.CreateMap<MyCompany, MyCompaniesForReportViewModel>();
             this.CreateMap<MyCompany, MyCompanyInvoiceDetailsModel>();
+            this.CreateMap<MyCompany, MyCompanyEditFormModel>();
 
             this.CreateMap<CustomerOrder, CustomerOrderViewModel>();
             this.CreateMap<CustomerOrder, CustomerOrderDetailsModel>();
@@ -96,6 +98,7 @@ namespace SSMO.Infrastructure
             this.CreateMap<Payment, PurchaseAllPaymentsViewModel>();
             this.CreateMap<Payment, PaymentViewModel>();
 
+            this.CreateMap<FiscalAgent, FiscalAgentViewModel>();
         }
     }
 }

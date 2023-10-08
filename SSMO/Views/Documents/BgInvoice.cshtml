@@ -84,6 +84,13 @@
             </ul>
           </div>
         </div>
+        <div class="col-xl-6">
+                    @if(Model.FiscalAgentName != "-")
+                    {
+                        @Model.FiscalAgentName <br />
+                        @Model.FiscalAgentDetail
+                    }
+        </div>
 
         <div class="row my-2 mx-1 justify-content-center">
           <table class="table table-striped table-borderless">

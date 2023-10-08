@@ -6,8 +6,10 @@ namespace SSMO.Services
     public interface ICurrency
     {
 
-        public ICollection<string> GetCurrency();
+        public ICollection<string> GetCurrencyList();
         //  public int GetCurrencyId(string a);
-        public IEnumerable<GetCurrencyModel> AllCurrency();
+        public ICollection<GetCurrencyModel> AllCurrency();
+
+        public string GetCurrency(int id);
     }
 }

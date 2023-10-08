@@ -35,5 +35,10 @@ namespace SSMO.Models.CustomerOrders
         public string DealDescriptionEng { get; set; }
         public string DealTypeBg { get; set; }
         public string DealDescriptionBg { get; set; }
+        public List<int> ChoosenBanks { get; set; }
+        public ICollection<InvoiceBankDetailsViewModel> CompanyBankDetails { get; set; }
+        public ICollection<FiscalAgentViewModel> FiscalAgents { get; set; }        
+        public int FiscalAgent { get; set; }
+        public bool IsEur { get; set; }
     }
 }

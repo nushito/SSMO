@@ -1,4 +1,5 @@
 ﻿using ImageMagick;
+using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Reports.FSC;
 using SSMO.Models.Reports.Invoice;
@@ -17,6 +18,7 @@ namespace SSMO.Services
         private static SupplierOrdersPaymentReportViewModel _payments;
         private static BgInvoiceViewModel _bgInvoice;
         private static CustomerInvoicePaymentsReportsViewModel _customerInvoicePayments;
+        private static CustomerOrderPrintViewModel _customerOrderPrint;
         public static void AddClient(InvoiceDetailsViewModel clientModel)
         {
             _clientModel = clientModel;
@@ -74,6 +76,15 @@ namespace SSMO.Services
         public static CustomerInvoicePaymentsReportsViewModel GetCustomerInvoicePayments()
         {
             return _customerInvoicePayments;
+        }
+
+        public static void AddCustomerOrderPrint(CustomerOrderPrintViewModel customerOrderPrint)
+        {
+            _customerOrderPrint = customerOrderPrint;
+        }
+        public static CustomerOrderPrintViewModel GetCustomerOrderPrint()
+        {
+            return _customerOrderPrint;
         }
 
     }

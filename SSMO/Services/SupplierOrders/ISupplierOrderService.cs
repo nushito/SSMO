@@ -26,7 +26,7 @@ namespace SSMO.Services.SupplierOrders
         public EditSupplierOrderPaymentModel GetPaymentsPerOrderForEdit(int id);
 
         public bool EditSupplierOrderPurchasePayment
-            (int id, decimal? paidAdvance, DateTime? date, 
+            (int id, decimal? paidAdvance, DateTime? date, string newCurrency,string action,decimal? exchangeRate, 
            ICollection<PurchaseNewpaymentsPerOrderFormModel> PurchasePayments);
 
         public ICollection<SupplierOrdersListForPurchaseEditModel> GetSupplierOrdersNumbers();

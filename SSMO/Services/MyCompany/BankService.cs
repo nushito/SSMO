@@ -13,14 +13,13 @@ namespace SSMO.Services.MyCompany
             this.dbContext = dbContext;
         }
 
-        public int Create(int currencyId, string currencyName,
-            string bankName, string iban, string swift, string address, string companyName, int companyId)
+        public int Create
+            (int currencyId, string bankName, string iban, string swift, string address, string companyName, int companyId)
         {
 
             var newBank = new BankDetails
             {
-                 CurrencyId = currencyId,
-                 Currency = new Currency { Name = currencyName},
+                 CurrencyId = currencyId,                
                  BankName = bankName,
                  Iban = iban,
                  Swift = swift,

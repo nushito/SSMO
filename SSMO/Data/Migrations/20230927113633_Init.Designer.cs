@@ -10,8 +10,8 @@ using SSMO.Data;
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20230728103115_NullablePayment")]
-    partial class NullablePayment
+    [Migration("20230927113633_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -399,7 +399,8 @@ namespace SSMO.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
+                    b.HasIndex("AddressId")
+                        .IsUnique();
 
                     b.ToTable("Customers");
                 });
@@ -641,6 +642,18 @@ namespace SSMO.Data.Migrations
 
                     b.Property<DateTime?>("DatePaidAmount")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("DealDescriptionBg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DealDescriptionEng")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DealTypeBg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DealTypeEng")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("DebitNoteTotalAmount")
                         .HasPrecision(18, 2)
@@ -976,7 +989,8 @@ namespace SSMO.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
+                    b.HasIndex("AddressId")
+                        .IsUnique();
 
                     b.ToTable("MyCompanies");
                 });
@@ -1357,7 +1371,8 @@ namespace SSMO.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AddressId");
+                    b.HasIndex("AddressId")
+                        .IsUnique();
 
                     b.HasIndex("BankDetailId");
 
@@ -1582,13 +1597,13 @@ namespace SSMO.Data.Migrations
 
             modelBuilder.Entity("SSMO.Data.Models.Customer", b =>
                 {
-                    b.HasOne("SSMO.Data.Models.Address", "ClientAddress")
-                        .WithMany("Customers")
-                        .HasForeignKey("AddressId")
+                    b.HasOne("SSMO.Data.Models.Address", "Address")
+                        .WithOne("Customers")
+                        .HasForeignKey("SSMO.Data.Models.Customer", "AddressId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("ClientAddress");
+                    b.Navigation("Address");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.CustomerOrder", b =>
@@ -1754,9 +1769,9 @@ namespace SSMO.Data.Migrations
             modelBuilder.Entity("SSMO.Data.Models.MyCompany", b =>
                 {
                     b.HasOne("SSMO.Data.Models.Address", "Address")
-                        .WithMany("MyCompanies")
-                        .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithOne("MyCompany")
+                        .HasForeignKey("SSMO.Data.Models.MyCompany", "AddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Address");
@@ -1892,8 +1907,8 @@ namespace SSMO.Data.Migrations
             modelBuilder.Entity("SSMO.Data.Models.Supplier", b =>
                 {
                     b.HasOne("SSMO.Data.Models.Address", "Address")
-                        .WithMany("Suppliers")
-                        .HasForeignKey("AddressId")
+                        .WithOne("Suppliers")
+                        .HasForeignKey("SSMO.Data.Models.Supplier", "AddressId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1945,7 +1960,7 @@ namespace SSMO.Data.Migrations
                 {
                     b.Navigation("Customers");
 
-                    b.Navigation("MyCompanies");
+                    b.Navigation("MyCompany");
 
                     b.Navigation("Suppliers");
                 });
