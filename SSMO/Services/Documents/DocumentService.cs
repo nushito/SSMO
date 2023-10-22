@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using SSMO.Models.CustomerOrders;
 using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace SSMO.Services.Documents
 {
@@ -220,8 +221,18 @@ namespace SSMO.Services.Documents
                 TotalQuantity= invoice.TotalQuantity,
                 DealDescriptionBg = invoice.DealDescriptionBg,
                 DealTypeBg= invoice.DealTypeBg,
-                FiscalAgentId = invoice.FiscalAgentId
+                
             };
+
+            if(invoice.FiscalAgentId!= null)
+            {
+                bgInvoice.FiscalAgentId = invoice.FiscalAgentId;
+            }
+
+            if(invoice.FscTextId!= null)
+            {
+                bgInvoice.FscTextId= invoice.FscTextId; 
+            }
 
             switch (invoice.DocumentType)
             {
@@ -287,6 +298,7 @@ namespace SSMO.Services.Documents
                 .FirstOrDefault();
 
             var bankDetails = dbContext.BankDetails
+                .Include(a=>a.Documents)
                 .Where(i => invoice.BankDetails.Select(i=>i.Id).Contains(i.Id))
                 .ToList();
 
@@ -484,6 +496,15 @@ namespace SSMO.Services.Documents
                 .ToList();
             return agents;
             
+        }
+
+        public ICollection<int> GetInvoiceList()
+        {
+            return dbContext.Documents
+                .Where(i=>i.DocumentType != Data.Enums.DocumentTypes.Purchase)
+                .OrderByDescending(n=>n.DocumentNumber)
+                .Select(n=>n.DocumentNumber)                
+                .ToList();
         }
     }
 }

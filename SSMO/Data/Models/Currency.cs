@@ -15,5 +15,6 @@ namespace SSMO.Data.Models
         public ICollection<Document> DocumentsNewCurrencyForCostPrice { get; set; }
         public ICollection<Payment> Payments { get; set; }
         public ICollection<Payment> PaymentsWithExchangeRate { get; set; }
+        public ICollection<ServiceOrder> ServiceOrders { get; set; }
     }
 }

@@ -108,8 +108,12 @@
                             <td >
                         @order.StatusName
                             </td>
+                           <td>
                             <a asp-controller="Reports" asp-action="SupplierOrderDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
+                           </td>
+                           <td>
                             <a asp-controller="Reports" asp-action="SupplierOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
+                           </td>
                         </tr>                       
             }
         }    

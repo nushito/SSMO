@@ -12,9 +12,9 @@
  <form enctype="multipart/form-data" method="post" >
     <h4>New Customer Order</h4>    
      <div class="form-group row col-md-4">
-        <label asp-for="Type">Choose type</label>
+        <label class="mr-1" asp-for="Type">Choose type<span></span> </label>
         <select asp-for="Type">
-          <option value="Order Confirmation">Order Confirmation</option>
+           <option value="Order Confirmation">Order Confirmation</option>
            <option value="Proforma Invoice">Proforma Invoice</option>
         </select>
     </div>
@@ -35,6 +35,35 @@
         <label asp-for="Date"></label>
         <input itemid="date" asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
         <span asp-validation-for="Date" class="small text-danger"></span>
+    </div>
+    <div class="form-group row col-md-4">
+        <div class="form-group col-md-4">
+            <div class="form-group">
+                <label >Customer</label>
+                <select id="client" asp-for="CustomerId" class="form-control">
+                <option value="">All</option>
+                    @foreach (var item in Model.Customers)
+                    {
+                            <option value="@item.Id">@item.Name</option>                        
+                    }
+                    <span asp-validation-for="CustomerId" class="small text-danger"></span>
+                </select>
+            </div>
+
+        </div>
+        <div class="form-group col-md-6">
+            <div class="form-group">
+                <label >My Company</label>
+                <select id="mycompany" asp-for="MyCompanyId" class="form-control">
+                <option value="">All</option>
+                    @foreach (var company in Model.MyCompanies)
+                    {
+                            <option value="@company.Id">@company.Name</option>
+                    }
+                    <span asp-validation-for="MyCompanyId" class="small text-danger"></span>
+                </select>
+            </div>            
+        </div>    
     </div>
     <div class="form-group row col-md-4">
         <label asp-for="DeliveryTerms"></label>
@@ -68,36 +97,7 @@
                <option value="@item.Id">@item.CurrencyName:@item.BankName - @item.Iban</option>
             } 
         </select>
-    </div>
-    <div class="form-group row col-md-4">
-        <div class="form-group col-md-4">
-            <div class="form-group">
-                <label >Customer</label>
-                <select id="client" asp-for="CustomerId" class="form-control">
-                <option value="">All</option>
-                    @foreach (var item in Model.Customers)
-                    {
-                        <option value="@item.Id">@item.Name</option>                        
-                    }
-                    <span asp-validation-for="CustomerId" class="small text-danger"></span>
-                </select>
-            </div>
-
-        </div>
-        <div class="form-group col-md-6">
-            <div class="form-group">
-                <label >My Company</label>
-                <select id="mycompany" asp-for="MyCompanyId" class="form-control">
-                <option value="">All</option>
-                    @foreach (var company in Model.MyCompanies)
-                    {
-                        <option value="@company.Id">@company.Name</option>
-                    }
-                    <span asp-validation-for="MyCompanyId" class="small text-danger"></span>
-                </select>
-            </div>            
-        </div>    
-    </div>
+    </div>    
     <div class="form-group row col-md-4">
        
         <label>Choose Fiscal Agent</label>
@@ -155,6 +155,16 @@
           </select>
         </div>
     </div>
+     <div class="form-group row col-md-4">
+        <label>Fsc Text</label>
+        <select asp-for="@Model.FscText" class="form-control">
+            <option value="">-</option>
+            @foreach (var fsc in Model.FscTexts)
+            {
+                        <option value="@fsc.Id">@fsc.FscTextEng</option>
+            }
+        </select> 
+    </div>
     
     @if(Model.SupplierOrdersBySupplier.Count() > 0)
     {
@@ -166,7 +176,7 @@
                         <option value="@item.SupplierOrderId">@item.SupplierAndOrderSelect</option>
                 }  
             </select>
-
+         <span asp-validation-for="SelectedSupplierOrders" class="small text-danger"></span>
        </div>   
     }
 

@@ -3,7 +3,9 @@
 @using SSMO.Services.MyCompany
 @inject IProductService service;
 @inject IMycompanyService mycompanyService;
-
+ <script type="text/javascript" src="~/js/datepicker.js">   
+    </script>
+ 
 <p class="font-weight-bold">Choose Invoice for Credit Note</p>
 <form method="post">
     <div class="container">
@@ -158,14 +160,11 @@
     </div>
 </form>
 
+ 
+
 @section Scripts {
     
-    <script type="text/javascript">
-        $(function () {
-            $("#datepicker").datepicker();
-        });
-    </script>
-
+       
     <script type="text/javascript">
             $(document).ready(function() {
                 //Dropdownlist Selectedchange event
@@ -200,7 +199,7 @@
                     return false;
                 })
             });
-        
+             
                     var counter = 1;
                     $(function products () {
                         $('#addrow').click(function () {
@@ -252,6 +251,9 @@
                         return false;
                     }
        </script>
+
+             <script type="text/javascript" src="~/js/datepicker.js">    
+            </script>   
     }
 
     

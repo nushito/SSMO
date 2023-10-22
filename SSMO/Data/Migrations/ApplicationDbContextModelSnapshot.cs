@@ -485,6 +485,9 @@ namespace SSMO.Data.Migrations
                     b.Property<int?>("FiscalAgentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("FscTextId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("GrossWeight")
                         .HasPrecision(18, 3)
                         .HasColumnType("decimal(18,3)");
@@ -546,6 +549,8 @@ namespace SSMO.Data.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("FiscalAgentId");
+
+                    b.HasIndex("FscTextId");
 
                     b.HasIndex("MyCompanyId");
 
@@ -750,6 +755,9 @@ namespace SSMO.Data.Migrations
                     b.Property<int?>("FiscalAgentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("FscTextId")
+                        .HasColumnType("int");
+
                     b.Property<decimal>("GrossWeight")
                         .HasColumnType("decimal");
 
@@ -827,6 +835,8 @@ namespace SSMO.Data.Migrations
 
                     b.HasIndex("FiscalAgentId");
 
+                    b.HasIndex("FscTextId");
+
                     b.HasIndex("MyCompanyId");
 
                     b.HasIndex("PurchaseProductDetailsId");
@@ -860,6 +870,24 @@ namespace SSMO.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("FiscalAgents");
+                });
+
+            modelBuilder.Entity("SSMO.Data.Models.FscText", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("FscTextBg")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FscTextEng")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FscTexts");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.Grade", b =>
@@ -1114,6 +1142,9 @@ namespace SSMO.Data.Migrations
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("ServiceOrderId")
+                        .HasColumnType("int");
+
                     b.Property<int?>("SupplierOrderId")
                         .HasColumnType("int");
 
@@ -1126,6 +1157,8 @@ namespace SSMO.Data.Migrations
                     b.HasIndex("CustomerOrderId");
 
                     b.HasIndex("DocumentId");
+
+                    b.HasIndex("ServiceOrderId");
 
                     b.HasIndex("SupplierOrderId");
 
@@ -1366,13 +1399,19 @@ namespace SSMO.Data.Migrations
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
 
-                    b.Property<int>("CustomerOrderId")
+                    b.Property<int>("CurrencyId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("DeliveryAddress")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DocumentId1")
                         .HasColumnType("int");
 
                     b.Property<string>("Eta")
@@ -1384,14 +1423,17 @@ namespace SSMO.Data.Migrations
                     b.Property<string>("LoadingAddress")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("MyCompanyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Number")
+                        .HasColumnType("int");
+
                     b.Property<bool>("Paid")
                         .HasColumnType("bit");
 
-                    b.Property<int>("SupplierOrderId")
+                    b.Property<int>("TransportCompanyId")
                         .HasColumnType("int");
-
-                    b.Property<string>("TransportCompany")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("TruckNumber")
                         .HasColumnType("nvarchar(max)");
@@ -1401,12 +1443,17 @@ namespace SSMO.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerOrderId");
+                    b.HasIndex("CurrencyId");
 
-                    b.HasIndex("DocumentId")
-                        .IsUnique();
+                    b.HasIndex("DocumentId");
 
-                    b.HasIndex("SupplierOrderId");
+                    b.HasIndex("DocumentId1")
+                        .IsUnique()
+                        .HasFilter("[DocumentId1] IS NOT NULL");
+
+                    b.HasIndex("MyCompanyId");
+
+                    b.HasIndex("TransportCompanyId");
 
                     b.ToTable("ServiceOrders");
                 });
@@ -1583,6 +1630,42 @@ namespace SSMO.Data.Migrations
                     b.HasIndex("SupplierId");
 
                     b.ToTable("SupplierOrders");
+                });
+
+            modelBuilder.Entity("SSMO.Data.Models.TransportCompany", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ContactPerson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Eik")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Vat")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AddressId")
+                        .IsUnique();
+
+                    b.ToTable("TransportCompanies");
                 });
 
             modelBuilder.Entity("BankDetailsCustomerOrder", b =>
@@ -1764,6 +1847,11 @@ namespace SSMO.Data.Migrations
                         .HasForeignKey("FiscalAgentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("SSMO.Data.Models.FscText", "FscText")
+                        .WithMany("CustomerOrders")
+                        .HasForeignKey("FscTextId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SSMO.Data.Models.MyCompany", "MyCompany")
                         .WithMany("Orders")
                         .HasForeignKey("MyCompanyId")
@@ -1781,6 +1869,8 @@ namespace SSMO.Data.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("Fiscalagent");
+
+                    b.Navigation("FscText");
 
                     b.Navigation("MyCompany");
 
@@ -1836,6 +1926,11 @@ namespace SSMO.Data.Migrations
                         .HasForeignKey("FiscalAgentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("SSMO.Data.Models.FscText", "FscText")
+                        .WithMany("Documents")
+                        .HasForeignKey("FscTextId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SSMO.Data.Models.MyCompany", "MyCompany")
                         .WithMany("Documents")
                         .HasForeignKey("MyCompanyId")
@@ -1863,6 +1958,8 @@ namespace SSMO.Data.Migrations
                     b.Navigation("Customer");
 
                     b.Navigation("Fiscalagent");
+
+                    b.Navigation("FscText");
 
                     b.Navigation("MyCompany");
 
@@ -1959,6 +2056,11 @@ namespace SSMO.Data.Migrations
                         .HasForeignKey("DocumentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("SSMO.Data.Models.ServiceOrder", "ServiceOrder")
+                        .WithMany("Payments")
+                        .HasForeignKey("ServiceOrderId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SSMO.Data.Models.SupplierOrder", "SupplierOrder")
                         .WithMany("Payments")
                         .HasForeignKey("SupplierOrderId")
@@ -1971,6 +2073,8 @@ namespace SSMO.Data.Migrations
                     b.Navigation("CustomerOrder");
 
                     b.Navigation("Document");
+
+                    b.Navigation("ServiceOrder");
 
                     b.Navigation("SupplierOrder");
                 });
@@ -2053,29 +2157,41 @@ namespace SSMO.Data.Migrations
 
             modelBuilder.Entity("SSMO.Data.Models.ServiceOrder", b =>
                 {
-                    b.HasOne("SSMO.Data.Models.CustomerOrder", "CustomerOrder")
-                        .WithMany()
-                        .HasForeignKey("CustomerOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("SSMO.Data.Models.Currency", "Currency")
+                        .WithMany("ServiceOrders")
+                        .HasForeignKey("CurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SSMO.Data.Models.Document", "Document")
+                        .WithMany("ServiceOrders")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("SSMO.Data.Models.Document", null)
                         .WithOne("ServiceOrder")
-                        .HasForeignKey("SSMO.Data.Models.ServiceOrder", "DocumentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .HasForeignKey("SSMO.Data.Models.ServiceOrder", "DocumentId1");
+
+                    b.HasOne("SSMO.Data.Models.MyCompany", "MyCompany")
+                        .WithMany("ServiceOrders")
+                        .HasForeignKey("MyCompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("SSMO.Data.Models.SupplierOrder", "SupplierOrder")
-                        .WithMany()
-                        .HasForeignKey("SupplierOrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                    b.HasOne("SSMO.Data.Models.TransportCompany", "TransportCompany")
+                        .WithMany("ServiceOrders")
+                        .HasForeignKey("TransportCompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("CustomerOrder");
+                    b.Navigation("Currency");
 
                     b.Navigation("Document");
 
-                    b.Navigation("SupplierOrder");
+                    b.Navigation("MyCompany");
+
+                    b.Navigation("TransportCompany");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.Supplier", b =>
@@ -2130,6 +2246,17 @@ namespace SSMO.Data.Migrations
                     b.Navigation("Supplier");
                 });
 
+            modelBuilder.Entity("SSMO.Data.Models.TransportCompany", b =>
+                {
+                    b.HasOne("SSMO.Data.Models.Address", "Address")
+                        .WithOne("TransportCompany")
+                        .HasForeignKey("SSMO.Data.Models.TransportCompany", "AddressId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Address");
+                });
+
             modelBuilder.Entity("SSMO.Data.Models.Address", b =>
                 {
                     b.Navigation("Customers");
@@ -2137,6 +2264,8 @@ namespace SSMO.Data.Migrations
                     b.Navigation("MyCompany");
 
                     b.Navigation("Suppliers");
+
+                    b.Navigation("TransportCompany");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.Currency", b =>
@@ -2152,6 +2281,8 @@ namespace SSMO.Data.Migrations
                     b.Navigation("Payments");
 
                     b.Navigation("PaymentsWithExchangeRate");
+
+                    b.Navigation("ServiceOrders");
 
                     b.Navigation("SupplierOrders");
                 });
@@ -2197,9 +2328,18 @@ namespace SSMO.Data.Migrations
                     b.Navigation("PurchaseProducts");
 
                     b.Navigation("ServiceOrder");
+
+                    b.Navigation("ServiceOrders");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.FiscalAgent", b =>
+                {
+                    b.Navigation("CustomerOrders");
+
+                    b.Navigation("Documents");
+                });
+
+            modelBuilder.Entity("SSMO.Data.Models.FscText", b =>
                 {
                     b.Navigation("CustomerOrders");
 
@@ -2219,6 +2359,8 @@ namespace SSMO.Data.Migrations
 
                     b.Navigation("Orders");
 
+                    b.Navigation("ServiceOrders");
+
                     b.Navigation("SupplierOrders");
                 });
 
@@ -2236,6 +2378,11 @@ namespace SSMO.Data.Migrations
                     b.Navigation("InvoiceProductDetails");
 
                     b.Navigation("InvoicesToCustomer");
+                });
+
+            modelBuilder.Entity("SSMO.Data.Models.ServiceOrder", b =>
+                {
+                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.Size", b =>
@@ -2272,6 +2419,11 @@ namespace SSMO.Data.Migrations
                     b.Navigation("Products");
 
                     b.Navigation("PurchaseProductDetails");
+                });
+
+            modelBuilder.Entity("SSMO.Data.Models.TransportCompany", b =>
+                {
+                    b.Navigation("ServiceOrders");
                 });
 #pragma warning restore 612, 618
         }

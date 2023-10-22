@@ -39,15 +39,7 @@ namespace SSMO.Models.SupplierOrders
         [Range(0.0, 9999999999999.99999)]
         public decimal Amount { get; set; }
         public decimal TotalAmount { get; set; }
-
-        [Range(0.0, 9999999999999.99999)]
-        public decimal PaidAvance { get; set; }
-        [Range(0.0, 9999999999999.99999)]
-        public decimal Balance { get; set; }
-        [Required]
-        [DisplayFormat(DataFormatString = "{0:dd.MM.yyyy}", ApplyFormatInEditMode = true)]
-        public DateTime DatePaidAmount { get; set; }
-        public bool PaidStatus { get; set; }
+       
         public int? VAT { get; set; }
       
         [Range(0.0, 9999999999999.99999)]      

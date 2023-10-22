@@ -42,7 +42,13 @@
                                 <span>Add Fiscal Agent</span>
                             </a>
                         </li>
-                     
+                         <li class="nav-item active">
+                             <a href="~/FscTexts/AddFscText" class="nav-link">
+                                       <i class="fas fa-fw fa-tachometer-alt"></i>
+                                        <span>Add FSC Text</span>
+                                    </a>                               
+                          </li>
+
                     <li class="nav-item active">
                         <a href="~/ServiceOrders/AddServiceOrder" class="nav-link">
                             <i class="fas fa-fw fa-tachometer-alt"></i>
@@ -82,7 +88,7 @@
                         </div>
                     </li>
                 
-                         <li class="nav-item active">
+                             <li class="nav-item active mb-1">
                         <div class="dropdown">
                             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Suppliers
@@ -93,6 +99,17 @@
                             </div>
                         </div>
                     </li>
+                        <li class="nav-item active mb-1">
+                            <div class="dropdown">
+                                <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Transport Company
+                                </button>
+                                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item" asp-area="" asp-controller="TransportCompanies" asp-action="Add">Add New Transport Company</a>
+                                              <a class="dropdown-item" asp-area="" asp-controller="TransportCompanies" asp-action="Edit">Edit Transport Company</a>
+                                </div>
+                            </div>
+                        </li>
 
                     <!-- Heading -->
                     <li class="sidebar-heading text-capitalize">

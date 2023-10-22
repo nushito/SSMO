@@ -1,8 +1,12 @@
 ﻿
 namespace SSMO.Services.MyCompany
 {
+    using DocumentFormat.OpenXml.Office2010.Excel;
     using SSMO.Data;
     using SSMO.Data.Models;
+    using SSMO.Models.CustomerOrders;
+    using SSMO.Models.Documents.Invoice;
+    using System.Collections.Generic;
     using System.Linq;
   
     public class BankService : IBankService
@@ -40,6 +44,40 @@ namespace SSMO.Services.MyCompany
             dbContext.SaveChanges();
             return newBank.Id;
            
+        }
+
+        public ICollection<BankDetailsViewModel> GetMyBanks(int customerOrderId)
+        {
+            var companyId = dbContext.CustomerOrders
+                .Where(i => i.Id == customerOrderId)
+                .Select(m => m.MyCompanyId)
+                .FirstOrDefault();
+
+            var bankList = dbContext.BankDetails
+                .Where(c => c.CompanyId == companyId)
+                .ToList();
+
+            var bankDetails = new List<BankDetailsViewModel>();
+
+            foreach (var bank in bankList)
+            {
+                var currency = dbContext.Currencies
+                    .Where(i => i.Id == bank.CurrencyId)
+                    .Select(n => n.Name)
+                    .FirstOrDefault();
+
+                bankDetails.Add(new BankDetailsViewModel
+                {
+                    Id = bank.Id,
+                    BankName = bank.BankName,
+                    CurrencyName = currency,
+                    CurrencyId = bank.CurrencyId,
+                    Iban = bank.Iban,
+                    Swift = bank.Swift,
+                });
+            }
+
+            return bankDetails;
         }
     }
 }

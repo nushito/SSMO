@@ -8,8 +8,7 @@
     <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
         <div class="input-group-prepend">
             <span class="input-group-text" id="addon-wrapping">Company Name</span>
-        </div>
-      
+        </div>      
         <input asp-for="Name" class="form-control" placeholder="Customer Name" aria-label="Name" aria-describedby="addon-wrapping">
         <span asp-validation-for="Name" class="small text-danger"></span>
     </div>
@@ -17,17 +16,14 @@
     <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
         <div class="input-group-prepend">
             <span class="input-group-text" id="addon-wrapping">EIK</span>
-        </div>
-       
+        </div>       
         <input asp-for="EIK" class="form-control" placeholder="Eik" aria-label="EIK" aria-describedby="addon-wrapping">
         <span asp-validation-for="EIK" class="small text-danger"></span> 
     </div>
-
     <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
         <div class="input-group-prepend">
             <span class="input-group-text" id="addon-wrapping">VAT</span>
-        </div>
-       
+        </div>       
         <input asp-for="VAT" class="form-control" placeholder="Vat" aria-label="VAT" aria-describedby="addon-wrapping">
         <span asp-validation-for="VAT" class="small text-danger"></span>
     </div>
@@ -35,8 +31,7 @@
     <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
         <div class="input-group-prepend">
             <span class="input-group-text" id="addon-wrapping">Country</span>
-        </div>
-       
+        </div>       
         <input asp-for="Country" class="form-control" placeholder="Country" aria-label="Country" aria-describedby="addon-wrapping">
         <span asp-validation-for="Country" class="small text-danger"></span>
     </div>
@@ -44,24 +39,21 @@
     <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
         <div class="input-group-prepend">
             <span class="input-group-text" id="addon-wrapping">City</span>
-        </div>
-        
+        </div>        
         <input asp-for="City" class="form-control" placeholder="City" aria-label="City" aria-describedby="addon-wrapping">
         <span asp-validation-for="City" class="small text-danger"></span> 
     </div>
     <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
         <div class="input-group-prepend">
             <span class="input-group-text" id="addon-wrapping">Street</span>
-        </div>
-       
+        </div>       
         <input asp-for="Street" class="form-control" placeholder="Street" aria-label="Address" aria-describedby="addon-wrapping">
         <span asp-validation-for="Street" class="small text-danger"></span> 
     </div>
     <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
         <div class="input-group-prepend">
             <span class="input-group-text" id="addon-wrapping">Representative person</span>
-        </div>
-      
+        </div>      
         <input asp-for="RepresentativePerson" class="form-control" placeholder="Manager" aria-describedby="addon-wrapping">
         <span asp-validation-for="RepresentativePerson" class="small text-danger"></span>
     </div>
@@ -69,8 +61,7 @@
     <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
         <div class="input-group-prepend">
             <span class="input-group-text" id="addon-wrapping">Email</span>
-        </div>
-       
+        </div>       
         <input asp-for="Email" class="form-control" placeholder="Email" aria-describedby="addon-wrapping">
         <span asp-validation-for="Email" class="small text-danger"></span>
     </div>
@@ -84,31 +75,41 @@
     </div>
      <h5>БГ Данни</h5>
             <hr/>
-            <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
-                <label asp-for="BgCustomerName">Фирма</label>
-                <input class="form-control" asp-for="BgCustomerName" placeholder="Име">
-                <span asp-validation-for="BgCustomerName" class="small text-danger"></span>
-            </div>
-            <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
-                <label asp-for="BgCountry">Държава</label>
-                <input type="text" class="form-control" asp-for="BgCountry" placeholder="Държава">
-                <span asp-validation-for="BgCountry" class="small text-danger"></span>
-            </div>
-            <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
-                <label asp-for="BgCity">Град</label>
-                <input type="text" class="form-control" asp-for="BgCity" placeholder="Град">
-                <span asp-validation-for="BgCity" class="small text-danger"></span>
-            </div>
-            <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
-                <label asp-for="BgStreet">Адрес</label>
-                <input type="text" class="form-control" asp-for="BgStreet" placeholder="Улица">
-                <span asp-validation-for="BgStreet" class="small text-danger"></span>
-            </div>
              <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
-                <label asp-for="BgRepresentativePerson">Управител</label>
-                <input type="text" class="form-control" asp-for="BgRepresentativePerson" placeholder="Управител">
-                <span asp-validation-for="BgRepresentativePerson" class="small text-danger"></span>
-            </div>
+               <div class="input-group-prepend">
+                <span class="input-group-text" id="addon-wrapping">Фирма</span>
+                </div>      
+               <input asp-for="BgCustomerName" class="form-control" placeholder="Фирма" aria-label="BgCustomerName" aria-describedby="addon-wrapping">
+               <span asp-validation-for="BgCustomerName" class="small text-danger"></span>
+            </div>     
+            <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+               <div class="input-group-prepend">
+                <span class="input-group-text" id="addon-wrapping">Държава</span>
+                </div>      
+               <input asp-for="BgCountry" class="form-control" placeholder="Държава" aria-label="BgCountry" aria-describedby="addon-wrapping">
+               <span asp-validation-for="BgCountry" class="small text-danger"></span>
+            </div> 
+             <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+               <div class="input-group-prepend">
+                <span class="input-group-text" id="addon-wrapping">Град</span>
+                </div>      
+               <input asp-for="BgCity" class="form-control" placeholder="Град" aria-label="BgCity" aria-describedby="addon-wrapping">
+               <span asp-validation-for="BgCity" class="small text-danger"></span>
+            </div> 
+            <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+               <div class="input-group-prepend">
+                <span class="input-group-text" id="addon-wrapping">Адрес</span>
+                </div>      
+               <input asp-for="BgStreet" class="form-control" placeholder="Адрес" aria-label="BgStreet" aria-describedby="addon-wrapping">
+               <span asp-validation-for="BgStreet" class="small text-danger"></span>
+            </div> 
+           <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+               <div class="input-group-prepend">
+                <span class="input-group-text" id="addon-wrapping">Управител</span>
+                </div>      
+               <input asp-for="BgRepresentativePerson" class="form-control" placeholder="Управител" aria-label="BgRepresentativePerson" aria-describedby="addon-wrapping">
+               <span asp-validation-for="BgRepresentativePerson" class="small text-danger"></span>
+            </div>            
             <hr />
 
     <button type="submit" class="btn btn-primary mt-3">Submit</button>

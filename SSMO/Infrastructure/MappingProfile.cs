@@ -6,6 +6,7 @@ using SSMO.Models.Customers;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Documents.Packing_List;
 using SSMO.Models.Documents.Purchase;
+using SSMO.Models.FscTexts;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Models.Reports;
@@ -13,6 +14,7 @@ using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.Purchase;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
+using SSMO.Models.ServiceOrders;
 using SSMO.Models.Suppliers;
 using SSMO.Services.Documents.Invoice;
 using SSMO.Services.Documents.Purchase;
@@ -34,6 +36,7 @@ namespace SSMO.Infrastructure
             this.CreateMap<MyCompany, MyCompaniesForReportViewModel>();
             this.CreateMap<MyCompany, MyCompanyInvoiceDetailsModel>();
             this.CreateMap<MyCompany, MyCompanyEditFormModel>();
+            this.CreateMap<MyCompany, MyCompaniesForTrasnportOrderViewModel>();
 
             this.CreateMap<CustomerOrder, CustomerOrderViewModel>();
             this.CreateMap<CustomerOrder, CustomerOrderDetailsModel>();
@@ -99,6 +102,8 @@ namespace SSMO.Infrastructure
             this.CreateMap<Payment, PaymentViewModel>();
 
             this.CreateMap<FiscalAgent, FiscalAgentViewModel>();
+
+            this.CreateMap<FscText, FscTextViewModel>();
         }
     }
 }

@@ -22,6 +22,8 @@ using SSMO.Infrastructure;
 using SSMO.Services.SupplierOrders;
 using System.Text.Json;
 using SSMO.Services.Documents;
+using SSMO.Services.FscTextDocuments;
+using System.Threading.Tasks;
 
 namespace SSMO.Controllers
 {
@@ -38,15 +40,16 @@ namespace SSMO.Controllers
         private readonly IStatusService statusService;
         private readonly ISupplierOrderService supplierOrderService;
         private readonly IDocumentService documentService;
+        private readonly IFscTextService fscTextService;
         public CustomerOrdersController(ISupplierService supplierService,
            ICurrency currency,
            IMycompanyService myCompanyService,
            ICustomerService customerService,
            IProductService productService, IMapper mapper,
-            ApplicationDbContext dbContext, ICustomerOrderService cusomerOrderService,
+           ICustomerOrderService cusomerOrderService,
             IReportsService reportService, IStatusService statusService,
             ISupplierOrderService supplierOrderService, IDocumentService
-             documentService)
+             documentService, IFscTextService fscTextService)
         {
             this.supplierService = supplierService;
             this.currency = currency;
@@ -59,6 +62,7 @@ namespace SSMO.Controllers
             this.statusService = statusService;
             this.supplierOrderService = supplierOrderService;
             this.documentService = documentService;
+            this.fscTextService = fscTextService;
         }
 
         [HttpGet]
@@ -88,15 +92,16 @@ namespace SSMO.Controllers
                 Statuses = statusService.GetAllStatus(),
                 BankDetails = customerOrderService.GetBanks(),
                 SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders(),
-                FiscalAgents = documentService.GetFiscalAgents()
-             };
+                FiscalAgents = documentService.GetFiscalAgents(),
+                FscTexts = fscTextService.GetAllFscTexts()
+            };
 
             return View(customerOrderDetails);
         }
       
         [HttpPost]
         [Authorize]
-        public IActionResult AddCustomerOrder(CustomerOrderViewModel customermodel)
+        public async Task<IActionResult> AddCustomerOrder(CustomerOrderViewModel customermodel)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(customermodel.MyCompanyId);
@@ -117,7 +122,8 @@ namespace SSMO.Controllers
                     Products = new List<ProductCustomerFormModel>(),
                     Statuses = statusService.GetAllStatus(),
                     SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders(),
-                    FiscalAgents = documentService.GetFiscalAgents()
+                    FiscalAgents = documentService.GetFiscalAgents(),
+                    FscTexts = fscTextService.GetAllFscTexts()
                 };
 
                 new ProductCustomerFormModel
@@ -131,7 +137,7 @@ namespace SSMO.Controllers
             int customerorderId;
             if (!customerOrderService.AnyCustomerOrderExist())
             {
-                customerorderId = customerOrderService.CreateFirstOrder
+                customerorderId = await customerOrderService.CreateFirstOrder
                                 (customermodel.OrderConfirmationNumber,
                                  customermodel.CustomerPoNumber,
                                  customermodel.Date,
@@ -141,18 +147,18 @@ namespace SSMO.Controllers
                                  customermodel.LoadingPlace,
                                  customermodel.DeliveryAddress,
                                  customermodel.CurrencyId,
-                                 customermodel.Origin,
-                                 customermodel.PaidAmountStatus,
+                                 customermodel.Origin,                                
                                  customermodel.Vat ?? 0, customermodel.StatusId, 
                                  (List<int>)customermodel.SelectedSupplierOrders,
                                  customermodel.Comment, customermodel.ChosenBanks, 
                                  customermodel.Type, customermodel.FiscalAgentId,
-                                 customermodel.DealType, customermodel.DealDescription);
+                                 customermodel.DealType, customermodel.DealDescription, 
+                                 customermodel.FscText);
                 ViewBag.NumberExist = 0;
             }
             else
             {
-                customerorderId = customerOrderService.CreateOrder
+                customerorderId = await customerOrderService.CreateOrder
                                  (customermodel.CustomerPoNumber,
                                  customermodel.Date,
                                  customermodel.CustomerId,
@@ -161,18 +167,19 @@ namespace SSMO.Controllers
                                  customermodel.LoadingPlace,
                                  customermodel.DeliveryAddress,
                                  customermodel.CurrencyId,
-                                 customermodel.Origin,
-                                 customermodel.PaidAmountStatus,
+                                 customermodel.Origin,                                 
                                  customermodel.Vat ?? 0, customermodel.StatusId, 
                                  (List<int>)customermodel.SelectedSupplierOrders,
                                  customermodel.Comment,customermodel.ChosenBanks, 
                                  customermodel.Type, customermodel.FiscalAgentId,
-                                  customermodel.DealType, customermodel.DealDescription);
+                                  customermodel.DealType, customermodel.DealDescription,
+                                  customermodel.FscText);
                 ViewBag.NumberExist = 1;
             }
             return RedirectToAction("AddOrderProducts", 
-                new { selectedSupplierOrders = customermodel.SelectedSupplierOrders, 
-                      customerorderId = customerorderId}) ;
+                new { selectedSupplierOrders = customermodel.SelectedSupplierOrders,
+                    customerorderId
+                }) ;
         }
 
         public IActionResult AddOrderProducts(List<int> selectedSupplierOrders, int customerorderId)
@@ -201,7 +208,7 @@ namespace SSMO.Controllers
                     DescriptionId = product.DescriptionId,
                     GradeId = product.GradeId,
                     SizeId = product.SizeId,
-                    FSCSertificate = product.PurchaseFscCertificate,
+                    FscCertificate = product.PurchaseFscCertificate,
                     FSCClaim = product.PurchaseFscClaim,                    
                     Pallets = product.Pallets,
                     SheetsPerPallet = product.SheetsPerPallet,
@@ -221,7 +228,7 @@ namespace SSMO.Controllers
 
         [HttpPost]
         [Authorize]
-        public IActionResult AddOrderProducts(IEnumerable<ProductCustomerFormModel> model, int customerorderId)
+        public async Task<IActionResult> AddOrderProducts(IEnumerable<ProductCustomerFormModel> model, int customerorderId)
         {
             // var count = int.Parse(TempData["Count"].ToString());
             string userId = this.User.UserId();
@@ -249,19 +256,19 @@ namespace SSMO.Controllers
                 if(product.QuantityAvailableForCustomerOrder == 0) { continue; }
                 else { product.Quantity = product.QuantityAvailableForCustomerOrder; }
 
-                var check = productService.CreateCustomerOrderProduct(product.Id, customerorderId, product.SupplierOrderId, product.Description,
-                             product.Grade, product.Size, product.FSCSertificate, product.FSCClaim, product.Pallets,
-                             product.SheetsPerPallet, product.SellPrice, product.Quantity, product.Unit);
+                var check = await productService.CreateCustomerOrderProduct
+                    (product.Id, customerorderId, product.SupplierOrderId, product.Description,
+                    product.Grade, product.Size, product.FscCertificate, product.FSCClaim, product.Pallets,
+                    product.SheetsPerPallet, product.SellPrice, product.Quantity, product.Unit);
 
                 if (!check)
                 {
                     return BadRequest();
                 }
-
             }
             customerOrderService.CustomerOrderCounting(customerorderId);
 
-            return RedirectToAction("PrintCustomerOrder", customerorderId);
+            return RedirectToAction("PrintCustomerOrder",new { customerorderId });
         }
 
         public IActionResult PrintCustomerOrder(int customerorderId)

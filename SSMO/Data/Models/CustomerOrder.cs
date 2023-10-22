@@ -25,6 +25,8 @@ namespace SSMO.Data.Models
         public Customer Customer { get; set; }  
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
+        public int? FscTextId { get; set; }
+        public FscText FscText { get; set; }
         public int StatusId { get; set; }
         public Status Status { get; set; }
         public int CurrencyId { get; set; }

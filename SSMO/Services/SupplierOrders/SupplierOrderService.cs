@@ -34,9 +34,8 @@ namespace SSMO.Services.SupplierOrders
             this.productService = productService;
         }
 
-        public int CreateSupplierOrder(int myCompanyId, int supplierId, DateTime Date, 
-            string number, int statusId, int currencyId, string fscClaim, int vat,
-            DateTime datePaidAmount, decimal paidAvance, bool paidStatus,
+        public async Task<int> CreateSupplierOrder(int myCompanyId, int supplierId, DateTime Date, 
+            string number, int statusId, int currencyId, string fscClaim, int vat,            
             string loadingAddress, string deliveryAddress, string deliveryTerms)
         {
             
@@ -53,21 +52,14 @@ namespace SSMO.Services.SupplierOrders
                 CurrencyId = currencyId,
                 VAT = vat,
                 FscClaim = fscClaim,
-                Products = new List<Product>(),
-                PaidAvance = paidAvance,               
-                PaidStatus = paidStatus,
+                Products = new List<Product>(),                
                 LoadingAddress = loadingAddress,
                 DeliveryAddress = deliveryAddress,
                 DeliveryTerms = deliveryTerms
             };
-
-           if(datePaidAmount.ToString() != null)
-            {
-                supplierSpec.DatePaidAmount = datePaidAmount.ToString();
-            }
-
-            dbContext.SupplierOrders.Add(supplierSpec);
-            dbContext.SaveChanges();
+          
+          await dbContext.SupplierOrders.AddAsync(supplierSpec);
+           await dbContext.SaveChangesAsync();
 
             return supplierSpec.Id;
         }
@@ -90,8 +82,7 @@ namespace SSMO.Services.SupplierOrders
             }
 
 
-            if(paidAdvance > 0.001m)
-            {               
+            if(paidAdvance > 0.001m)            {               
 
                 var orderPayment = new Payment
                 {
@@ -402,14 +393,14 @@ namespace SSMO.Services.SupplierOrders
             return supplierOrders;
         }
 
-        public void TotalAmountAndQuantitySum(int supplierOrderId)
+        public async Task TotalAmountAndQuantitySum(int supplierOrderId)
         {
            var spOrder = dbContext.SupplierOrders.Find(supplierOrderId);
            spOrder.VatAmount = spOrder.Amount * spOrder.VAT / 100;
            spOrder.TotalAmount = (decimal)(spOrder.Amount + spOrder.VatAmount);
            spOrder.Balance = spOrder.TotalAmount - spOrder.PaidAvance;
           // spOrder.TotalQuantity = spOrder.Products.Sum(a => a.OrderedQuantity);
-           dbContext.SaveChanges();    
+          await dbContext.SaveChangesAsync();    
           
         }
     }

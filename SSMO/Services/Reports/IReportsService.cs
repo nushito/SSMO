@@ -7,6 +7,7 @@ using SSMO.Models.Reports.Purchase;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SSMO.Services.Reports
 {
@@ -18,7 +19,7 @@ namespace SSMO.Services.Reports
             int currentpage, int supplierOrdersPerPage);
         SupplierOrderDetailsModel SupplierOrderDetail(int id);
         CustomerOrderDetailsModel CustomerOrderDetails(int id);
-        bool EditCustomerOrder(int id, string number,
+        Task<bool> EditCustomerOrder(int id, string number,
                 System.DateTime date,
                 int myCompanyId,
                 string deliveryTerms,
@@ -27,7 +28,7 @@ namespace SSMO.Services.Reports
                int currencyId, int status,
                string fscClaim, string fscCertificate,
                decimal paidAdvance, bool paidStatus,
-               IList<ProductCustomerFormModel> products, List<int> banks);
+               IList<ProductCustomerFormModel> products, List<int> banks, int? fiscalAgentId, int? fscText);
         public IEnumerable<CustomerOrderListViewBySupplier> GetCustomerOrdersBySupplier(int customerId, string supplierId);
         public CustomerInvoicesPaymentCollectionViewModel CustomersInvoicesPaymentDetails(string customerName, int currentpage, int customerInvoicePerPage);
         public SupplierInvoiceCollectionViewModel SuppliersInvoicesPaymentDetails(string supplierName, int currentpage, int supplierInvoicePerPage);
@@ -37,7 +38,7 @@ namespace SSMO.Services.Reports
         public CustomerOrderPaymentCollectionViewModel CustomerOrdersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage);
         public SupplierOrderForEditModel SupplierOrderForEditDetails(int supplierOrderId);
 
-        bool EditSupplierOrder(int supplierOrderId, string supplierOrderNumber,
+        Task<bool> EditSupplierOrder(int supplierOrderId, string supplierOrderNumber,
                DateTime date,
                int myCompanyId,
                string deliveryTerms,

@@ -37,10 +37,7 @@ namespace SSMO.Data.Models
         public ICollection<SupplierOrder> SupplierOrders { get; set; }
         public ICollection<BankDetails> BankDetails { get; set; }
         public ICollection<Document> Documents { get; set; }
-
-
-
-
+        public ICollection<ServiceOrder> ServiceOrders { get; set; }
 
     }
 }

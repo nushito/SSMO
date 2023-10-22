@@ -38,9 +38,9 @@
             @foreach (var item in Model.CompanyBankDetails)
             {
                        <option value="@item.Id">@item.CurrencyName:@item.BankName - @item.Iban</option>
-            }   
-
+            }  
         </select>
+   <span asp-validation-for="ChosenBanks" class="small text-danger"></span>
     </div>
     <div class="row col-md-4">
         <label asp-for="CurrencyExchangeRate">Currency Exchange Rate to BGN</label>
@@ -57,7 +57,18 @@
             <option value="@Model.FiscalAgentName" selected>@Model.FiscalAgentName</option>
             @foreach (var item in Model.CompanyBankDetails)
             {
-                           <option value="@item.Id">@item.CurrencyName:@item.BankName - @item.Iban</option>
+               <option value="@item.Id">@item.CurrencyName:@item.BankName - @item.Iban</option>
+            }   
+
+        </select>
+    </div>
+     <div class="form-group row col-md-4">
+        <label >Fsc Text</label>
+        <select asp-for="FscTextEng" class="form-control">
+            <option value="-" selected>@Model.FscText</option>
+            @foreach (var item in Model.FscTexts)
+            {
+                 <option value="@item.Id">@item.FscTextEng</option>
             }   
 
         </select>
@@ -84,7 +95,7 @@
                             <tr>
                               <input type="hidden" asp-for="@Model.Products[i].Id"/>
                               <input type="hidden" asp-for="@Model.Products[i].ProductId"/>
-                                <td class="col-sm-1" scope="col">
+                                    <td >
                                     <div class="editor-field">
                                           <select asp-for="@Model.Products[i].DescriptionId" value="@Model.Products[i].DescriptionId">
                                         <option value="">All</option>
@@ -95,7 +106,7 @@
                                         </select>                                        
                                     </div>
                                 </td>
-                                    <td class="col-sm-1" scope="col">
+                                      <td >
                                         <div class="editor-field" >
                                                      <select asp-for="@Model.Products[i].GradeId" value="@Model.Products[i].GradeId">
                                          <option value="">All</option>
@@ -106,7 +117,7 @@
                                         </select>  
                                             </div>
                                         </td>
-                                    <td class="col-sm-1" scope="col">
+                                      <td >
                                     <div class="editor-field">
                                                       <select asp-for="@Model.Products[i].SizeId" value="@Model.Products[i].SizeId">
                                           <option value="">All</option>
@@ -117,39 +128,39 @@
                                         </select>  
                                     </div>
                                 </td>
-                                    <td class="col-sm-2" scope="col">
+                                        <td >
                                     <div class="editor-field">
                                                 <input asp-for="@Model.Products[i].FscClaim" value="@Model.Products[i].FscClaim" type="text" class="form-control"/>
                                     </div>
                                 </td>
-                                    <td class="col-sm-2" scope="col">
+                                      <td >
                                     <div class="editor-field">
                                                <input asp-for="@Model.Products[i].FscSertificate" value="@Model.Products[i].FscSertificate" type="text" class="form-control"/>
                                     </div>
                                 </td>
-                                            <td class="col-sm-2" scope="col">
+                                    <td >
                                     <div class="editor-field">
                                         <input asp-for="@Model.Products[i].Unit" value="@Model.Products[i].Unit" type="text" class="form-control"/>
                                     </div>
                                 </td>
-                                <td class="col-sm-2" scope="col">
+                                    <td>
                                     <div class="editor-field" scope="col">
                                        <input asp-for="@Model.Products[i].InvoicedQuantity" value="@Model.Products[i].InvoicedQuantity" type="number" class="form-control"/>
                                 </div>
                             </td>
-                                  <td class="col-sm-2" scope="col">
+                                     <td>
                                 <div class="editor-field">
                                            <input asp-for="@Model.Products[i].SellPrice" value="@Model.Products[i].SellPrice" type="number" class="form-control"/>
                                         <span asp-validation-for="@Model.Products[i].SellPrice" class="small text-danger"></span>
                                 </div>
                             </td>
-                                <td class="col-sm-2" scope="col" width="150">
+                                    <td >
                                 <div class="editor-field">
                                                 <input asp-for="@Model.Products[i].Pallets" value="@Model.Products[i].Pallets" type="number" class="form-control"/>
                                         <span asp-validation-for="@Model.Products[i].Pallets" class="small text-danger"></span>
                                 </div>
                             </td>
-                                <td class="col-sm-2" scope="col">
+                                    <td >
                                 <div class="editor-field">
                                    <input asp-for="@Model.Products[i].SheetsPerPallet" value="@Model.Products[i].SheetsPerPallet" type="number" class="form-control"/>
                                   <span asp-validation-for="@Model.Products[i].SheetsPerPallet" class="small text-danger"></span>

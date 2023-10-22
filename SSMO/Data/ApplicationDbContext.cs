@@ -37,6 +37,8 @@ namespace SSMO.Data
         public DbSet<PurchaseProductDetails> PurchaseProductDetails { get; set; }
         public DbSet<Payment> Payments { get; set; }
         public DbSet<FiscalAgent> FiscalAgents { get; set; }
+        public DbSet<FscText> FscTexts { get; set; }
+        public DbSet<TransportCompany> TransportCompanies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
@@ -57,6 +59,12 @@ namespace SSMO.Data
                 .HasOne(a => a.Customers)
                 .WithOne(a => a.Address)
                 .HasForeignKey<Customer>(a => a.AddressId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Address>()
+                .HasOne(a => a.TransportCompany)
+                .WithOne(c=>c.Address)
+                .HasForeignKey<TransportCompany>(c=>c.AddressId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<BankDetails>()
@@ -130,7 +138,7 @@ namespace SSMO.Data
             builder.Entity<CustomerOrder>()
                 .HasOne(a => a.Status)
                 .WithMany(a => a.CustomerOrders)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict);       
 
             builder.Entity<SupplierOrder>()
                 .Property(a => a.TotalAmount)
@@ -203,6 +211,30 @@ namespace SSMO.Data
                .Property(a => a.AmountAfterVat)
                .HasColumnType("decimal")
                .HasPrecision(18, 2);
+
+            builder.Entity<ServiceOrder>()
+                .HasOne(c=>c.Currency)
+                .WithMany(s=>s.ServiceOrders)
+                .HasForeignKey(c => c.CurrencyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ServiceOrder>()
+                .HasOne(c=>c.MyCompany)
+                .WithMany(s=>s.ServiceOrders)
+                .HasForeignKey(c => c.MyCompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ServiceOrder>()  
+                .HasOne(c=>c.Document)
+                .WithMany(c=>c.ServiceOrders)
+                .HasForeignKey(c => c.DocumentId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+           builder.Entity<ServiceOrder>()
+                .HasOne(a=>a.TransportCompany) 
+                .WithMany(s=>s.ServiceOrders)
+                .HasForeignKey(a=>a.TransportCompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Product>()
                 .Property(a => a.QuantityLeftForPurchaseLoading)
@@ -660,6 +692,13 @@ namespace SSMO.Data
           .IsRequired(false);
 
             builder.Entity<Payment>()
+                .HasOne(s => s.ServiceOrder)
+                .WithMany(p => p.Payments)
+                .HasForeignKey(k => k.ServiceOrderId)
+                .OnDelete(DeleteBehavior.Restrict)
+                .IsRequired(false);
+
+            builder.Entity<Payment>()
                 .HasOne(a => a.Currency)
                 .WithMany(a => a.Payments)
                 .HasForeignKey(k => k.CurrencyId)
@@ -702,6 +741,22 @@ namespace SSMO.Data
                 .HasForeignKey(a => a.FiscalAgentId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<FscText>()
+                .HasMany(d => d.Documents)
+                .WithOne(d => d.FscText)
+                .HasForeignKey(d => d.FscTextId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<FscText>()
+            .HasMany(d => d.CustomerOrders)
+            .WithOne(d => d.FscText)
+            .HasForeignKey(d => d.FscTextId)
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            
 
             base.OnModelCreating(builder);
         }

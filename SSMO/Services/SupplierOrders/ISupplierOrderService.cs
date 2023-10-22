@@ -11,14 +11,13 @@ namespace SSMO.Services.SupplierOrders
 {
     public interface ISupplierOrderService
     {
-        public int CreateSupplierOrder(int myCompanyId,
+        public Task<int> CreateSupplierOrder(int myCompanyId,
                 int supplierId,
                 DateTime Date,
                 string number,              
-                int statusId, int currencyId, string fscClaim, int vat,
-                DateTime datePaidAmount, decimal paidAvance,  bool paidStatus, 
+                int statusId, int currencyId, string fscClaim, int vat,                 
                 string loadingAddress, string deliveryAddress, string deliveryTerms);
-        void TotalAmountAndQuantitySum(int supplierOrderId);
+        Task TotalAmountAndQuantitySum(int supplierOrderId);
 
         public SupplierOrderPaymentCollectionModel GetSupplierOrders
             (string supplierName,DateTime startDate, DateTime endDate, int currentpage, int supplierOrdersPerPage);

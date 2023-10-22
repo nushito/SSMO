@@ -89,6 +89,8 @@ namespace SSMO.Data.Models
         public string DealDescriptionBg { get; set; }
         public int? FiscalAgentId { get; set; }
         public FiscalAgent Fiscalagent { get; set; }
+        public int? FscTextId { get; set; }
+        public FscText FscText { get; set; }
         public ICollection<BankDetails> BankDetails { get; set; }        
         public ICollection<CustomerOrder> CustomerOrders { get; set; }
         public ICollection<PurchaseProductDetails> PurchaseProducts { get; set; }
@@ -98,5 +100,6 @@ namespace SSMO.Data.Models
         public ICollection<InvoiceProductDetails> DebitNoteProducts { get; set; }
         public ICollection<InvoiceProductDetails> CreditNoteProducts { get; set; }
         public ICollection<Payment> Payments { get; set; }
+        public ICollection<ServiceOrder> ServiceOrders { get; set; }
     }
 }

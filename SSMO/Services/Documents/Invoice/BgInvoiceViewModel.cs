@@ -21,6 +21,8 @@ namespace SSMO.Services.Documents.Invoice
         public string DealDescriptionBg { get; set; }
         public string FiscalAgentName { get; set; }
         public string FiscalAgentDetail { get; set; }
+        public string FscTextBg { get; set; }
+        public string FscCertificate { get; set; }
         public BGMyCompanyInvoicePrintViewModel BgMyCompany { get; set; }
         public BGCustomerForInvoicePrint BgCustomer { get; set; }
         public ICollection<BGProductsForBGInvoiceViewModel> BgProducts { get; set; }

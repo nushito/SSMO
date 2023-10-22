@@ -9,5 +9,6 @@
         public string City { get; set; }
         public string Street { get; set; }
         public string RepresentativePerson { get; set; }
+        public string FscCertificate { get; set; }
     }
 }

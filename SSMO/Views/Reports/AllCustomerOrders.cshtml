@@ -115,7 +115,7 @@
              <div class="col">
                     @order.StatusName
             </div>
-            <a asp-controller="Reports" asp-action="CustomerOrderDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
+                    <a asp-controller="Reports" asp-action="CustomerOrderDetailsPrint" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
             <a asp-controller="Reports" asp-action="CustomerOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
             </div>
             <hr />

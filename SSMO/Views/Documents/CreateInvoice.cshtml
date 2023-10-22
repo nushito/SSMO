@@ -152,6 +152,13 @@
           </div>
         </div>
         <hr>
+         <div class="row">
+                    @if (Model.FscTextEng != null)
+                    {
+                        @Model.FscTextEng <br />
+                           <span>License code:</span> @Model.FscCertificate
+                    }
+        </div>
         <table class="table-borderless">
             <tr>
                 <td class="px-3 mr-5">
@@ -160,6 +167,7 @@
                    Description of the deal: @Model.DealDescriptionEng
                 </td>
             </tr>
+
             <tr>
                 @foreach (var bank in Model.CompanyBankDetails)
                 {

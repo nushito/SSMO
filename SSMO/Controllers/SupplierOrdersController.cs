@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace SSMO.Controllers
 {
@@ -76,7 +77,7 @@ namespace SSMO.Controllers
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public IActionResult AddSupplierConfirmation(SupplierOrderFormModel model, IFormCollection collections)
+        public async Task<IActionResult> AddSupplierConfirmation(SupplierOrderFormModel model, IFormCollection collections)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(model.MyCompanyId);
@@ -111,11 +112,11 @@ namespace SSMO.Controllers
 
             model.ProductList = new List<ProductSupplierFormModel>();
 
-            var supplierOrderId = supplierOrderService.CreateSupplierOrder
+            var supplierOrderId = await supplierOrderService.CreateSupplierOrder
                                   (model.MyCompanyId, model.SupplierId, model.Date,
                                    model.Number, model.StatusId,
-                                   model.CurrencyId, model.FscClaim, model.VAT ?? 0, model.DatePaidAmount,
-                                   model.PaidAvance, model.PaidStatus, model.LoadingAddress, model.DeliveryAddress,
+                                   model.CurrencyId, model.FscClaim, model.VAT ?? 0,
+                                   model.LoadingAddress, model.DeliveryAddress,
                                    model.DeliveryTerms);
             ViewBag.NumberExist = 1;
           
@@ -159,9 +160,10 @@ namespace SSMO.Controllers
 
             foreach (var product in model.ProductList)
             {
-                productService.CreateProduct(product, supplierOrderId);                             
+               await productService.CreateProduct(product, supplierOrderId);                             
             }
-            supplierOrderService.TotalAmountAndQuantitySum(supplierOrderId);
+           await supplierOrderService.TotalAmountAndQuantitySum(supplierOrderId);
+
             return RedirectToAction("Index", "Home");
         }
 

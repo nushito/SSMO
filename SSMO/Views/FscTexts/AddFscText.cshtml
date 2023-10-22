@@ -1,0 +1,26 @@
+﻿@model FscTextFormModel
+
+@{
+    ViewBag.Title = "New FSC Text";
+}
+
+<h3 class="text-center">Add New FSC Text</h3>
+
+<form method="post">
+  
+    <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="FscTextEng">Fsc Text Eng</label>
+        <input asp-for="FscTextEng" type="text" class="form-control" placeholder="Fsc Text for documents">
+        <span asp-validation-for="FscTextEng" class="small text-danger"></span>
+    </div>
+    <div class="form-group offset-3 mb-2 col-md-6">
+        <label asp-for="FscTextBg">FSC Текс БГ</label>
+        <input asp-for="FscTextBg" type="text" class="form-control" placeholder="Fsc текс за документи">
+        <span asp-validation-for="FscTextBg" class="small text-danger"></span>
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Save</button>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

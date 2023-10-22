@@ -21,7 +21,7 @@ namespace SSMO.Models.Products
         public string Unit { get; set; }
         public ICollection<string> Units { get; set; }
         public string FSCClaim { get; set; }
-        public string FSCSertificate { get; set; }
+        public string FscCertificate { get; set; }
         public int CustomerOrderId { get; set; }
      
         [Range(0.0, 9999999999999.99999)]

@@ -99,31 +99,42 @@
     </div>
      <h5>БГ Данни</h5>
             <hr/>
-            <div class="form-group">
-                <label asp-for="CustomerForEdit.BgName">Фирма</label>
-                <input class="form-control" asp-for="CustomerForEdit.BgName" placeholder="Име">
+            <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="addon-wrapping">Фирма</span>
+                </div>
+                <input asp-for="CustomerForEdit.BgName" class="form-control" placeholder="Фирма" aria-describedby="addon-wrapping" />
                 <span asp-validation-for="CustomerForEdit.BgName" class="small text-danger"></span>
             </div>
-             <div class="form-group">
-                <label asp-for="CustomerForEdit.BgRepresentativePerson">Управител</label>
-                <input type="text" class="form-control" asp-for="CustomerForEdit.BgRepresentativePerson" placeholder="Управител">
+            <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="addon-wrapping">Управител</span>
+                </div>
+                <input asp-for="CustomerForEdit.BgRepresentativePerson" class="form-control" placeholder="Управител" aria-describedby="addon-wrapping" />
                 <span asp-validation-for="CustomerForEdit.BgRepresentativePerson" class="small text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CustomerForEdit.CustomerAddress.BgCountry">Държава</label>
-                <input type="text" class="form-control" asp-for="CustomerForEdit.CustomerAddress.BgCountry" placeholder="Държава">
+              <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="addon-wrapping">Държава</span>
+                </div>
+                <input asp-for="CustomerForEdit.CustomerAddress.BgCountry" class="form-control" placeholder="Държава" aria-describedby="addon-wrapping" />
                 <span asp-validation-for="CustomerForEdit.CustomerAddress.BgCountry" class="small text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CustomerForEdit.CustomerAddress.BgCity">Град</label>
-                <input type="text" class="form-control" asp-for="CustomerForEdit.CustomerAddress.BgCity" placeholder="Град">
+            <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="addon-wrapping">Град</span>
+                </div>
+                <input asp-for="CustomerForEdit.CustomerAddress.BgCity" class="form-control" placeholder="Град" aria-describedby="addon-wrapping" />
                 <span asp-validation-for="CustomerForEdit.CustomerAddress.BgCity" class="small text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="CustomerForEdit.CustomerAddress.Street">Адрес</label>
-                <input type="text" class="form-control" asp-for="CustomerForEdit.CustomerAddress.Street" placeholder="Улица">
+             <div class="input-group flex-nowrap offset-3 mb-2 col-md-6">
+                <div class="input-group-prepend">
+                    <span class="input-group-text" id="addon-wrapping">Адрес</span>
+                </div>
+                <input asp-for="CustomerForEdit.CustomerAddress.Street" class="form-control" placeholder="Адрес" aria-describedby="addon-wrapping" />
                 <span asp-validation-for="CustomerForEdit.CustomerAddress.Street" class="small text-danger"></span>
             </div>
+           
             <hr />
 
     <button type="submit" class="btn btn-primary mt-3">Submit</button>

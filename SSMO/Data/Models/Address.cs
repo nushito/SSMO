@@ -20,6 +20,7 @@ namespace SSMO.Data.Models
         public MyCompany MyCompany { get; set; }       
         public Supplier Suppliers { get; set; }       
         public Customer Customers { get; set; }
-        
+        public TransportCompany TransportCompany { get; set; }
+
     }
 }

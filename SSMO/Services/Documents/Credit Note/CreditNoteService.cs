@@ -39,6 +39,7 @@ namespace SSMO.Services.Documents.Credit_Note
             string deliveryAddress, List<AddProductsToCreditAndDebitNoteFormModel> products)
         {
             var invoiceForCredit = dbContext.Documents
+                .Include(a=>a.BankDetails)
                 .Where(n => n.Id == invoiceId && n.DocumentType == Data.Enums.DocumentTypes.Invoice)
                 .FirstOrDefault();  
 
@@ -82,7 +83,8 @@ namespace SSMO.Services.Documents.Credit_Note
                     .ToList();
 
                var existProduct = dbContext.InvoiceProductDetails
-                    .Where(a=> mainProductList.Select(a=>a.Id).Contains(a.ProductId) && a.InvoiceId == invoiceForCredit.Id)
+                    .Where(a=> mainProductList.Select(a=>a.Id)
+                    .Contains(a.ProductId) && a.InvoiceId == invoiceForCredit.Id)
                     .FirstOrDefault();
 
                 if(existProduct != null)
@@ -93,6 +95,7 @@ namespace SSMO.Services.Documents.Credit_Note
                     {
                         return null;
                     }
+
                     existProduct.CreditNoteId = creditNote.Id;
                     existProduct.CreditNotePallets = product.Pallets;
                     existProduct.CreditNotePrice = product.Price;
@@ -106,13 +109,21 @@ namespace SSMO.Services.Documents.Credit_Note
                     //creditNote.TotalQuantity += product.Quantity;
 
                     if (quantityBack == true)
-                    {  
+                    {  if(mainProduct.Unit.ToString() != product.Unit)
+                        {
+                            var size = productService.GetSizeName(mainProduct.SizeId);
+
+                            product.Quantity =productService.ConvertUnitQuantityToDiffUnitQuantity
+                                (mainProduct.Unit.ToString(), product.Unit, product.Quantity, size, existProduct.TotalSheets);
+                        }
                         mainProduct.QuantityAvailableForCustomerOrder += product.Quantity;
-                        var customerOrderProduct = dbContext.CustomerOrderProductDetails
-                            .Where(i => i.ProductId == mainProduct.Id && i.CustomerOrderId == existProduct.CustomerOrderId)
-                            .FirstOrDefault();
+                        mainProduct.SoldQuantity -= product.Quantity;
+                        //var customerOrderProduct = dbContext.CustomerOrderProductDetails
+                        //    .Where(i => i.ProductId == mainProduct.Id && i.CustomerOrderId == existProduct.CustomerOrderId)
+                        //    .FirstOrDefault();
+                       
                         //TODO dali se vrashta v austanding ili nie rachno pravim edit na CO. moje da ne se vrashta nishto ???
-                      //  customerOrderProduct.AutstandingQuantity += product.Quantity;
+                        //  customerOrderProduct.AutstandingQuantity += product.Quantity;
                     }                    
                 }
                 else
@@ -185,12 +196,15 @@ namespace SSMO.Services.Documents.Credit_Note
 
         public bool EditCreditNote
             (int id, DateTime date, string incoterms, string truckNumber, decimal netWeight, 
-            decimal grossWeight, decimal deliveryCost, decimal currencyExchangeRate, string comment, IList<EditProductForCreditNoteViewModel> products)
+            decimal grossWeight, decimal deliveryCost, decimal currencyExchangeRate, string comment, 
+            IList<EditProductForCreditNoteViewModel> products)
         {
             if(id == 0) { return false; }
 
             var creditNote = dbContext.Documents
-                .Find(id);
+                .Include(b => b.BankDetails)
+                .Where(i => i.Id == id)
+                .FirstOrDefault();               
 
             creditNote.Date = date;
             creditNote.Incoterms= incoterms;
@@ -221,8 +235,29 @@ namespace SSMO.Services.Documents.Credit_Note
                 productForEdit.CreditNoteBgAmount = productForEdit.CreditNoteProductAmount * currencyExchangeRate;
 
                 creditNote.Amount += product.CreditNotePrice * product.CreditNoteQuantity;
-               // creditNote.TotalQuantity += product.CreditNoteQuantity;               
+
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
+
+                
+                    if (mainProduct.Unit != productForEdit.Unit)
+                    {
+                        var size = productService.GetSizeName(mainProduct.SizeId);
+
+                    productForEdit.CreditNoteQuantity = productService.ConvertUnitQuantityToDiffUnitQuantity
+                            (mainProduct.Unit.ToString(), productForEdit.Unit.ToString(), product.CreditNoteQuantity, size, product.TotalSheets);
+                    }
+                    mainProduct.QuantityAvailableForCustomerOrder += product.CreditNoteQuantity;
+                    mainProduct.SoldQuantity -= product.CreditNoteQuantity;
+                    //var customerOrderProduct = dbContext.CustomerOrderProductDetails
+                    //    .Where(i => i.ProductId == mainProduct.Id && i.CustomerOrderId == existProduct.CustomerOrderId)
+                    //    .FirstOrDefault();
+
+                    //TODO dali se vrashta v austanding ili nie rachno pravim edit na CO. moje da ne se vrashta nishto ???
+                    //  customerOrderProduct.AutstandingQuantity += product.Quantity;
+              
+                // creditNote.TotalQuantity += product.CreditNoteQuantity;               
             }
+
             creditNote.VatAmount = creditNote.Amount * creditNote.Vat / 100;
             creditNote.CreditNoteTotalAmount = creditNote.Amount + creditNote.VatAmount ?? 0;
             documentService.EditBgInvoice(creditNote.DocumentNumber);

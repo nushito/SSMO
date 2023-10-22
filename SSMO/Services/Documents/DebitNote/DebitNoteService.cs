@@ -47,6 +47,7 @@ namespace SSMO.Services.Documents.DebitNote
             }
 
             var invoice = dbContext.Documents
+                .Include(b=>b.BankDetails)
                .Where(i => i.Id == invoiceId)
                .FirstOrDefault();
 

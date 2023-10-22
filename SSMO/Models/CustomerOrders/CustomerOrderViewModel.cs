@@ -1,4 +1,5 @@
 ﻿using SSMO.Models.Customers;
+using SSMO.Models.FscTexts;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Models.Reports;
@@ -46,10 +47,7 @@ namespace SSMO.Models.CustomerOrders
         public string Origin { get; set; }
         public decimal TotalQuantity { get; set; }
         public decimal TotalAmount { get; set; }
-        public int? Vat { get; set; }
-        public decimal PaidAvance { get; set; }
-        public decimal Balance { get; set; }
-        public bool PaidAmountStatus { get; set; }
+        public int? Vat { get; set; }      
         public decimal Amount { get; set; }
         public decimal SubTotal { get; set; }
         public int SupplierOrderId { get; set; }
@@ -59,9 +57,11 @@ namespace SSMO.Models.CustomerOrders
         public ICollection<BankDetailsViewModel> BankDetails { get; set; }
         public int ProductsCount { get; set; }
         public IEnumerable<SupplierOrdersBySupplier> SupplierOrdersBySupplier { get; set; }
-        public int FiscalAgentId { get; set; }
+        public int? FiscalAgentId { get; set; }
         public ICollection<FiscalAgentViewModel> FiscalAgents { get; set; }
         public string DealType { get; set; }
         public string DealDescription { get; set; }
+        public int? FscText { get; set; }
+        public ICollection<FscTextViewModel> FscTexts { get; set; }
     }
 }

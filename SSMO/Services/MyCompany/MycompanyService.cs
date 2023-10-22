@@ -8,6 +8,7 @@ using SSMO.Infrastructure;
 using SSMO.Models.Reports;
 using SSMO.Data.Models;
 using SSMO.Models.Documents.Invoice;
+using SSMO.Models.ServiceOrders;
 
 namespace SSMO.Services.MyCompany
 {
@@ -26,16 +27,28 @@ namespace SSMO.Services.MyCompany
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public ICollection<MyCompaniesForReportViewModel> GetAllCompanies()
+       private List<Data.Models.MyCompany> UserCompanies()
         {
             var loggedUserId = _httpContextAccessor.ContextAccessUserId();
             var listDbCompanies = dbContext.MyCompanies
-                .Where(idvalue=>idvalue.UserId == loggedUserId).ToList();
-            var allCompanies = mapper.Map<ICollection<MyCompaniesForReportViewModel>>(listDbCompanies);
+                .Where(idvalue => idvalue.UserId == loggedUserId).ToList();
+
+            return listDbCompanies;
+        }
+
+        public ICollection<MyCompaniesForReportViewModel> GetAllCompanies()
+        {  
+            var allCompanies = mapper.Map<ICollection<MyCompaniesForReportViewModel>>(UserCompanies());
 
             return allCompanies;
         }
 
+        public ICollection<MyCompaniesForTrasnportOrderViewModel> GetCompaniesForTransportOrder()
+        {
+            var allCompanies = mapper.Map<ICollection<MyCompaniesForTrasnportOrderViewModel>>(UserCompanies());
+
+            return allCompanies;
+        }
         public ICollection<string> GetCompaniesNames()
         {
             var loggedUserId = _httpContextAccessor.ContextAccessUserId();

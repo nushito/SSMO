@@ -64,6 +64,19 @@
         </div>
 
     </div>
+     <div class="form-group col-md-4">
+        <div class="form-group">
+            <label asp-for="FiscalAgentId">Choose Fiscal Agent</label>
+            <select asp-for="FiscalAgentId" class="form-control">
+                <option value="">-</option>
+                @foreach (var agent in Model.FiscalAgents)
+                {
+                            <option value="@agent.Id">@agent.Name</option>
+                }
+                <span asp-validation-for="FiscalAgentId" class="small text-danger"></span>
+            </select>
+        </div>
+    </div>
 
     <div class="form-group-sm col-md-4">
         <label asp-for="Origin"></label>
@@ -83,7 +96,6 @@
     </div>
 
     <div class="form-group row col-md-4">
-
             <label asp-for="Vat"></label>
             <input asp-for="Vat" min="0" step="1" class="form-control" type="number" />
        </div>
@@ -97,6 +109,19 @@
             }
                 <span asp-validation-for="StatusId" class="small text-danger"></span>
             </select>
+    </div>
+      <div class="form-group col-md-4">
+        <div class="form-group">
+            <label asp-for="FscText">Fsc Text</label>
+            <select asp-for="FscText" class="form-control">
+                <option value="">-</option>
+                @foreach (var fsc in Model.FscTexts)
+                {
+                                <option value="@fsc.Id">@fsc.FscTextEng</option>
+                }
+                <span asp-validation-for="FiscalAgentId" class="small text-danger"></span>
+            </select>
+        </div>
 
     </div>
     <h6>Products</h6>
@@ -113,7 +138,7 @@
                     <td>Unit</td>
                     <td>Pallets Number</td>
                     <td>Sheets/pallet</td>
-                    <td>Quantity m3</td>
+                    <td>Quantity</td>
                     <td>Price</td>
                 </tr>
             </thead>
@@ -122,6 +147,7 @@
                 {
                       <tr>
                               <input type="hidden" asp-for="@Model.Products[i].Id" value="@Model.Products[i].Id">
+                             <input type="hidden" asp-for="@Model.Products[i].ProductId" value="@Model.Products[i].ProductId">
                             <td class="col-sm-1">
                                 <div class="editor-field">
                                    <select asp-for="@Model.Products[i].Description">
@@ -166,7 +192,7 @@
                             <br>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                   <input asp-for="@Model.Products[i].FSCSertificate" class="text-box single-line" placeholder="FSC Certificate" aria-label="FSC Certificate" value="@Model.Products[i].FSCSertificate">
+                                   <input asp-for="@Model.Products[i].FscCertificate" class="text-box single-line" placeholder="FSC Certificate" aria-label="FSC Certificate" value="@Model.Products[i].FscCertificate">
                                 </div>
                             </td>
                             <br>

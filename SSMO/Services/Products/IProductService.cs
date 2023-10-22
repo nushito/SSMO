@@ -19,7 +19,7 @@ namespace SSMO.Services.Products
 {
     public interface IProductService
     {
-        public void CreateProduct(ProductSupplierFormModel model, int supplierOrderId);
+        public Task CreateProduct(ProductSupplierFormModel model, int supplierOrderId);
         public void CreateNewProductOnEditSupplierOrder(NewProductsForSupplierOrderModel products);    
         public bool DescriptionExist(string name);
         public void AddDescription(string name, string bgName);
@@ -32,7 +32,7 @@ namespace SSMO.Services.Products
         public IEnumerable<string> GetGrades();
         public ICollection<string> GetUnits();
         public IEnumerable<ProductPerSupplierOrderDetails> Details(List<int> supplierOrderserId);
-        public bool CreateCustomerOrderProduct(int id, int customerorderId,
+        public Task<bool> CreateCustomerOrderProduct(int id, int customerorderId,
             int supplierOrderId, string description, string grade,
             string size, string fscCert, string fscClaim,
             int pallets, int sheetsPerPallet, decimal price, decimal orderedQuantity, string unit);
@@ -67,8 +67,10 @@ namespace SSMO.Services.Products
             (int myCompanyId, DateTime startDate, DateTime EndDate, string fscClaim);
         public ICollection<SoldProductsFscCollectionViewModel> SoldProductFscCollection
             (int myCompanyId, DateTime startDate, DateTime EndDate, string fscClaim);
-
         public void CalculateCostPriceInDiffCurrency(int purchaseId, string action);
+
+        public decimal ConvertUnitQuantityToDiffUnitQuantity
+            (string firstUnit, string secondUnit,decimal quantity, string size, int totalSheets);
 
     }
 }

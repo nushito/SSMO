@@ -1,4 +1,8 @@
 ﻿
+using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using SSMO.Models.CustomerOrders;
+using System.Collections.Generic;
+
 namespace SSMO.Services.MyCompany
 {
    public interface IBankService
@@ -11,5 +15,8 @@ namespace SSMO.Services.MyCompany
             string address, 
             string companyName, 
             int companyId);
+
+        public ICollection<BankDetailsViewModel> GetMyBanks(int customerOrderId);
+
     }
 }

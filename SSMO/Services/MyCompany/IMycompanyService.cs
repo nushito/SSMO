@@ -1,6 +1,7 @@
 ﻿using SSMO.Models.Documents.Invoice;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Reports;
+using SSMO.Models.ServiceOrders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace SSMO.Services.MyCompany
       public ICollection<string> GetCompaniesNames();
         public ICollection<string> GetCompaniesUserId();
         public ICollection<MyCompaniesForReportViewModel> GetAllCompanies();
+        public ICollection<MyCompaniesForTrasnportOrderViewModel> GetCompaniesForTransportOrder();
         public string GetUserIdMyCompanyByName(string name);
         public string GetUserIdMyCompanyById(int id); 
         public string GetUserIdMyCompanyBySupplierOrdreNum(string supplierOrder);

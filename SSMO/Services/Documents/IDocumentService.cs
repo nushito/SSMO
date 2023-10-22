@@ -19,6 +19,8 @@ namespace SSMO.Services.Documents
 
         public ICollection<int> GetPackingList();
 
+        public ICollection<int> GetInvoiceList();
+
         public PackingListForPrintViewModel PackingListForPrint(int packingListNumber);
 
         public void CreateBgInvoice(int documentNumberId);

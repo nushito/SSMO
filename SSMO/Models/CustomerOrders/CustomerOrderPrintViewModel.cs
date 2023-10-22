@@ -33,5 +33,7 @@ namespace SSMO.Models.CustomerOrders
         public string DealDescription { get; set; }
         public ICollection<BankDetailsViewModel> BankDetails { get; set; }
         public FiscalAgentPrintViewModel FiscalAgent { get; set; }
+        public string FscText { get; set; }
+        public string FscCertificate { get; set; }
     }
 }

@@ -26,8 +26,7 @@ namespace SSMO.Models.MyCompany
         public string City { get; set; }
         public string Street { get; set; }
         public string RepresentativePerson { get; set; }
-        public string BgRepresentativePerson { get; set; }
-        public string FSCClaim { get; set; }
+        public string BgRepresentativePerson { get; set; }       
         public string FSCSertificate { get; set; }
         public ICollection<AddBankDetailsFormModel> BankDetails { get; set; }
 

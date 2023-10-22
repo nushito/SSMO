@@ -113,8 +113,7 @@
             }
 
             data.Grades.AddRange(new[]
-            {
-                new Grade {Name = "None"},
+            {               
                 new Grade {Name = "-"},
                 new Grade{Name = "A"},
                 new Grade{Name = "B"},

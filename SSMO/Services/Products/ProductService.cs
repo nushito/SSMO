@@ -24,6 +24,7 @@ using SSMO.Repository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Description = SSMO.Data.Models.Description;
 using Size = SSMO.Data.Models.Size;
 
@@ -41,7 +42,7 @@ namespace SSMO.Services.Products
             this.mapper = mapper.ConfigurationProvider;
             this.productRepository = productRepository;
         }
-        public void CreateProduct(ProductSupplierFormModel model, int supplierOrderId)
+        public async Task CreateProduct(ProductSupplierFormModel model, int supplierOrderId)
         {
             var description = dbContext.Descriptions.Where(a => a.Id == model.DescriptionId).Select(n=>n.Name).FirstOrDefault();
             var size = dbContext.Sizes.Where(a => a.Id == model.SizeId).Select(n=>n.Name).FirstOrDefault();
@@ -67,19 +68,20 @@ namespace SSMO.Services.Products
                 TotalSheets = model.Pallets*model.SheetsPerPallet,
                 CustomerOrderProductDetails = new List<CustomerOrderProductDetails>(),
                 InvoiceProductDetails = new List<InvoiceProductDetails>(),
-                PurchaseProductDetails = new List<PurchaseProductDetails>()
+                PurchaseProductDetails = new List<PurchaseProductDetails>(),
+                OrderedQuantity= model.Quantity
             };                        
 
-            if(model.Quantity == 0)
+            if(model.Unit != Data.Enums.Unit.m3.ToString() && !String.Equals(size,"-"))
             {
                 var sum = ConvertStringSizeToQubicMeters(size);
                
-               product.OrderedQuantity = Math.Round(sum * model.Pallets * model.SheetsPerPallet, 5);
+               product.QuantityM3 = Math.Round(sum * model.Pallets * model.SheetsPerPallet, 5);
                 
             }
-            else
+            else if(!String.Equals(size, "-"))
             {
-                product.OrderedQuantity = model.Quantity;
+                product.QuantityM3 = model.Quantity;
             }
 
             product.QuantityAvailableForCustomerOrder = product.OrderedQuantity;
@@ -88,9 +90,10 @@ namespace SSMO.Services.Products
            
             var order = dbContext.SupplierOrders.Where(a => a.Id == supplierOrderId).FirstOrDefault();           
             order.Amount += product.PurchaseAmount;
+          
             order.Products.Add(product);
 
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
         public void AddDescription(string name, string bgName)
         {
@@ -155,14 +158,14 @@ namespace SSMO.Services.Products
         {
             return dbContext.Grades.Select(a => a.Name).ToList();
         }
-        public bool CreateCustomerOrderProduct(int id, int customerorderId,
+        public async Task<bool> CreateCustomerOrderProduct(int id, int customerorderId,
             int supplierOrderId, string description, string grade,
             string size, string fscCert, string fscClaim,
             int pallets, int sheetsPerPallet, decimal price, decimal orderedQuantity, string unit)
         {
             var product = dbContext.Products.Find(id);
            
-            if (product == null || product.QuantityAvailableForCustomerOrder < orderedQuantity || product.QuantityAvailableForCustomerOrder <= 0)
+            if (product == null || product.QuantityAvailableForCustomerOrder <= 0)
             {
                 return false;
             }
@@ -181,15 +184,30 @@ namespace SSMO.Services.Products
             SellPrice = price,
             SupplierOrderId = supplierOrderId,
             Unit = Enum.Parse<Unit>(unit),
-            TotalSheets = product.Pallets * product.SheetsPerPallet,
+            TotalSheets = pallets * sheetsPerPallet,
             Amount = Math.Round(price * orderedQuantity, 4),
             AutstandingQuantity= orderedQuantity
             };
 
+            var sizeForCalculatiob = dbContext.Sizes.
+                Where(i => i.Id == product.SizeId)
+                .Select(n => n.Name)
+                .FirstOrDefault();
+
+
             product.CustomerOrderProductDetails.Add(customerOrderProduct);
             
-            product.QuantityAvailableForCustomerOrder -= customerOrderProduct.Quantity;
-            
+            if(product.Unit == customerOrderProduct.Unit)
+            {
+                product.QuantityAvailableForCustomerOrder -= customerOrderProduct.Quantity;
+            }
+            else 
+            {
+                product.QuantityAvailableForCustomerOrder = RecalculateAvailableQuantity
+                    ( product.Unit.ToString(), customerOrderProduct.Unit.ToString(),product.OrderedQuantity, customerOrderProduct.Quantity,
+                    sizeForCalculatiob, customerOrderProduct.TotalSheets);
+            }
+          
             var customerOrder = dbContext.CustomerOrders.Where(i => i.Id == customerorderId).FirstOrDefault();
             // customerOrder.CustomerOrderProducts = new List<CustomerOrderProductDetails>();  
 
@@ -210,7 +228,7 @@ namespace SSMO.Services.Products
               purchase.CustomerOrderProducts.Add(customerOrderProduct);
             }
            
-            dbContext.SaveChanges();
+           await dbContext.SaveChangesAsync();
 
             return true;
         }
@@ -293,7 +311,8 @@ namespace SSMO.Services.Products
             return name;
         }
         public decimal CalculateDeliveryCostOfTheProductInCo
-            (decimal quantity, decimal quantityM3, decimal totalQuantity, decimal deliveryCost, Unit unit, string size)
+            (decimal quantity, decimal quantityM3, decimal totalQuantity, 
+            decimal deliveryCost, Unit unit, string size)
         {
             var cost = deliveryCost / totalQuantity * quantityM3;
 
@@ -302,6 +321,7 @@ namespace SSMO.Services.Products
             decimal thickness = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5);
             decimal calcMeter = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5) * 
                 Math.Round(decimal.Parse(dimensionArray[2]) / 1000, 5);
+            decimal feetTom3 = quantityM3 * 0.0929m * thickness;
 
             for (int i = 0; i < dimensionArray.Count(); i++)
             {
@@ -319,6 +339,10 @@ namespace SSMO.Services.Products
             else if(unit == Data.Enums.Unit.m)
             {
                 cost *= calcMeter;
+            }
+            else if(unit == Data.Enums.Unit.sqfeet)
+            {
+                cost /= feetTom3;
             }
 
             return cost;
@@ -348,7 +372,7 @@ namespace SSMO.Services.Products
 
             if (product != null)
             {
-                product.QuantityAvailableForCustomerOrder += quantity - oldQuantity;
+                product.QuantityAvailableForCustomerOrder += oldQuantity - quantity;
             }
 
             dbContext.SaveChanges();
@@ -560,7 +584,7 @@ namespace SSMO.Services.Products
                         Unit = product.Unit,
                         Pallets = product.Pallets,
                         SheetsPerPallet = product.SheetsPerPallet,
-                        InvoicedQuantity = mainProduct.LoadedQuantityM3 - mainProduct.SoldQuantity,
+                        InvoicedQuantity = product.AutstandingQuantity,    /*mainProduct.LoadedQuantityM3 - mainProduct.SoldQuantity,*/
                         SellPrice = product.SellPrice,
                         FscCertificate = product.FscCertificate,
                         FscClaim = product.FscClaim,
@@ -618,6 +642,7 @@ namespace SSMO.Services.Products
                         {
                             PurchaseCostPriceId = c.Id,
                             CostPrice = c.CostPrice,
+                            Unit = c.Unit.ToString()
                         }).ToList();
 
                     productForInvoice.PurchaseCostPrice = purchaseProductCostPrice;
@@ -742,7 +767,7 @@ namespace SSMO.Services.Products
                 product.DeliveryCost = CalculateDeliveryCostOfTheProductInCo
                    (product.InvoicedQuantity,product.QuantityM3ForCalc, invoice.TotalQuantity, 
                    invoice.DeliveryTrasnportCost,product.Unit,size);
-
+               // product.Profit = (product.Amount - purchaseProductDetail.CostPrice * purchaseProductDetail.Quantity) - product.DeliveryCost;
                 product.Profit = (product.SellPrice - purchaseProductDetailCostPrice) * 
                     product.InvoicedQuantity - product.DeliveryCost;
             }
@@ -789,7 +814,7 @@ namespace SSMO.Services.Products
         }
 
         public decimal ConvertStringSizeToQubicMeters(string size)
-        {
+        {                    
             var dimensionArray = size.Split('/').ToArray();           
             decimal sum = 1M;
 
@@ -1032,6 +1057,8 @@ namespace SSMO.Services.Products
                 .Where(d=>d.DocumentId == purchaseId)
                 .ToList();
 
+            var newAmount = payments.Select(n=>n.NewAmountPerExchangeRate).Sum();   
+
             var purchaseProducts = dbContext.PurchaseProductDetails
                 .Where(i => i.PurchaseInvoiceId == purchaseId)
                 .ToList();
@@ -1039,12 +1066,12 @@ namespace SSMO.Services.Products
             var paymentsSum = payments.Select(a=>a.NewAmountPerExchangeRate).Sum();
             decimal calcNumber = 0.0m;
             
-            var expenses = purchase.Duty + purchase.Factoring * purchase.Amount / 100 +
+            var expenses = purchase.Duty + purchase.Factoring * newAmount / 100 +
                       purchase.CustomsExpenses + purchase.FiscalAgentExpenses +
-                      purchase.ProcentComission * purchase.Amount / 100 + purchase.PurchaseTransportCost +
+                      purchase.ProcentComission * newAmount / 100 + purchase.PurchaseTransportCost +
                       purchase.BankExpenses + purchase.OtherExpenses;
 
-            foreach (var product in purchaseProducts)
+            foreach (var product in purchaseProducts.Where(a=>a.QuantityM3 != null).ToList())
             {
                 var mainProduct = productRepository.GetMainProduct(product.ProductId);
 
@@ -1057,11 +1084,10 @@ namespace SSMO.Services.Products
 
                 switch (action)
                 {
-                    case "/": calcNumber = 1 / (paymentsSum / purchase.Amount ?? 0);product.Amount /= calcNumber; break;
-                    case "*": calcNumber = paymentsSum / purchase.Amount ?? 0;product.Amount *= calcNumber; break;
+                    case "/": calcNumber = 1 / (paymentsSum / newAmount ?? 0); product.Amount = product.PurchasePrice/calcNumber*product.Quantity; break;
+                    case "*": calcNumber = paymentsSum / newAmount ?? 0;product.Amount = product.PurchasePrice* calcNumber*product.Quantity; break;
                     default: break;
                 }
-
 
                 for (int i = 0; i < dimensionArray.Count(); i++)
                 {
@@ -1070,7 +1096,7 @@ namespace SSMO.Services.Products
 
                 if (product.Unit == Data.Enums.Unit.m3)
                 {
-                    product.CostPrice = (product.Amount + (expenses / purchase.TotalQuantity * product.Quantity)) / product.Quantity;
+                    product.CostPrice = (decimal)((product.Amount + (expenses / purchase.TotalQuantity * product.Quantity)) / product.Quantity);
                 }
                 else
                 if (product.Unit == Data.Enums.Unit.m2)
@@ -1090,6 +1116,97 @@ namespace SSMO.Services.Products
                     product.CostPrice = ((product.Amount + (expenses / purchase.TotalQuantity * product.QuantityM3)) / product.QuantityM3 ?? 0) * calcMeter;
                 }
             }
+        }
+
+        private decimal RecalculateAvailableQuantity(string firstUnit, string secondUnit, 
+            decimal mainProductQuantity, decimal customerOrderProductQuantity, string size, int totalSheets)
+        {
+            var quantity = ConvertUnitQuantityToDiffUnitQuantity(firstUnit, secondUnit, customerOrderProductQuantity, size, totalSheets);
+            var availableQuantity = mainProductQuantity - quantity;
+            return availableQuantity;
+        }
+
+        public decimal ConvertUnitQuantityToDiffUnitQuantity
+            (string firstUnit, string secondUnit, decimal quantity, string size, int totalSheets)
+        {
+            var dimensionArray = size.Split('/').ToArray();
+            decimal thickness = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5);
+
+            decimal calcMeter = Math.Round(decimal.Parse(dimensionArray[0]) / 1000, 5) *
+                Math.Round(decimal.Parse(dimensionArray[2]) / 1000, 5);
+
+            decimal qubic = ConvertStringSizeToQubicMeters(size);
+
+            decimal squareCalc = Math.Round(decimal.Parse(dimensionArray[1]) / 1000, 5)
+                * Math.Round(decimal.Parse(dimensionArray[2]) / 1000, 5);
+
+            decimal length = Math.Round(decimal.Parse(dimensionArray[2]) / 1000, 5);
+
+            decimal width = Math.Round(decimal.Parse(dimensionArray[1]) / 1000, 5);
+
+            if (firstUnit == Data.Enums.Unit.m3.ToString())
+            {
+                switch (secondUnit)
+                {
+                    case "m2":
+                        quantity *= thickness;
+                        break;
+                    case "pcs":
+                    case "sheets":
+                        quantity *= qubic; break;
+                    case "m": quantity = (quantity / totalSheets) * qubic; break;
+                    case "sqfeet":
+                        quantity *= 0.0929m * thickness;
+                        break;
+                    default: break;
+                }
+            }
+            else if (firstUnit == Data.Enums.Unit.m2.ToString())
+            {
+                switch (secondUnit)
+                {
+                    case "m3": quantity /= thickness; break;
+                    case "pcs": case "sheets": quantity *= squareCalc; break;
+                    case "m":  quantity  *= width; break;
+                    case "sqfeet":  quantity /= 10.764m; break;
+                    default: break;
+                }
+            }
+            else if (firstUnit == Data.Enums.Unit.pcs.ToString() || firstUnit == Data.Enums.Unit.sheets.ToString())
+            {
+                switch (secondUnit)
+                {
+                    case "m2": quantity /= squareCalc; break;
+                    case "m3": quantity /= qubic; break;
+                    case "m": quantity /= length; break;
+                    case "sqfeet": quantity = (quantity * 0.0929m * thickness) / qubic; break;
+                    default: break;
+                }
+            }
+            else if (firstUnit == Data.Enums.Unit.m.ToString())
+            {
+                switch (secondUnit)
+                {
+                    case "m2": quantity /= width; break;
+                    case "pcs": case "sheets": quantity *= length; break;
+                    case "m3": quantity = (quantity / thickness) / width; break;
+                    case "sqfeet": quantity = (quantity / 10.764m) / width; break;
+                    default: break;
+                }
+            }
+            else if (firstUnit == Data.Enums.Unit.sqfeet.ToString())
+            {
+                switch (secondUnit)
+                {
+                    case "m2": quantity *= 10.764m; break;
+                    case "pcs": case "sheets": quantity = quantity * squareCalc * 10.764m; break;
+                    case "m": quantity = quantity * width * 10.764m; break;
+                    case "m3": quantity = (quantity / thickness) / 0.0929m; break;
+                    default: break;
+                }
+            }
+
+            return quantity;
         }
     }
 }

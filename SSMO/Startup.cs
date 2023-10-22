@@ -29,6 +29,8 @@ using SSMO.Services.PDF;
 using SSMO.Services.Documents.Credit_Note;
 using SSMO.Services.Documents.DebitNote;
 using SSMO.Repository;
+using SSMO.Services.FscTextDocuments;
+using SSMO.Services.TransportService;
 
 namespace SSMO
 {
@@ -96,6 +98,8 @@ namespace SSMO
             services.AddTransient<IProductRepository, ProductRepository>();
             services.AddScoped<IViewRenderService, ViewRenderService>();
             services.AddScoped<IHtmlToPdfConverter, HtmlToPdfConverter>();
+            services.AddTransient<IFscTextService, FscTextService>();  
+            services.AddTransient<ITransportService, TransportService>();   
             services.AddScoped<HttpContextUserIdExtension>();
 
             services.AddMvc(options =>

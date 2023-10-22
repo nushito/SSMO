@@ -75,22 +75,6 @@
          <label asp-for="DeliveryAddress">Delivery Address</label> 
          <input asp-for="DeliveryAddress"  type="text" class="form-control"/>       
     </div>
-    <div class="row col-sm-4 mb-2">                  
-         <label asp-for="PaidAvance">  Paid Advance</label> 
-         <input asp-for="PaidAvance"  min="0.00000" step="0.00001" class="form-control"/>       
-    </div>
-     <div class="row col-md-4 mb-2">
-        <label asp-for="DatePaidAmount"></label>
-        <input itemid="date" asp-for="DatePaidAmount" name="Date" type="date" id="datepicker" class="form-control"/> 
-        <span asp-validation-for="DatePaidAmount" class="small text-danger"></span>
-    </div>
-
-    <div class="form-check">              
-       <input class="form-check-input" type="checkbox" asp-for="PaidStatus">
-       <label class="form-check-label" asp-for="PaidStatus">  Paid </label> 
-       <span asp-validation-for="PaidStatus" class="small text-danger"></span>
-    </div>
-         
    
  <div class="row col-md-4">
      <label asp-for="VAT">Enter VAT %</label>
@@ -180,16 +164,19 @@
                                 <td>
                                     <div class="editor-field">
                                             <input asp-for="ProductList.ElementAt(i).PurchasePrice" class="text-box single-line" name="Price[0]" value="" required="required">
+                                                    <span asp-validation-for="ProductList.ElementAt(i).PurchasePrice" class="small text-danger"></span>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="editor-field">
-                                            <input asp-for="ProductList.ElementAt(i).Pallets" class="text-box single-line" name="Pallets[0]" value="" required="required">
+                                            <input asp-for="ProductList.ElementAt(i).Pallets" class="text-box single-line" name="Pallets[0]" value="" required="required" type="number">
+                                                      <span asp-validation-for="ProductList.ElementAt(i).Pallets" class="small text-danger"></span>
                                     </div>
                                 </td>
                                 <td>
                                     <div class="editor-field">
-                                           <input asp-for="ProductList.ElementAt(i).SheetsPerPallet" class="text-box single-line" name="SheetsPerPallet[0]" value="" required="required">
+                                           <input asp-for="ProductList.ElementAt(i).SheetsPerPallet" class="text-box single-line" name="SheetsPerPallet[0]" value="" required="required" type="number">
+                                                    <span asp-validation-for="ProductList.ElementAt(i).SheetsPerPallet" class="small text-danger"></span>
                                     </div>
                                 </td>
                                 <td>

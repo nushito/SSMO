@@ -4,8 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 
 namespace SSMO.Models.MyCompany
-{
-    using static SSMO.Data.ConstantsValidation;
+{    
     public class AddBankDetailsFormModel
     {
         public AddBankDetailsFormModel()

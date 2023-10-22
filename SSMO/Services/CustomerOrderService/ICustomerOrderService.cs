@@ -6,28 +6,29 @@ using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace SSMO.Services.CustomerOrderService
 {
     public interface ICustomerOrderService
     {
-        public int CreateOrder
+        public Task<int> CreateOrder
             (string num, DateTime date, int customer, 
             int company, string deliveryTerms, 
             string loadingAddress, string deliveryAddress,
-            int currency,string origin, bool paidStatus, 
+            int currency,string origin,  
             int vat, int statusId,List<int> supplierOrders, 
-            string comment, List<int> banks, string type, int fiscalAgentId,
-            string dealType, string dealDescription);
+            string comment, List<int> banks, string type, int? fiscalAgentId,
+            string dealType, string dealDescription, int? fscText);
 
-        public int CreateFirstOrder
+        public Task<int> CreateFirstOrder
             (int number, string num, DateTime date, int customer,
             int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,
-            int currency, string origin, bool paidStatus,
+            int currency, string origin, 
             int vat, int statusId, List<int> supplierOrders,
-            string comment, List<int> banks, string type, int fiscalAgentId,
-            string dealType, string dealDescription);
+            string comment, List<int> banks, string type, int? fiscalAgentId,
+            string dealType, string dealDescription, int? fscText);
 
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id);
         public SSMO.Data.Models.CustomerOrder OrderPerNumber(int number);

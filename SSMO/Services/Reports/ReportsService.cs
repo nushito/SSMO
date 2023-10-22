@@ -21,6 +21,9 @@ using System.Threading.Tasks;
 using SSMO.Models.Reports.Purchase;
 using SSMO.Data.Enums;
 using SSMO.Models.CustomerOrders;
+using Microsoft.EntityFrameworkCore;
+using SSMO.Repository;
+using SSMO.Services.CustomerOrder.Models;
 
 namespace SSMO.Services.Reports
 {
@@ -34,12 +37,14 @@ namespace SSMO.Services.Reports
         private readonly IMycompanyService myCompanyService;
         private readonly ICustomerOrderService customerOrderService;
         private readonly ISupplierService supplierService;
+        private readonly IProductRepository productRepository;
 
         public ReportsService
             (ApplicationDbContext context, IConfigurationProvider mapper,
             IProductService productService, IInvoiceService invoiceService,
             ISupplierOrderService supplierOrderService, IMycompanyService mycompanyService,
-            ICustomerOrderService customerOrderService, ISupplierService supplierService)
+            ICustomerOrderService customerOrderService, ISupplierService supplierService,
+            IProductRepository productRepository)
         {
             dbcontext = context;
             this.mapper = mapper;//.ConfigurationProvider;
@@ -49,6 +54,7 @@ namespace SSMO.Services.Reports
             this.myCompanyService = mycompanyService;
             this.customerOrderService = customerOrderService;
             this.supplierService = supplierService;
+            this.productRepository = productRepository;
         }
         public CustomerOrdersQueryModel AllCustomerOrders
             (string customerName, DateTime startDate, DateTime endDate,
@@ -114,6 +120,19 @@ namespace SSMO.Services.Reports
                 Vat = corder.Vat                
             };
            
+            if(corder.FiscalAgentId != 0)
+            {
+
+                orderForEdit.FiscalAgent = dbcontext.FiscalAgents
+                    .Where(i => i.Id == corder.FiscalAgentId)
+                    .Select(n => new FiscalAgentViewModel
+                    {
+                        Name = n.Name,
+                        Id = n.Id
+                    })
+                    .FirstOrDefault();
+            }
+
             orderForEdit.Products = (List<ProductCustomerFormModel>)productService.DetailsPerCustomerOrder(id);
 
             return orderForEdit;
@@ -246,18 +265,30 @@ namespace SSMO.Services.Reports
                 .FirstOrDefault();
 
             order.MyCompanyName = myCompanyName;
+
+            if(order.FIscalAgentId != 0)
+            {
+                order.FiscalAgentName = dbcontext.FiscalAgents
+                    .Where(i=>i.Id == order.FIscalAgentId)
+                    .Select(n=>n.Name)
+                    .FirstOrDefault();
+            }
             return order;
         }
 
-        public bool EditCustomerOrder(int id,
+        public async Task<bool> EditCustomerOrder(int id,
             string number, System.DateTime date,
             int myCompanyId, string deliveryTerms,
             string loadingPlace, string deliveryAddress,
             int currencyId, int status, string fscClaim,
             string fscCertificate, decimal paidAdvance, bool paidStatus,
-             IList<ProductCustomerFormModel> products, List<int> banks)
+             IList<ProductCustomerFormModel> products, List<int> banks, 
+             int? fiscalAgentId, int? fscText)
         {
-            var order = dbcontext.CustomerOrders.Find(id);
+            var order = dbcontext.CustomerOrders                
+                .Where(a=>a.Id == id)
+                .Include(a => a.BankDetails)
+                .FirstOrDefault();                     
 
             if (order == null)
             {
@@ -277,18 +308,41 @@ namespace SSMO.Services.Reports
             order.PaidAvance = paidAdvance;
             order.PaidAmountStatus = paidStatus;
             order.Amount = 0;
+         
+            if(fiscalAgentId != null)
+            {
+                order.FiscalAgentId = fiscalAgentId;
+            }
 
-            order.BankDetails = dbcontext.BankDetails
+            if(fscText!= null)
+            {
+                order.FscTextId = fscText;
+            }
+            
+
+            var newList = new List<BankDetails>();  
+
+           var bankDetails = dbcontext.BankDetails                
                 .Where(i=> banks.Contains(i.Id))
                 .ToList();
+
+            var oldBanks = order.BankDetails                
+                .ToList();
+
+            oldBanks?.ForEach(i => order.BankDetails.Remove(i));
 
             if (products != null)
             {
                 foreach (var product in products)
                 {
+                    var mainProduct = productRepository.GetMainProduct(product.ProductId);
+                    var size = productService.GetSizeName(mainProduct.SizeId);
+
                     var productPerCorder = dbcontext.CustomerOrderProductDetails
                                        .Where(co => co.Id == product.Id)
                                        .FirstOrDefault();
+                    var oldQuantity = productPerCorder.Quantity;
+                    var oldTotalSheets = productPerCorder.TotalSheets;
 
                     if (product.Quantity == 0)
                     {
@@ -298,13 +352,44 @@ namespace SSMO.Services.Reports
                     }
                     else
                     {
+                        var invoicedQuantity = dbcontext.InvoiceProductDetails
+                            .Where(p => p.ProductId == mainProduct.Id
+                            && p.CustomerOrderId == id
+                            && p.CustomerOrderProductDetailsId == productPerCorder.Id)
+                            .Select(q => q.InvoicedQuantity)
+                            .FirstOrDefault();
+                           
+
                         productPerCorder.Pallets = product.Pallets;
                         productPerCorder.SellPrice = product.SellPrice;
                         productPerCorder.SheetsPerPallet = product.SheetsPerPallet;
                         productPerCorder.Unit = Enum.Parse<Unit>(product.Unit.ToString());
+                        productPerCorder.AutstandingQuantity = product.Quantity - invoicedQuantity;
                         productPerCorder.Quantity = product.Quantity;
                         productPerCorder.TotalSheets = product.Pallets * product.SheetsPerPallet;
-                        productPerCorder.Amount = Math.Round(product.SellPrice * product.Quantity, 4);
+                        productPerCorder.Amount = Math.Round(product.SellPrice * product.Quantity, 5);
+
+                        if(invoicedQuantity > 0m)
+                        {
+                            productPerCorder.AutstandingQuantity -= invoicedQuantity;
+                        }
+
+                        if (product.Unit == mainProduct.Unit.ToString())
+                        {
+                            mainProduct.QuantityAvailableForCustomerOrder = mainProduct.QuantityAvailableForCustomerOrder +oldQuantity - productPerCorder.Quantity;
+                        }
+                        else
+                        {
+                            var oldAvailableQuantity = productService.ConvertUnitQuantityToDiffUnitQuantity
+                            (mainProduct.Unit.ToString(), product.Unit.ToString(), oldQuantity,
+                                size, oldTotalSheets);
+
+                            var quantity = productService.ConvertUnitQuantityToDiffUnitQuantity
+                            (mainProduct.Unit.ToString(), product.Unit.ToString(), product.Quantity,
+                                size, productPerCorder.TotalSheets);
+
+                            mainProduct.QuantityAvailableForCustomerOrder = mainProduct.QuantityAvailableForCustomerOrder + oldAvailableQuantity - quantity;
+                        }
                     }
                     order.Amount += productPerCorder.Amount;
                 }
@@ -314,8 +399,11 @@ namespace SSMO.Services.Reports
                 order.TotalAmount = order.Amount + order.SubTotal;
                 order.Balance = order.TotalAmount - paidAdvance;
 
-            dbcontext.SaveChanges();
+            await dbcontext.SaveChangesAsync();
 
+            bankDetails.ForEach(i => order.BankDetails.Add(i));
+
+            await dbcontext.SaveChangesAsync();
             return true;
         }
 
@@ -486,7 +574,7 @@ namespace SSMO.Services.Reports
             return supplierOrderForEdit;
         }
 
-        public bool EditSupplierOrder
+        public async Task<bool> EditSupplierOrder
             (int supplierOrderId, string supplierOrderNumber,
             DateTime date, int myCompanyId, string deliveryTerms,
             string loadingPlace, string deliveryAddress,
@@ -559,10 +647,10 @@ namespace SSMO.Services.Reports
                     }
                 }
 
-                supplierOrderService.TotalAmountAndQuantitySum(supplierOrderId);
+               await supplierOrderService.TotalAmountAndQuantitySum(supplierOrderId);
             }
 
-            dbcontext.SaveChanges();
+            await dbcontext.SaveChangesAsync();
             return true;
         }
 
@@ -660,8 +748,7 @@ namespace SSMO.Services.Reports
                         .Where(id => id.Id == invoice.DebitToInvoiceId)
                         .Select(n => n.DocumentNumber).FirstOrDefault();
                     invoice.TotalAmount = invoice.DebitNoteTotalAmount;
-                }
-                
+                }                
             }
 
             var collection = new InvoiceReportModel
@@ -691,6 +778,7 @@ namespace SSMO.Services.Reports
         public InvoiceDetailsViewModel InvoiceDetails(int id)
         {
             var invoice = dbcontext.Documents
+                .Include(b=>b.BankDetails)
                 .Where(i => i.Id == id);
 
             if (invoice == null) return null;

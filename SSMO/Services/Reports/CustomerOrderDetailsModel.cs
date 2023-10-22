@@ -20,5 +20,7 @@ namespace SSMO.Services.Reports
         public string CustomerName { get; set; }
         public bool PaidStatus { get; set; }
         public ICollection<ProductsForCustomerOrderDetailsViewModel> Products { get; set; }
+        public int FIscalAgentId { get; set; }
+        public string FiscalAgentName { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using SSMO.Models.CustomerOrders;
 using SSMO.Models.Customers;
+using SSMO.Models.FscTexts;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Services.Curruncies;
@@ -43,7 +44,15 @@ namespace SSMO.Models.Reports.CustomerOrderReportForEdit
         public IEnumerable<SupplierOrdersBySupplier> SupplierOrdersBySupplier { get; set; }
         public IEnumerable<int> SelectedSupplierOrders { get; set; }
         public List<int> ChosenBanks { get; set; }
-        public ICollection<BankDetailsViewModel> BankDetails { get; set; }       
+        public ICollection<BankDetailsViewModel> BankDetails { get; set; }      
+        public FiscalAgentViewModel FiscalAgent { get; set; }
+        public int? FiscalAgentId { get; set; }
+        public ICollection<FiscalAgentViewModel> FiscalAgents { get; set; }
+        public string DealType { get; set; }
+        public string DealDescription { get; set; }
+
+        public int? FscText { get; set; }
+        public ICollection<FscTextViewModel>  FscTexts { get; set; }
 
     }
 }
