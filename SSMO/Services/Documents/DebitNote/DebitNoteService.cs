@@ -108,7 +108,8 @@ namespace SSMO.Services.Documents.DebitNote
                         DebitNoteBgPrice = product.DebitNotePrice * debitNote.CurrencyExchangeRateUsdToBGN,
                         DebitNoteId = debitNote.Id,
                        // CustomerOrderId = customerOrders.Select(a => a.Id).First(),
-                        InvoiceId = debitNote.Id
+                        InvoiceId = debitNote.Id,
+                        DebitNoteTotalSheets = product.DebitNotePallets* product.DebitNoteSheetsPerPallet
                     };
 
                     invoiceProduct.TotalSheets = product.DebitNotePallets * product.DebitNoteSheetsPerPallet;
@@ -152,7 +153,8 @@ namespace SSMO.Services.Documents.DebitNote
                         DebitNoteBgAmount = product.Price * debitNote.CurrencyExchangeRateUsdToBGN * product.DebitNoteQuantity,
                         DebitNoteId = debitNote.Id,
                         InvoiceId = debitNote.Id,
-                        ProductId = mainProduct.Id
+                        ProductId = mainProduct.Id,
+                        DebitNoteTotalSheets = product.Pallets * product.SheetsPerPallet
                     };
 
                     if (product.ChoosenCustomerOrderProductDetailsId != null)
@@ -191,7 +193,7 @@ namespace SSMO.Services.Documents.DebitNote
         public CreditAndDebitNoteViewModel CreateDebitNote
             (int invoiceId, DateTime date,bool moreQuantity,string deliveryAddress, 
             List<AddProductsToCreditAndDebitNoteFormModel> products, 
-            List<PurchaseProductsForDebitNoteViewModel> availableProducts)
+            List<PurchaseProductsForDebitNoteViewModel> availableProducts, string paymentTerms)
         {
             var invoiceForDebit = dbContext.Documents
                .Where(n => n.Id == invoiceId && n.DocumentType == Data.Enums.DocumentTypes.Invoice)
@@ -215,7 +217,8 @@ namespace SSMO.Services.Documents.DebitNote
                 Vat = invoiceForDebit.Vat,
                 DebitNoteProducts = new List<InvoiceProductDetails>(),
                 CreditAndDebitNoteProducts = new List<Product>(),
-                InvoiceProducts = new List<InvoiceProductDetails>()
+                InvoiceProducts = new List<InvoiceProductDetails>(),
+                PaymentTerms = paymentTerms
             };
 
             dbContext.Documents.Add(debitNote);
@@ -249,7 +252,7 @@ namespace SSMO.Services.Documents.DebitNote
                             productForDebit.DebitNoteAmount = product.Quantity * product.Price;
                             productForDebit.DebitNoteBgAmount = product.Price * debitNote.CurrencyExchangeRateUsdToBGN * product.Quantity;
                             productForDebit.DebitNoteBgPrice = product.Price * debitNote.CurrencyExchangeRateUsdToBGN;
-                            productForDebit.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                            productForDebit.DebitNoteTotalSheets = product.Pallets * product.SheetsPerPallet;
                         }
                         else
                         {
@@ -267,7 +270,7 @@ namespace SSMO.Services.Documents.DebitNote
                                // CustomerOrderId = invoiceForDebit.CustomerOrders.Select(i => i.Id).First()
                             };
 
-                            debitProduct.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                            debitProduct.DebitNoteTotalSheets = product.Pallets * product.SheetsPerPallet;
                             debitNote.InvoiceProducts.Add(debitProduct);   
                         }                        
                     }
@@ -295,7 +298,7 @@ namespace SSMO.Services.Documents.DebitNote
                             DebitNoteId = debitNote.Id
                         };
 
-                        debitProduct.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                        debitProduct.DebitNoteTotalSheets = product.Pallets * product.SheetsPerPallet;
                         debitNote.DebitNoteProducts.Add(debitProduct);
                         debitNote.CreditAndDebitNoteProducts.Add(newProduct);
                     }
@@ -365,14 +368,16 @@ namespace SSMO.Services.Documents.DebitNote
         }
 
         public bool EditDebitNote
-            (int id, DateTime date, string incoterms,string comment, List<EditProductForDebitNoteViewModel> products)
+            (int id, DateTime date, string incoterms,string comment, 
+            List<EditProductForDebitNoteViewModel> products, string paymentTerms)
         {
             var debitNoteForEdit = dbContext.Documents.Find(id);
 
             debitNoteForEdit.Date = date;
             debitNoteForEdit.Incoterms= incoterms;
             debitNoteForEdit.Amount = 0; //TODO dali e dobre da zanulim?
-          
+            debitNoteForEdit.PaymentTerms= paymentTerms;
+
         if(products != null)
             {
                 foreach (var product in products)
@@ -380,12 +385,16 @@ namespace SSMO.Services.Documents.DebitNote
                     var invoicedProduct = dbContext.InvoiceProductDetails
                         .Where(i=>i.Id == product.Id)
                         .FirstOrDefault();
+
                     var mainProduct = productRepository.GetMainProduct(invoicedProduct.ProductId);
+
+                    mainProduct.SoldQuantity += product.DebitNoteQuantity - invoicedProduct.DebitNoteQuantity;
 
                     if (product.ServiceOrProductQuantity == true)
                     {
                         mainProduct.QuantityLeftForPurchaseLoading += invoicedProduct.DebitNoteQuantity - product.DebitNoteQuantity;                        
                     }
+
                     invoicedProduct.DebitNoteQuantity = product.DebitNoteQuantity;
                     invoicedProduct.Unit = product.Unit;
                     invoicedProduct.DebitNotePrice= product.DebitNotePrice;
@@ -394,7 +403,7 @@ namespace SSMO.Services.Documents.DebitNote
                     invoicedProduct.DebitNoteBgAmount = invoicedProduct.DebitNoteBgPrice * product.DebitNoteQuantity;
                     invoicedProduct.DebitNotePallets = product.DebitNotePallets;
                     invoicedProduct.DebitNoteSheetsPerPallet = product.DebitNoteSheetsPerPallet;
-                    invoicedProduct.TotalSheets = product.DebitNotePallets * product.DebitNoteSheetsPerPallet;
+                    invoicedProduct.DebitNoteTotalSheets = product.DebitNotePallets * product.DebitNoteSheetsPerPallet;
                     debitNoteForEdit.Amount += invoicedProduct.DebitNoteAmount;
                 }
             }
@@ -453,7 +462,8 @@ namespace SSMO.Services.Documents.DebitNote
                 Products = new List<EditProductForDebitNoteViewModel>(),
                 DebitToInvoiceNumberId = invoice.Id,
                 InvoiceNumber = invoice.DocumentNumber,
-                DebitNoteInvoicenumbers = GetInvoiceNumbers()
+                DebitNoteInvoicenumbers = GetInvoiceNumbers(),
+                PaymentTerms = debitNote.PaymentTerms
             };
 
             if (products.Any())

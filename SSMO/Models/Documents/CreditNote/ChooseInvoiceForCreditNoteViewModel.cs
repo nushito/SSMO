@@ -20,6 +20,7 @@ namespace SSMO.Models.Documents.CreditNote
         public ICollection<int> InvoiceNumbers { get; set; }
         public string CreditNoteDeliveryAddress { get; set; }
         public bool QuantityBack { get; set; }
+        public string PaymentTerms { get; set; }
         public ICollection<AddProductsToCreditAndDebitNoteFormModel> Products { get; set; }        
     }
 }

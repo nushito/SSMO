@@ -55,6 +55,10 @@ namespace SSMO.Data.Models
         public ICollection<InvoiceProductDetails> InvoiceProductDetails { get; set; }
         public ICollection<Payment> Payments { get; set; }
         public ICollection<BankDetails> BankDetails { get; set; }
-
+        public ICollection<ServiceOrder> ServiceOrders { get; set; }
+        public string DeliveryPeriod{ get; set; }
+        public string PaymentTerms { get; set; }
+        public string Etd { get; set; }
+        public string Eta { get; set; }
     }
 }

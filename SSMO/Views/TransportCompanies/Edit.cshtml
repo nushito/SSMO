@@ -1,0 +1,67 @@
+﻿@model EditTransportCompanyModel
+
+<form method="get">
+    <div class="container">
+    <label>Choose company for edit</label>
+    <select asp-for="Id" typeof="number">
+        <option value="-"> Choose company </option>
+            @foreach (var company in Model.TransportCompanies)
+            {
+                <option value="@company.Id">@company.Name</option>
+            }
+    </select>
+    </div>
+    <div class="container">
+    <input type="submit" class="btn btn-info" value="Search"/></div>
+<br />
+</form>
+
+<form method="post">
+             <div class="form-group col-md-6">
+                <label asp-for="TransportCompany.Name">Company name</label>
+                <input class="form-control" asp-for="TransportCompany.Name" placeholder="Enter company name">
+                <span asp-validation-for="TransportCompany.Name" class="small text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="TransportCompany.Eik">Company EIK</label>
+                <input class="form-control" asp-for="TransportCompany.Eik" placeholder="write company EIK">
+                <span asp-validation-for="TransportCompany.Eik" class="small text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="TransportCompany.Vat">Company VAT</label>
+                <input type="text" class="form-control" asp-for="TransportCompany.Vat" placeholder="write company VAT">
+                <span asp-validation-for="TransportCompany.Vat" class="small text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="TransportCompany.Country">Country</label>
+                <input type="text" class="form-control" asp-for="TransportCompany.Country" placeholder="Country">
+                <span asp-validation-for="TransportCompany.Country" class="small text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="TransportCompany.City">City</label>
+                <input type="text" class="form-control" asp-for="TransportCompany.City" placeholder="City">
+                <span asp-validation-for="TransportCompany.City" class="small text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="TransportCompany.Address">Street</label>
+                <input type="text" class="form-control" asp-for="TransportCompany.Address" placeholder="Street">
+                <span asp-validation-for="TransportCompany.Address" class="small text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="TransportCompany.PhoneNumber">Phone No</label>
+                <input type="text" class="form-control" asp-for="TransportCompany.PhoneNumber" placeholder="phone number">
+                <span asp-validation-for="TransportCompany.PhoneNumber" class="small text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="TransportCompany.Email">E-mail</label>
+                <input type="text" class="form-control" asp-for="TransportCompany.Email" placeholder="email">
+                <span asp-validation-for="TransportCompany.Email" class="small text-danger"></span>
+            </div>
+            <div class="form-group col-md-6">
+                <label asp-for="TransportCompany.ContactPerson">Representative</label>
+                <input type="text" class="form-control" asp-for="TransportCompany.ContactPerson" placeholder="RepresentativePerson">
+                <span asp-validation-for="TransportCompany.ContactPerson" class="small text-danger"></span>
+            </div>
+            <hr />
+            <button type="submit" class="btn btn-primary mb-2" style="padding-bottom: 10px">Submit</button>
+</form>

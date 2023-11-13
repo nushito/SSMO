@@ -77,7 +77,8 @@
             <td>
                 <label asp-for="CostPriceCurrency" >Choose different currency for cost calculation</label>
                 <select asp-for="CostPriceCurrency" class="form-control">
-                    <option value="">-</option>
+                    <option value="">Select currency</option>
+                    <option value="0">-</option>
                     @foreach (var currency in Model.Currencies)
                     {
                         <option value="@currency.Id">@currency.Name</option>                        

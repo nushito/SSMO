@@ -52,7 +52,7 @@ namespace SSMO.Services.Documents
                 .Select(num => num.DocumentNumber)
                 .ToList();
         }
-
+        //vrashta modela na viziq za print na paking lista
         public PackingListForPrintViewModel PackingListForPrint(int packingListNumber)
         {
             if (packingListNumber == 0) return null;
@@ -79,7 +79,7 @@ namespace SSMO.Services.Documents
                 DocumentNumber = packingListNumber,
                 CustomerId = packingList.CustomerId,
                 Incoterms = packingList.Incoterms,
-                FSCClaim = packingList.FSCClaim,
+                FSCClaim = packingList.FscClaim,
                 FSCSertificate = packingList.FSCSertificate,
                 MyCompanyId = packingList.MyCompanyId,
                 NetWeight = packingList.NetWeight,
@@ -206,7 +206,7 @@ namespace SSMO.Services.Documents
                 VatAmount = invoice.VatAmount * currencyExchange,                
                 CustomerId = invoice.CustomerId,
                 Date = invoice.Date,
-                FSCClaim = invoice.FSCClaim,
+                FscClaim = invoice.FscClaim,
                 FSCSertificate = invoice.FSCSertificate,
                 MyCompanyId = invoice.MyCompanyId,
                 SupplierOrderId = invoice.SupplierOrderId,              
@@ -252,7 +252,7 @@ namespace SSMO.Services.Documents
             dbContext.Documents.Add(bgInvoice);
             dbContext.SaveChanges();
         }
-
+        //vrashta modela na viziq za print na creditno i debitno
         public CreditAndDebitNoteViewModel PrintCreditAndDebitNote(int id)       
         {
             var creditOrDebitNote = dbContext.Documents
@@ -373,8 +373,8 @@ namespace SSMO.Services.Documents
                 EIK = seller.Eik,
                 VAT = seller.VAT,
                 Name = seller.Name,
-                FSCSertificate = seller.FSCSertificate,
-                FSCClaim = seller.FSCClaim,
+                FSCSertificate = seller.FscSertificate,
+                FSCClaim = seller.FscClaim,
                 RepresentativePerson = seller.RepresentativePerson,
                 City = addressSeller.City,
                 Country = addressSeller.Country,
@@ -394,7 +394,7 @@ namespace SSMO.Services.Documents
             }
             return creditOrDebitNoteForPrint;
         }
-
+       //redaktira BG fakturata
         public void EditBgInvoice(int documentNumber)
         {
             var invoice = dbContext.Documents
@@ -414,7 +414,7 @@ namespace SSMO.Services.Documents
             bgInvoice.VatAmount = invoice.VatAmount * currencyExchange;
             bgInvoice.CustomerId = invoice.CustomerId;
             bgInvoice.Date = invoice.Date;
-            bgInvoice.FSCClaim = invoice.FSCClaim;
+            bgInvoice.FscClaim = invoice.FscClaim;
             bgInvoice.FSCSertificate = invoice.FSCSertificate;
             bgInvoice.SupplierOrderId = invoice.SupplierOrderId;
             bgInvoice.SupplierId = invoice.SupplierId;
@@ -445,7 +445,7 @@ namespace SSMO.Services.Documents
 
             dbContext.SaveChanges();            
         }
-
+        //kolekciq ot banki i detaili
         public List<InvoiceBankDetailsViewModel> BankDetails(int id)
         {
             var bankList = dbContext.BankDetails
@@ -474,15 +474,17 @@ namespace SSMO.Services.Documents
 
             return bankDetails;
         }
-
-        public void AddFiscalAgent(string name, string bgName, string details, string bgDetails)
+        //dobavq fiscalen agent
+        public void AddFiscalAgent
+            (string name, string bgName, string details, string bgDetails, string userId)
         {
-            var agent = new FiscalAgent
+            var agent = new Data.Models.FiscalAgent
             {
                 Name = name,
                 BgName = bgName,
                 Details = details,
-                BgDetails = bgDetails
+                BgDetails = bgDetails,
+                UserId = userId
             };
 
            dbContext.FiscalAgents.Add(agent);
@@ -498,13 +500,6 @@ namespace SSMO.Services.Documents
             
         }
 
-        public ICollection<int> GetInvoiceList()
-        {
-            return dbContext.Documents
-                .Where(i=>i.DocumentType != Data.Enums.DocumentTypes.Purchase)
-                .OrderByDescending(n=>n.DocumentNumber)
-                .Select(n=>n.DocumentNumber)                
-                .ToList();
-        }
+        
     }
 }

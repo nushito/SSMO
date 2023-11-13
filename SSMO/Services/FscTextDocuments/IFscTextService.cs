@@ -5,7 +5,7 @@ namespace SSMO.Services.FscTextDocuments
 {
     public interface IFscTextService
     {
-        public void AddFscText(string textEng, string textBg);
+        public void AddFscText(string textEng, string textBg, string userId);
         public ICollection<FscTextViewModel> GetAllFscTexts();
     }
 }

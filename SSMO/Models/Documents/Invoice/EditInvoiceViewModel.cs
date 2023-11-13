@@ -35,6 +35,8 @@ namespace SSMO.Models.Documents.Invoice
         public List<int> SelectedCustomerOrders { get; set; }
         public List<int> ChosenBanks { get; set; }
         public ICollection<BankDetailsViewModel> CompanyBankDetails { get; set; }
-       
+        public string PaymentTerms { get; set; }
+        public string DeliveryAddress { get; set; }
+        public string LoadingAddress { get; set; }
     }
 }

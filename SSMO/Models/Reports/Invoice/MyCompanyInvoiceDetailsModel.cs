@@ -23,8 +23,8 @@ namespace SSMO.Models.Reports.Invoice
 
         public string RepresentativePerson { get; set; }
 
-        public string FSCClaim { get; set; }
+        public string FscClaim { get; set; }
 
-        public string FSCSertificate { get; set; }
+        public string FscSertificate { get; set; }
     }
 }

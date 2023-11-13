@@ -3,10 +3,13 @@ using SSMO.Models.Customers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using AutoMapper;
-using SSMO.Models.Reports.PrrobaCascadeDropDown;
+using SSMO.Models.Reports.CustomerOrderCascadeDropDown;
 using SSMO.Data.Models;
+using SSMO.Models.ServiceOrders;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace SSMO.Services.Customer
 {
@@ -14,6 +17,7 @@ namespace SSMO.Services.Customer
     {
         private readonly ApplicationDbContext dbContext;
         private readonly IMapper mapper;
+       
         public CustomerService(ApplicationDbContext dbContex, IMapper mapper)
         {
             this.dbContext = dbContex;
@@ -23,7 +27,8 @@ namespace SSMO.Services.Customer
         public bool CreateCustomer
             (string customerName, string vat, string eik, string representativePerson, 
             string country, string city, string street, string email, string phoneNumber, 
-            string bgName, string bgStreet, string bgCity, string bgCountry, string bgRepresentativePerson)
+            string bgName, string bgStreet, string bgCity, string bgCountry, 
+            string bgRepresentativePerson, string userId)
         {
             if (customerName == null) return false;
 
@@ -45,7 +50,9 @@ namespace SSMO.Services.Customer
                     BgCustomerName = bgName,
                     BgCustomerRepresentativePerson = bgRepresentativePerson,
                     PhoneNumber = phoneNumber,
-                }
+                    UserId = userId
+                },
+                
             };                      
 
             this.dbContext.Addresses.Add(address);
@@ -59,6 +66,19 @@ namespace SSMO.Services.Customer
             var listCustomers = dbContext.Customers.ToList();
 
             var customers = mapper.Map<IEnumerable<AddCustomerFormModel>>(listCustomers);
+            return customers;
+        }
+
+        public IEnumerable<CustomersListForServiceOrderViewModel> CustomersListForService(string userId)
+        {            
+            var customers = dbContext.Customers
+                .Where(i=>i.UserId == userId)
+                .Select(a => new CustomersListForServiceOrderViewModel
+            {
+                Id = a.Id,
+                Name = a.Name
+            }).ToList();
+
             return customers;
         }
 
@@ -128,14 +148,18 @@ namespace SSMO.Services.Customer
             return getCustomer;
         }
 
-        public IEnumerable<string> GetCustomerNames()
+        public IEnumerable<string> GetCustomerNames(string userId)
         {
-            return dbContext.Customers.Select(a => a.Name).ToList();
+            return dbContext.Customers
+                .Where(i=>i.UserId == userId)
+                .Select(a => a.Name).ToList();
         }
-
-        public IEnumerable<CustomerListView> GetCustomerNamesAndId()
+        //vrashta kolekciq ot ID & Name na klientite
+        public IEnumerable<CustomerListView> GetCustomerNamesAndId(string userId)
         {
-            var customers = dbContext.Customers.Select(a => new CustomerListView
+            var customers = dbContext.Customers
+                .Where(i=>i.UserId == userId)   
+                .Select(a => new CustomerListView
             {
                 Id = a.Id,
                 Name = a.Name

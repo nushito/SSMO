@@ -46,5 +46,8 @@ namespace SSMO.Models.Reports.Invoice
         public string DealDescriptionEng { get; set; }
         public ICollection<InvoiceBankDetailsModel> CompanyBankDetails { get; set; }
         public IEnumerable<InvoiceProductsDetailsViewModel> Products { get; set; }
+        public string PaymentTerms { get; set; }
+        public string LoadingAddress { get; set; }
+        public string DeliveryAddress { get; set; }
     }
 }

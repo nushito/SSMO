@@ -34,7 +34,11 @@
          <div class="row col-md-4">   
          <label asp-for="DeliveryAddress"></label>
          <input id="deliveryAddress" class="form-control" type="text" asp-for="DeliveryAddress" name="DeliveryAddress">         
-        </div>        
+        </div>  
+         <div class="row col-md-4">
+           <label asp-for="PaymentTerms">Payment Terms</label>
+           <input asp-for="PaymentTerms" type="text" class="form-control"/>
+        </div>
         <hr />
         <div class="table-responsive">
             <p>Available Products on stock</p>

@@ -1,9 +1,9 @@
 ﻿using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.DebitNote;
 using SSMO.Models.Documents.Invoice;
-using SSMO.Models.Products;
 using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
+using SSMO.Services.TransportService;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,7 +19,8 @@ namespace SSMO.Services.CustomerOrderService
             int currency,string origin,  
             int vat, int statusId,List<int> supplierOrders, 
             string comment, List<int> banks, string type, int? fiscalAgentId,
-            string dealType, string dealDescription, int? fscText);
+            string dealType, string dealDescription, int? fscText, string paymentTerms,
+            string eta, string etd);
 
         public Task<int> CreateFirstOrder
             (int number, string num, DateTime date, int customer,
@@ -28,7 +29,8 @@ namespace SSMO.Services.CustomerOrderService
             int currency, string origin, 
             int vat, int statusId, List<int> supplierOrders,
             string comment, List<int> banks, string type, int? fiscalAgentId,
-            string dealType, string dealDescription, int? fscText);
+            string dealType, string dealDescription, int? fscTextm, string paymentTerms,
+            string eta, string etd);
 
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id);
         public SSMO.Data.Models.CustomerOrder OrderPerNumber(int number);
@@ -36,18 +38,6 @@ namespace SSMO.Services.CustomerOrderService
 
         public void CheckCustomerOrderStatus(int id);
 
-        //public bool EditProductAsPerSupplierSpec(int productId,int descriptionId,
-        //    int sizeId,
-        //    int gradeId,
-        //    string fscClaim,
-        //    string fscCertificate,
-        //    int cusomerOrderId,
-        //    decimal quantity,
-        //    decimal purchasePrice,
-        //    int pallets,
-        //    int sheetsPerPallet
-        //    );
-       
         public void CustomerOrderCounting(int customerorderId);
 
         public bool AnyCustomerOrderExist();
@@ -63,7 +53,7 @@ namespace SSMO.Services.CustomerOrderService
         public int CustomerOrderNumberById(int id);
 
         public ICollection<BankDetailsViewModel> GetBanks();
-
         public CustomerOrderPrintViewModel GetCustomerOrderPrint(int id);
+        public ICollection<CustomerOrderJsonListForServiceOrder> CustomerOrdersForService(int id);
     }
 }

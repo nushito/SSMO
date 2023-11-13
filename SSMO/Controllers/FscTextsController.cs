@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using SSMO.Infrastructure;
 using SSMO.Models.FscTexts;
 using SSMO.Services.FscTextDocuments;
 
@@ -25,7 +26,8 @@ namespace SSMO.Controllers
                 return View();
             }
 
-            fscTextService.AddFscText(model.FscTextEng, model.FscTextBg);
+            string userId = this.User.UserId();
+            fscTextService.AddFscText(model.FscTextEng, model.FscTextBg,userId);
 
             return RedirectToAction("Index","Home");
         }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SSMO.Infrastructure;
 using SSMO.Models.Descriptions;
 using SSMO.Models.FiscalAgent;
 using SSMO.Services.Documents;
@@ -27,8 +28,9 @@ namespace SSMO.Controllers
             {
                 return View();
             }
-
-            _documentService.AddFiscalAgent(model.Name, model.BgName, model.Details, model.BgDetails);
+            string userId = this.User.UserId();
+            _documentService.AddFiscalAgent
+                (model.Name, model.BgName, model.Details, model.BgDetails,userId);
 
             return RedirectToAction("Index", "Home");
         }

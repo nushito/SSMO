@@ -24,13 +24,15 @@ using SSMO.Services.Documents.Purchase;
 using SSMO.Services.Documents.Invoice;
 using System.Collections.Generic;
 using System.Globalization;
-using iTextSharp.text;
 using SSMO.Services.PDF;
 using SSMO.Services.Documents.Credit_Note;
 using SSMO.Services.Documents.DebitNote;
 using SSMO.Repository;
 using SSMO.Services.FscTextDocuments;
 using SSMO.Services.TransportService;
+using SSMO.Services.Addresses;
+using SSMO.Services.FiscalAgent;
+using SSMO.Services.Images;
 
 namespace SSMO
 {
@@ -95,11 +97,15 @@ namespace SSMO
             services.AddTransient<IInvoiceService, InvoiceService>();
             services.AddTransient<ICreditNoteService, CreditNoteService>();
             services.AddTransient<IDebitNoteService, DebitNoteService>();
-            services.AddTransient<IProductRepository, ProductRepository>();
-            services.AddScoped<IViewRenderService, ViewRenderService>();
-            services.AddScoped<IHtmlToPdfConverter, HtmlToPdfConverter>();
+            services.AddTransient<IProductRepository, ProductRepository>();            
             services.AddTransient<IFscTextService, FscTextService>();  
             services.AddTransient<ITransportService, TransportService>();   
+            services.AddTransient<IAddressService, AddressService>();   
+            services.AddTransient<IFiscalAgentService, FiscalAgentService>();
+            services.AddTransient<IImageService, ImageService>();   
+
+            services.AddScoped<IViewRenderService, ViewRenderService>();
+            services.AddScoped<IHtmlToPdfConverter, HtmlToPdfConverter>();
             services.AddScoped<HttpContextUserIdExtension>();
 
             services.AddMvc(options =>
@@ -150,7 +156,7 @@ namespace SSMO
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
                 endpoints.MapDefaultControllerRoute();
-                endpoints.MapRazorPages();
+                endpoints.MapRazorPages();                
             });
         }
     }

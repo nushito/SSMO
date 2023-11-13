@@ -1,0 +1,147 @@
+﻿@model AllServiceOrdersCollectionViewModel
+@{
+    ViewBag.Title = "Service Orders";
+}
+<form method="get">
+    <h2 style="align-self:center">Service Orders</h2>
+     <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="MyCompanyId">My Company</label>
+            <select asp-for="MyCompanyId" class="form-control">
+                <option value="">All</option>
+                @foreach (var company in Model.MyCompanies)
+                {
+                        <option value="@company.Id">@company.Name</option>
+                }
+            </select>
+        </div>        
+        <div class="form-group col-3" >
+             <label asp-for="StartDate" >Start Date</label>
+             <div class="input-group date" id="datepicker1">
+                 <input asp-for="StartDate" type="date" class="form-control" data-date-format="dd-mm-yyyy" value="@DateTime.Now.ToString("dd-MM-yyyy")"/> 
+                 <span asp-validation-for="StartDate" class="glyphicon glyphicon-calendar"></span>
+             </div>            
+        </div>
+         <div class="form-group col-3"  >
+             <label asp-for="EndDate" >End Date</label>
+             <div class="input-group date" id="datepicker2">
+                <input asp-for="EndDate"  type="date" class="form-control" data-date-format="dd-mm-yyyy" value="@DateTime.Now.ToString("dd-MM-yyyy")"/> 
+                <span asp-validation-for="EndDate" class="glyphicon glyphicon-calendar"></span>
+             </div>
+        </div>
+    </div>
+    <div class="row">
+        <input type="submit" class="btn btn-info" value="Search" />
+    </div>
+    <br />
+</form>
+@{
+    var previouspage = Model.CurrentPage - 1;
+    if (previouspage < 1)
+    {
+        previouspage = 1;
+    }
+
+    var maxpage = Math.Ceiling((double)Model.TotalServiceOrders / AllServiceOrdersCollectionViewModel.serviceOrdersPerPage);
+}
+<div class="row mb-5">
+    <div class="col-md-6">
+        <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
+           asp-controller="Reports"
+           asp-action="AllServiceOrders"
+           asp-route-currentPage="@previouspage"
+           asp-route-mycompanyId="@Model.MyCompanyId"><<</a>
+    </div>
+
+    @{
+        var shouldButtonBeDisabled = Model.CurrentPage == maxpage ||
+                             Model.ServiceOrders == null;
+    }
+
+    <div class="col-md-6">
+        <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
+           asp-controller="Reports"
+           asp-action="AllServiceOrders"
+           asp-route-currentPage="@(Model.CurrentPage + 1)"
+           asp-route-mycompanyId="@Model.MyCompanyId">>></a>
+    </div>
+</div>
+
+<table class="table">
+    <thead >
+        <tr >
+          <th >
+            Service Order Number
+        </th>
+        <th >
+            Date
+        </th>
+        <th>
+            Transport Company
+        </th>
+        <th>
+            Cost
+        </th>
+        <th >
+            Loading Address
+        </th>
+        <th >
+            Delivery Address
+        </th>
+        <th >
+            Supplier/Supplier Order No
+        </th>
+         <th >
+            Customer/Customer Order No
+        </th>
+       <th>
+
+       </th>
+       <th>
+
+       </th>
+        </tr>
+    </thead>
+    <tbody>
+            @if (Model.ServiceOrders != null)
+            {
+                @foreach (var order in Model.ServiceOrders)
+                {
+                    <tr >
+                        <td >
+                        @order.Number
+                        </td>
+                        <td >
+                        @order.Date
+                        </td>
+                        <td >
+                        @order.TransportCompanyName
+                        </td>
+                        <td >
+                        @order.Cost
+                            </td>
+                        <td >
+                        @order.LoadingAddress
+                        </td>
+                        <td >
+                        @order.DeliveryAddress
+                        </td>
+                        <td >
+                        @order.Supplier/@order.SupplierOrderNumber
+                        </td>
+                        <th>
+                        @order.Customer/@order.CustomerOrderNumber
+                        </th>
+                        <td>
+                             <a asp-controller="Reports" asp-action="ServiceOrderDetail" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
+                        </td>
+                        <td>
+                            <a asp-controller="Reports" asp-action="EditServiceOrder" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
+                        </td>
+                     </tr>                       
+                }
+            }    
+    </tbody>
+</table>
+
+

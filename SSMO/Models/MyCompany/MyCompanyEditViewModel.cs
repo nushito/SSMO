@@ -19,9 +19,16 @@ namespace SSMO.Models.MyCompany
         public string Country { get; set; }
         public string City { get; set; }
         public string Street { get; set; }
+        public string CorrespondBgCountry { get; set; }
+        public string CorrespondBgCity { get; set; }
+        public string CorrespondBgStreet { get; set; }
+        public string CorrespondCountry { get; set; }
+        public string CorrespondCity { get; set; }
+        public string CorrespondStreet { get; set; }
         public string RepresentativePerson { get; set; }
         public string BgRepresentativePerson { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
+
     }
 }

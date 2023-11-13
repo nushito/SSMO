@@ -16,14 +16,19 @@ using SSMO.Services.Reports;
 using System;
 using SSMO.Services.Status;
 using System.IO;
-using iTextSharp.text.pdf;
-using iTextSharp.text;
 using SSMO.Infrastructure;
 using SSMO.Services.SupplierOrders;
 using System.Text.Json;
 using SSMO.Services.Documents;
 using SSMO.Services.FscTextDocuments;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Syncfusion.HtmlConverter;
+using Syncfusion.Pdf;
+using DocumentFormat.OpenXml.InkML;
+using System.Text.RegularExpressions;
+using System.Text;
+
 
 namespace SSMO.Controllers
 {
@@ -153,7 +158,8 @@ namespace SSMO.Controllers
                                  customermodel.Comment, customermodel.ChosenBanks, 
                                  customermodel.Type, customermodel.FiscalAgentId,
                                  customermodel.DealType, customermodel.DealDescription, 
-                                 customermodel.FscText);
+                                 customermodel.FscText, customermodel.PaymentTerms,
+                                 customermodel.Eta, customermodel.Etd);
                 ViewBag.NumberExist = 0;
             }
             else
@@ -173,7 +179,8 @@ namespace SSMO.Controllers
                                  customermodel.Comment,customermodel.ChosenBanks, 
                                  customermodel.Type, customermodel.FiscalAgentId,
                                   customermodel.DealType, customermodel.DealDescription,
-                                  customermodel.FscText);
+                                  customermodel.FscText, customermodel.PaymentTerms,
+                                  customermodel.Eta, customermodel.Etd);
                 ViewBag.NumberExist = 1;
             }
             return RedirectToAction("AddOrderProducts", 
@@ -182,7 +189,8 @@ namespace SSMO.Controllers
                 }) ;
         }
 
-        public IActionResult AddOrderProducts(List<int> selectedSupplierOrders, int customerorderId)
+        public IActionResult AddOrderProducts
+            (List<int> selectedSupplierOrders, int customerorderId)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
@@ -275,8 +283,10 @@ namespace SSMO.Controllers
         {
             var printModel = customerOrderService.GetCustomerOrderPrint(customerorderId);
             ClientService.AddCustomerOrderPrint(printModel);    
+
             return View(printModel);
         }
 
+        
     }
 }

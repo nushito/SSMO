@@ -97,16 +97,14 @@
                         }   
                     </span> 
                  </li>  
+                  <li class="text-muted">Place of loading: <span style="color:#5d9fc5 ;">@Model.LoadingAddress</span></li>
+                   <li class="text-muted">Delivery Address: <span style="color:#5d9fc5 ;">@Model.DeliveryAddress</span></li>
               <li class="text-muted">Delivery Terms: <span style="color:#5d9fc5 ;">@Model.Incoterms</span></li>
               <li class="text-muted">Truck Number: <span style="color:#5d9fc5 ;">@Model.TruckNumber</span></li>
-              <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;">@Model.NetWeight kg</span></li>
-               <li class="text-muted">Gross Weight: <span style="color:#5d9fc5 ;">@Model.GrossWeight kg</span></li>
+             
             </ul>
           </div>
-        </div>
-        <div>
-            <p>@Model.Comment</p>
-        </div>
+        </div>       
         <div class="row my-2 mx-1 justify-content-center">
           <table class="table table-striped table-borderless">
             <thead style="background-color:#84B0CA ;" class="text-white">
@@ -167,8 +165,7 @@
                     {
                         <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
                         <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
-                        <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.CreditNoteTotalAmount.ToString("N2")</span></li>
-                                
+                        <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.CreditNoteTotalAmount.ToString("N2")</span></li>                                
                     }
                     else if(Model.DebitToInvoiceId != 0)
                     {
@@ -185,22 +182,30 @@
             </ul>
           </div>
         </div>
+         <div class="m-1">
+             <ul class="list-unstyled">
+               <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;">@Model.NetWeight kg</span></li>
+               <li class="text-muted">Gross Weight: <span style="color:#5d9fc5 ;">@Model.GrossWeight kg</span></li>
+               <li>Notes: @Model.Comment</li>
+           </ul>           
+        </div>
         <table class="table-borderless">
              <tr class="mb-2">
                 <td class="px-3 mr-5">
                     Event Date: @Model.Date.ToShortDateString() <br />
                     Deal Type: @Model.DealTypeEng <br />
-                   Description of the deal: @Model.DealDescriptionEng
+                    Description of the deal: @Model.DealDescriptionEng <br />
+                    Payment Terms: @Model.PaymentTerms
                 </td>
-            </tr>
-            
+            </tr>  
+            <hr />
             <tr>
                 @foreach (var bank in Model.CompanyBankDetails)
                 {
-                        <td class="px-3 mr-5">
-                        Currency:@bank.CurrencyName<hr/>
-                        Bank:@bank.BankName<hr/>
-                        IBAN:@bank.Iban<hr/>
+                       <td class="px-3 mr-5">
+                        Currency:@bank.CurrencyName<br/>
+                        Bank:@bank.BankName<br>
+                        IBAN:@bank.Iban<br/>
                         SWIFT:@bank.Swift
                     </td>
                 }

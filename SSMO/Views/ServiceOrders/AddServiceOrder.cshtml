@@ -1,58 +1,103 @@
 ﻿@model ServiceOrderFormModel
 @{
-    ViewBag.Title = "New Transport Order";
+    ViewBag.Title = "New Service/Transport Order";
 }
-
 <form method="post">
+    <h5>Create Transport order</h5>
     @if (ViewBag.FirstTransport)
     {
-        <div class="row col-md-4">
+        <div class="row col-4">
             <label asp-for="Number">Fill First Transport Number</label>
-            <input asp-for="Number" type="text" class="form-control" class="form-control">
+            <input asp-for="Number" type="text" class="form-control" >
             </div>
     }
-     <div class="row col-md-4">
+     <div class="row col-4">
             <label asp-for="Date">Date</label>
-            <input asp-for="Date" type="date" class="form-control" class="form-control">
-            </div>
-     <div class="form-group row col-md-6">
+            <input asp-for="Date" type="date" class="form-control" />
+     </div>
+     <div  class="form-group row col-4">
+         <label asp-for="TransportCompanyId">Choose Transport Company</label>
+         <select asp-for="TransportCompanyId" class="form-control">
+            @foreach(var company in Model.TransportCompany)
+            {
+                <option value="@company.Id">@company.Name</option>
+            }
+        </select>
+     </div>
+     <div class="form-group row col-4">
             <div class="form-group">
                 <label >My Company</label>
                 <select id="mycompany" asp-for="MyCompanyId" class="form-control">
                 <option value="">All</option>
                 @foreach (var company in Model.MyCompanies)
                 {
-                                <option value="@company.Id">@company.Name</option>
+                  <option value="@company.Id">@company.Name</option>
                 }
                     <span asp-validation-for="MyCompanyId" class="small text-danger"></span>
                 </select>
             </div>            
-        </div>    
+        </div> 
 
-       
-
-       <div class="form-group row col-md-4">
+       <div class="row col-4">
         <label asp-for="LoadingAddress">Loading address</label>
-        <input asp-for="LoadingAddress" type="text" name="LoadingAddress" class="form-group" />
+        <input asp-for="LoadingAddress" type="text" name="LoadingAddress" class="form-control" />
        </div>
-
-        <div class="form-group row col-md-4">
+        <div class="row col-4">
         <label asp-for="DeliveryAddress">Delivery address</label>
-        <input asp-for="DeliveryAddress" type="text" name="DeliveryAddress" class="form-group" />
+        <input asp-for="DeliveryAddress" type="text" name="DeliveryAddress" class="form-control" />
        </div>
-
-        <div class="form-group row col-md-4">
+       <div class="row col-4">
+            <label asp-for="Etd">Loading Date</label>
+            <input asp-for="Etd" type="text" class="form-control">
+         </div>
+          <div class="row col-4">
+            <label asp-for="Eta">Estimate Time of Arrival</label>
+            <input asp-for="Eta" type="text" class="form-control">
+         </div>
+        <div class="row col-4 m-1">
         <label asp-for="TruckNumber">Truck number</label>
-        <input asp-for="TruckNumber" type="text" name="TruckNumber" class="form-group" />
+        <input asp-for="TruckNumber" type="text" name="TruckNumber" class="form-control" />
        </div>
-
-          <div class="form-group row col-md-4">
+       <div class="row col-md-4">
+        <label asp-for="DriverName">Driver Name</label>
+        <input asp-for="DriverName" type="text" name="DriverName" class="form-control" />
+       </div>
+       <div class="row col-4">
+        <label asp-for="DriverPhone">Driver Phone No</label>
+        <input asp-for="DriverPhone" type="text" name="DriverPhone" class="form-control" />
+       </div>
+       <div class="row col-4">
+        <label asp-for="GrossWeight">Weight kg</label>
+        <input asp-for="GrossWeight" type="text" name="GrossWeight" class="form-control" />
+       </div>
+        <div class="row col-4">
         <label asp-for="Cost">Cost</label>
-        <input asp-for="Cost" type="number" name="Cost" class="form-group" />
+        <input asp-for="Cost" type="number" min="0.001" step="0.001" name="Cost" class="form-control" />
        </div>
-
-        <div class="form-group row col-md-4">
-        <label asp-for="CurrencyId"></label>
+        <div class="row col-4">
+        <label asp-for="PaymentMethod">Плащане/Method of payment</label>
+        <select asp-for="PaymentMethod" type="text" name="PaymentMethod" class="form-control" >
+            <option value="Bank">По банков път/By Bank</option>
+            <option value="Cash">В брой/In cash</option>
+        </select>
+       </div>
+       <div class="row col-4">
+        <label asp-for="PaymentTerms">Срок на плащане/Payment Terms</label>
+        <select asp-for="PaymentTerms" type="text" name="PaymentTerms" class="form-control" >
+            <option value="AfterDischarge">След разтоварване и представяне на ЧМР/After discharge and copy of CMR</option>
+            <option value="AdvancePayment">С авансово плащане/With advance payment</option>
+        </select>
+       </div>
+       <div class="row col-4">
+        <label asp-for="Payer">Платец/Paid by</label>
+        <input asp-for="Payer" type="text" name="Payer" class="form-control" />
+       </div>
+       <div class="row col-4">
+        <label asp-for="Vat">VAT %</label>
+        <input asp-for="Vat" type="number" name="Vat" class="form-control" />
+       </div>
+        <div class="row col-4">
+        <label asp-for="CurrencyId">Choose Currency</label>
         <select id="currency" asp-for="CurrencyId" class="form-control">
             @foreach (var item in Model.Currencies)
             {
@@ -60,31 +105,64 @@
             }
         </select>
     </div>
-
-     <div class="form-group row col-md-4">
+    <div>
+        <p>Tarnsport from supplier</p>
+    </div>
+     <div class="row col-md-4">
         <label asp-for="SupplierId">Choose Supplier</label>
         <select id="SupplierId" asp-for="SupplierId" class="form-control">
             <option value="">-</option>
-            @foreach (var item in Model.Suppliers)
+            @foreach (var supplier in Model.Suppliers)
             {
-                    <option value="@item.Id">@item.Name</option>
+               <option value="@supplier.Id">@supplier.Name</option>
             }
         </select>
     </div>
-
-     <div class="row col-md-4 mb-3">           
-             <label asp-for="PurchaseInvoiceId"  class="control-label"> Select Purchase</label>
-             <select asp-for="PurchaseInvoiceId"  class="form-control" id="PurchaseInvoiceNumber" name="PurchaseInvoiceId" asp-items="@(new SelectList(string.Empty,"PurchaseInvoiceId", "PurchaseInvoiceNumber"))"></select>               
+     <div class="row col-4 mb-3">           
+             <label asp-for="SupplierOrderId"  class="control-label"> Select Supplier Order</label>
+             <select asp-for="SupplierOrderId"  class="form-control" id="SupplierOrderNumber" name="SupplierOrderId" asp-items="@(new SelectList(string.Empty,"SupplierOrderId", "SupplierOrderNumber"))"></select>               
         </div>  
-<p>or Choose </p>
-     <input type="submit" value="Add Transport Order" class="btn btn-primary mt-3"/>        
+        <div>
+
+        </div>
+    <div>
+        <p>Transport for customer </p>
+    </div>     
+    <div class="row col-4">
+        <label asp-for="CustomerId">Choose Customer</label>
+        <select id="CustomerId" asp-for="CustomerId" class="form-control">
+            <option value=""> -</option>
+            @foreach(var customer in Model.Customers)
+            {
+                <option value="@customer.Id">@customer.Name</option>
+            }
+        </select>
+    </div>
+    <div class="row col-4 mb-3">
+        <label asp-for="CustomerOrderNumberId" class="control-label">Select Customer Order No</label>
+        <select asp-for="CustomerOrderNumberId" class="form-control" id="CustomerOrder" name="CustomerOrderNumberId" asp-items="@(new SelectList(string.Empty,"CustomerOrderId","CustomerOrderNumber"))"></select>
+    </div>
+    <div class="row col-4 mb-1">
+        <label asp-for="FiscalAgentId">Choose Fiscal/Customs Agent</label>
+        <select asp-for="FiscalAgentId" class="form-control">
+         <option value="">-</option>
+          @foreach(var agent in Model.FiscalAgents)
+           {
+            <option value="@agent.FiscalAgentId">@agent.FiscalAgentName</option>
+           }
+        </select>
+    </div>
+    <div class="row col-4 ">       
+        <label asp-for="Comment">Коментар/Comment </label>
+        <input asp-for="Comment" type="text" name="Comment" class="form-control" />         
+       </div>
+<input type="submit" value="SAVE" class="btn btn-primary m-3"/>        
 </form>
 
 
 @section Scripts{
-        <script type="text/javascript" src="~/js/getInvoicesForTransport.js">
-     
-    </script>
+        <script type="text/javascript" src="~/js/getInvoicesForTransport.js"></script>
+        <script type="text/javascript" src="~/js/getCustomerOrders.js"></script>
         
 }
  

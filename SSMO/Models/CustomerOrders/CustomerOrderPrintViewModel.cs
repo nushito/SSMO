@@ -35,5 +35,8 @@ namespace SSMO.Models.CustomerOrders
         public FiscalAgentPrintViewModel FiscalAgent { get; set; }
         public string FscText { get; set; }
         public string FscCertificate { get; set; }
+        public string PaymentTerms { get; set; }
+        public string Eta { get; set; }
+        public string Etd { get; set; }
     }
 }

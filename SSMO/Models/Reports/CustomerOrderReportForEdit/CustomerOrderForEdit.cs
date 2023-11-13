@@ -34,9 +34,7 @@ namespace SSMO.Models.Reports.CustomerOrderReportForEdit
         public string FscClaim { get; set; }
         public string FscCertificate { get; set; }
         public string Origin { get; set; }
-        public int? Vat { get; set; }
-        public decimal PaidAdvance { get; set; }
-        public bool PaidAmountStatus { get; set; }
+        public int? Vat { get; set; }      
         public int SupplierOrderId { get; set; }
         public int SupplierId { get; set; }
         public string Supplier { get; set; }
@@ -50,9 +48,11 @@ namespace SSMO.Models.Reports.CustomerOrderReportForEdit
         public ICollection<FiscalAgentViewModel> FiscalAgents { get; set; }
         public string DealType { get; set; }
         public string DealDescription { get; set; }
-
         public int? FscText { get; set; }
         public ICollection<FscTextViewModel>  FscTexts { get; set; }
+        public string PaymentTerms { get; set; }
+        public string Eta { get; set; }
+        public string Etd { get; set; }
 
     }
 }

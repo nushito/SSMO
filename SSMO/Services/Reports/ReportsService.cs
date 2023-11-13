@@ -24,6 +24,8 @@ using SSMO.Models.CustomerOrders;
 using Microsoft.EntityFrameworkCore;
 using SSMO.Repository;
 using SSMO.Services.CustomerOrder.Models;
+using SSMO.Models.Reports.ServiceOrders;
+using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace SSMO.Services.Reports
 {
@@ -113,11 +115,11 @@ namespace SSMO.Services.Reports
                 DeliveryTerms = corder.DeliveryTerms,
                 FscCertificate = corder.FSCSertificate,
                 FscClaim = corder.FSCClaim,
-                MyCompanyId = corder.MyCompanyId,
-                PaidAmountStatus = corder.PaidAmountStatus,
+                MyCompanyId = corder.MyCompanyId,               
                 Origin = corder.Origin,
                 StatusId = corder.StatusId,
-                Vat = corder.Vat                
+                Vat = corder.Vat,
+                PaymentTerms = corder.PaymentTerms
             };
            
             if(corder.FiscalAgentId != 0)
@@ -281,9 +283,9 @@ namespace SSMO.Services.Reports
             int myCompanyId, string deliveryTerms,
             string loadingPlace, string deliveryAddress,
             int currencyId, int status, string fscClaim,
-            string fscCertificate, decimal paidAdvance, bool paidStatus,
+            string fscCertificate, 
              IList<ProductCustomerFormModel> products, List<int> banks, 
-             int? fiscalAgentId, int? fscText)
+             int? fiscalAgentId, int? fscText, string paymentTerms, string eta, string etd)
         {
             var order = dbcontext.CustomerOrders                
                 .Where(a=>a.Id == id)
@@ -304,10 +306,11 @@ namespace SSMO.Services.Reports
             order.CurrencyId = currencyId;
             order.StatusId = status;
             order.FSCClaim = fscClaim;
-            order.FSCSertificate = fscCertificate;
-            order.PaidAvance = paidAdvance;
-            order.PaidAmountStatus = paidStatus;
+            order.FSCSertificate = fscCertificate;           
             order.Amount = 0;
+            order.PaymentTerms = paymentTerms;
+            order.Eta = eta;
+            order.Etd = etd;
          
             if(fiscalAgentId != null)
             {
@@ -396,8 +399,7 @@ namespace SSMO.Services.Reports
             }
 
                 order.SubTotal = order.Amount * order.Vat / 100 ?? 0;
-                order.TotalAmount = order.Amount + order.SubTotal;
-                order.Balance = order.TotalAmount - paidAdvance;
+                order.TotalAmount = order.Amount + order.SubTotal;                
 
             await dbcontext.SaveChangesAsync();
 
@@ -437,7 +439,8 @@ namespace SSMO.Services.Reports
             return customerOrdersBySupplier;
         }
 
-        public CustomerOrderPaymentCollectionViewModel CustomerOrdersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage)
+        public CustomerOrderPaymentCollectionViewModel CustomerOrdersPaymentDetails
+            (string customerName, int currentpage, int customerOrdersPerPage)
         {
             if (String.IsNullOrEmpty(customerName))
             {
@@ -630,7 +633,7 @@ namespace SSMO.Services.Reports
                     product.TotalSheets = item.Pallets * item.SheetsPerPallet;
                     product.Amount = item.OrderedQuantity * item.PurchasePrice;
                     product.OrderedQuantity = item.OrderedQuantity;
-                    product.QuantityLeftForPurchaseLoading = item.OrderedQuantity - product.LoadedQuantityM3;
+                    product.QuantityLeftForPurchaseLoading = item.OrderedQuantity - product.LoadedQuantity;
 
                     var sumProductInCustomerOrders = dbcontext.CustomerOrderProductDetails
                         .Where(p => p.ProductId == item.Id)
@@ -850,9 +853,9 @@ namespace SSMO.Services.Reports
             invoiceDetails.Seller.Street = sellerAddress.Street;
             invoiceDetails.Seller.City = sellerAddress.City;
             invoiceDetails.Seller.Country = sellerAddress.Country;
-
+            //TODO dali vyarno darpa izbranite banki
             var bankDetails = dbcontext.BankDetails
-                .Where(i => i.CompanyId == invoiceDetails.MyCompanyId);
+                .Where(i => i.CompanyId == invoiceDetails.MyCompanyId && i.Documents.Select(i=>i.Id).Contains(id));
 
             var invoiceBankDetails = bankDetails.ProjectTo<InvoiceBankDetailsModel>(mapper).ToList();
 
@@ -957,6 +960,48 @@ namespace SSMO.Services.Reports
 
             return purchaseInvoices;
         }
+        public ServiceOrdersQueryModel ServiceOrdersCollection
+            (int companyId, DateTime startDate, DateTime endDate, int currentPage, int ordersPerPage)
+        {            
+            var queryOrders = dbcontext.ServiceOrders
+                    .Where(a => a.MyCompanyId == companyId && a.Date >= startDate && a.Date <= endDate);
 
+            var serviceOrders = queryOrders.ProjectTo<ServiceOrderCollectionDetailViewModel>(this.mapper).ToList();
+
+            var serviceOrdersList = serviceOrders.Skip((currentPage - 1) * ordersPerPage).Take(ordersPerPage);
+
+            foreach (var order in serviceOrdersList)
+            { 
+                if(order.CustomerOrderId != null)
+                {
+                    var customerOrder = dbcontext.CustomerOrders.Find(order.CustomerOrderId);
+                    order.CustomerOrderNumber = customerOrder.OrderConfirmationNumber;
+                    order.Customer = dbcontext.Customers
+                        .Where(a=>a.Id == customerOrder.CustomerId)
+                        .Select(a=>a.Name).FirstOrDefault();
+                }
+                else
+                {
+                    var supplierOrder = dbcontext.SupplierOrders.Find(order.SupplierOrderId);
+                    order.SupplierOrderNumber = supplierOrder.Number;
+                    order.Supplier = dbcontext.Suppliers
+                        .Where(a => a.Id == supplierOrder.SupplierId)
+                        .Select(a => a.Name).FirstOrDefault();
+                }
+                order.TransportCompanyName = dbcontext.TransportCompanies
+                    .Where(i=>i.Id == order.TransportCompanyId)
+                    .Select(n=>n.Name)
+                    .FirstOrDefault();
+            }
+
+            var serviceOrdersQery = new ServiceOrdersQueryModel
+            {
+                TotalServiceOrders = serviceOrders.Count,
+                ServiceOrders = serviceOrdersList
+            };
+
+            return serviceOrdersQery;
+            
+        }
     }
 }

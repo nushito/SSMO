@@ -44,6 +44,7 @@ namespace SSMO.Models.CustomerOrders
         public bool IsEur { get; set; }
         public int? FscTextEng { get; set; }
         public ICollection<FscTextViewModel> FscTexts { get; set; }
-
+        public string PaymentTerms { get; set; }
+        public string LoadingAddress { get; set; }       
     }
 }

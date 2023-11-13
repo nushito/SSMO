@@ -28,32 +28,25 @@ using SSMO.Models.Documents.Purchase;
 using SSMO.Services.PDF;
 using System.Threading.Tasks;
 using System;
-using iTextSharp.text;
-using iTextSharp.tool.xml;
 using System.IO;
-using iTextSharp.text.pdf;
-using iTextSharp.tool.xml.pipeline.html;
-using iTextSharp.tool.xml.html;
-using iTextSharp.tool.xml.pipeline.css;
-using iTextSharp.tool.xml.pipeline.end;
-using iTextSharp.tool.xml.parser;
 using ClosedXML.Excel;
 using SSMO.Models.Reports.FSC;
-using iTextSharp.text.pdf.qrcode;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using SSMO.Models.Documents.CreditNote;
-using System.Runtime.CompilerServices;
 using SSMO.Services.Documents.Credit_Note;
 using SSMO.Services.Documents.DebitNote;
 using SSMO.Models.Documents.DebitNote;
 using SSMO.Models.Reports.CreditNote;
-using DocumentFormat.OpenXml.Wordprocessing;
 using SSMO.Models.Reports.DebitNote;
-using SSMO.Data.Models;
-using DocumentFormat.OpenXml.Spreadsheet;
 using SSMO.Services.Documents;
 using SSMO.Services.FscTextDocuments;
 using SSMO.Models.CustomerOrders;
+using SSMO.Models.Reports.ServiceOrders;
+using SSMO.Services.TransportService;
+using DocumentFormat.OpenXml.Drawing.Charts;
+using System.Net.Mime;
+using SSMO.Models.ServiceOrders;
+using SSMO.Data.Models;
+using SSMO.Services.FiscalAgent;
 
 namespace SSMO.Controllers
 {
@@ -77,6 +70,7 @@ namespace SSMO.Controllers
 		private readonly IDocumentService documentService;
 		private readonly IFscTextService fscTextService;
 		private readonly IBankService bankService;
+		private readonly ITransportService transportService;
 
 		public ReportsController(IReportsService service,
 		   ICustomerService customerService, ISupplierService supplierService,
@@ -85,7 +79,8 @@ namespace SSMO.Controllers
 		   IPurchaseService purchaseService, ISupplierOrderService supplierOrderService,
 		   IViewRenderService viewRenderService, IHtmlToPdfConverter htmlToPdfConverter,
 		   ICreditNoteService creditNoteService, IDebitNoteService debitNoteService,
-		   IDocumentService documentService, IFscTextService fscTextService, IBankService bankService) //IWebHostEnvironment environment)
+		   IDocumentService documentService, IFscTextService fscTextService, IBankService bankService,
+		   ITransportService transportService) //IWebHostEnvironment environment)
 		{
 			this.reportService = service;
 			this.customerService = customerService;
@@ -105,13 +100,14 @@ namespace SSMO.Controllers
 			this.documentService = documentService;
 			this.fscTextService = fscTextService;
 			this.bankService = bankService;
+			this.transportService = transportService;
 		}
 		public IActionResult AllCustomerOrders(CustomerOrderReportAll model)
 		{
-			//TODO When All are selected page is empty
-			if (model.CustomerName != null)
-			{
-				string userId = this.User.UserId();
+            string userId = this.User.UserId();
+            //TODO When All are selected page is empty
+            if (model.CustomerName != null)
+			{			
 
 				var listMyCompany = myCompanyService.MyCompaniesNamePerCustomer(model.CustomerName);
 
@@ -121,7 +117,7 @@ namespace SSMO.Controllers
 				}
 			}
 
-			var customerNames = customerService.GetCustomerNames();
+			var customerNames = customerService.GetCustomerNames(userId);
 
 			var customerOrderCollection = reportService.AllCustomerOrders(
 				model.CustomerName, model.StartDate, model.EndDate,
@@ -148,13 +144,17 @@ namespace SSMO.Controllers
 		[HttpGet]
 		public IActionResult CustomerOrderEdit(int id)
 		{
-			if (!ModelState.IsValid)
+            string userId = this.User.UserId();
+            var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid)
 			{
 				new CustomerOrderForEdit
 				{
 					Currencies = currency.AllCurrency(),
 					MyCompanies = myCompanyService.GetAllCompanies(),
-					Suppliers = supplierService.GetSuppliers(),
+					Suppliers = supplierService.GetSuppliers(userId),
 					Products = new List<ProductCustomerFormModel>(),
 					Statuses = statusService.GetAllStatus(),
 					SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders(),
@@ -162,14 +162,11 @@ namespace SSMO.Controllers
 					FiscalAgents = documentService.GetFiscalAgents(),
 					FscTexts = fscTextService.GetAllFscTexts()
 				};
-			}
-
-			string userId = this.User.UserId();
-			var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
-			if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
+			}			
 
 			var customerOrderForEdit = reportService.CustomerOrderDetailsForEdit(id);
-			customerOrderForEdit.Suppliers = supplierService.GetSuppliers();
+
+			customerOrderForEdit.Suppliers = supplierService.GetSuppliers(userId);
 			customerOrderForEdit.Currencies = currency.AllCurrency();
 			customerOrderForEdit.MyCompanies = myCompanyService.GetAllCompanies();
 			customerOrderForEdit.Statuses = statusService.GetAllStatus();
@@ -191,7 +188,8 @@ namespace SSMO.Controllers
 
 		[HttpPost]
 		[Authorize]
-		public async Task<IActionResult> CustomerOrderEdit(int id, CustomerOrderForEdit model, string command)
+		public async Task<IActionResult> CustomerOrderEdit(int id, 
+			CustomerOrderForEdit model, string command)
 		{
 			string userId = this.User.UserId();
 			string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(model.MyCompanyId);
@@ -212,7 +210,7 @@ namespace SSMO.Controllers
 				{
 					Currencies = currency.AllCurrency(),
 					MyCompanies = myCompanyService.GetAllCompanies(),
-					Suppliers = supplierService.GetSuppliers(),
+					Suppliers = supplierService.GetSuppliers(userId),
 					Products = new List<ProductCustomerFormModel>(),
 					Statuses = statusService.GetAllStatus(),
 					SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders(),
@@ -233,13 +231,12 @@ namespace SSMO.Controllers
 				model.CurrencyId,
 				model.StatusId,
 				model.FscClaim,
-				model.FscCertificate,
-				model.PaidAdvance,
-				model.PaidAmountStatus,
+				model.FscCertificate,				
 				model.Products,
 				model.ChosenBanks,
 				model.FiscalAgentId, 
-				model.FscText);
+				model.FscText, model.PaymentTerms,
+				model.Eta, model.Etd);
 
 			if (!editOrder)
 			{
@@ -253,60 +250,7 @@ namespace SSMO.Controllers
 
 			return RedirectToAction("PrintCustomerOrder", "CustomerOrders", new { customerorderId = id });
 		}
-
-		[HttpGet]
-		[Authorize]
-		public IActionResult CustomerOrdersBySupplier()
-		{
-			string userId = this.User.UserId();
-			var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
-			if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
-
-			var customersList = customerService.GetCustomerNamesAndId();
-
-			CustomerBySupplierOrdersViewModel cascadeCustomerOrders = new()
-			{
-				Customers = customersList
-			};
-
-			ViewData["Selectedsupplier"] = 0;
-			cascadeCustomerOrders.ProductList = null;
-			return View(cascadeCustomerOrders);
-		}
-
-		[HttpPost]
-		[Authorize]
-		public IActionResult CustomerOrdersBySupplier(CustomerBySupplierOrdersViewModel model, IFormCollection fc)
-		{
-			string userId = this.User.UserId();
-			var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
-			if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
-
-			if (!User.Identity.IsAuthenticated)
-			{
-				return RedirectToAction("Index", "Home");
-			}
-			var customersList = customerService.GetCustomerNamesAndId();
-			if (!ModelState.IsValid)
-			{
-				new CustomerBySupplierOrdersViewModel()
-				{
-					Customers = customersList
-				};
-			};
-
-			var supplierId = fc["SupplierId"];
-			ViewData["SelectedSupplier"] = supplierId;
-			var ordersList = reportService.GetCustomerOrdersBySupplier(model.CustomerId, supplierId);
-
-			var finalListOrders = new CustomerBySupplierOrdersViewModel
-			{
-				Customers = customersList,
-				CustomerId = int.Parse(model.CustomerId.ToString()),
-				ProductList = ordersList,
-			};
-			return View(finalListOrders);
-		}
+				
 
 		[HttpGet]
 		public IActionResult GetSupplier(string id)
@@ -325,15 +269,14 @@ namespace SSMO.Controllers
 		}
 		public IActionResult AllSupplierOrders(SupplierOrdersReportAll model)
 		{
-			if (!ModelState.IsValid)
+            string userId = this.User.UserId();
+            if (!ModelState.IsValid)
 			{
 				return View(model);
 			}
 
 			if (model.SupplierName != null)
-			{
-				string userId = this.User.UserId();
-
+			{	
 				var listMyCompany = myCompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
 
 				if (!listMyCompany.Contains(userId))
@@ -342,7 +285,7 @@ namespace SSMO.Controllers
 				}
 			}
 
-			model.SupplierNames = supplierService.GetSupplierNames();
+			model.SupplierNames = supplierService.GetSupplierNames(userId);
 
 			var supplierOrdersCollection = reportService.AllSupplierOrders
 				(model.SupplierName,model.StartDate,model.EndDate,
@@ -487,9 +430,9 @@ namespace SSMO.Controllers
 		}
 		public IActionResult InvoicePaymentReport(CustomerInvoicePaymentsReportsViewModel model)
 		{
-			if (model.CustomerName != null)
-			{
-				string userId = this.User.UserId();
+            string userId = this.User.UserId();
+            if (model.CustomerName != null)
+			{				
 				var userIdMyCompany = myCompanyService.MyCompaniesNamePerCustomer(model.CustomerName);
 
 				if (!userIdMyCompany.Contains(userId))
@@ -500,7 +443,7 @@ namespace SSMO.Controllers
 			if (!ModelState.IsValid) return View();
 			//TODO When All are selected page is empty
 
-			var customerNames = customerService.GetCustomerNames();
+			var customerNames = customerService.GetCustomerNames(userId);
 
 			var customerPaymentCollection = reportService.CustomersInvoicesPaymentDetails(
 				model.CustomerName,
@@ -557,10 +500,11 @@ namespace SSMO.Controllers
 		
 		public IActionResult CustomerOrdersPaymentReport(CustomerOrderPaymentReportViewModel model)
 		{
-			if (model.CustomerName != null)
-			{
-				string userId = this.User.UserId();
-				var userIdMyCompany = myCompanyService.MyCompaniesNamePerCustomer(model.CustomerName);
+            string userId = this.User.UserId();
+            if (model.CustomerName != null)
+			{				
+				var userIdMyCompany = myCompanyService.MyCompaniesNamePerCustomer
+					(model.CustomerName);
 
 				if (!userIdMyCompany.Contains(userId))
 				{
@@ -569,7 +513,7 @@ namespace SSMO.Controllers
 			}
 			if (!ModelState.IsValid) return View();
 			//TODO When All are selected page is empty
-			var customerNames = customerService.GetCustomerNames();
+			var customerNames = customerService.GetCustomerNames(userId);
 
 			var customerOrdersPaymentCollection = reportService.CustomerOrdersPaymentDetails(
 				model.CustomerName,
@@ -636,7 +580,7 @@ namespace SSMO.Controllers
 				return View();
 			}
 
-			var supplierNames = supplierService.GetSupplierNames();
+			var supplierNames = supplierService.GetSupplierNames(userId);
 			model.SupplierNames = supplierNames;
 
 			var supplierOrdersPaymentCollection = supplierOrderService.GetSupplierOrders
@@ -835,7 +779,9 @@ namespace SSMO.Controllers
 			var checkEditableInvoice = await invoiceService.EditInvoice
 				(id, model.CurrencyExchangeRate, model.Date, model.GrossWeight, model.NetWeight,
 				model.DeliveryCost, model.OrderConfirmationNumber, model.TruckNumber,
-			   model.Products, model.Incoterms, model.Comment, model.ChosenBanks, model.FiscalAgentId, model.FscTextEng);
+			   model.Products, model.Incoterms, model.Comment, model.ChosenBanks, 
+			   model.FiscalAgentId, model.FscTextEng, model.PaymentTerms,model.DeliveryAddress,
+			   model.LoadingAddress);
 
 			if (!checkEditableInvoice) return BadRequest();
 
@@ -928,7 +874,8 @@ namespace SSMO.Controllers
 
 			var editcreditnote = creditNoteService.EditCreditNote
 				(id, model.Date, model.Incoterms, model.TruckNumber, model.NetWeight,
-				model.GrossWeight, model.DeliveryCost, model.CurrencyExchangeRate, model.Comment, model.Products);
+				model.GrossWeight, model.DeliveryCost, model.CurrencyExchangeRate, model.Comment, 
+				model.Products, model.PaymentTerms);
 
 			if (editcreditnote == false)
 			{
@@ -1076,7 +1023,8 @@ namespace SSMO.Controllers
 		}
 
 		[HttpPost]
-		public IActionResult EditDebitNote(EditDebitNoteViewModel model, string documentType, string command, int id)
+		public IActionResult EditDebitNote
+			(EditDebitNoteViewModel model, string documentType, string command, int id)
 		{
 			string userId = this.User.UserId();
 			var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
@@ -1096,7 +1044,7 @@ namespace SSMO.Controllers
 			}
 
 			var editDebitNote = debitNoteService.EditDebitNote
-				(id, model.Date, model.Incoterms, model.Comment, model.Products);
+				(id, model.Date, model.Incoterms, model.Comment, model.Products, model.PaymentTerms);
 
 			if (editDebitNote == false)
 			{
@@ -1245,7 +1193,7 @@ namespace SSMO.Controllers
 
 			if (!ModelState.IsValid) { return BadRequest(); }
 
-			model.Suppliers = supplierService.GetSupplierNames();
+			model.Suppliers = supplierService.GetSupplierNames(userId);
 
 			var purchaseCollection = reportService.PurchaseInvoices
 				(model.Supplier, model.StartDate.Date, model.EndDate.Date, model.CurrentPage,
@@ -1305,46 +1253,124 @@ namespace SSMO.Controllers
 			return RedirectToAction("AllPurchases");
 		}
 
-		[HttpGet]
-		public async Task<IActionResult> ExportInvoiceToPdf()
+		public IActionResult AllServiceOrders(AllServiceOrdersCollectionViewModel model) 
 		{
-			InvoiceDetailsViewModel invoice = ClientService.GetClient();
-			await Export();
-			return View(invoice);
-		}
-		public async Task<string> Export()
-		{
-			System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-			var pdfModel = ClientService.GetClient();
-			var filename = "doc" + pdfModel.DocumentNumber + "_" + DateTime.Now.ToString("ddMMyyyy");
-			var stringForPrint = await viewRenderService.RenderToStringAsync("~/Views/Reports/ExportInvoiceToPdf.cshtml", pdfModel);
-			iTextSharp.text.Document document = new iTextSharp.text.Document();
-			XMLWorkerFontProvider fontProvider = new XMLWorkerFontProvider(XMLWorkerFontProvider.DONTLOOKFORFONTS);
-			var path = Directory.GetCurrentDirectory() + filename + ".pdf";
-			PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(path, FileMode.Create));
-			//foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()+"/"+"wwwroot/fonts"))
-			//{
-			//	FontFactory.FontImp.Register(file);
-			//}
+            string userId = this.User.UserId();
+            var mycompaniesUserId = myCompanyService.GetCompaniesUserId();
+            if (!mycompaniesUserId.Contains(userId))
+            {
+                return BadRequest();
+            }
 
-			document.Open();
-			document.Add(new Chunk(""));
-
-			using (var strReader = new StringReader(stringForPrint))
+			if (!ModelState.IsValid)
 			{
-				HtmlPipelineContext htmlcontext = new HtmlPipelineContext(null);
-				htmlcontext.SetTagFactory(Tags.GetHtmlTagProcessorFactory());
-				ICSSResolver cSSResolver = XMLWorkerHelper.GetInstance().GetDefaultCssResolver(false);
-				//cSSResolver.AddCssFile(Directory.GetCurrentDirectory() + "/wwwroot/css/site.css", true);
-				IPipeline pipeline = new CssResolverPipeline(cSSResolver, new HtmlPipeline(htmlcontext, new PdfWriterPipeline(document, writer)));
-				var worker = new XMLWorker(pipeline, true);
-				var xmlParse = new XMLParser(true, worker);
-				xmlParse.Parse(strReader);
-				xmlParse.Flush();
+				return BadRequest();
 			}
-			document.Close();
-			return path;
+
+			model.MyCompanies = myCompanyService.GetCompaniesForTransportOrder();
+			
+			var ordersCollection = reportService.ServiceOrdersCollection
+				(model.MyCompanyId,model.StartDate,model.EndDate,model.CurrentPage,
+				AllServiceOrdersCollectionViewModel.serviceOrdersPerPage);
+			
+			
+			model.ServiceOrders = ordersCollection.ServiceOrders;
+			model.TotalServiceOrders = ordersCollection.TotalServiceOrders;
+
+            return View(model);		
 		}
+
+		public IActionResult ServiceOrderDetail(int id)
+		{
+            var userId = this.User.UserId();
+            var myuserId = myCompanyService.GetCompaniesUserId();
+            if (!myuserId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid) { return BadRequest(); }
+
+			var serviceOrderForPrint = transportService.ServiceOrderPrintDetails(id);
+
+            ClientService.AddServiceOrder(serviceOrderForPrint);
+
+            return View(serviceOrderForPrint);	
+		}
+
+		[HttpGet]
+		public IActionResult EditServiceOrder(int id)
+		{
+            var userId = this.User.UserId();
+            var myuserId = myCompanyService.GetCompaniesUserId();
+            if (!myuserId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid) { return BadRequest(); }
+			//vzimame zaqwkata za redaktirane
+			var getOrder = transportService.GetForEditTransportOrder(id);
+			getOrder.Customers = customerService.CustomersListForService(userId);//spisyk klienti
+			getOrder.Suppliers = supplierService.GetSuppliers(userId);
+            return View(getOrder);
+		}
+
+		[HttpPost]
+		public IActionResult EditServiceOrder(int id, ServiceOrderForEditViewModel model)
+        {
+            var userId = this.User.UserId();
+            var myuserId = myCompanyService.GetCompaniesUserId();
+            if (!myuserId.Contains(userId)) { return BadRequest(); }
+
+            if (!ModelState.IsValid) { return BadRequest(); }
+
+			var checkEdit = transportService.EditTransportOrder(id, model.Date, model.TransportCompanyId,
+				model.LoadingAddress, model.Eta, model.Etd, model.DeliveryAddress, model.TruckNumber,
+				model.Cost, model.MyCompanyId, model.SupplierOrderId, model.CustomerOrderNumberId, 
+				model.FiscalAgentId, model.CurrencyId, model.Vat, model.DriverName,
+				model.DriverPhone, model.Comment, model.GrossWeight, model.PaymentMethod, 
+				model.PaymentTerms, model.Payer); 
+
+			if(checkEdit == false) { return BadRequest(); }	
+
+            return RedirectToAction("Index", "Home");
+		}
+		
+		[HttpGet]
+		//public async Task<IActionResult> ExportInvoiceToPdf()
+		//{
+		//	InvoiceDetailsViewModel invoice = ClientService.GetClient();
+		//	await Export();
+		//	return View(invoice);
+		//}
+		//public async Task<string> Export()
+		//{
+		//	System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
+		//	var pdfModel = ClientService.GetClient();
+		//	var filename = "doc" + pdfModel.DocumentNumber + "_" + DateTime.Now.ToString("ddMMyyyy");
+		//	var stringForPrint = await viewRenderService.RenderToStringAsync("~/Views/Reports/ExportInvoiceToPdf.cshtml", pdfModel);
+		//	iTextSharp.text.Document document = new iTextSharp.text.Document();
+		//	XMLWorkerFontProvider fontProvider = new XMLWorkerFontProvider(XMLWorkerFontProvider.DONTLOOKFORFONTS);
+		//	var path = Directory.GetCurrentDirectory() + filename + ".pdf";
+		//	PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(path, FileMode.Create));
+		//	//foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()+"/"+"wwwroot/fonts"))
+		//	//{
+		//	//	FontFactory.FontImp.Register(file);
+		//	//}
+
+		//	document.Open();
+		//	document.Add(new Chunk(""));
+
+		//	using (var strReader = new StringReader(stringForPrint))
+		//	{
+		//		HtmlPipelineContext htmlcontext = new HtmlPipelineContext(null);
+		//		htmlcontext.SetTagFactory(Tags.GetHtmlTagProcessorFactory());
+		//		ICSSResolver cSSResolver = XMLWorkerHelper.GetInstance().GetDefaultCssResolver(false);
+		//		//cSSResolver.AddCssFile(Directory.GetCurrentDirectory() + "/wwwroot/css/site.css", true);
+		//		IPipeline pipeline = new CssResolverPipeline(cSSResolver, new HtmlPipeline(htmlcontext, new PdfWriterPipeline(document, writer)));
+		//		var worker = new XMLWorker(pipeline, true);
+		//		var xmlParse = new XMLParser(true, worker);
+		//		xmlParse.Parse(strReader);
+		//		xmlParse.Flush();
+		//	}
+		//	document.Close();
+		//	return path;
+		//}
 
 		//public async Task<ActionResult> ExportToPdf2()
 		//      {
@@ -1385,19 +1411,19 @@ namespace SSMO.Controllers
 
 			return this.File(fileContents, "application/pdf");
 		}
-		public FileResult ExportPdf2(string exportData)
-		{
-			using (MemoryStream stream = new System.IO.MemoryStream())
-			{
-				StringReader reader = new StringReader(exportData);
-				iTextSharp.text.Document PdfFile = new iTextSharp.text.Document(iTextSharp.text.PageSize.A4);
-				PdfWriter writer = PdfWriter.GetInstance(PdfFile, stream);
-				PdfFile.Open();
-				XMLWorkerHelper.GetInstance().ParseXHtml(writer, PdfFile, reader);
-				PdfFile.Close();
-				return File(stream.ToArray(), "application/pdf", "exportData.pdf");
-			}
-		}
+		//public FileResult ExportPdf2(string exportData)
+		//{
+		//	using (MemoryStream stream = new System.IO.MemoryStream())
+		//	{
+		//		StringReader reader = new StringReader(exportData);
+		//		iTextSharp.text.Document PdfFile = new iTextSharp.text.Document(iTextSharp.text.PageSize.A4);
+		//		PdfWriter writer = PdfWriter.GetInstance(PdfFile, stream);
+		//		PdfFile.Open();
+		//		XMLWorkerHelper.GetInstance().ParseXHtml(writer, PdfFile, reader);
+		//		PdfFile.Close();
+		//		return File(stream.ToArray(), "application/pdf", "exportData.pdf");
+		//	}
+		//}
 
 		public FileResult ExportToExcel()
 		{
@@ -1526,8 +1552,12 @@ namespace SSMO.Controllers
 				row++;
 				worksheet.Cell(row, 1).Value = "Event date";
 				worksheet.Cell(row,2).Value = invoice.Date.ToShortTimeString();
+				row++;
 
-				foreach (var bank in invoice.CompanyBankDetails)
+                worksheet.Cell(row,1).Value = "Payment Terms";
+				worksheet.Cell(row, 2).Value = invoice.PaymentTerms;
+
+                foreach (var bank in invoice.CompanyBankDetails)
 				{
 					row++;
 					worksheet.Cell(row, 1).Value = "Currency";
@@ -1553,7 +1583,6 @@ namespace SSMO.Controllers
 				}
 			}
 		}
-
         public FileResult ExportToExcelBg()
         {
             BgInvoiceViewModel invoice = ClientService.GetBgInvoice();
@@ -1777,7 +1806,6 @@ namespace SSMO.Controllers
 			}
 
 		}
-
 		public FileResult ExportFscToExcel()
 		{
             ProductsFscCollectionViewModel fscReport = ClientService.GetFscReport();
@@ -1873,7 +1901,6 @@ namespace SSMO.Controllers
                 }
             }
         }
-
         public FileResult ExportPurchasePaymentToExcel()
         {
             SupplierOrdersPaymentReportViewModel payments = ClientService.GetPurchasePayments();
@@ -1957,7 +1984,6 @@ namespace SSMO.Controllers
             }
 
         }
-
         public FileResult ExportCustomerInvoicePaymentsToExcel()
         {
             CustomerInvoicePaymentsReportsViewModel payments = ClientService.GetCustomerInvoicePayments();
@@ -2045,7 +2071,6 @@ namespace SSMO.Controllers
             }
 
         }
-
 		public FileResult ExportCoToExcel()
 		{
 		  CustomerOrderPrintViewModel order = ClientService.GetCustomerOrderPrint();
@@ -2093,6 +2118,9 @@ namespace SSMO.Controllers
                
                 worksheet.Cell(10, 1).Value = "Delivery Terms";
                 worksheet.Cell(10, 2).Value = order.DeliveryTerms;
+
+				worksheet.Cell(10, 4).Value = "Delivery Address";
+				worksheet.Cell(10, 5).Value = order.DeliveryAddress;
 
                 worksheet.Cell(11, 1).Value = "Truck No";
                 worksheet.Cell(11, 2).Value = "-";
@@ -2165,6 +2193,9 @@ namespace SSMO.Controllers
                 worksheet.Cell(row, 1).Value = "Event date";
                 worksheet.Cell(row, 2).Value = order.Date.ToShortTimeString();
 
+				worksheet.Cell(row, 4).Value = "Payment Terms";
+				worksheet.Cell(row, 5).Value = order.PaymentTerms;
+
                 foreach (var bank in order.BankDetails)
                 {
                     row++;
@@ -2190,6 +2221,97 @@ namespace SSMO.Controllers
                     return File(content, contentType, filename);
                 }
             }
+        }
+		public FileResult ExportServiceOrderExcel()
+		{
+			ServiceOrderDetailsPrintViewModel order = ClientService.GetServiceOrder();
+           
+			using (var excelDocument = new XLWorkbook())
+            {
+                IXLWorksheet worksheet = excelDocument.Worksheets.Add("Invoice");
+				worksheet.Cell(1, 1).Value = "Заявка/Order Nо:";
+                worksheet.Cell(1, 2).Value = order.Number;				
+                worksheet.Cell(2, 1).Value = "Date";
+                worksheet.Cell(2, 2).Value = order.Date;
+                worksheet.Cell(3, 1).Value = "Заявител/Applicant:";
+                worksheet.Cell(3, 2).Value = "Превозвач/Transport Company:";
+                worksheet.Cell(4, 1).Value = order.MyCompany.Name;
+                worksheet.Cell(4, 2).Value = order.TransportCompany.Name;
+                worksheet.Cell(5, 1).Value = order.MyCompany.Vat;
+                worksheet.Cell(5, 2).Value = order.TransportCompany.Vat;
+                worksheet.Cell(6, 1).Value = order.MyCompany.Address;
+                worksheet.Cell(6, 2).Value = order.TransportCompany.Address;
+
+                worksheet.Cell(7, 1).Value = "Адрес за кореспонденция/Correspondence address:";
+                worksheet.Cell(7, 2).Value = "Данни за товара/Goods:";
+                worksheet.Cell(8, 1).Value = order.MyCompany.CorrespondAddress;
+                worksheet.Cell(8, 2).Value = order.ProductType;
+                worksheet.Cell(9, 2).Value = order.GrossWeight;
+
+                worksheet.Cell(10, 1).Value = "Товарен адрес/Loading address:";
+                worksheet.Cell(10, 2).Value = "Дата на товарене/Date of loading:";
+                worksheet.Cell(11, 1).Value = order.LoadingAddress;
+                worksheet.Cell(11, 2).Value = order.Etd;
+
+
+                worksheet.Cell(12, 1).Value = "Разтоварен пункт/Discharged address:";
+                worksheet.Cell(12, 2).Value = "Детайли митница/Customs details:";
+                worksheet.Cell(13, 1).Value = order.DeliveryAddress;
+                
+                if (order.FiscalAgent != null)
+                {
+                    worksheet.Cell(13, 2).Value = order.FiscalAgent.FiscalAgentName;
+                    worksheet.Cell(14, 2).Value = order.FiscalAgent.FiscalAgentDetails;
+                }
+
+                
+                worksheet.Cell(15, 1).Value = "Плащане/Payment:";
+                worksheet.Cell(15, 3).Value = "Камион No/Truck No:";
+				worksheet.Cell(15, 4).Value = order.TruckNumber;
+
+                worksheet.Cell(16, 1).Value = "Навло/Freight:";
+                worksheet.Cell(16, 2).Value = order.Cost;
+                worksheet.Cell(16, 3).Value = "Шофьор/Driver:";
+                worksheet.Cell(16, 4).Value = order.DriverName;
+
+                worksheet.Cell(17, 1).Value = "Валута/Currency:";
+                worksheet.Cell(17, 2).Value = order.Currency;
+                worksheet.Cell(17, 3).Value = "Теl: ";
+                worksheet.Cell(17, 4).Value = order.DriverPhone;
+                worksheet.Cell(18, 1).Value = "Метод на плащане/Payment method:";
+                worksheet.Cell(18, 2).Value = order.PaymentMethod;
+                worksheet.Cell(19, 1).Value = "Срок на плащане/Payment Terms:";
+                worksheet.Cell(19, 2).Value = order.PaymentTerms;
+                worksheet.Cell(20, 1).Value = "Платец/Paid by:";
+                worksheet.Cell(20, 2).Value = order.Payer;
+
+				worksheet.Cell(21, 1).Value = "Коментар/Comment:";
+				worksheet.Cell(21, 2).Value = order.Comment;
+
+                worksheet.Cell(22, 1).Value = "С настоящето потвърждаваме следното:";
+                worksheet.Cell(22, 2).Value = "We hereby confirm the following:";
+				worksheet.Cell(23,1).Value = "1.Тази заявка представлява договор за транспорт.";
+				worksheet.Cell(23, 2).Value = "1. This application is a transport contract.";
+				worksheet.Cell(24, 1).Value = "2. Превозвачът се задължава да представи валидна застрахова за отговорността " +
+					"си за нанесени щети на пратката до\r\n стойности, определени в чл.71, т.3 от Закона за автомобилни превози и чл.23," +
+					" т3 и т.4 от Конвенцията за договора за\r\n  международен автомобилен превоз на стоки, покриваща до 12 USD на " +
+					"килограм, но не повече от фактурната стойност\r\n  на пратката.";
+				worksheet.Cell(24, 2).Value = "2. The carrier shall present a valid insurance for liability for damage to the consignment to the values specified in Article 71, item 3 of\r\n                the Law on Road Transport and Article 23, T3 and 4 of the Convention on the Contract for International carriage of goods by covering\r\n                up to 12 USD per kilogram but not exceeding the invoice value of the consignment.";
+				worksheet.Cell(25, 1).Value = "3. При неявяване на автомобила на уговорената дата на товарене, ПРЕВОЗВАЧА заплаща 100 eur неустойка.";
+				worksheet.Cell(25, 2).Value = "3. If the car is missing on the agreed loading date, the CARRIER pays a penalty of 100 eur.";
+				worksheet.Cell(26, 1).Value = "4. При неспазване на горепосочените условия, възниквалите спорове ще се решават в арбитражния съд в гр.Варна.";
+				worksheet.Cell(26, 2).Value = "4. Failure to comply with the above conditions arising disputes will be resolved in the arbitration court in Varna, Bulgaria.";
+
+                using var stream = new MemoryStream();
+                excelDocument.SaveAs(stream);
+                var content = stream.ToArray();
+                string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                var strDate = DateTime.Now.ToString("yyyyMMdd");
+                string filename = string.Format($"Invoice_{strDate}.xlsx");
+
+                return File(content, contentType, filename);
+            }            
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿
 using SSMO.Controllers;
 using SSMO.Data.Enums;
-using SSMO.Data.Enums;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -33,7 +32,7 @@ namespace SSMO.Data.Models
         public decimal? QuantityM3 { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
-        public decimal LoadedQuantityM3 { get; set; }
+        public decimal LoadedQuantity { get; set; }
         public decimal QuantityLeftForPurchaseLoading { get; set; }
         public decimal QuantityAvailableForCustomerOrder { get; set; }
         public decimal SoldQuantity { get; set; }
@@ -62,7 +61,8 @@ namespace SSMO.Data.Models
         public int? SupplierOrderId { get; set; }
         public SupplierOrder SupplierOrder { get; set; }
         public int? DocumentId { get; set; }
-        public Document Document { get; set; }      
+        public Document Document { get; set; }
+        public string HsCode { get; set; }
 
         [Column(TypeName = "decimal(18,4)")]
         public decimal? PurchaseTransportCost { get; set; }

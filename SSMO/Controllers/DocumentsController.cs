@@ -26,9 +26,7 @@ using SSMO.Models.Documents;
 using SSMO.Services.Documents.DebitNote;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Services.Customer;
-using SSMO.Data.Models;
 using SSMO.Services.FscTextDocuments;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using System.Threading.Tasks;
 
 namespace SSMO.Controllers
@@ -76,18 +74,17 @@ namespace SSMO.Controllers
 
         public IActionResult AddPurchase(SupplierOrderListModel model)
         {
+            string userId = this.User.UserId();
             if (model.SupplierName != null)
-            {
-                string userId = this.User.UserId();
+            {                
                 var userIdMyCompany = mycompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
 
                 if (!userIdMyCompany.Contains(userId))
                 {
                     return BadRequest();
                 }
-
             }
-            var suppliersList = this.supplierService.GetSupplierNames();
+            var suppliersList = this.supplierService.GetSupplierNames(userId);
 
             var supplierOrdersList = this.purchaseService.GetSupplierOrdersForPurchase(
                 model.SupplierName, model.CurrentPage, SupplierOrderListModel.SupplierOrdersPerPage);
@@ -179,7 +176,8 @@ namespace SSMO.Controllers
                 model.BankExpenses, model.OtherExpenses, model.Vat,
                 model.TruckNumber,model.Swb, model.ProductDetails, model.Incoterms,
                 model.DeliveryAddress, 
-                model.ShippingLine, model.Eta, model.DelayCostCalculation,model.CostPriceCurrency);
+                model.ShippingLine, model.Eta, model.DelayCostCalculation,
+                model.CostPriceCurrency);
 
             if (!purchase)
             {
@@ -187,6 +185,7 @@ namespace SSMO.Controllers
             }
             return RedirectToAction("Index", "Home");
         }
+
         [HttpGet]
         public IActionResult CustomerOrdersForInvoice()
         {
@@ -196,7 +195,7 @@ namespace SSMO.Controllers
 
             var customers = new CustomerOrdersForInvoice
             {
-                Customers = customerService.GetCustomerNamesAndId(),
+                Customers = customerService.GetCustomerNamesAndId(userId),
                 MyCompanies = mycompanyService.GetCompaniesNameAndId()
             };
 
@@ -222,6 +221,8 @@ namespace SSMO.Controllers
                 myCompanyId = model.MyCompanyId
             });
         }
+       
+        //izbirat se porachkite kym klienta koito shte se fakturirat
         [HttpGet]
         public IActionResult GetCustomerOrders(string id)
         {
@@ -388,13 +389,15 @@ namespace SSMO.Controllers
                     myCompanyId = myCompanyId,
                     comment = model.Comment,
                     deliveryAddress = model.DeliveryAddress,
+                    loadingAddress = model.LoadingAddress,
                     dealTypeEng = model.DealTypeEng,
                     dealTypeBg = model.DealTypeBg,
                     descriptionEng = model.DealDescriptionEng,
                     descriptionBg = model.DealDescriptionBg,
                     banks = model.ChoosenBanks,
                     fiscalAgent = model.FiscalAgent,
-                    fscText = model.FscTextEng
+                    fscText = model.FscTextEng,
+                    paymentTerms = model.PaymentTerms
                 });
         }
 
@@ -404,7 +407,7 @@ namespace SSMO.Controllers
           string swb, decimal netWeight, decimal grossWeight, string incoterms, 
           int customerId, int currencyId, int vat, int myCompanyId, string comment, string deliveryAddress,
           string dealTypeEng, string dealTypeBg, string descriptionEng, string descriptionBg, List<int> banks, 
-          int? fiscalAgent, int? fscText)
+          int? fiscalAgent, int? fscText, string paymentTerms,string loadingAddress)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(mycompanyname);
@@ -434,7 +437,8 @@ namespace SSMO.Controllers
                 (orders, products, serviceProducts, date, currencyExchangeRateUsdToBGN, number, 
                 mycompanyname, truckNumber, deliveryCost, swb, netWeight, grossWeight, incoterms, 
                 customerId, currencyId, vat, myCompanyId, comment, deliveryAddress, 
-                dealTypeEng, dealTypeBg, descriptionEng, descriptionBg, banks, fiscalAgent, fscText);
+                dealTypeEng, dealTypeBg, descriptionEng, descriptionBg, banks, fiscalAgent, 
+                fscText, paymentTerms,loadingAddress);
          
             if (invoiceForPrint == null)
             {
@@ -515,6 +519,7 @@ namespace SSMO.Controllers
             return View(model);
         }
 
+        //izbira se faktura za kreditno
         [HttpGet]
         public IActionResult ChooseInvoiceForCreditNote()
         {
@@ -589,11 +594,13 @@ namespace SSMO.Controllers
             TempData["products"] = JsonConvert.SerializeObject(model.Products);
 
             return RedirectToAction("CreateCreditNote",
-                new { invoiceId = model.InvoiceId, date = model.Date, quantityBack = model.QuantityBack, deliveryAddress = model.CreditNoteDeliveryAddress});
+                new { invoiceId = model.InvoiceId, date = model.Date, quantityBack = model.QuantityBack, 
+                    deliveryAddress = model.CreditNoteDeliveryAddress, paymentTerms = model.PaymentTerms});
         }
 
+        //sazdava se kreditno
         public IActionResult CreateCreditNote
-            (int invoiceId, DateTime date, bool quantityBack, string deliveryAddress)
+            (int invoiceId, DateTime date, bool quantityBack, string deliveryAddress, string paymentTerms)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
@@ -602,11 +609,12 @@ namespace SSMO.Controllers
          
             List<AddProductsToCreditAndDebitNoteFormModel> productsForCredit = JsonConvert.DeserializeObject<List<AddProductsToCreditAndDebitNoteFormModel>>(TempData["products"].ToString());
             var creditNote = creditNoteService.CreateCreditNote
-                (invoiceId, date, quantityBack, deliveryAddress, productsForCredit);
+                (invoiceId, date, quantityBack, deliveryAddress, productsForCredit, paymentTerms);
 
             return View(creditNote);  
         }
 
+        //izbira se faktura za debitno
         [HttpGet]
         public IActionResult ChooseInvoiceForDebitNote()
         {
@@ -682,11 +690,12 @@ namespace SSMO.Controllers
 
             return RedirectToAction("CreateDebitNote",
                 new { invoiceId = model.InvoiceId, date = model.Date, 
-                    moreQuantity = model.MoreQuantity, deliveryAddress = model.DeliveryAddress               
-                     });
+                    moreQuantity = model.MoreQuantity, deliveryAddress = model.DeliveryAddress,               
+                    paymentTerms = model.PaymentTerms });
         }
-
-        public IActionResult CreateDebitNote(int invoiceId, DateTime date, bool moreQuantity, string deliveryAddress)
+        //sazdava se debitno
+        public IActionResult CreateDebitNote
+            (int invoiceId, DateTime date, bool moreQuantity, string deliveryAddress, string paymentTerms)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
@@ -696,7 +705,7 @@ namespace SSMO.Controllers
             List<PurchaseProductsForDebitNoteViewModel> availableProducts = JsonConvert.DeserializeObject<List<PurchaseProductsForDebitNoteViewModel>>(TempData["availableProducts"].ToString());
             List<AddProductsToCreditAndDebitNoteFormModel> productsForDebit = JsonConvert.DeserializeObject<List<AddProductsToCreditAndDebitNoteFormModel>>(TempData["products"].ToString());
             var debitNoteForPrint = debitNoteService.CreateDebitNote
-                (invoiceId, date, moreQuantity,deliveryAddress,productsForDebit, availableProducts);
+                (invoiceId, date, moreQuantity,deliveryAddress,productsForDebit, availableProducts, paymentTerms);
 
             return View(debitNoteForPrint);
         }

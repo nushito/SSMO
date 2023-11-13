@@ -15,11 +15,12 @@ namespace SSMO.Services
         private readonly ApplicationDbContext dbContext;
         private readonly IMapper mapper;
 
-        public List<string> SuppliersFscCertificates()
+        public List<string> SuppliersFscCertificates(string userId)
         {
             
             return dbContext.Suppliers
-                .Select(f=>f.FSCSertificate)               
+                .Where(i=>i.UserId == userId)
+                .Select(f=>f.FscSertificate)               
                 .ToList();
         }
 
@@ -31,7 +32,7 @@ namespace SSMO.Services
 
         public bool AddNewSupplier
             (string name, string vat, string eik, string email, string city, 
-            string street, string country, string manager, string fscCertificate)
+            string street, string country, string manager, string fscCertificate, string userId)
         {
 
            var address = new Address
@@ -46,7 +47,8 @@ namespace SSMO.Services
                    Eik = eik,
                    Email = email,
                    RepresentativePerson = manager,
-                   FSCSertificate = fscCertificate
+                   FscSertificate = fscCertificate,
+                   UserId = userId
                }
            };
 
@@ -118,7 +120,7 @@ namespace SSMO.Services
 
             var supplierFsc = dbContext.Suppliers
                 .Where(id => id.Id == supplierId)
-                .Select(fs => fs.FSCSertificate)
+                .Select(fs => fs.FscSertificate)
                 .FirstOrDefault();
 
             if(supplierFsc == null)
@@ -138,7 +140,7 @@ namespace SSMO.Services
 
             var supplierFsc = dbContext.Suppliers
                 .Where(id => id.Id == supplierId)
-                .Select(fs => fs.FSCSertificate)
+                .Select(fs => fs.FscSertificate)
                 .FirstOrDefault();
 
             if (supplierFsc == null)
@@ -150,18 +152,20 @@ namespace SSMO.Services
 
         }
 
-        public IEnumerable<string> GetSupplierNames()
+        public IEnumerable<string> GetSupplierNames(string userId)
         {
             return dbContext
                  .Suppliers
+                 .Where(i=>i.UserId == userId)
                  .Select(n => n.Name
                  ).ToList();
         }
 
-        public ICollection<AllSuppliers> GetSuppliers()
+        public ICollection<AllSuppliers> GetSuppliers(string userId)
         {
             return dbContext
                  .Suppliers
+                 .Where(i=>i.UserId == userId)
                  .Select(a => 
                  new AllSuppliers 
                  {

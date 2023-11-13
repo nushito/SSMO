@@ -16,6 +16,14 @@
         <input asp-for="Incoterms" type="text" class="form-control">
     </div>
      <div class="row col-md-4">
+        <label asp-for="DeliveryAddress">Delivery Address</label>
+        <input asp-for="DeliveryAddress" type="text" class="form-control">
+    </div>
+     <div class="row col-md-4">
+        <label asp-for="LoadingAddress">Loading Address</label>
+        <input asp-for="LoadingAddress" type="text" class="form-control">
+    </div>
+     <div class="row col-md-4">
         <label asp-for="TruckNumber">Truck Number</label>
         <input asp-for="TruckNumber" type="text" class="form-control">
     </div>
@@ -31,6 +39,10 @@
    <div class="row col-md-4">
         <label asp-for="DeliveryCost">Delivery Cost</label>
         <input asp-for="DeliveryCost" type="number" min="0" step="0.00001" class="form-control">
+    </div>
+     <div class="row col-md-4">
+        <label asp-for="PaymentTerms">Payment Terms</label>
+        <input asp-for="PaymentTerms" type="text" class="form-control">
     </div>
      <div class="form-group row col-md-4">
         <label asp-for="ChosenBanks">Choose Banks</label>

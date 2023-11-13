@@ -1,12 +1,9 @@
-﻿using SSMO.Data.Models;
-using SSMO.Models.CustomerOrders;
+﻿using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Documents.Packing_List;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SSMO.Services.Documents
 {
@@ -19,7 +16,7 @@ namespace SSMO.Services.Documents
 
         public ICollection<int> GetPackingList();
 
-        public ICollection<int> GetInvoiceList();
+       
 
         public PackingListForPrintViewModel PackingListForPrint(int packingListNumber);
 
@@ -28,7 +25,8 @@ namespace SSMO.Services.Documents
         public CreditAndDebitNoteViewModel PrintCreditAndDebitNote(int id);
         public List<InvoiceBankDetailsViewModel> BankDetails(int id);
 
-        public void AddFiscalAgent(string name, string bgName, string details, string bgDetails);
+        public void AddFiscalAgent
+            (string name, string bgName, string details, string bgDetails,string userId);
         public ICollection<FiscalAgentViewModel> GetFiscalAgents();
 
     }

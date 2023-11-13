@@ -37,9 +37,13 @@ namespace SSMO.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
+
+            string userId = this.User.UserId();
             var isCustomerCreated = customerService.CreateCustomer
-                (model.Name, model.VAT, model.EIK, model.RepresentativePerson, model.Country, model.City, model.Street, model.Email, model.PhoneNumber,
-                model.BgCustomerName, model.BgStreet, model.BgCity, model.BgCountry, model.BgRepresentativePerson);
+                (model.Name, model.VAT, model.EIK, model.RepresentativePerson, model.Country, 
+                model.City, model.Street, model.Email, model.PhoneNumber,
+                model.BgCustomerName, model.BgStreet, model.BgCity, model.BgCountry, 
+                model.BgRepresentativePerson, userId);
 
             if(!isCustomerCreated) return View();
 
@@ -49,10 +53,9 @@ namespace SSMO.Controllers
         [HttpGet]
         public IActionResult Edit(EditCustomerViewModel model)
         {
+            string userId = this.User.UserId();
             if (model.CustomerName != null)
             {
-                string userId = this.User.UserId();
-
                 var listMyCompany = myCompanyService.MyCompaniesNamePerCustomer(model.CustomerName);
 
                 if (!listMyCompany.Contains(userId))
@@ -64,7 +67,7 @@ namespace SSMO.Controllers
             {
                 return RedirectToAction("Index", "Home");
             }
-            var customerNames = customerService.GetCustomerNames();
+            var customerNames = customerService.GetCustomerNames(userId);
             model.CustomerNames = customerNames;
             model.CustomerForEdit = customerService.GetCustomerForEdit(model.CustomerName);
             return View(model);

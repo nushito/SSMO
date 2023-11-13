@@ -112,6 +112,9 @@
         <hr>
         <table class="table-borderless">
             <tr>
+                Payment Terms: @Model.PaymentTerms
+            </tr>
+            <tr>
                 @foreach (var bank in Model.CompanyBankDetails)
                 {
                     <td class="px-3 m-2 l-3">

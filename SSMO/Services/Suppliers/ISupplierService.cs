@@ -10,12 +10,12 @@ namespace SSMO.Services
     {
         public bool AddNewSupplier
             (string name, string vat,string eik, string email, string city, 
-            string street, string country,string manager, string fscCertificate);
-        public ICollection<AllSuppliers> GetSuppliers();
+            string street, string country,string manager, string fscCertificate, string userId);
+        public ICollection<AllSuppliers> GetSuppliers(string userId);
        
         public IEnumerable<SupplierDetailsList> GetSuppliersIdAndNames(int id);
         //public List<SelectListItem> GetSuppliersByCustomerId(int id);
-        public IEnumerable<string> GetSupplierNames();
+        public IEnumerable<string> GetSupplierNames(string userId);
         public EditSupplierFormModel GetSupplierForEdit(string supplierName);
 
         public bool EditSupplier(string supplierName, string vat, string eik, string representativePerson,
@@ -25,6 +25,6 @@ namespace SSMO.Services
         public string GetSupplierFscCertificateByOrderId(int orderId);
         public string SupplierNameById(int id);
         public string SupplierNameBySupplierOrderId(int id);
-        public List<string> SuppliersFscCertificates();
+        public List<string> SuppliersFscCertificates(string userId);
     }
 }

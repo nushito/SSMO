@@ -56,6 +56,10 @@
         <label asp-for="DeliveryAddress">Delivery Address</label>
         <input asp-for="DeliveryAddress" type="text" class="form-control">
     </div>
+      <div class="row col-md-4">
+        <label asp-for="LoadingAddress">Loading Address</label>
+        <input asp-for="LoadingAddress" type="text" class="form-control">
+    </div>
      <div class="row col-md-4">
         <label asp-for="NetWeight">Net Weight</label>
         <input asp-for="NetWeight" type="text" class="form-control">
@@ -156,7 +160,10 @@
          <label asp-for="Comment">Comment</label>
         <input asp-for="Comment" type="text"  class="form-control" />
     </div>
-   
+   <div class="row col-md-4">
+       <label asp-for="PaymentTerms">Payment Terms</label>
+       <input asp-for="PaymentTerms" type="text" class="form-control"/>
+   </div>
     <div class="row col-md-4">
         <label >Choose bank options</label>
         <select asp-for="ChoosenBanks" class="form-control" multiple>

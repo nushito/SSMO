@@ -25,7 +25,7 @@ namespace SSMO.Models.Documents.DebitNote
         public decimal CurrencyExchangeRate { get; set; }
         public string Incoterms { get; set; }
         public string Comment { get; set; }
-        public List<EditProductForDebitNoteViewModel> Products { get; set; }      
-       
+        public List<EditProductForDebitNoteViewModel> Products { get; set; }
+        public string PaymentTerms { get; set; }
     }
 }

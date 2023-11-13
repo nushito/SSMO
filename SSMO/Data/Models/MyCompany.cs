@@ -30,14 +30,14 @@ namespace SSMO.Data.Models
         [Required]
         public string RepresentativePerson { get; set; }
         public string UserId { get; set; }
-        public string FSCClaim { get; set; }
-        public string FSCSertificate { get; set; }
-
+        public string FscClaim { get; set; }
+        public string FscSertificate { get; set; }      
         public ICollection<CustomerOrder> Orders { get; set; }
         public ICollection<SupplierOrder> SupplierOrders { get; set; }
         public ICollection<BankDetails> BankDetails { get; set; }
         public ICollection<Document> Documents { get; set; }
         public ICollection<ServiceOrder> ServiceOrders { get; set; }
+        public ICollection<Image> Images { get; set; }
 
     }
 }

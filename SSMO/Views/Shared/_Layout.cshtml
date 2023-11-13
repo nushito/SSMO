@@ -7,6 +7,7 @@
     <link href="~/business.ico" rel="shortcut icon" type="image/x-icon" />
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/material.css" />
 </head>
 <body>
     <header>
@@ -55,14 +56,13 @@
    
          <div class="row">
         <div class="col-3 border-right-0 ml-sm-n1">
-            <aside class="navbar">
+            <aside class="navbar" style="display:flex;flex-direction: column;order: 1;">
                <partial name="_SideLayout" />
-
             </aside>
         </div>
         <div class="col-9 align-content-between mb-0 pr-sm-1 border-left-0 border-right-0">
             
-                <main role="main" class="pb-9 m-0">
+                <main role="main" class="pb-9 mb-1">
                     @RenderBody()
                 </main>
            
@@ -85,6 +85,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.syncfusion.com/ej2/dist/ej2.min.js"></script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

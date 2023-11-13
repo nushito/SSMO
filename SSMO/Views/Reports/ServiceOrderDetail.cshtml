@@ -1,0 +1,165 @@
+﻿@model ServiceOrderDetailsPrintViewModel
+@{
+    ViewBag.Title = "Service Order Details For Print";
+}
+<table class="table table-bordered" style="width:100%">
+    <thead class="thead-dark">
+         <tr>
+            <th class="text-center" colspan="2" style="width:100%">
+                <p>Заявка/Order Nо: @Model.Number / @Model.Date.ToShortDateString()</p>
+            </th>
+         </tr>
+    </thead>
+    <tbody>
+        <tr>
+        <td>
+            Заявител/Applicant:<br />
+                @Model.MyCompany.Name <br />
+                @Model.MyCompany.Vat <br />
+                @Model.MyCompany.Address
+        </td>
+        <td>
+            Превозвач/Transport Company: <br />
+                @Model.TransportCompany.Name <br />
+                @Model.TransportCompany.Vat <br />
+                @Model.TransportCompany.Address
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Адрес за кореспонденция/Correspondence address: <br />
+                @Model.MyCompany.CorrespondAddress
+        </td>
+        <td>
+            Данни за товара/Goods: <br />
+                @Model.ProductType <br />
+                @Model.GrossWeight
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Товарен адрес/Loading address: <br />
+                @Model.LoadingAddress
+        </td>
+        <td>
+            Дата на товарене/Date of loading:<br />
+                @Model.Etd
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Разтоварен адрес/Discharged address:<br />
+                @Model.DeliveryAddress
+        </td>
+        <td>
+            Детайли митница/Customs details:<br />
+                @if (Model.FiscalAgent != null)
+                {
+                    @Model.FiscalAgent.FiscalAgentName<br />
+                    @Model.FiscalAgent.FiscalAgentDetails
+                }            
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Плащане/Payment: <br />
+            Метод на плащане/Payment method: 
+                @if (Model.PaymentMethod == "Bank")
+                {
+                        <p>По банков път/By Bank</p>                    
+                }
+                else
+                {
+                        <p>В брой/In cash</p>
+                }
+               
+                Срок на плащане/Payment Terms: 
+                @if (Model.PaymentTerms == "AfterDischarge")
+                {
+                        <p>След разтоварване и представяне на ЧМР/After discharge and copy of CMR</p>
+                }
+                else
+                {
+                        <p>С авансово плащане/With advance payment</p>
+                }
+                
+                Навло/Freight: @Model.Cost <br />    
+            Валута/Currency: @Model.Currency<br />
+            Платец/Paid by: @Model.Payer
+        </td>
+        <td>
+            <span>
+            Камион No/Truck No: @Model.TruckNumber<br />
+            Шофьор/Driver: @Model.DriverName <br />
+            Теl: @Model.DriverPhone
+            </span>   
+        </td>
+    </tr>
+    <tr>
+        <td >
+            <p>Коментар/Comment:</p>@Model.Comment
+        </td>
+        <td>
+            <p class="font-italic">Допълнителни изисквания/Additional requirements:</p><br />
+            <span>Не се разрешава разпалетизиране на стоката.Камионът да разполага с поне 11 колана.</span>
+            <hr />
+            <span>Unpacking of the goods is not allowed.Truck should have at least 11 belts.</span>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+<p>Нормативна база: Конвенция CMR, TIR, (АDR-само за опасни товари), ЗЗД, ТЗ</p>
+<p>We work in accordance with the CMR convention and the Standard Trading and Warehousing Conditions of the Bulgarian Association for Freight Forwarding, Transport and Logistics.</p>
+        </td>
+    </tr>
+    <tr>
+        <td>
+               <p>С настоящето потвърждаваме следното:</p> 
+          <content>
+            <ul>
+                <li>
+                Тази заявка представлява договор за транспорт.
+                </li>
+                <li>
+                Превозвачът се задължава да представи валидна застрахова за отговорността си за нанесени щети на пратката до
+                стойности, определени в чл.71, т.3 от Закона за автомобилни превози и чл.23, т3 и т.4 от Конвенцията за договора за
+                международен автомобилен превоз на стоки, покриваща до 12 USD на килограм, но не повече от фактурната стойност
+                на пратката.
+                </li>
+                <li>
+                При неявяване на автомобила на уговорената дата на товарене, ПРЕВОЗВАЧА заплаща 100 eur неустойка.
+                </li>
+                <li>
+                При неспазване на горепосочените условия, възниквалите спорове ще се решават в арбитражния съд в гр.Варна.
+                </li>
+            </ul>
+        </content>
+        </td>
+        <td>
+                    <p> We hereby confirm the following:</p>
+        <content>
+             <ul>
+                <li>
+                This application is a transport contract.
+                </li>
+                <li>
+                The carrier shall present a valid insurance for liability for damage to the consignment to the values specified in Article 71, item 3 of
+                the Law on Road Transport and Article 23, T3 and 4 of the Convention on the Contract for International carriage of goods by covering
+                up to 12 USD per kilogram but not exceeding the invoice value of the consignment.
+                </li>
+                <li>
+                If the car is missing on the agreed loading date, the CARRIER pays a penalty of 100 eur.
+                </li>
+                <li>
+                 Failure to comply with the above conditions arising disputes will be resolved in the arbitration court in Varna, Bulgaria
+                </li>
+            </ul>
+        </content>
+     </td>
+    </tr>
+    </tbody>
+</table>
+<div>
+     <a class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportServiceOrderExcel"><i
+              class="fas fa-print text-primary"></i>Download Excel</a>
+</div>

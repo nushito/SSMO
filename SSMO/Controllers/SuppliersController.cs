@@ -36,10 +36,9 @@ namespace SSMO.Controllers
         [Authorize]
         public IActionResult AddSupplier(AddSupplierModel model)
         {
+            string userId = this.User.UserId();
             if (model.Name != null)
-            {
-                string userId = this.User.UserId();
-
+            {                
                 var listMyCompany = mycompanyService.GetCompaniesUserId();
 
                 if (!listMyCompany.Contains(userId))
@@ -56,10 +55,10 @@ namespace SSMO.Controllers
             {
                 return View();
             }
-
+            
             var supplier = supplierService.AddNewSupplier
                 (model.Name, model.VAT, model.Eik, model.Email, model.City, model.SupplierAddress, 
-                model.Country, model.RepresentativePerson, model.FSCSertificate);
+                model.Country, model.RepresentativePerson, model.FSCSertificate, userId);
            
             if (supplier == false) return View(model);
 
@@ -70,10 +69,9 @@ namespace SSMO.Controllers
         [Authorize]
         public IActionResult EditSupplier(EditSupplierViewModel model)
         {
+            string userId = this.User.UserId();
             if (model.SupplierName != null)
-            {
-                string userId = this.User.UserId();
-
+            {    
                 var listMyCompany = mycompanyService.MyCompaniesNamePerSupplier(model.SupplierName);
 
                 if (!listMyCompany.Contains(userId))
@@ -86,7 +84,7 @@ namespace SSMO.Controllers
                 return RedirectToAction("Index", "Home");
             }
 
-            var supplierNames = supplierService.GetSupplierNames();
+            var supplierNames = supplierService.GetSupplierNames(userId);
             model.SupplierNames = supplierNames;
             model.SupplierForEdit = supplierService.GetSupplierForEdit(model.SupplierName); 
             return View(model);

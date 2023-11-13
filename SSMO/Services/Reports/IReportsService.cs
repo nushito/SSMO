@@ -4,6 +4,7 @@ using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.PrrobaCascadeDropDown;
 using SSMO.Models.Reports.Purchase;
+using SSMO.Models.Reports.ServiceOrders;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using System;
 using System.Collections.Generic;
@@ -26,9 +27,9 @@ namespace SSMO.Services.Reports
                 string loadingPlace,
                 string deliveryAddress,
                int currencyId, int status,
-               string fscClaim, string fscCertificate,
-               decimal paidAdvance, bool paidStatus,
-               IList<ProductCustomerFormModel> products, List<int> banks, int? fiscalAgentId, int? fscText);
+               string fscClaim, string fscCertificate,              
+               IList<ProductCustomerFormModel> products, List<int> banks, 
+               int? fiscalAgentId, int? fscText, string paymentTerms, string eta, string etd);
         public IEnumerable<CustomerOrderListViewBySupplier> GetCustomerOrdersBySupplier(int customerId, string supplierId);
         public CustomerInvoicesPaymentCollectionViewModel CustomersInvoicesPaymentDetails(string customerName, int currentpage, int customerInvoicePerPage);
         public SupplierInvoiceCollectionViewModel SuppliersInvoicesPaymentDetails(string supplierName, int currentpage, int supplierInvoicePerPage);
@@ -54,6 +55,9 @@ namespace SSMO.Services.Reports
 
         public PurchaseCollectionQueryModel PurchaseInvoices
             (string supplierName, DateTime startDate, DateTime endDate, int currentpage, int invoiceperPage);
+
+        public ServiceOrdersQueryModel ServiceOrdersCollection
+            (int companyId, DateTime startDate, DateTime endDate, int currentPage, int ordersPerPage);
 
     }
 }

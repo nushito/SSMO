@@ -10,7 +10,9 @@ namespace SSMO.Data.Models
         public string Details { get; set; }
         public string BgName { get; set; }
         public string BgDetails { get; set; }
+        public string UserId { get; set; }
         public ICollection<Document>  Documents { get; set; }
         public ICollection<CustomerOrder> CustomerOrders { get; set; }
+        public ICollection<ServiceOrder> ServiceOrders { get; set; } //transportni zayavki
     }
 }

@@ -283,7 +283,7 @@ namespace SSMO.Services.Products
 
         public ICollection<string> GetFascCertMyCompany()
         {
-            var fscCert = dbContext.MyCompanies.Select(f => f.FSCSertificate).ToList();
+            var fscCert = dbContext.MyCompanies.Select(f => f.FscSertificate).ToList();
             return fscCert;
         }
         public string GetDescriptionName(int id)
@@ -381,7 +381,7 @@ namespace SSMO.Services.Products
             (int? descriptionId, int? gradeId, int? sizeId, int currentPage = 1, int productsPerPage = int.MaxValue)
         {
             var products = dbContext.Products
-               .Where(d => d.LoadedQuantityM3 != 0 && d.SoldQuantity < d.OrderedQuantity);
+               .Where(d => d.LoadedQuantity != 0 && d.SoldQuantity < d.OrderedQuantity);
                
 
             if (descriptionId != null)
@@ -426,8 +426,8 @@ namespace SSMO.Services.Products
                     Description = GetDescriptionName(product.DescriptionId),
                     Size = GetSizeName(product.SizeId),
                     Grade = GetGradeName(product.GradeId),
-                    LoadedQuantity = product.LoadedQuantityM3,
-                    QuantityOnStock = product.LoadedQuantityM3 - product.SoldQuantity,        
+                    LoadedQuantity = product.LoadedQuantity,
+                    QuantityOnStock = product.LoadedQuantity - product.SoldQuantity,        
                     SupplierName = supplierName,
                     CustomerProductsDetails = new List<ProductDetailsForEachCustomerOrderViewModel>(),
                     PurchaseProductDetails = new List<PurchaseProductDetailsListViewModel>()
@@ -534,14 +534,14 @@ namespace SSMO.Services.Products
                 .Where(i => i.Id == productId) 
                 .FirstOrDefault();
 
-            product.LoadedQuantityM3 = 0;   
+            product.LoadedQuantity = 0;   
         }
         public void NewLoadingQuantityToEditPurchase(int productId, int purchaseId)
         {
             var product = dbContext.Products
                 .Where(i => i.Id == productId).FirstOrDefault();
 
-            product.LoadedQuantityM3 = product.OrderedQuantity;
+            product.LoadedQuantity = product.OrderedQuantity;
             dbContext.SaveChanges();
         }
         public ICollection<string> GetUnits()
@@ -574,7 +574,7 @@ namespace SSMO.Services.Products
                 var mainProduct = dbContext.Products
                     .Where(i=>i.Id == product.ProductId).FirstOrDefault();
                 //TODO dali invoicedquantity da e = loadedquantity?
-                if (mainProduct.LoadedQuantityM3 > 0)
+                if (mainProduct.LoadedQuantity > 0)
                 {
                     var productForInvoice = new ProductsForInvoiceViewModel
                     {

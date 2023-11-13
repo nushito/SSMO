@@ -35,6 +35,5 @@ namespace SSMO.Services.Documents.Purchase
         public List<PurchaseProductAsSupplierOrderViewModel> Products(int id);
         public IList<PurchaseProductsForDebitNoteViewModel> PurchaseProducts();
 
-        public ICollection<PurchaseInvoiceListJson> GetPurchaseInvoices(int id);
     }
 }

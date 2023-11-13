@@ -21,21 +21,24 @@
             </select>
         </div>
          <div class="row col-md-4 mb-3">           
-             <label class="control-label"> Select Invoice</label>
+             <label asp-for="InvoiceId" class="control-label"> Select Invoice</label>
              <select class="form-control" id="InvoiceNumber" name="InvoiceId" asp-for="InvoiceId" asp-items="@(new SelectList(string.Empty,"InvoiceId", "InvoiceNumber"))"></select>               
         </div>    
         <div class="row col-md-4">
-        <label asp-for="Date" >Date Credit note</label>
-        <input itemid="date" asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
-        <span asp-validation-for="Date" class="small text-danger"></span>
+            <label asp-for="Date" >Date Credit note</label>
+            <input itemid="date" asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
+            <span asp-validation-for="Date" class="small text-danger"></span>
         </div>
 
          <div class="row col-md-4">
-        <label asp-for="CreditNoteDeliveryAddress" >Delivery Address</label>
-        <input asp-for="CreditNoteDeliveryAddress" type="text" class="form-control"/> 
-        <span asp-validation-for="CreditNoteDeliveryAddress" class="small text-danger"></span>
+            <label asp-for="CreditNoteDeliveryAddress" >Delivery Address</label>
+            <input asp-for="CreditNoteDeliveryAddress" type="text" class="form-control"/> 
+            <span asp-validation-for="CreditNoteDeliveryAddress" class="small text-danger"></span>
         </div>
-        
+        <div class="row col-md-4">
+           <label asp-for="PaymentTerms">Payment Terms</label>
+           <input asp-for="PaymentTerms" type="text" class="form-control"/>
+       </div>
         <div class="row col-md-4">         
          <input id="quantityBack" class="form-check-input" type="checkbox" asp-for="QuantityBack" name="quantityBack">
          <label asp-for="QuantityBack">Quantity back</label>

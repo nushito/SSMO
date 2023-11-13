@@ -47,15 +47,28 @@
                 <input type="text" class="form-control" asp-for="Company.Street" placeholder="Street">
                 <span asp-validation-for="Company.Street" class="small text-danger"></span>
             </div>
-    @* <div class="form-group">
-                <label asp-for="FSCClaim">FSC Claim</label>
-                <input type="text" class="form-control" asp-for="FSCClaim" placeholder="Street">
-                <span asp-validation-for="FSCClaim" class="small text-danger"></span>
-            </div>*@
+            <br />
+             <p style="font-weight:200">Corresponding Address:</p>
              <div class="form-group">
-                <label asp-for="Company.FSCSertificate">FSC Certificate code</label>
-                <input type="text" class="form-control" asp-for="Company.FSCSertificate" placeholder="FSC Certificate code">
-                <span asp-validation-for="Company.FSCSertificate" class="small text-danger"></span>
+                <label asp-for="Company.CorrespondCountry">Country</label>
+                <input type="text" class="form-control" asp-for="Company.CorrespondCountry" placeholder="Country">
+                <span asp-validation-for="Company.CorrespondCountry" class="small text-danger"></span>
+            </div>           
+            <div class="form-group">
+                <label asp-for="Company.CorrespondCity">City</label>
+                <input type="text" class="form-control" asp-for="Company.CorrespondCity" placeholder="City">
+                <span asp-validation-for="Company.CorrespondCity" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company.CorrespondStreet">Street</label>
+                <input type="text" class="form-control" asp-for="Company.CorrespondStreet" placeholder="Street">
+                <span asp-validation-for="Company.CorrespondStreet" class="small text-danger"></span>
+            </div>
+
+             <div class="form-group">
+                <label asp-for="Company.FscSertificate">FSC Certificate code</label>
+                <input type="text" class="form-control" asp-for="Company.FscSertificate" placeholder="FSC Certificate code">
+                <span asp-validation-for="Company.FscSertificate" class="small text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Company.RepresentativePerson">Representative</label>
@@ -84,6 +97,22 @@
                 <label asp-for="Company.BgStreet">Адрес</label>
                 <input type="text" class="form-control" asp-for="Company.BgStreet" placeholder="Улица">
                 <span asp-validation-for="Company.BgStreet" class="small text-danger"></span>
+            </div>
+             <p style="font-weight:200">Адрес за кореспонденция:</p>
+             <div class="form-group">
+                <label asp-for="Company.CorrespondBgCountry">Държава</label>
+                <input type="text" class="form-control" asp-for="Company.CorrespondBgCountry" placeholder="Country">
+                <span asp-validation-for="Company.CorrespondBgCountry" class="small text-danger"></span>
+            </div>           
+            <div class="form-group">
+                <label asp-for="Company.CorrespondBgCity">Град</label>
+                <input type="text" class="form-control" asp-for="Company.CorrespondBgCity" placeholder="City">
+                <span asp-validation-for="Company.CorrespondBgCity" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Company.CorrespondStreet">Улица</label>
+                <input type="text" class="form-control" asp-for="Company.CorrespondStreet" placeholder="Street">
+                <span asp-validation-for="Company.CorrespondBgStreet" class="small text-danger"></span>
             </div>
              <div class="form-group">
                 <label asp-for="Company.BgRepresentativePerson">Управител</label>

@@ -1,16 +1,12 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using DocumentFormat.OpenXml.Drawing;
-using DocumentFormat.OpenXml.Office2010.Excel;
-using Microsoft.AspNetCore.Mvc;
 using SSMO.Data;
 using SSMO.Data.Models;
 using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.Purchase;
-using SSMO.Models.Products;
 using SSMO.Models.Reports.PaymentsModels;
-using SSMO.Services.Documents.Purchase;
 using SSMO.Services.Products;
+using SSMO.Services.TransportService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,7 +59,6 @@ namespace SSMO.Services.SupplierOrders
 
             return supplierSpec.Id;
         }
-
         public bool EditSupplierOrderPurchasePayment
             (int id, decimal? paidAdvance, DateTime? date, string newCurrency, string action, decimal? exchangeRate,
              ICollection<PurchaseNewpaymentsPerOrderFormModel> purchasePayments)
@@ -81,32 +76,30 @@ namespace SSMO.Services.SupplierOrders
                 return false;
             }
 
+            var newPayment = new Payment();
 
-            if(paidAdvance > 0.001m)            {               
-
-                var orderPayment = new Payment
-                {
-                    PaidAmount = (decimal)paidAdvance,
-                    Date = (DateTime)date,
-                    SupplierOrderId = id,
-                    CurrencyId = supplierOrder.CurrencyId,
-                    CurruncyRateExchange = exchangeRate
-                };
+            if(paidAdvance > 0.001m)            
+            {
+                newPayment.PaidAmount = (decimal)paidAdvance;
+                newPayment.Date = (DateTime)date;
+                newPayment.SupplierOrderId = id;
+                newPayment.CurrencyId = supplierOrder.CurrencyId;
+                newPayment.CurruncyRateExchange = exchangeRate;
 
                 if (exchangeRate != 0 && newCurrency != null)
                 {
                     var currencyId = dbContext.Currencies
                         .Where(i=>i.Name.ToLower() == newCurrency.ToLower())
                         .Select(i=>i.Id).FirstOrDefault();
-                    orderPayment.CurrencyForCalculationsId = currencyId;
+                    newPayment.CurrencyForCalculationsId = currencyId;
 
                     switch (action)
                     {
-                        case "/": 
-                            orderPayment.NewAmountPerExchangeRate = (decimal)paidAdvance / exchangeRate ?? 0;                            
+                        case "/":
+                            newPayment.NewAmountPerExchangeRate = (decimal)paidAdvance / exchangeRate ?? 0;                            
                             break;
-                        case "*": 
-                            orderPayment.NewAmountPerExchangeRate = (decimal)paidAdvance * exchangeRate ?? 0; 
+                        case "*":
+                            newPayment.NewAmountPerExchangeRate = (decimal)paidAdvance * exchangeRate ?? 0; 
                             break;
                         default: break;
                     }
@@ -114,13 +107,12 @@ namespace SSMO.Services.SupplierOrders
 
                 supplierOrder.Balance -= paidAdvance ?? 0;
 
-                dbContext.Payments.Add(orderPayment);
-                supplierOrder.Payments.Add(orderPayment);
+                dbContext.Payments.Add(newPayment);
+                supplierOrder.Payments.Add(newPayment);
 
                 dbContext.SaveChanges();
             }
-
-            
+                        
             if(supplierOrder.Balance <= 0.001m)
             {
                 supplierOrder.PaidStatus = true;
@@ -132,7 +124,6 @@ namespace SSMO.Services.SupplierOrders
                 supplierOrder.PaidStatus = false;
             }
 
-
             foreach (var payment in purchasePayments)
             {
                 if(payment.NewPaidAmount > 0.001m)
@@ -140,38 +131,31 @@ namespace SSMO.Services.SupplierOrders
                     var purchaseInvoice = dbContext.Documents.Find(payment.Id);
                     DateTime newDate = (DateTime)payment.NewDatePaidAmount;
 
-                    var invoicePayment = new Payment
-                    {
-                        PaidAmount = payment.NewPaidAmount,
-                        Date = newDate,
-                        DocumentId = purchaseInvoice.Id,
-                        CurrencyId = purchaseInvoice.CurrencyId,
-                        CurruncyRateExchange = exchangeRate
-                    };
+                    newPayment.PaidAmount = payment.NewPaidAmount;
+                    newPayment.Date = newDate;
+                    newPayment.DocumentId = purchaseInvoice.Id;
+                    newPayment.CurrencyId = purchaseInvoice.CurrencyId;
+                    newPayment.CurruncyRateExchange = exchangeRate;
+                    newPayment.SupplierOrderId = supplierOrder.Id;                                     
 
                     if (exchangeRate != 0 && newCurrency != null)
                     {
                         var currencyId = dbContext.Currencies
                             .Where(i => i.Name.ToLower() == newCurrency.ToLower())
                             .Select(i => i.Id).FirstOrDefault();
-                        invoicePayment.CurrencyForCalculationsId = currencyId;
+                        newPayment.CurrencyForCalculationsId = currencyId;
 
                         switch (action)
                         {
                             case "/":
-                                invoicePayment.NewAmountPerExchangeRate = (decimal)payment.NewPaidAmount / exchangeRate ?? 0;
+                                newPayment.NewAmountPerExchangeRate = (decimal)payment.NewPaidAmount / exchangeRate ?? 0;
                                 break;
                             case "*":
-                                invoicePayment.NewAmountPerExchangeRate = (decimal)payment.NewPaidAmount * exchangeRate ?? 0;
+                                newPayment.NewAmountPerExchangeRate = (decimal)payment.NewPaidAmount * exchangeRate ?? 0;
                                 break;
                             default: break;
                         }
-
-                        dbContext.Payments.Add(invoicePayment);
-                        purchaseInvoice.Payments.Add(invoicePayment);
-                        dbContext.SaveChanges();
-
-                        productService.CalculateCostPriceInDiffCurrency(payment.Id, action);
+                                               
                         supplierOrder.Balance -= payment.NewPaidAmount;
                         purchaseInvoice.Balance -= payment.NewPaidAmount;
 
@@ -187,8 +171,8 @@ namespace SSMO.Services.SupplierOrders
                         continue;
                     }
 
-                    dbContext.Payments.Add(invoicePayment);
-                    purchaseInvoice.Payments.Add(invoicePayment);
+                    dbContext.Payments.Add(newPayment);
+                    purchaseInvoice.Payments.Add(newPayment);                                  
 
                     supplierOrder.Balance -= payment.NewPaidAmount;
                     purchaseInvoice.Balance -= payment.NewPaidAmount;
@@ -202,6 +186,13 @@ namespace SSMO.Services.SupplierOrders
                         supplierOrder.PaidStatus = true;                       
                         return true;
                     }
+                }
+
+                if (payment.IsChecked == true)
+                {
+                    newPayment.DocumentId = payment.Id;
+                    dbContext.SaveChanges();
+                    productService.CalculateCostPriceInDiffCurrency(payment.Id, action);
                 }
             }
 
@@ -237,17 +228,14 @@ namespace SSMO.Services.SupplierOrders
                 PurchasePaymentsCollection = new List<PurchaseNewpaymentsPerOrderFormModel>(),
                 Currency= currency,
                 ConvertToThatCurrency = costPriceCurrency
-            };
-           
+            };           
            
             foreach (var purchase in purchases)
-            {
-               
+            {               
                 var purchasePayment = new PurchaseNewpaymentsPerOrderFormModel
                 {
                     Id= purchase.Id,
-                    PurchaseNumber = purchase.PurchaseNumber,
-                    
+                    PurchaseNumber = purchase.PurchaseNumber                    
                 };
 
                 supplierOrderForEdit.PurchasePaymentsCollection.Add(purchasePayment);
@@ -393,6 +381,7 @@ namespace SSMO.Services.SupplierOrders
             return supplierOrders;
         }
 
+        //izchislqva sumata i balansa na specifikaciyata ot dostavchika
         public async Task TotalAmountAndQuantitySum(int supplierOrderId)
         {
            var spOrder = dbContext.SupplierOrders.Find(supplierOrderId);
@@ -403,5 +392,19 @@ namespace SSMO.Services.SupplierOrders
           await dbContext.SaveChangesAsync();    
           
         }
+
+        public ICollection<SupplierOrderJsonListForServiceOrder> GetSupplierOrder(int id)
+        {
+            var supplierId = dbContext.Suppliers.Where(a => a.Id.Equals(id)).Select(i => i.Id).FirstOrDefault();
+            return dbContext.SupplierOrders
+                .Where(s => s.SupplierId == supplierId)
+                .Select(n => new SupplierOrderJsonListForServiceOrder
+                {
+                    SupplierOrderId = n.Id,
+                    SupplierOrderNumber = n.Number
+                   
+                }).ToList();
+        }
+
     }
 }

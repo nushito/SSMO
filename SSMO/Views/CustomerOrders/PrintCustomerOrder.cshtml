@@ -4,17 +4,18 @@
     var i = 0;
 }
 
-<div class="card">
+<div class="card print">
   <div class="card-body">
     <div class="container mb-5 mt-3">
       <div class="row d-flex align-items-baseline">
         <div class="col-xl-9">
           <p style="color: #7e8d9f;font-size: 20px;">@Model.Type: <strong>@Model.OrderConfirmationNumber</strong></p>
         </div>
-        <div class="col-xl-3 float-end">
+        <div class="col-xl-3 float-end"> 
           <a class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark"><i
               class="fas fa-print text-primary"></i> Print</a>
-          <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" asp-controller="Reportts" asp-action="ExportCoToExcel"><i
+              <form method="post" asp-action="Pdf" asp-controller="Exports"><input type="submit" value="Convert To PDF"></form>
+          <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportCoToExcel"><i
               class="far fa-file-pdf text-danger"></i> Export xls</a>              
         </div>
         <hr>
@@ -58,8 +59,7 @@
                    <li class="text-muted">Customer Po No: <span style="color:#5d9fc5 ;">@Model.CustomerPoNumber                                  
                   </span></li>
               <li class="text-muted">Delivery Terms: <span style="color:#5d9fc5 ;">@Model.DeliveryTerms</span></li>             
-              <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;">-</span></li>
-               <li class="text-muted">Gross Weight: <span style="color:#5d9fc5 ;">-</span></li>
+              
             </ul>
           </div>
           <div class="col-xl-4">
@@ -72,7 +72,13 @@
                        
               </div>
             </div>
-                       
+           <div class="col-xl-4">
+               Delivery Period: @Model.Eta <br />
+           </div>    
+            <div class="col-xl-4">
+               Ship to address: @Model.DeliveryAddress<br />
+               
+           </div>
             <div class="row my-2 mx-1 justify-content-center">
               <table class="table table-striped table-borderless">
                 <thead style="background-color:#84B0CA ;" class="text-white">
@@ -122,7 +128,13 @@
         </div>
         <hr>
          <div>
-                <p>@Model.Comment</p>
+             <ul class="list-unstyled">
+             <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;">-</span></li>
+               <li class="text-muted">Gross Weight: <span style="color:#5d9fc5 ;">-</span></li>
+                <li>Notes: @Model.Comment</li>
+                <li>Country of origin:@Model.Origin</li>
+         </ul>
+             
             </div>
         <table class="table-borderless">            
             <tr>
@@ -130,6 +142,9 @@
                     Event Date: @Model.Date.ToShortDateString() <br />
                     Deal Type: @Model.DealType <br />
                    Description of the deal: @Model.DealDescription
+                </td>
+                <td class="px-3 mr-5">
+                   Payment Terms: @Model.PaymentTerms
                 </td>
             </tr>
            <tr></tr>

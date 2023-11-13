@@ -16,7 +16,13 @@ namespace SSMO.Data.Models
         public string City { get; set; }
         public string Bgcountry { get; set; }
         [Required]
-        public string Country { get; set; }      
+        public string Country { get; set; }
+        public string CorrespondBgCountry { get; set; }
+        public string CorrespondBgCity { get; set; }
+        public string CorrespondBgStreet { get; set; }
+        public string CorrespondCountry { get; set; }
+        public string CorrespondCity { get; set; }
+        public string CorrespondStreet { get; set; }
         public MyCompany MyCompany { get; set; }       
         public Supplier Suppliers { get; set; }       
         public Customer Customers { get; set; }

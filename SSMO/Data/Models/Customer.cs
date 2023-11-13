@@ -29,6 +29,7 @@ namespace SSMO.Data.Models
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        public string UserId { get; set; }
         public ICollection<CustomerOrder> Orders { get; set; }
         public ICollection<Document> Invoices { get; set; }
     }

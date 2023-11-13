@@ -3,6 +3,7 @@ using SSMO.Models.Documents.Purchase;
 using SSMO.Models.Products;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Services.Documents.Purchase;
+using SSMO.Services.TransportService;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -32,5 +33,7 @@ namespace SSMO.Services.SupplierOrders
         public ICollection<SupplierOrdersNumbersListViewModel> GetSupplierOrdersNumbersJsonList(int id);
         public ICollection<SupplierOrdersBySupplier> SuppliersAndOrders();
 
+        //get Json list na specifikacii ot dostavchici 
+        public ICollection<SupplierOrderJsonListForServiceOrder> GetSupplierOrder(int id);
     }
 }

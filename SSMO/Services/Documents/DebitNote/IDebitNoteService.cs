@@ -11,11 +11,14 @@ namespace SSMO.Services.Documents.DebitNote
     {
         public CreditAndDebitNoteViewModel CreateDebitNote
            (int invoiceId, DateTime date,bool moreQuantity,string deliveryAddress,
-            List<AddProductsToCreditAndDebitNoteFormModel> products, List<PurchaseProductsForDebitNoteViewModel> availableProducts);
+            List<AddProductsToCreditAndDebitNoteFormModel> products, 
+            List<PurchaseProductsForDebitNoteViewModel> availableProducts,string paymentTerms);
 
         public EditDebitNoteViewModel ViewDebitNoteForEdit(int id);
 
-        public bool EditDebitNote(int id, DateTime date, string incoterms, string comment, List<EditProductForDebitNoteViewModel> products);
+        public bool EditDebitNote
+            (int id, DateTime date, string incoterms, string comment, 
+            List<EditProductForDebitNoteViewModel> products, string paymentTerms);
 
         public ICollection<InvoiceNumbersForEditedDebitNoteViewModel> GetInvoiceNumbers();
 

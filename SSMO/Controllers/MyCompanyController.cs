@@ -9,6 +9,8 @@ using SSMO.Services;
 using SSMO.Services.MyCompany;
 using SSMO.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 
 namespace SSMO.Controllers
 {
@@ -48,9 +50,11 @@ namespace SSMO.Controllers
             string userId = this.User.UserId();//this.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var isCompanyRegistered = mycompany.RegisterMyCompany(
-                model.Name, model.EIK, model.VAT, model.FSCSertificate, userId, model.City, 
+                model.Name, model.EIK, model.VAT, model.FscSertificate, userId, model.City, 
                 model.Street, model.Country, model.RepresentativePerson, model.BgName,
-                model.BgCity, model.BgStreet, model.BgCountry, model.RepresentativePerson);
+                model.BgCity, model.BgStreet, model.BgCountry, model.RepresentativePerson,
+                model.CorrespondCountry, model.CorrespondCity,model.CorrespondStreet,
+                model.CorrespondBgCountry, model.CorrespondBgCity, model.CorrespondBgStreet);
 
             if (!isCompanyRegistered) return View();
            
@@ -127,9 +131,11 @@ namespace SSMO.Controllers
             if (!ModelState.IsValid) { return BadRequest(); }
 
             var isEdited = mycompany.EditCompany(id, model.Company.Name, model.Company.BgName, model.Company.EIK, model.Company.VAT,
-                model.Company.FSCClaim, model.Company.FSCSertificate, model.Company.RepresentativePerson, 
+                model.Company.FscClaim, model.Company.FscSertificate, model.Company.RepresentativePerson, 
                 model.Company.BgRepresentativePerson, model.Company.Street, model.Company.BgStreet, 
-                model.Company.City, model.Company.BgCity, model.Company.Country, model.Company.BgCountry);
+                model.Company.City, model.Company.BgCity, model.Company.Country, model.Company.BgCountry,
+                model.Company.CorrespondCountry, model.Company.CorrespondCity, model.Company.CorrespondStreet,
+                model.Company.CorrespondBgCountry, model.Company.CorrespondBgCity, model.Company.CorrespondBgStreet);
 
             if(!isEdited) { return BadRequest(); }
 

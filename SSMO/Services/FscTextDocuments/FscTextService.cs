@@ -18,12 +18,13 @@ namespace SSMO.Services.FscTextDocuments
             mapper = configurationProvider;
         }
 
-        public void AddFscText(string textEng, string textBg)
+        public void AddFscText(string textEng, string textBg, string userId)
         {
             var text = new FscText
             {
                 FscTextEng = textEng,
-                FscTextBg = textBg
+                FscTextBg = textBg,
+                UserId = userId
             };
 
             dbContext.FscTexts.Add(text);

@@ -39,7 +39,7 @@ namespace SSMO.Data
         public DbSet<FiscalAgent> FiscalAgents { get; set; }
         public DbSet<FscText> FscTexts { get; set; }
         public DbSet<TransportCompany> TransportCompanies { get; set; }
-
+        public DbSet<Image> Images { get; set; }    
         protected override void OnModelCreating(ModelBuilder builder)
         {
 
@@ -213,6 +213,11 @@ namespace SSMO.Data
                .HasPrecision(18, 2);
 
             builder.Entity<ServiceOrder>()
+               .Property(a => a.Balance)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 2);
+
+            builder.Entity<ServiceOrder>()
                 .HasOne(c=>c.Currency)
                 .WithMany(s=>s.ServiceOrders)
                 .HasForeignKey(c => c.CurrencyId)
@@ -228,12 +233,34 @@ namespace SSMO.Data
                 .HasOne(c=>c.Document)
                 .WithMany(c=>c.ServiceOrders)
                 .HasForeignKey(c => c.DocumentId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
-           builder.Entity<ServiceOrder>()
+            builder.Entity<ServiceOrder>()
+                .HasOne(c => c.SupplierOrder)
+                .WithMany(c => c.ServiceOrders)
+                .HasForeignKey(c => c.SupplierOrderId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ServiceOrder>()
+                 .HasOne(c => c.CustomerOrder)
+                 .WithMany(c => c.ServiceOrders)
+                 .HasForeignKey(c => c.CustomerOrderId)
+                 .IsRequired(false)
+                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ServiceOrder>()
                 .HasOne(a=>a.TransportCompany) 
                 .WithMany(s=>s.ServiceOrders)
                 .HasForeignKey(a=>a.TransportCompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<ServiceOrder>()
+                .HasOne(a => a.FiscalAgent)
+                .WithMany(s => s.ServiceOrders)
+                .HasForeignKey(f => f.FiscalAgentId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Product>()
@@ -272,7 +299,7 @@ namespace SSMO.Data
                 .HasPrecision(18, 5);
 
             builder.Entity<Product>()
-                .Property(a => a.LoadedQuantityM3)
+                .Property(a => a.LoadedQuantity)
                 .HasColumnType("decimal")
                 .HasPrecision(18, 5);
 
@@ -755,8 +782,6 @@ namespace SSMO.Data
             .HasForeignKey(d => d.FscTextId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
-
-            
 
             base.OnModelCreating(builder);
         }

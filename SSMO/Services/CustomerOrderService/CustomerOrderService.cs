@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using ClosedXML.Excel;
 using Microsoft.EntityFrameworkCore;
 using SSMO.Data;
 using SSMO.Data.Models;
@@ -13,6 +12,7 @@ using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Repository;
 using SSMO.Services.Products;
+using SSMO.Services.TransportService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,16 +47,17 @@ namespace SSMO.Services.CustomerOrderService
         public async Task<int> CreateOrder(string num, DateTime date, int customerId, int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,int currency,string origin, 
             int vat, int statusId, List<int> supplierOrders, string comment, 
-            List<int> banks, string type, int? fiscalAgentId, string dealType, string dealDescription, int? fscText)
+            List<int> banks, string type, int? fiscalAgentId, string dealType, string dealDescription, 
+            int? fscText, string paymentTerms, string eta, string etd)
         {
            
             var fscClaim = dbContext.MyCompanies
                 .Where(a => a.Id == company)
-                .Select(a => a.FSCClaim).FirstOrDefault();
+                .Select(a => a.FscClaim).FirstOrDefault();
 
             var fscCertificate = dbContext.MyCompanies
                .Where(a => a.Id == company)
-               .Select(a => a.FSCSertificate).FirstOrDefault();
+               .Select(a => a.FscSertificate).FirstOrDefault();
 
             var banksForOrder = dbContext.BankDetails
                 .Include(a=>a.CustomerOrders)
@@ -90,7 +91,10 @@ namespace SSMO.Services.CustomerOrderService
                 BankDetails= new List<BankDetails>(),
                 Type= type,
                 DealType= dealType,
-                DealDescription= dealDescription                
+                DealDescription= dealDescription,
+                PaymentTerms= paymentTerms,
+                Eta = eta,
+                Etd = etd
             };
 
             if (fiscalAgentId != null)
@@ -167,15 +171,16 @@ namespace SSMO.Services.CustomerOrderService
             int customerId, int company, string deliveryTerms, string loadingAddress, 
             string deliveryAddress, int currency, string origin, 
            int vat, int statusId, List<int> supplierOrders, string comment, 
-           List<int> banks, string type, int? fiscalAgentId, string dealType, string dealDescription, int? fscText)
+           List<int> banks, string type, int? fiscalAgentId, string dealType, string dealDescription, 
+           int? fscText, string paymentTerms, string eta, string etd)
         {
             var fscClaim = dbContext.MyCompanies
                  .Where(a => a.Id == company)
-                 .Select(a => a.FSCClaim).FirstOrDefault();
+                 .Select(a => a.FscClaim).FirstOrDefault();
 
             var fscCertificate = dbContext.MyCompanies
                .Where(a => a.Id == company)
-               .Select(a => a.FSCSertificate).FirstOrDefault();
+               .Select(a => a.FscSertificate).FirstOrDefault();
 
             var banksForOrder = dbContext.BankDetails
                 .Include(c=>c.CustomerOrders)
@@ -204,6 +209,9 @@ namespace SSMO.Services.CustomerOrderService
                 Type = type,
                 DealType = dealType,
                 DealDescription = dealDescription,
+                PaymentTerms= paymentTerms,
+                Eta = eta,
+                Etd = etd
             };
 
             banksForOrder.ForEach(i => order.BankDetails.Add(i));
@@ -404,7 +412,9 @@ namespace SSMO.Services.CustomerOrderService
                 Vat = order.Vat,
                 DealType = order.DealType,
                 DealDescription = order.DealDescription,
-                BankDetails = new List<BankDetailsViewModel>()               
+                BankDetails = new List<BankDetailsViewModel>(),
+                PaymentTerms = order.PaymentTerms,
+                Eta = order.Eta,
             };
 
             var myCompany = dbContext.MyCompanies
@@ -419,7 +429,7 @@ namespace SSMO.Services.CustomerOrderService
                     .FirstOrDefault();
             }
 
-            model.FscCertificate = myCompany.FSCSertificate;
+            model.FscCertificate = myCompany.FscSertificate;
 
             var companyAddress = dbContext.Addresses
                 .Where(I => I.Id == myCompany.AddressId)
@@ -456,7 +466,7 @@ namespace SSMO.Services.CustomerOrderService
                 City = companyAddress.City,
                 Country= companyAddress.Country,
                 Street= companyAddress.Street,
-                FscCertificate = myCompany.FSCSertificate
+                FscCertificate = myCompany.FscSertificate
             };
 
             foreach (var bankDetail in order.BankDetails)
@@ -485,7 +495,30 @@ namespace SSMO.Services.CustomerOrderService
                 product.Size = productService.GetSizeName(mainProduct.SizeId);
                 product.Grade = productService.GetGradeName(mainProduct.GradeId);
             }
+
+            if(order.FiscalAgentId != null)
+            {
+                model.FiscalAgent = dbContext.FiscalAgents
+                    .Where(i => i.Id == order.FiscalAgentId)
+                    .Select(n => new FiscalAgentPrintViewModel
+                    {
+                         Details = n.Details,
+                         Name = n.Name
+                    }).FirstOrDefault();                 
+            };
+
            return model;
+        }
+
+        public ICollection<CustomerOrderJsonListForServiceOrder> CustomerOrdersForService(int id)
+        {
+            return dbContext.CustomerOrders
+                .Where(i=>i.CustomerId == id)
+                .Select(n=> new CustomerOrderJsonListForServiceOrder
+                {
+                    CustomerOrderId = n.Id,
+                    CustomerOrderNumber = n.OrderConfirmationNumber
+                }).ToList();
         }
     }
 }

@@ -68,7 +68,7 @@ namespace SSMO.Services.Documents.Invoice
             decimal netWeight, decimal grossWeight, string incoterms,int customerId, int currencyId, int vat, 
             int myCompanyId, string comment, string deliveryAddress,
             string dealTypeEng, string dealTypeBg, string descriptionEng, string descriptionBg, List<int> banks, 
-            int? fiscalAgent, int? fscText)
+            int? fiscalAgent, int? fscText, string paymentTerms, string loadingAddress)
         {
             var loggedUser = httpContextAccessor.ContextAccessUserId();
             var myCompany = dbContext.MyCompanies
@@ -80,26 +80,7 @@ namespace SSMO.Services.Documents.Invoice
                .ToList();
 
             if (loggedUser != myCompany.UserId) { return null; }
-           
-            foreach (var product in products)
-            {
-                if (product.InvoicedQuantity == 0) continue;
-
-                var mainProduct = productRepository.GetMainProduct(product.ProductId);
-                if (mainProduct == null) continue;
-                mainProduct.SoldQuantity += product.InvoicedQuantity;
-
-                var size = productService.GetSizeName(mainProduct.SizeId);
-
-                var customerOrderProduct = dbContext.CustomerOrderProductDetails
-                    .Where(i => i.ProductId == product.ProductId && i.CustomerOrderId == product.CustomerOrderId)
-                    .FirstOrDefault();
-             
-                if(customerOrderProduct.AutstandingQuantity < product.InvoicedQuantity)
-                {
-                    return null;
-                }
-            }
+          
             var customerOrders = dbContext.CustomerOrders
                .Where(on => selectedCustomerOrderNumbers.Contains(on.Id))
                .ToList();
@@ -133,7 +114,9 @@ namespace SSMO.Services.Documents.Invoice
                 DealTypeBg = dealTypeBg,
                 DealDescriptionEng = descriptionEng,
                 DealDescriptionBg = descriptionBg,
-                BankDetails = new List<BankDetails>()
+                BankDetails = new List<BankDetails>(),
+                PaymentTerms = paymentTerms,
+                LoadingAddress = loadingAddress
             };
 
             if (CheckFirstInvoice(myCompanyId))
@@ -183,6 +166,7 @@ namespace SSMO.Services.Documents.Invoice
 
                 var mainProduct = productRepository.GetMainProduct(product.ProductId);
                 if (mainProduct == null) continue;
+
                 mainProduct.SoldQuantity += product.InvoicedQuantity;
                 
                 var size = productService.GetSizeName(mainProduct.SizeId);
@@ -194,6 +178,11 @@ namespace SSMO.Services.Documents.Invoice
                 var customerOrder = dbContext.CustomerOrders
                     .Where(i=>i.Id == product.CustomerOrderId)
                     .FirstOrDefault();
+
+                if (customerOrderProduct.AutstandingQuantity < product.InvoicedQuantity)
+                {
+                    continue;
+                }
 
                 customerOrderProduct.AutstandingQuantity -= product.InvoicedQuantity;
 
@@ -240,8 +229,7 @@ namespace SSMO.Services.Documents.Invoice
                     else if(!String.Equals(size, "-"))
                     {        
                         invoiceCreate.TotalQuantity += invoiceProduct.QuantityM3ForCalc;
-                    }
-              
+                    }              
 
                 invoiceProduct.TotalSheets = invoiceProduct.Pallets * invoiceProduct.SheetsPerPallet;               
                 invoiceProduct.Amount = invoiceProduct.SellPrice * invoiceProduct.InvoicedQuantity;
@@ -395,8 +383,8 @@ namespace SSMO.Services.Documents.Invoice
                 Country = addressCompany.Country,
                 Street = addressCompany.Street,
                 EIK = myCompany.Eik,
-                FSCClaim = myCompany.FSCClaim,
-                FSCSertificate = myCompany.FSCSertificate,
+                FSCClaim = myCompany.FscClaim,
+                FSCSertificate = myCompany.FscSertificate,
                 RepresentativePerson = myCompany.RepresentativePerson,
                 VAT = myCompany.VAT
             };
@@ -406,7 +394,7 @@ namespace SSMO.Services.Documents.Invoice
                 invoiceForPrint.FscTextEng = dbContext.FscTexts
                     .Where(i => i.Id == fscText)
                     .Select(n => n.FscTextEng).FirstOrDefault();
-                invoiceForPrint.FscCertificate = myCompany.FSCSertificate;
+                invoiceForPrint.FscCertificate = myCompany.FscSertificate;
             }
 
 
@@ -460,7 +448,9 @@ namespace SSMO.Services.Documents.Invoice
                 CurrencyId = invoice.CurrencyId,
                 CustomerOrders = invoice.CustomerOrders,
                 SupplierOrderId = invoice.SupplierOrderId,
-                TotalQuantity= invoice.TotalQuantity
+                TotalQuantity= invoice.TotalQuantity,
+                DeliveryAddress = invoice.DeliveryAddress,
+                LoadingAddress = invoice.LoadingAddress
             };
 
             dbContext.Documents.Add(packingList);
@@ -488,6 +478,8 @@ namespace SSMO.Services.Documents.Invoice
             packingList.GrossWeight = invoice.GrossWeight;
             packingList.NetWeight = invoice.NetWeight;
             packingList.SupplierOrderId = invoice.SupplierOrderId;
+            packingList.DeliveryAddress = invoice.DeliveryAddress;
+            packingList.LoadingAddress = invoice.LoadingAddress;
 
             dbContext.SaveChanges();
         }
@@ -552,7 +544,8 @@ namespace SSMO.Services.Documents.Invoice
             }
 
             var payment = new Payment
-            {
+            {  
+                CurrencyId = invoice.CurrencyId,
                 DocumentId = invoice.Id,
                 Date = (DateTime)datePaidAmount,
                 PaidAmount = paidAdvance
@@ -678,7 +671,7 @@ namespace SSMO.Services.Documents.Invoice
                     .Select(n => n.FscTextBg)
                     .FirstOrDefault();
 
-                bgInvoiceForPrint.FscCertificate = mycompany.FSCSertificate;
+                bgInvoiceForPrint.FscCertificate = mycompany.FscSertificate;
             }
 
             if(bgInvoiceForPrint.DocumentType == "CreditNote")
@@ -774,13 +767,16 @@ namespace SSMO.Services.Documents.Invoice
                 Products = new List<EditProductForCompanyInvoicesViewModel>(),
                 DocumentType = invoice.DocumentType.ToString(),
                 CompanyBankDetails = new List<BankDetailsViewModel>(),
+                PaymentTerms = invoice.PaymentTerms,
                 FscTexts = dbContext.FscTexts                    
                     .Select(n => new FscTextViewModel{
                       FscTextEng = n.FscTextEng,
                       Id = n.Id,
                       FscTextBg = n.FscTextBg 
                     })
-                    .ToList()   
+                    .ToList()   ,
+                LoadingAddress = invoice.LoadingAddress,
+                DeliveryAddress = invoice.DeliveryAddress
         };
 
             if(fiscalAgent != null)
@@ -861,7 +857,8 @@ namespace SSMO.Services.Documents.Invoice
             (int id, decimal currencyExchangeRate, DateTime date, decimal grossWeight, decimal netWeight,
             decimal deliveryCost, int orderConfirmationNumber, string truckNumber,
             ICollection<EditProductForCompanyInvoicesViewModel> products,
-            string incoterms, string comment, List<int> banks, int? fiscalAgentId, int? fscText)
+            string incoterms, string comment, List<int> banks, int? fiscalAgentId, 
+            int? fscText, string paymentTerms, string deliveryAddress, string loadingAddress)
         {
             if (id == 0) return false;
 
@@ -886,6 +883,9 @@ namespace SSMO.Services.Documents.Invoice
             invoice.TotalQuantity= 0;         
             invoice.FiscalAgentId= fiscalAgentId;
             invoice.FscTextId = fscText;
+            invoice.PaymentTerms= paymentTerms;
+            invoice.DeliveryAddress = deliveryAddress;
+            invoice.LoadingAddress = loadingAddress;
 
             var oldBanks = invoice.BankDetails.ToList();
             if (oldBanks != null)

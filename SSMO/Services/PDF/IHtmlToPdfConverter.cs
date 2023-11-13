@@ -1,7 +1,5 @@
 ﻿using DevExpress.Utils;
 using ImageMagick;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
 using System;
 using System.Diagnostics;
 using System.IO;

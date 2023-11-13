@@ -13,12 +13,7 @@ using System.Linq;
 namespace SSMO.Models.CustomerOrders
 {
     public class CustomerOrderViewModel
-    {
-        public CustomerOrderViewModel()
-        {
-            
-        }
-
+    {      
         public int Id { get; set; }
         public int OrderConfirmationNumber { get; set; }
         public string Type { get; set; }
@@ -63,5 +58,8 @@ namespace SSMO.Models.CustomerOrders
         public string DealDescription { get; set; }
         public int? FscText { get; set; }
         public ICollection<FscTextViewModel> FscTexts { get; set; }
+        public string PaymentTerms { get; set; }
+        public string Etd { get; set; }
+        public string Eta { get; set; }
     }
 }

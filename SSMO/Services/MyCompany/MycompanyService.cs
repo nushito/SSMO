@@ -9,6 +9,7 @@ using SSMO.Models.Reports;
 using SSMO.Data.Models;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.ServiceOrders;
+using SSMO.Services.Addresses;
 
 namespace SSMO.Services.MyCompany
 {
@@ -17,17 +18,19 @@ namespace SSMO.Services.MyCompany
         private readonly ApplicationDbContext dbContext;
         private readonly IMapper mapper;
         private readonly HttpContextUserIdExtension _httpContextAccessor;
+        private readonly IAddressService addressService;
         public MycompanyService
             (ApplicationDbContext dbContext, IMapper mapper,
-             HttpContextUserIdExtension httpContextAccessor)
+             HttpContextUserIdExtension httpContextAccessor, IAddressService addressService)
 
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            this.addressService = addressService;
         }
 
-       private List<Data.Models.MyCompany> UserCompanies()
+        private List<Data.Models.MyCompany> UserCompanies()
         {
             var loggedUserId = _httpContextAccessor.ContextAccessUserId();
             var listDbCompanies = dbContext.MyCompanies
@@ -128,51 +131,32 @@ namespace SSMO.Services.MyCompany
 
         public bool RegisterMyCompany(
              string name, string eik, string vat, string fsc, string userId, string city, string addres, string country, string representativePerson,
-            string bgName, string bgCity, string bgAddress, string bgCountry, string bgRepresentative)
+            string bgName, string bgCity, string bgAddress, string bgCountry, string bgRepresentative,
+            string correspondCountry, string correspondCity, string correspondStreet,
+            string correspondBgCountry, string correspondBgCity, string correspondBgStreet)
         {
             if (userId == null) return false;
 
-            var address = new Address
-            {
-                City = city,
-                Country = country,
-                Street = addres,
-                BgCity = bgCity,
-                Bgcountry = bgCountry,
-                BgStreet = bgAddress,
-                MyCompany = new Data.Models.MyCompany
-                {
-                    Name = name,
-                    BgName = bgName,
-                    Eik = eik,
-                    VAT = vat,
-                    RepresentativePerson = representativePerson,
-                    BgRepresentativePerson = bgRepresentative,
-                    FSCSertificate = fsc,
-                    UserId = userId,
-                    
-                }
-        };
+            var addressNum = addressService.CreateAddress
+                (addres,city,country,bgAddress,bgCity,bgCountry, correspondStreet, 
+                correspondCity, correspondCountry, correspondBgStreet, correspondBgCity, correspondBgCountry);
 
-            dbContext.Addresses.Add(address);   
+            var myCompany = new Data.Models.MyCompany
+            {
+                Name = name,
+                BgName = bgName,
+                Eik = eik,
+                VAT = vat,
+                RepresentativePerson = representativePerson,
+                BgRepresentativePerson = bgRepresentative,
+                FscSertificate = fsc,
+                UserId = userId,
+                AddressId = addressNum               
+            };          
+
+            dbContext.MyCompanies.Add(myCompany);   
             dbContext.SaveChanges();
 
-            //var company = new Data.Models.MyCompany
-            //{
-            //    Name = name,
-            //    BgName = bgName,
-            //    Eik = eik,
-            //    VAT = vat,                
-            //    RepresentativePerson = representativePerson,
-            //    BgRepresentativePerson = bgRepresentative,
-            //    FSCSertificate = fsc,
-            //    UserId = userId,
-            //    AddressId = address.Id
-            //};
-
-            //dbContext.MyCompanies.Add(company);
-            //dbContext.SaveChanges();
-           
             return true;
         }
 
@@ -198,7 +182,7 @@ namespace SSMO.Services.MyCompany
             var userId = _httpContextAccessor.ContextAccessUserId();
             return dbContext.MyCompanies
                 .Where(u => u.UserId == userId)
-                .Select(f => f.FSCSertificate)
+                .Select(f => f.FscSertificate)
                 .ToList();            
         }
 
@@ -248,7 +232,9 @@ namespace SSMO.Services.MyCompany
 
         public bool EditCompany(int id, string name, string bgname, string eik, string vat, string fscClaim, 
             string fscCertificate, string representativeName, string representativeNameBg, string street, string bgStreet, 
-            string city, string bgCity, string country, string bgCountry)
+            string city, string bgCity, string country, string bgCountry,
+            string correspondCountry, string correspondCity, string correspondStreet,
+            string correspondBgCountry, string correspondBgCity, string correspondBgStreet)
         {
             var company = dbContext.MyCompanies.Find(id);
             if (company == null) { return false; }
@@ -257,20 +243,16 @@ namespace SSMO.Services.MyCompany
             company.BgName= bgname; 
             company.Eik = eik;
             company.VAT= vat;
-            company.FSCClaim= fscClaim; 
-            company.FSCSertificate = fscCertificate;
+            company.FscClaim= fscClaim; 
+            company.FscSertificate = fscCertificate;
             company.RepresentativePerson= representativeName;
-            company.BgRepresentativePerson = representativeNameBg;  
+            company.BgRepresentativePerson = representativeNameBg;
 
-            var address = dbContext.Addresses.Find(company.AddressId);
-
-            address.Street = street;
-            address.City = city;
-            address.Country = country;  
-            address.BgCity= bgCity;
-            address.BgStreet= bgStreet; 
-            address.Bgcountry= bgCountry;
-
+            addressService.ЕditAddress
+                (company.AddressId, street, city, country, bgStreet, bgCity, bgCountry,
+                correspondStreet, correspondCity, correspondCountry, correspondBgStreet, 
+                correspondBgCity, correspondBgCountry);
+          
             return true;
         }
     }

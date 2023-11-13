@@ -16,10 +16,8 @@ using SSMO.Services.MyCompany;
 using SSMO.Services.Products;
 using SSMO.Services.Status;
 using SSMO.Services.SupplierOrders;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace SSMO.Controllers
@@ -33,15 +31,14 @@ namespace SSMO.Controllers
         private readonly IProductService productService;
         private readonly ICustomerOrderService cusomerOrderService;
         private readonly IMapper mapper;
-        private readonly ApplicationDbContext dbContext;
+        
         private readonly IStatusService statusService;
         private readonly ISupplierOrderService supplierOrderService;
         public SupplierOrdersController(ISupplierService supplierService,
            ICurrency currency,
            IMycompanyService myCompanyService,
            ICustomerService customerService,
-           IProductService productService, IMapper mapper,
-           ApplicationDbContext dbContext,
+           IProductService productService, IMapper mapper,          
            ICustomerOrderService cusomerOrderService, 
            IStatusService statusService,
            ISupplierOrderService supplierOrderService)
@@ -51,8 +48,7 @@ namespace SSMO.Controllers
             this.myCompanyService = myCompanyService;
             this.customerService = customerService;
             this.productService = productService;
-            this.mapper = mapper;
-            this.dbContext = dbContext;
+            this.mapper = mapper;           
             this.cusomerOrderService = cusomerOrderService;
             this.statusService = statusService;
             this.supplierOrderService = supplierOrderService;
@@ -62,15 +58,16 @@ namespace SSMO.Controllers
         [Authorize]
         public IActionResult AddSupplierConfirmation()
         {
+            string userId = this.User.UserId();
             ViewBag.NumberExist = 1;
             return View(new SupplierOrderFormModel
             {
                 Currencies = currency.AllCurrency(),
                 MyCompanies = myCompanyService.GetAllCompanies(),
-                Suppliers = supplierService.GetSuppliers(),
+                Suppliers = supplierService.GetSuppliers(userId),
                 Statuses = statusService.GetAllStatus(),   
                 ProductList= new List<ProductSupplierFormModel> { },
-                SupplierFscCertificate = supplierService.SuppliersFscCertificates()
+                SupplierFscCertificate = supplierService.SuppliersFscCertificates(userId)
             });
         }
 
@@ -98,20 +95,20 @@ namespace SSMO.Controllers
                 {
                     Currencies = currency.AllCurrency(),
                     MyCompanies = myCompanyService.GetAllCompanies(),
-                    Suppliers = supplierService.GetSuppliers(),
+                    Suppliers = supplierService.GetSuppliers(userId),
                     Statuses = statusService.GetAllStatus(),  
                     ProductList = new List<ProductSupplierFormModel> { },
-                    SupplierFscCertificate = supplierService.SuppliersFscCertificates()
+                    SupplierFscCertificate = supplierService.SuppliersFscCertificates(userId)
                 };
             };
 
-            if (!supplierService.GetSuppliers().Any())
+            if (!supplierService.GetSuppliers(userId).Any())
             {
                 return RedirectToAction("AddSupplier", "SuppliersController");
             };
 
             model.ProductList = new List<ProductSupplierFormModel>();
-
+            //create supplier order 
             var supplierOrderId = await supplierOrderService.CreateSupplierOrder
                                   (model.MyCompanyId, model.SupplierId, model.Date,
                                    model.Number, model.StatusId,
@@ -129,7 +126,7 @@ namespace SSMO.Controllers
                     loopsNum++;
                 }
             }
-
+            //get products from jquery 
             for (int i = 1; i <= loopsNum; i++)
             {
                 var description = collections["DescriptionId[" + i + "]"];
@@ -165,14 +162,6 @@ namespace SSMO.Controllers
            await supplierOrderService.TotalAmountAndQuantitySum(supplierOrderId);
 
             return RedirectToAction("Index", "Home");
-        }
-
-        
-        public IActionResult PrintSupplierOrder(int supplierOrderId)
-        {
-
-            return RedirectToAction("Index", "Home");
-        }
-
+        }        
     }
 }

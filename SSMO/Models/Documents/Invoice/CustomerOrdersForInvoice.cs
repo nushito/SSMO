@@ -1,4 +1,4 @@
-﻿using SSMO.Models.Reports.PrrobaCascadeDropDown;
+﻿using SSMO.Models.Reports.CustomerOrderCascadeDropDown;
 using System.Collections.Generic;
 
 namespace SSMO.Models.Documents.Invoice

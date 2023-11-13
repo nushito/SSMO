@@ -1,4 +1,5 @@
-﻿using SSMO.Services.Documents.Invoice;
+﻿using SSMO.Models.Image;
+using SSMO.Services.Documents.Invoice;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -40,6 +41,11 @@ namespace SSMO.Models.Documents.Invoice
         public string FiscalAgentDetail { get; set; }
         public string FscTextEng { get; set; }
         public string FscCertificate { get; set; }
+        public string DeliveryAddress { get; set; }
+        public string LoadingAddress { get; set; }
+        public string PaymentTerms { get; set; }
+        public ImageModelViewForAllDocuments Header { get; set; }
+        public ImageModelViewForAllDocuments Footer { get; set; }
         public ICollection<InvoiceBankDetailsViewModel> CompanyBankDetails { get; set; }
         public IEnumerable<ProductsForInvoiceModel> Products { get; set; }
         public IEnumerable<ServiceProductForInvoiceFormModel> ServiceProducts { get; set; }

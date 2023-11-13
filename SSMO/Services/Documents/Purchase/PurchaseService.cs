@@ -35,6 +35,8 @@ namespace SSMO.Services.Documents.Purchase
             this.supplierOrderService = supplierOrderService;
             this.productRepository = productRepository; 
         }
+
+        //sazdava polupka na bazata na id-tata na izbranite specifikacii na dostavchika
         public async Task<bool> CreatePurchaseAsPerSupplierOrder(int id,
             string number, DateTime date, 
             decimal netWeight, decimal brutoWeight,
@@ -49,6 +51,7 @@ namespace SSMO.Services.Documents.Purchase
 
             if (supplierOrder == null) { return false; }
            
+            //new entity na Purchase
             var purchase = new Document
             {
                 PurchaseNumber = number,
@@ -99,6 +102,7 @@ namespace SSMO.Services.Documents.Purchase
 
                 if(product.OrderedQuantity > mainProduct.OrderedQuantity) { return false; }
 
+                //new entity na Purchase Product
                 var purchaseProduct = new PurchaseProductDetails
                 {
                     ProductId = mainProduct.Id,
@@ -117,7 +121,7 @@ namespace SSMO.Services.Documents.Purchase
                 purchaseProduct.Amount = purchaseProduct.Quantity*purchaseProduct.PurchasePrice;
                 purchaseProduct.TotalSheets = purchaseProduct.Pallets*purchaseProduct.SheetsPerPallet;
 
-               
+               //ako produkta e usluga ne se prewrashta v kubici
                 if(product.ProductOrNot == true)
                 {
                     var quantityM3 = productService.ConvertStringSizeToQubicMeters(size);
@@ -126,7 +130,7 @@ namespace SSMO.Services.Documents.Purchase
            
 
                 mainProduct.PurchaseProductDetails.Add(purchaseProduct);
-                mainProduct.LoadedQuantityM3 += purchaseProduct.Quantity;
+                mainProduct.LoadedQuantity += purchaseProduct.Quantity;
                 mainProduct.QuantityLeftForPurchaseLoading = mainProduct.OrderedQuantity - purchaseProduct.Quantity;
                 purchase.PurchaseProducts.Add(purchaseProduct);
 
@@ -168,8 +172,9 @@ namespace SSMO.Services.Documents.Purchase
             {
                 return false;
             }
-           
-            if(delayCostCalc == false)
+
+            //izchislqva se razhodite i sebestoinostta na produktite ako ne e izbrano da se napravi na po-kasen etap
+            if (delayCostCalc == false)
             {
                 var expenses = purchase.Duty + purchase.Factoring * purchase.Amount / 100 +
                       purchase.CustomsExpenses + purchase.FiscalAgentExpenses +
@@ -219,7 +224,7 @@ namespace SSMO.Services.Documents.Purchase
             var productsBySupplierOrder = dbContext.Products
                 .Where(p => p.SupplierOrderId == supplierOrder.Id).ToList();
 
-            if(productsBySupplierOrder.Sum(a=>a.OrderedQuantity) == productsBySupplierOrder.Sum(b => b.LoadedQuantityM3))
+            if(productsBySupplierOrder.Sum(a=>a.OrderedQuantity) == productsBySupplierOrder.Sum(b => b.LoadedQuantity))
             {
                 supplierOrder.StatusId = dbContext.Statuses
                     .Where(a=>a.Name == "Finished")
@@ -231,6 +236,7 @@ namespace SSMO.Services.Documents.Purchase
             return true;
         }
 
+        //redakciyq na pokupka
         public async Task<bool> EditPurchaseInvoice(int id, string number, DateTime date, int supplierOrderId, 
             int vat, decimal netWeight, decimal grossWeight, string truckNumber, string swb, 
             decimal purchaseTransportCost, decimal bankExpenses, decimal duty, decimal customsExpenses, 
@@ -266,6 +272,7 @@ namespace SSMO.Services.Documents.Purchase
             purchaseInvoiceForEdit.ShippingLine= shippingLine;
             purchaseInvoiceForEdit.Eta = eta;   
         
+            //redakciya na produktite 
             foreach (var product in purchaseProducts)
             {
                 var productForEdit = dbContext.PurchaseProductDetails
@@ -279,9 +286,9 @@ namespace SSMO.Services.Documents.Purchase
                     return false;
                 }
                
-                mainProduct.LoadedQuantityM3 -= productForEdit.Quantity;
-                mainProduct.LoadedQuantityM3 += product.Quantity;
-                mainProduct.QuantityLeftForPurchaseLoading = mainProduct.OrderedQuantity - mainProduct.LoadedQuantityM3;
+                mainProduct.LoadedQuantity -= productForEdit.Quantity;
+                mainProduct.LoadedQuantity += product.Quantity;
+                mainProduct.QuantityLeftForPurchaseLoading = mainProduct.OrderedQuantity - mainProduct.LoadedQuantity;
                 
                 productForEdit.PurchasePrice = product.PurchasePrice;
                 productForEdit.SheetsPerPallet = product.SheetsPerPallet;   
@@ -290,6 +297,7 @@ namespace SSMO.Services.Documents.Purchase
                 productForEdit.FscClaim = product.FscClaim;
                 productForEdit.Quantity = product.Quantity;
                 productForEdit.Amount = product.Quantity * product.PurchasePrice;
+                productForEdit.TotalSheets = product.Pallets * product.SheetsPerPallet;
                 purchaseInvoiceForEdit.Amount += productForEdit.Amount;
 
                 if (purchaseProducts.All(u=>u.Unit == Unit.m3.ToString()) || purchaseProducts.All(u => u.Unit == Unit.m2.ToString())
@@ -315,13 +323,16 @@ namespace SSMO.Services.Documents.Purchase
                             purchaseInvoiceForEdit.TotalQuantity += productForEdit.QuantityM3 ?? 0;
                         }
                     }
-                }       
+                }
+                
             }
-
+           
             purchaseInvoiceForEdit.VatAmount = purchaseInvoiceForEdit.Vat * purchaseInvoiceForEdit.Amount / 100;
             purchaseInvoiceForEdit.TotalAmount = purchaseInvoiceForEdit.VatAmount ?? 0 + purchaseInvoiceForEdit.Amount;
 
            await dbContext.SaveChangesAsync();
+
+            //izchislqva se razhodite i sebestoinostta na produktite
 
             var expenses = purchaseInvoiceForEdit.Duty + purchaseInvoiceForEdit.Factoring * purchaseInvoiceForEdit.Amount / 100 +
                    purchaseInvoiceForEdit.CustomsExpenses + purchaseInvoiceForEdit.FiscalAgentExpenses +
@@ -376,7 +387,7 @@ namespace SSMO.Services.Documents.Purchase
             var supplierOrder = dbContext.SupplierOrders
                 .Where(i=>i.Id == purchaseInvoiceForEdit.SupplierOrderId).FirstOrDefault();
 
-            if (productsBySupplierOrder.Sum(a => a.OrderedQuantity) == productsBySupplierOrder.Sum(b => b.LoadedQuantityM3))
+            if (productsBySupplierOrder.Sum(a => a.OrderedQuantity) == productsBySupplierOrder.Sum(b => b.LoadedQuantity))
             {
                 supplierOrder.StatusId = dbContext.Statuses
                     .Where(a => a.Name == "Finished")
@@ -387,18 +398,7 @@ namespace SSMO.Services.Documents.Purchase
             await dbContext.SaveChangesAsync();
             return true;
         }
-        public ICollection<PurchaseInvoiceListJson> GetPurchaseInvoices(int id)
-        {
-            var supplierId = dbContext.Suppliers.Where(a=>a.Id.Equals(id)).Select(i=>i.Id).FirstOrDefault();
-            return dbContext.Documents
-                .Where(s=>s.SupplierId == supplierId)
-                .Select(n=> new PurchaseInvoiceListJson
-                {
-                    PurchaseInvoiceId = n.Id,
-                    PurchaseInvoiceNumber = n.PurchaseNumber
-                }).ToList();    
-        }
-
+        
         public IEnumerable<PurchaseModelAsPerSpec> GetSupplierOrdersForPurchase(string supplierName
             , int currentpage, int supplierOrdersPerPage)
         {
@@ -571,7 +571,7 @@ namespace SSMO.Services.Documents.Purchase
         public IList<PurchaseProductsForDebitNoteViewModel> PurchaseProducts()
         {
             var productsForSale = dbContext.Products
-                .Where(a=>a.LoadedQuantityM3 > 0 && a.SoldQuantity < a.LoadedQuantityM3)
+                .Where(a=>a.LoadedQuantity > 0 && a.SoldQuantity < a.LoadedQuantity)
                 .SelectMany(p=>p.PurchaseProductDetails)
                 .ToList();
 
@@ -611,7 +611,7 @@ namespace SSMO.Services.Documents.Purchase
                     Size = productService.GetSizeName(mainProduct.SizeId),
                     GradeId = mainProduct.GradeId,
                     Grade = productService.GetGradeName(mainProduct.GradeId),
-                    AvailableQuantity = mainProduct.LoadedQuantityM3 - mainProduct.SoldQuantity,
+                    AvailableQuantity = mainProduct.LoadedQuantity - mainProduct.SoldQuantity,
                     PurchaseInvoicelId = product.PurchaseInvoiceId,
                     Unit = product.Unit,
                     FscSertificate = product.FscCertificate,

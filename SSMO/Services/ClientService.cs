@@ -1,10 +1,12 @@
 ﻿using ImageMagick;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Reports.FSC;
 using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.ProductsStock;
+using SSMO.Models.Reports.ServiceOrders;
 using SSMO.Services.Documents.Invoice;
 using System.Collections.Generic;
 
@@ -19,6 +21,7 @@ namespace SSMO.Services
         private static BgInvoiceViewModel _bgInvoice;
         private static CustomerInvoicePaymentsReportsViewModel _customerInvoicePayments;
         private static CustomerOrderPrintViewModel _customerOrderPrint;
+        private static ServiceOrderDetailsPrintViewModel _serviceOrder;
         public static void AddClient(InvoiceDetailsViewModel clientModel)
         {
             _clientModel = clientModel;
@@ -85,6 +88,16 @@ namespace SSMO.Services
         public static CustomerOrderPrintViewModel GetCustomerOrderPrint()
         {
             return _customerOrderPrint;
+        }
+
+        public static void AddServiceOrder(ServiceOrderDetailsPrintViewModel serviceOrder)
+        {
+            _serviceOrder = serviceOrder;
+        }
+
+        public static ServiceOrderDetailsPrintViewModel GetServiceOrder()
+        {
+            return _serviceOrder;
         }
 
     }

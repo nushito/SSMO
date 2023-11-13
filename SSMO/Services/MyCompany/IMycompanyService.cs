@@ -22,7 +22,9 @@ namespace SSMO.Services.MyCompany
         public List<string> MyCompaniesNamePerSupplier(string name);
         public bool RegisterMyCompany(
             string name, string eik, string vat, string fsc,string userId, string city, string addres, string country, string representativePerson,
-            string bgName, string bgCity, string bgAddress, string bgCountry, string bgRepresentative);
+            string bgName, string bgCity, string bgAddress, string bgCountry, string bgRepresentative,
+            string correspondCountry, string correspondCity, string correspondStreet,
+            string correspondBgCountry, string correspondBgCity,string correspondBgStreet);
 
         public int GetMyCompanyId(string name);
         public ICollection<string> MyCompaniesFscList();
@@ -34,6 +36,8 @@ namespace SSMO.Services.MyCompany
 
         public bool EditCompany(int id, string name, string bgname, string eik, string vat,string fscClaim, string fscCertificate, 
             string representativeName, string representativeNameBg, string street, string bgStreet, 
-            string city, string bgCity, string country, string bgCountry);
+            string city, string bgCity, string country, string bgCountry,
+            string correspondCountry, string correspondCity, string correspondStreet,
+            string correspondBgCountry, string correspondBgCity, string correspondBgStreet);
     }
 }

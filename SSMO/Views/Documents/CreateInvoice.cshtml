@@ -68,10 +68,11 @@
                                         @item <span>;</span>
                                     }
                   </span></li>
+                  <li class="text-muted">Place of loading: <span style="color:#5d9fc5 ;">@Model.LoadingAddress</span></li>
+              <li class="text-muted">Delivery Address: <span style="color:#5d9fc5 ;">@Model.DeliveryAddress</span></li>
               <li class="text-muted">Delivery Terms: <span style="color:#5d9fc5 ;">@Model.Incoterms</span></li>
               <li class="text-muted">Truck Number: <span style="color:#5d9fc5 ;">@Model.TruckNumber</span></li>
-              <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;">@Model.NetWeight kg</span></li>
-               <li class="text-muted">Gross Weight: <span style="color:#5d9fc5 ;">@Model.GrossWeight kg</span></li>
+             
             </ul>
           </div>
           <div class="col-xl-4">
@@ -79,10 +80,6 @@
               @Model.FiscalAgentName <br />
               @Model.FiscalAgentDetail
           </div>
-        </div>
-
-        <div>
-            <p>@Model.Comment</p>
         </div>
         <div class="row my-2 mx-1 justify-content-center">
           <table class="table table-striped table-borderless">
@@ -136,13 +133,11 @@
                     </tr>
 
                     }   
-                }
-                            
+                }                            
             </tbody>
           </table>
         </div>
-        <div class="row">
-          
+        <div class="row">          
           <div class="col-xl-3">
             <ul class="list-unstyled">
               <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
@@ -150,6 +145,13 @@
             <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.TotalAmount.ToString("N2")</span></li>
           </ul>
           </div>
+        </div>
+         <div>
+            <ul class="list-unstyled">
+               <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;">@Model.NetWeight kg</span></li>
+               <li class="text-muted">Gross Weight: <span style="color:#5d9fc5 ;">@Model.GrossWeight kg</span></li>  
+               <li><p>Notes: @Model.Comment</p></li>
+           </ul>
         </div>
         <hr>
          <div class="row">
@@ -166,6 +168,9 @@
                     Deal Type: @Model.DealTypeEng <br />
                    Description of the deal: @Model.DealDescriptionEng
                 </td>
+                <td class="px-3 mr-5">
+                    Payment Terms: @Model.PaymentTerms
+                </td>
             </tr>
 
             <tr>
@@ -179,8 +184,7 @@
                          </td>
                 }
             </tr>
-        </table>
-       
+        </table>       
       </div>
     </div>
   </div>

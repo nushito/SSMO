@@ -23,15 +23,17 @@
     <PackageReference Include="ClosedXML" Version="0.100.3" />
     <PackageReference Include="DevExpress.Data" Version="22.2.4" />
     <!--<PackageReference Include="EntityFramework" Version="6.4.4" />-->
-    <PackageReference Include="iTextSharp" Version="5.5.13.3" />
-    <PackageReference Include="itextsharp.xmlworker" Version="5.5.13.3" />
+    <!--<PackageReference Include="iTextSharp" Version="5.5.13.3" />
+    <PackageReference Include="itextsharp.xmlworker" Version="5.5.13.3" />-->
     <PackageReference Include="Magick.NET.Core" Version="12.2.2" />
+    <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="5.0.17" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="5.0.17" />
+    <PackageReference Include="Syncfusion.HtmlToPdfConverter.AspNet.Mvc5" Version="23.1.41" />
     <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="20.4.0.44" />
     <PackageReference Include="System-Web-Helpers.dll" Version="1.0.0" />
     <PackageReference Include="System.Text.Json" Version="7.0.1" />

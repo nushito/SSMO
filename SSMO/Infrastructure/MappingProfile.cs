@@ -13,6 +13,7 @@ using SSMO.Models.Reports;
 using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Models.Reports.Purchase;
+using SSMO.Models.Reports.ServiceOrders;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using SSMO.Models.ServiceOrders;
 using SSMO.Models.Suppliers;
@@ -104,6 +105,8 @@ namespace SSMO.Infrastructure
             this.CreateMap<FiscalAgent, FiscalAgentViewModel>();
 
             this.CreateMap<FscText, FscTextViewModel>();
+
+            this.CreateMap<ServiceOrder, ServiceOrderCollectionDetailViewModel>();
         }
     }
 }

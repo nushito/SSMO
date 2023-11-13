@@ -37,11 +37,28 @@
                 <input type="text" class="form-control" asp-for="Street" placeholder="Street">
                 <span asp-validation-for="Street" class="small text-danger"></span>
             </div>
+            <br />
+             <p style="font-weight:200">Corresponding Address:</p>
+             <div class="form-group">
+                <label asp-for="CorrespondCountry">Country</label>
+                <input type="text" class="form-control" asp-for="CorrespondCountry" placeholder="Country">
+                <span asp-validation-for="CorrespondCountry" class="small text-danger"></span>
+            </div>           
+            <div class="form-group">
+                <label asp-for="CorrespondCity">City</label>
+                <input type="text" class="form-control" asp-for="CorrespondCity" placeholder="City">
+                <span asp-validation-for="CorrespondCity" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CorrespondStreet">Street</label>
+                <input type="text" class="form-control" asp-for="CorrespondStreet" placeholder="Street">
+                <span asp-validation-for="CorrespondStreet" class="small text-danger"></span>
+            </div>
           
              <div class="form-group">
-                <label asp-for="FSCSertificate">FSC Certificate code</label>
-                <input type="text" class="form-control" asp-for="FSCSertificate" placeholder="FSC Certificate code">
-                <span asp-validation-for="FSCSertificate" class="small text-danger"></span>
+                <label asp-for="FscSertificate">FSC Certificate code</label>
+                <input type="text" class="form-control" asp-for="FscSertificate" placeholder="FSC Certificate code">
+                <span asp-validation-for="FscSertificate" class="small text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="RepresentativePerson">Representative</label>
@@ -67,19 +84,33 @@
                 <span asp-validation-for="BgCity" class="small text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="BgStreet">Адрес</label>
+                <label asp-for="BgStreet">Улица</label>
                 <input type="text" class="form-control" asp-for="BgStreet" placeholder="Улица">
                 <span asp-validation-for="BgStreet" class="small text-danger"></span>
+            </div>
+             <p style="font-weight:200">Адрес за кореспонденция:</p>
+             <div class="form-group">
+                <label asp-for="CorrespondBgCountry">Държава</label>
+                <input type="text" class="form-control" asp-for="CorrespondBgCountry" placeholder="Country">
+                <span asp-validation-for="CorrespondBgCountry" class="small text-danger"></span>
+            </div>           
+            <div class="form-group">
+                <label asp-for="CorrespondBgCity">Град</label>
+                <input type="text" class="form-control" asp-for="CorrespondBgCity" placeholder="City">
+                <span asp-validation-for="CorrespondBgCity" class="small text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="CorrespondStreet">Улица</label>
+                <input type="text" class="form-control" asp-for="CorrespondStreet" placeholder="Street">
+                <span asp-validation-for="CorrespondBgStreet" class="small text-danger"></span>
             </div>
              <div class="form-group">
                 <label asp-for="BgRepresentativePerson">Управител</label>
                 <input type="text" class="form-control" asp-for="BgRepresentativePerson" placeholder="Управител">
                 <span asp-validation-for="BgRepresentativePerson" class="small text-danger"></span>
             </div>
-            <hr />
-            <button type="submit" class="btn btn-primary">Submit</button>
-          
+            <hr />           
+            <button type="submit" class="btn btn-primary">Submit</button>          
         </form>
     </div>
-
 </div>

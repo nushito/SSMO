@@ -28,9 +28,17 @@
     <div class="form-group row col-md-4">
         <label asp-for="DeliveryAddress"></label>
         <input id="deliveryaddress" asp-for="DeliveryAddress" type="text" class="form-control" placeholder="Delivery address" />
-
     </div>
-
+     <div class="form-group row col-md-8">
+         <td class="col-md-4">
+         <label asp-for="Eta">ETA</label>
+        <input  asp-for="Eta" type="text" class="form-control" placeholder="Estimate time of arrival" />       
+         </td>
+        <td class="col-md-4">
+         <label asp-for="Etd">ETD</label>
+        <input  asp-for="Etd" type="text" class="form-control" placeholder="Estimate time of depart" />       
+         </td>
+    </div>
     <div class="form-group col-md-4">
         <label asp-for="CurrencyId"></label>
         <select id="currency" asp-for="CurrencyId" class="form-control">
@@ -84,19 +92,12 @@
         <span asp-validation-for="Origin" class="small text-danger"></span>
     </div>
     <div class="form-group-sm col-md-4">
-        <label asp-for="PaidAdvance"></label>
-        <input asp-for="PaidAdvance" type="number" min="0.0000" step="0.00001" class="form-control" />
-        <span asp-validation-for="PaidAdvance" class="small text-danger"></span>
-    </div>
-    <div class="form-group col-sm-4">
-        <input class="form-check-input" type="checkbox" asp-for="PaidAmountStatus">
-        <label class="form-check-label" asp-for="PaidAmountStatus">
-            Paid
-        </label>
-    </div>
-
+        <label asp-for="PaymentTerms">Payment Terms</label>
+        <input asp-for="PaymentTerms" type="text"  class="form-control" />
+        <span asp-validation-for="PaymentTerms" class="small text-danger"></span>
+    </div>   
     <div class="form-group row col-md-4">
-            <label asp-for="Vat"></label>
+            <label asp-for="Vat">VAT %</label>
             <input asp-for="Vat" min="0" step="1" class="form-control" type="number" />
        </div>
 

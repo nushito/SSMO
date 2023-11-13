@@ -33,7 +33,7 @@ namespace SSMO.Data.Models
         public DateTime CreditToInvoiceDate { get; set; }
         public int DebitToInvoiceId { get; set; }
         public DateTime DebitToInvoiceDate { get; set; }
-        public string FSCClaim { get; set; }
+        public string FscClaim { get; set; }
         public string FSCSertificate { get; set; }
         public int? CustomerId { get; set; }
         public Customer Customer { get; set; }
@@ -91,6 +91,8 @@ namespace SSMO.Data.Models
         public FiscalAgent Fiscalagent { get; set; }
         public int? FscTextId { get; set; }
         public FscText FscText { get; set; }
+        public string PaymentTerms { get; set; }
+        public string LoadingAddress { get; set; }
         public ICollection<BankDetails> BankDetails { get; set; }        
         public ICollection<CustomerOrder> CustomerOrders { get; set; }
         public ICollection<PurchaseProductDetails> PurchaseProducts { get; set; }

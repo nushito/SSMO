@@ -24,6 +24,6 @@ namespace SSMO.Models.Documents.CreditNote
         public string Incoterms { get; set; }
         public string Comment { get; set; }
         public IList<EditProductForCreditNoteViewModel> Products { get; set; }
-        
+        public string PaymentTerms { get; set; }
     }
 }
