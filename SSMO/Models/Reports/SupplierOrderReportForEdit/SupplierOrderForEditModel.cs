@@ -22,13 +22,8 @@ namespace SSMO.Models.Reports.SupplierOrderReportForEdit
         public IEnumerable<StatusModel> Statuses { get; set; }
         public int CurrencyId { get; set; }
         public IEnumerable<GetCurrencyModel> Currencies { get; set; }
-        public decimal Amount { get; set; }
-        public decimal PaidAvance { get; set; }
-        public string DatePaidAmount { get; set; }
-        public bool PaidStatus { get; set; }
-        public decimal TotalAmount { get; set; }
-        public string FSCClaim { get; set; }
-        public string FSCSertificate { get; set; }
+        public decimal Amount { get; set; }       
+        public decimal TotalAmount { get; set; }      
         public int? VAT { get; set; }
         public decimal NetWeight { get; set; }
         public decimal GrossWeight { get; set; }

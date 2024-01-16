@@ -28,6 +28,8 @@ using SSMO.Models.Documents.Invoice;
 using SSMO.Services.Customer;
 using SSMO.Services.FscTextDocuments;
 using System.Threading.Tasks;
+using ImageMagick.ImageOptimizers;
+using SSMO.Services.Images;
 
 namespace SSMO.Controllers
 {
@@ -47,6 +49,7 @@ namespace SSMO.Controllers
         private readonly ICurrency currencyService;
         private readonly IFscTextService fscTextService;
         private readonly IBankService bankService;
+        private readonly IImageService imageService;
       
         public DocumentsController
             (ISupplierOrderService supplierOrderService,
@@ -54,7 +57,8 @@ namespace SSMO.Controllers
             IInvoiceService invoiceService, IMycompanyService mycompanyService,
             IDocumentService documentService, ISupplierService supplierService, ICreditNoteService creditNoteService,
             IProductService productService, IDebitNoteService debitNoteService, ICustomerService customerService,
-            ICurrency currency, IFscTextService fscTextService, IBankService bankService)
+            ICurrency currency, IFscTextService fscTextService, IBankService bankService,
+            IImageService imageService)
         {
             this.supplierOrderService = supplierOrderService;
             this.purchaseService = purchaseService;
@@ -70,8 +74,9 @@ namespace SSMO.Controllers
             this.currencyService= currency;  
             this.fscTextService= fscTextService;
             this.bankService = bankService;
+            this.imageService = imageService;
         }
-
+        
         public IActionResult AddPurchase(SupplierOrderListModel model)
         {
             string userId = this.User.UserId();
@@ -132,7 +137,8 @@ namespace SSMO.Controllers
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PurchaseDetails(int id, string supplierOrderNumber, 
+        public async Task<IActionResult> PurchaseDetails
+            (int id, string supplierOrderNumber,
             PurchaseDetailsFormModel model)
         {
             string userId = this.User.UserId();
@@ -224,7 +230,7 @@ namespace SSMO.Controllers
        
         //izbirat se porachkite kym klienta koito shte se fakturirat
         [HttpGet]
-        public IActionResult GetCustomerOrders(string id)
+        public IActionResult GetCustomerOrders(string id,string myCompanyId)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
@@ -236,12 +242,14 @@ namespace SSMO.Controllers
             }
 
             var customerId = int.Parse(id.ToString());
-            var customerOrdersNum = customerOrderService.CustomerOrderCollection(customerId);
+            var mycompanyId = int.Parse(myCompanyId.ToString());    
+            var customerOrdersNum = customerOrderService.CustomerOrderCollection(customerId, mycompanyId);
             return Json(customerOrdersNum, new JsonSerializerOptions() { PropertyNameCaseInsensitive = false });
         }
         
         [HttpGet]
-        public IActionResult InvoiceDetails(int customerId, List<int> selectedCustomerOrders, int myCompanyId)
+        public IActionResult InvoiceDetails
+            (int customerId, List<int> selectedCustomerOrders, int myCompanyId)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
@@ -255,19 +263,20 @@ namespace SSMO.Controllers
            ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice(myCompanyId);
 
             var companiesNames = mycompanyService.GetCompaniesNames();
-           
+
             var collectionCustomerOrders = new CustomerOrderNumbersForInvoiceListView
             {
                 SelectedCustomerOrders = selectedCustomerOrders,
                 MyCompanyNames = companiesNames,
                 Products = new List<ProductsForInvoiceViewModel>(),
                 Currencies = currencyService.AllCurrency(),
-                CustomerId= customerId,
+                CustomerId = customerId,
                 ServiceProducts = new List<ServiceProductForInvoiceFormModel>(),
                 CompanyBankDetails = documentService.BankDetails(myCompanyId),
-                ChoosenBanks = new List<int> (),
+                ChoosenBanks = new List<int>(),
                 FiscalAgents = documentService.GetFiscalAgents(),
-                FscTexts = fscTextService.GetAllFscTexts()
+                FscTexts = fscTextService.GetAllFscTexts(),
+                Images = imageService.ImageCollection(myCompanyId)
             };
                         
             collectionCustomerOrders.Products = productService.ProductsForInvoice(selectedCustomerOrders);
@@ -278,14 +287,15 @@ namespace SSMO.Controllers
             return View(collectionCustomerOrders);
         }
 
-
         [HttpPost]
         [Authorize]
         public IActionResult InvoiceDetails
-            (CustomerOrderNumbersForInvoiceListView model, int customerId, int myCompanyId, IFormCollection collection)             
+            (CustomerOrderNumbersForInvoiceListView model, int customerId, int myCompanyId, 
+            IFormCollection collection)             
         {
             string userId = this.User.UserId();
-            string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(model.MyCompanyName);
+            string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName
+                                                        (model.MyCompanyName);
 
             if (userIdMyCompany != userId)
             {
@@ -314,7 +324,8 @@ namespace SSMO.Controllers
                     CompanyBankDetails = new List<InvoiceBankDetailsViewModel>(),
                     ChoosenBanks = new List<int>(),
                     FiscalAgents = documentService.GetFiscalAgents(),
-                    FscTexts = fscTextService.GetAllFscTexts()
+                    FscTexts = fscTextService.GetAllFscTexts(),
+                    Images = imageService.ImageCollection(myCompanyId)                   
                 };
 
                 ViewBag.CheckInvoice = invoiceService.CheckFirstInvoice(myCompanyId);
@@ -397,17 +408,22 @@ namespace SSMO.Controllers
                     banks = model.ChoosenBanks,
                     fiscalAgent = model.FiscalAgent,
                     fscText = model.FscTextEng,
-                    paymentTerms = model.PaymentTerms
+                    paymentTerms = model.PaymentTerms,
+                    header = model.Header,
+                    footer = model.Footer,
+                    placeOfIssue= model.PlaceOfIssue,
+                    factoring = model.Factoring,
+                    comission = model.Comission
                 });
         }
-
         public async Task<IActionResult> CreateInvoice(
             DateTime date, decimal currencyExchangeRateUsdToBGN,
           int number, string mycompanyname, string truckNumber, decimal deliveryCost, 
           string swb, decimal netWeight, decimal grossWeight, string incoterms, 
           int customerId, int currencyId, int vat, int myCompanyId, string comment, string deliveryAddress,
           string dealTypeEng, string dealTypeBg, string descriptionEng, string descriptionBg, List<int> banks, 
-          int? fiscalAgent, int? fscText, string paymentTerms,string loadingAddress)
+          int? fiscalAgent, int? fscText, string paymentTerms,string loadingAddress,
+          int header, int footer, string placeOfIssue, int? factoring, decimal? comission)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = mycompanyService.GetUserIdMyCompanyByName(mycompanyname);
@@ -425,20 +441,22 @@ namespace SSMO.Controllers
                 return View();
             }
 
-
             List<int> orders = JsonConvert.DeserializeObject<List<int>>(TempData["orders"].ToString() ?? null);
             
             List<ProductsForInvoiceViewModel> products = JsonConvert.DeserializeObject<List<ProductsForInvoiceViewModel>>(TempData["products"].ToString());
             
             List<ServiceProductForInvoiceFormModel> serviceProducts = JsonConvert.DeserializeObject<List<ServiceProductForInvoiceFormModel>>(TempData["serviceProducts"].ToString() ?? null);
             
-
             var invoiceForPrint = await invoiceService.CreateInvoice
                 (orders, products, serviceProducts, date, currencyExchangeRateUsdToBGN, number, 
                 mycompanyname, truckNumber, deliveryCost, swb, netWeight, grossWeight, incoterms, 
                 customerId, currencyId, vat, myCompanyId, comment, deliveryAddress, 
                 dealTypeEng, dealTypeBg, descriptionEng, descriptionBg, banks, fiscalAgent, 
-                fscText, paymentTerms,loadingAddress);
+                fscText, paymentTerms,loadingAddress, placeOfIssue, header, footer,factoring,comission);
+
+            invoiceForPrint.HeaderUrl = imageService.HeaderUrl(header);
+            invoiceForPrint.FooterUrl= imageService.FooterUrl(footer);
+            invoiceForPrint.PlaceOfIssue = placeOfIssue;
          
             if (invoiceForPrint == null)
             {
@@ -464,7 +482,7 @@ namespace SSMO.Controllers
                 return View();
             }
 
-            var documentNumbers = documentService.GetBgInvoices();
+            var documentNumbers = documentService.GetBgInvoices(model.MyCompanyId);
 
             if (documentNumbers == null)
             {
@@ -514,11 +532,22 @@ namespace SSMO.Controllers
                 ModelState.AddModelError(string.Empty, "Missing");
                 return View(model);
             }
-            model.PckingListNumbers = invoiceCollectionNumbers;
+
+            model.Companies = mycompanyService.GetAllCompanies();           
             model.PackingListForPrint = documentService.PackingListForPrint(model.PackingListNumber);
             return View(model);
         }
-
+        [HttpGet]
+        public IActionResult GetPackingListNumbers(string id)
+        {
+            if (id == null)
+            {
+                id = "0";
+            }
+            var sellerId = int.Parse(id.ToString());
+            var selectedNumbers = invoiceService.GetPackingListNumbers(sellerId);
+            return Json(selectedNumbers, new JsonSerializerOptions() { PropertyNameCaseInsensitive = false });
+        }
         //izbira se faktura za kreditno
         [HttpGet]
         public IActionResult ChooseInvoiceForCreditNote()
@@ -616,22 +645,27 @@ namespace SSMO.Controllers
 
         //izbira se faktura za debitno
         [HttpGet]
-        public IActionResult ChooseInvoiceForDebitNote()
+        public IActionResult ChooseInvoiceForDebitNote(DebitNoteChooseInvoiceViewModel model)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
             if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
          
-            var model = new DebitNoteChooseInvoiceViewModel
-            {
-                MyCompanies = mycompanyService.GetAllCompanies(),
-                Products = new List<AddProductsToCreditAndDebitNoteFormModel>()  ,
-                PurchaseProducts = purchaseService.PurchaseProducts()
-            };
+            //var model = new DebitNoteChooseInvoiceViewModel
+            //{
+            //    MyCompanies = mycompanyService.GetAllCompanies(),
+            //    Products = new List<AddProductsToCreditAndDebitNoteFormModel>(),
+            //    PurchaseProducts = new List<PurchaseProductsForDebitNoteViewModel>()
+            //   // PurchaseProducts = purchaseService.PurchaseProducts()
+            //};
+            model.MyCompanies = mycompanyService.GetAllCompanies();
+            model.Products = new List<AddProductsToCreditAndDebitNoteFormModel>();
+            model.PurchaseProducts = purchaseService.PurchaseProducts(model.InvoiceId);
             return View(model);
         }
         [HttpPost]
-        public IActionResult ChooseInvoiceForDebitNote(DebitNoteChooseInvoiceViewModel model, IFormCollection collections)
+        public IActionResult ChooseInvoiceForDebitNote
+            (DebitNoteChooseInvoiceViewModel model, IFormCollection collections)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
@@ -642,7 +676,7 @@ namespace SSMO.Controllers
                 {
                     MyCompanies = mycompanyService.GetAllCompanies(),
                     Products = new List<AddProductsToCreditAndDebitNoteFormModel>(),
-                    PurchaseProducts = purchaseService.PurchaseProducts()
+                    PurchaseProducts = new List<PurchaseProductsForDebitNoteViewModel>()
                 });
             }
 
@@ -672,6 +706,8 @@ namespace SSMO.Controllers
                     var fscClaim = collections["FscClaim[" + i + "]"];
                     var fscCertificate = collections["FscCertificate[" + i + "]"];
                     var quantity = collections["Quantity[" + i + "]"].ToString();
+                    var pallets = collections["Pallets[" + i + "]"].ToString();
+                    var sheetsPerPallet = collections["SheetsPerPallet[" + i + "]"].ToString();
                     var product = new AddProductsToCreditAndDebitNoteFormModel
                     {
                         DescriptionId = int.Parse(description.ToString()),
@@ -681,7 +717,9 @@ namespace SSMO.Controllers
                         Price = decimal.Parse(price.ToString()),
                         FscClaim = fscClaim,
                         FscSertificate = fscCertificate,
-                        Quantity = decimal.Parse(quantity.ToString())
+                        Quantity = decimal.Parse(quantity.ToString()),
+                        Pallets = int.Parse(pallets.ToString()),
+                        SheetsPerPallet = int.Parse(sheetsPerPallet.ToString())
                     };
                     model.Products.Add(product);
                 }
@@ -690,7 +728,8 @@ namespace SSMO.Controllers
 
             return RedirectToAction("CreateDebitNote",
                 new { invoiceId = model.InvoiceId, date = model.Date, 
-                    moreQuantity = model.MoreQuantity, deliveryAddress = model.DeliveryAddress,               
+                    moreQuantity = model.MoreQuantity, 
+                    deliveryAddress = model.DeliveryAddress,
                     paymentTerms = model.PaymentTerms });
         }
         //sazdava se debitno
@@ -705,7 +744,7 @@ namespace SSMO.Controllers
             List<PurchaseProductsForDebitNoteViewModel> availableProducts = JsonConvert.DeserializeObject<List<PurchaseProductsForDebitNoteViewModel>>(TempData["availableProducts"].ToString());
             List<AddProductsToCreditAndDebitNoteFormModel> productsForDebit = JsonConvert.DeserializeObject<List<AddProductsToCreditAndDebitNoteFormModel>>(TempData["products"].ToString());
             var debitNoteForPrint = debitNoteService.CreateDebitNote
-                (invoiceId, date, moreQuantity,deliveryAddress,productsForDebit, availableProducts, paymentTerms);
+                (invoiceId, date, deliveryAddress,productsForDebit, availableProducts, paymentTerms);
 
             return View(debitNoteForPrint);
         }

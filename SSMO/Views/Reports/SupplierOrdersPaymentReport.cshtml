@@ -3,7 +3,7 @@
     ViewBag.Title = "Edit Supplier Order Payment";
 }
 
-<form method="get">
+<form method="get">    
     <div class="row">
         <div class="form-group col-md-4">
             <label asp-for="SupplierName"></label>
@@ -91,13 +91,10 @@
                 </th>                             
                 <th>
                     Balance
-                </th>
-                <th> Advance payment</th>
-                <th>Date</th>
+                </th> 
                  <th>
                    Next Payments
-                </th>
-               
+                </th>               
         </tr>
     </thead>
     <tbody>
@@ -123,16 +120,13 @@
                         <th>Not Paid</th>
                     }
                     <th> @order.TotalAmount @order.PurchaseCurrency.ToUpper()</th>
-                    <th> @order.Balance</th>
-                    <th>@order.PaidAvance</th>
-                    <th> @order.DatePaidAmount</th>
+                    <th> @order.Balance</th>                    
                     <th class="align-self-auto"> @foreach (var payment in order.Payments)
                         {
                             @payment.PaidAmount<p>-</p>@payment.Date.Date.ToShortDateString()   
                             <br />
                         }        
                     </th>
-
                     <th><a asp-controller="Reports" asp-action="DetailsSupplierAndPurchasePayment" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Add new payment</a></th> 
                 </tr>               
                 <tr>
@@ -151,13 +145,7 @@
                                     </th>
                                     <th>
                                         Balance
-                                    </th>
-                                    <th>
-                                        Paid advance
-                                    </th>
-                                    <th>
-                                        Date
-                                    </th>
+                                    </th>                                   
                                     <th>
                                         Made payments
                                     </th>
@@ -178,13 +166,7 @@
                                         </td> 
                                         <td>
                                             @purchase.Balance
-                                        </td>
-                                        <td>
-                                            @purchase.PaidAdvance
-                                        </td>
-                                        <td>
-                                            @purchase.DatePaidAmount
-                                        </td>
+                                        </td>                                        
                                         <td>
                                             @foreach (var payment in purchase.PurchasePaymentsDetails)
                                             {
@@ -204,5 +186,4 @@
            
         }        
     </tbody>
-
 </table>

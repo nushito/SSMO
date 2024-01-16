@@ -6,6 +6,21 @@
 <div>
 </div>
     <form method="post">
+        <div class="row" style="color:red;font-size:15px;font-style:italic">
+        *Note: Method of Payments:
+        <ol type="1">
+            <li>
+        All payments will be made as per Supplier order (don't check any Purchase Invoice);
+            </li>
+            <li>
+        Payment is made as per Supplier order and chosen Purchase Invoice accordingly 
+        (you can fill amount in Supplier Order section or Puchase Invoices section, but always check the Invoice);
+            </li>
+            <li>
+        Fill amount/s and choose Invoice/s without Supplier Order
+            </li>
+        </ol>        
+    </div>
         <h2>Add new payment for Supplier Specification/Purchase Invoice</h2>
         <table class="table-bordered">
             <thead>
@@ -105,13 +120,18 @@
                     <td>
                       <input type="hidden" value="@Model.PurchasePaymentsCollection[i].Id" asp-for="@Model.PurchasePaymentsCollection[i].Id">
                     </td>
+                        <td class="col-md-1">
+                          <label style="color:red">Make Only Cost Calculation</label>
+                         <input type="checkbox" asp-for="@Model.PurchasePaymentsCollection[i].OnlyCalculate">
+                        </td>
                     <td class="col-md-1">
+                      <label>Choose Purchase Invoice for payment</label>
                      <input type="checkbox" asp-for="@Model.PurchasePaymentsCollection[i].IsChecked">
                     </td>
                      <td class="col-md-3">
                        <div class="form-group">
                             <label asp-for="@Model.PurchasePaymentsCollection[i].PurchaseNumber">Payment for Invoice No</label>
-                           <input type="number" min="0.00" step="0.00001" class="form-control" asp-for="@Model.PurchasePaymentsCollection[i].PurchaseNumber" value="@Model.PurchasePaymentsCollection[i].PurchaseNumber">
+                            <input type="text" class="form-control" asp-for="@Model.PurchasePaymentsCollection[i].PurchaseNumber" value="@Model.PurchasePaymentsCollection[i].PurchaseNumber">
                              <span asp-validation-for="@Model.PurchasePaymentsCollection[i].PurchaseNumber" class="small text-danger"></span>
                             </div>
                     </td>

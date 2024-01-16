@@ -1,4 +1,5 @@
 ﻿using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Image;
 using SSMO.Models.Reports.Invoice;
 using System;
 using System.Collections.Generic;
@@ -27,5 +28,7 @@ namespace SSMO.Models.Documents.DebitNote
         public string Comment { get; set; }
         public List<EditProductForDebitNoteViewModel> Products { get; set; }
         public string PaymentTerms { get; set; }
+        public string HeaderUrl { get; set; }
+        public string FooterUrl { get; set; }        
     }
 }

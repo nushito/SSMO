@@ -95,7 +95,8 @@
                         <th>Unit Price</th>      
                         <th>Pallets</th>
                         <th>Sheets per Pallet</th>  
-                        <th class="center">Quantity</th>                        
+                        <th class="center">Quantity</th>      
+                        <th>HS Code</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -183,7 +184,12 @@
                                     <div class="editor-field">
                                             <input asp-for="ProductList.ElementAt(i).Quantity" class="text-box single-line" name="Quantity[0]" value="" required="required">
                                     </div>
-                                </td>                            
+                                </td> 
+                                     <td>
+                                        <div class="editor-field">
+                                                <input asp-for="ProductList.ElementAt(i).HsCode" class="text-box single-line" name="HsCode[0]" value="" required="required">
+                                        </div>
+                                    </td>  
                                 <td>
                                     <button type="button" class="btn-danger" onclick="removeTr(0);">Delete</button>
                                 </td>
@@ -251,6 +257,9 @@
                                     '<td>' +
                                     '<input class="text-box single-line" name="Quantity[' + counter + ']" value="" required="required" />' +
                                     '</td>' +
+                                        '<td>' +
+                                        '<input class="text-box single-line" name="HsCode[' + counter + ']" value="" required="required" />' +
+                                        '</td>' +
                                     '<td>' +
                                      '<button type="button" class="btn btn-primary" onclick="removeTr(' + counter + ');">Delete</button>' +
                                     '</td>' +

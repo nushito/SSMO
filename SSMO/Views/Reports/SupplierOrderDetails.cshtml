@@ -96,6 +96,7 @@
                             <th>Quantity</th> 
                             <th>Price</th>                             
                             <th>Amount</th>
+                            <th>HS Code</th>
                         </tr>
             </thead>
             <tbody>
@@ -104,63 +105,66 @@
                 <tr>
                         <td class="col-sm-1">
                             <div class="editor-field">
-                        @product.DescriptionName
+                                 @product.DescriptionName
                             </div>
                         </td>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                        @product.SizeName
+                                 @product.SizeName
                                 </div>
                             </td>
                                 <td class="col-sm-1">
                                 <div class="editor-field">
-                        @product.GradeName
+                                 @product.GradeName
                                 </div>
                             </td>
                                 <td class="col-sm-1">
                                 <div class="editor-field">
-                        @product.FscClaim
+                                 @product.PurchaseFscClaim
                                 </div>
                             </td>
-                                <td class="col-sm-1">
+                             <td class="col-sm-1">
                                 <div class="editor-field">
-                        @product.FscCertificate
+                                @product.PurchaseFscCertificate
                                 </div>
                             </td>
                                  <td class="col-sm-1">
                                     <div class="editor-field">
-                        @product.Pallets
+                                @product.Pallets
                                     </div>
                                 </td>
-                                    <td class="col-sm-1">
+                              <td class="col-sm-1">
                                     <div class="editor-field">
-                        @product.SheetsPerPallet
-                                    </div>
-                                </td>
-                                <td class="col-sm-1">
+                                @product.SheetsPerPallet
+                                  </div>
+                            </td>
+                            <td class="col-sm-1">
                                 <div class="editor-field">
-                        @product.Unit
+                                @product.Unit
                                 </div>
                             </td>
-                                <td class="col-sm-1">
+                             <td class="col-sm-1">
                                 <div class="editor-field">
-                        @product.OrderedQuantity
+                                @product.OrderedQuantity
                                 </div>
                             </td>
-                                <td class="col-sm-1">
+                            <td class="col-sm-1">
                                 <div class="editor-field">
-                        @product.PurchasePrice
+                                  @product.PurchasePrice
                                 </div>
                             </td>
-
-                                <td class="col-sm-1">
+                             <td class="col-sm-1">
                                 <div class="editor-field">
-                        @product.PurchaseAmount
+                                  @product.PurchaseAmount
                                 </div>
                             </td>
+                            <td class="col-sm-1">
+                              <div class="editor-field">
+                                   @product.HsCode
+                              </div>
+                        </td>
                 </tr>
 
         }
             </tbody>
-
 </table>

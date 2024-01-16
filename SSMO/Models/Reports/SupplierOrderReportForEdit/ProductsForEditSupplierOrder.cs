@@ -23,8 +23,8 @@ namespace SSMO.Models.Reports.SupplierOrderReportForEdit
         public string Unit { get; set; }
         public ICollection<string> Units { get; set; }
       //  public IEnumerable<string> Grades { get; set; }
-        public string FSCClaim { get; set; }
-        public string FSCSertificate { get; set; }
+        public string PurchaseFscClaim { get; set; }
+        public string PurchaseFscCertificate { get; set; }
         public int SupplierOrderId { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal PurchasePrice { get; set; }
@@ -33,6 +33,7 @@ namespace SSMO.Models.Reports.SupplierOrderReportForEdit
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
         public int TotalSheets { get; set; }
+        public string HsCode { get; set; }
 
     }
 }

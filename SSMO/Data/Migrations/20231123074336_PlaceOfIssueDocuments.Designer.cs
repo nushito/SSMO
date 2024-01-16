@@ -10,8 +10,8 @@ using SSMO.Data;
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231113182618_Image")]
-    partial class Image
+    [Migration("20231123074336_PlaceOfIssueDocuments")]
+    partial class PlaceOfIssueDocuments
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -822,6 +822,9 @@ namespace SSMO.Data.Migrations
                     b.Property<string>("PaymentTerms")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PlaceOfIssue")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<decimal>("ProcentComission")
                         .HasPrecision(18, 5)
                         .HasColumnType("decimal(18,5)");
@@ -965,7 +968,7 @@ namespace SSMO.Data.Migrations
                     b.Property<string>("ImageTitle")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("MyCompanyId")
+                    b.Property<int>("MyCompanyId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -2095,9 +2098,13 @@ namespace SSMO.Data.Migrations
 
             modelBuilder.Entity("SSMO.Data.Models.Image", b =>
                 {
-                    b.HasOne("SSMO.Data.Models.MyCompany", null)
+                    b.HasOne("SSMO.Data.Models.MyCompany", "MyCompanyName")
                         .WithMany("Images")
-                        .HasForeignKey("MyCompanyId");
+                        .HasForeignKey("MyCompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MyCompanyName");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.InvoiceProductDetails", b =>

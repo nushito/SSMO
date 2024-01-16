@@ -18,7 +18,13 @@ namespace SSMO.Data.Migrations
                     BgCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     City = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Bgcountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Country = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CorrespondBgCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CorrespondBgCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CorrespondBgStreet = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CorrespondCountry = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CorrespondCity = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CorrespondStreet = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -61,7 +67,8 @@ namespace SSMO.Data.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Details = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     BgName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BgDetails = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    BgDetails = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -75,7 +82,8 @@ namespace SSMO.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     FscTextEng = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FscTextBg = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    FscTextBg = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -135,7 +143,8 @@ namespace SSMO.Data.Migrations
                     RepresentativePerson = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressId = table.Column<int>(type: "int", nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -188,7 +197,8 @@ namespace SSMO.Data.Migrations
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AddressId = table.Column<int>(type: "int", nullable: false),
-                    ContactPerson = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    ContactPerson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -239,7 +249,9 @@ namespace SSMO.Data.Migrations
                     DealType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DealDescription = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DeliveryPeriod = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PaymentTerms = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    PaymentTerms = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Etd = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Eta = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -283,6 +295,27 @@ namespace SSMO.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Images",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ImageTitle = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ImageData = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
+                    MyCompanyId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Images", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Images_MyCompanies_MyCompanyId",
+                        column: x => x.MyCompanyId,
+                        principalTable: "MyCompanies",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Suppliers",
                 columns: table => new
                 {
@@ -296,7 +329,8 @@ namespace SSMO.Data.Migrations
                     AddressId = table.Column<int>(type: "int", nullable: false),
                     FscClaim = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FscSertificate = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RepresentativePerson = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    RepresentativePerson = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UserId = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -531,6 +565,7 @@ namespace SSMO.Data.Migrations
                     FiscalAgentId = table.Column<int>(type: "int", nullable: true),
                     FscTextId = table.Column<int>(type: "int", nullable: true),
                     PaymentTerms = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LoadingAddress = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PurchaseProductDetailsId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -643,6 +678,7 @@ namespace SSMO.Data.Migrations
                     CustomerOrderId = table.Column<int>(type: "int", nullable: true),
                     SupplierOrderId = table.Column<int>(type: "int", nullable: true),
                     DocumentId = table.Column<int>(type: "int", nullable: true),
+                    HsCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PurchaseTransportCost = table.Column<decimal>(type: "decimal(18,4)", nullable: true),
                     DeliveryTrasnportCost = table.Column<decimal>(type: "decimal(18,4)", nullable: true),
                     BankExpenses = table.Column<decimal>(type: "decimal(18,4)", nullable: true),
@@ -721,10 +757,18 @@ namespace SSMO.Data.Migrations
                     Eta = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     TruckNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     AmountAfterVat = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Balance = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     DocumentId = table.Column<int>(type: "int", nullable: true),
                     CustomerOrderId = table.Column<int>(type: "int", nullable: true),
                     SupplierOrderId = table.Column<int>(type: "int", nullable: true),
                     FiscalAgentId = table.Column<int>(type: "int", nullable: true),
+                    Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DriverName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DriverPhone = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GrossWeight = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentTerms = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Payer = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DocumentId1 = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -1186,6 +1230,11 @@ namespace SSMO.Data.Migrations
                 column: "SupplierOrderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Images_MyCompanyId",
+                table: "Images",
+                column: "MyCompanyId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_InvoiceProductDetails_CreditNoteId",
                 table: "InvoiceProductDetails",
                 column: "CreditNoteId");
@@ -1490,6 +1539,9 @@ namespace SSMO.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "CustomerOrderSupplierOrder");
+
+            migrationBuilder.DropTable(
+                name: "Images");
 
             migrationBuilder.DropTable(
                 name: "InvoiceProductDetails");

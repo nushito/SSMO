@@ -6,21 +6,25 @@
 }
 
 <form class="get">
-    <div>
+    <div class="row">
         <h4>Choose Packing list No</h4>
     </div>
 <div class="row">
-        <div class="form-group col-md-4">
-            <label asp-for="PackingListNumber"></label>
-            <select asp-for="PackingListNumber" class="form-control">
+    <div class="row col-md-4 mb-3">
+     <label asp-for="MyCompanyId">Seller</label>
+            <select name= "MyCompanyId" asp-for="MyCompanyId" class="form-control">
             <option value="">All</option>
-                @foreach (var invoiceNum in Model.PckingListNumbers)
-                {
-                    <option value="@invoiceNum">@invoiceNum</option>
-                }
+            @foreach (var myCompany in Model.Companies)
+            {
+                       <option value="@myCompany.Id">@myCompany.Name</option>
+            }
 
             </select>
         </div>
+         <div class="row col-md-4 mb-3">           
+             <label asp-for="PackingListNumber" class="control-label"> Select PackingList Number</label>
+             <select class="form-control" id="PackingListNumber" name="PackingListNumber" asp-for="PackingListNumber" asp-items="@(new SelectList(string.Empty,"PackingListId", "PackingListNumber"))"></select>               
+        </div>  
     </div>
    <input type="submit" value="Packing list" class="btn btn-primary mt-3"  
         asp-route-invoiceNumber="@Model.PackingListNumber"/>
@@ -83,8 +87,7 @@
             <ul class="list-unstyled">
               <li class="text-muted">Delivery Terms: <span style="color:#5d9fc5 ;">@Model.PackingListForPrint.Incoterms</span></li>
               <li class="text-muted">Truck Number: <span style="color:#5d9fc5 ;">@Model.PackingListForPrint.TruckNumber</span></li>
-              <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;"> @Model.PackingListForPrint.NetWeight kg</span> </li>
-              <li class="text-muted">Gross Weight: <span style="color:#5d9fc5 ;"> @Model.PackingListForPrint.GrossWeight kg</span></li>
+              
             </ul>
           </div>
         </div>
@@ -132,9 +135,19 @@
         </div>
       
         <hr>
-      
+      <ul>
+         <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;"> @Model.PackingListForPrint.NetWeight kg</span> </li>
+         <li class="text-muted">Gross Weight: <span style="color:#5d9fc5 ;"> @Model.PackingListForPrint.GrossWeight kg</span></li>
+      </ul>
       </div>
     </div>
   </div>
 </div>
 }
+
+@section Scripts {
+     <script src="/js/getPackingListNumbersByCompany.js" type="text/javascript">                                       
+     </script>
+
+}
+                                   

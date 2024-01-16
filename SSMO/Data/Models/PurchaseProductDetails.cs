@@ -21,9 +21,12 @@ namespace SSMO.Data.Models
         public string FscCertificate { get; set; }
         public decimal PurchasePrice { get; set; }
         public decimal Amount { get; set; }
+        public decimal? CalculationCurrencyPrice { get; set; }
         public int PurchaseInvoiceId { get; set; }
         public Document PurchaseInvoice { get; set; }
-        public decimal CostPrice { get; set; }        
+        public decimal CostPrice { get; set; }
+        public int? CostPriceCurrencyId { get; set; }
+        public Currency CostPriceCurrency { get; set; }
         public string VehicleNumber { get; set; }
         public ICollection<Document> InvoicesToCustomer { get; set; }
         public ICollection<InvoiceProductDetails> InvoiceProductDetails { get; set; }

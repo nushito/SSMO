@@ -1,11 +1,15 @@
-﻿using AutoMapper.Internal;
+﻿using AutoMapper;
+using AutoMapper.Internal;
 using DocumentFormat.OpenXml.Office2010.ExcelAc;
+using DocumentFormat.OpenXml.VariantTypes;
 using SSMO.Data;
 using SSMO.Data.Models;
+using SSMO.Models.Reports.PaymentsModels.TransportModels;
 using SSMO.Models.Reports.ServiceOrders;
 using SSMO.Models.Reports.ServiceOrders.ModelsForPrint;
 using SSMO.Models.ServiceOrders;
 using SSMO.Models.TransportCompany;
+using SSMO.Repository;
 using SSMO.Services.Addresses;
 using SSMO.Services.Customer;
 using SSMO.Services.FiscalAgent;
@@ -27,9 +31,14 @@ namespace SSMO.Services.TransportService
         private readonly ICurrency currency;
         private readonly ICustomerService customerService;
         private readonly IFiscalAgentService fiscalAgentService;
+        private readonly IMapper mapper;
+        private readonly ICustomerOrderRepository customerOrderRepository;
+        private readonly ISupplierOrderRepository supplierOrderRepository;
         public TransportService(ApplicationDbContext dbContext, IAddressService addressService,
             ISupplierService supplierService, IMycompanyService mycompanyService,
-            ICurrency currency, ICustomerService customerService, IFiscalAgentService fiscalAgentService)
+            ICurrency currency, ICustomerService customerService, IFiscalAgentService fiscalAgentService,
+            IMapper mapper, ICustomerOrderRepository customerOrderRepository,
+            ISupplierOrderRepository supplierOrderRepository)
         {
             this.dbContext = dbContext;
             this.addressService = addressService;
@@ -38,6 +47,9 @@ namespace SSMO.Services.TransportService
             this.currency = currency;
             this.customerService = customerService;
             this.fiscalAgentService = fiscalAgentService;
+            this.mapper = mapper; 
+            this.customerOrderRepository = customerOrderRepository; 
+            this.supplierOrderRepository = supplierOrderRepository;
         }
 
         //create trasnport company
@@ -368,6 +380,71 @@ namespace SSMO.Services.TransportService
             dbContext.SaveChanges();
 
            return true;
+        }
+
+        public ICollection<TransportCompanySelectViewModel> GetTransportCompanies()
+        {
+            return dbContext.TransportCompanies
+                .Select(a=> new TransportCompanySelectViewModel
+                {
+                    Id= a.Id,
+                    Name= a.Name,
+                }).ToList();
+        }
+        public ICollection<TransportCompanyPaymentCollectionViewModel> TransportCompanyPaymentCollection
+            (int id, DateTime startDate, DateTime endDate)
+        {
+            if(id == 0)
+            {
+                return null;
+            }
+
+            var queryOrders = dbContext.ServiceOrders
+                .Where(i => i.TransportCompanyId == id)
+                .Where(d => d.Date >= startDate && d.Date <= endDate);
+
+            var orderCollection = mapper.Map<ICollection<TransportCompanyPaymentCollectionViewModel>>(queryOrders.ToList());
+
+            foreach (var order in orderCollection)
+            {
+                if(order.CustomerOrderId != 0)
+                {
+                    order.OrderConfirmationNumber = customerOrderRepository.GetCustomerOrderNumberById(order.CustomerOrderId);
+                }
+                else
+                {
+                    order.SupplierOrderNumber = supplierOrderRepository.GetSupplierOrderNumberById(order.SupplierOrderId);
+                }
+                order.Currency = currency.GetCurrency(order.CurrencyId);
+            }
+
+            return orderCollection;
+        }
+
+        public bool ServiceOrderPayment(int number, decimal amount, DateTime date)
+        {
+            if (number == 0) {return false; }
+
+            var order = dbContext.ServiceOrders
+                .Where(n => n.Number == number)
+                .FirstOrDefault();
+
+            if (order == null) { return false; }
+
+            dbContext.Payments.Add(new Payment
+            {
+                 CurrencyId = order.CurrencyId,
+                 Date = date,
+                 ServiceOrderId = order.Id,
+                 PaidAmount = amount
+            });
+
+            order.Balance = order.AmountAfterVat - amount;
+            if(order.Balance == 0)
+            {
+                order.Paid = true;
+            }
+            return true;
         }
     }
 }

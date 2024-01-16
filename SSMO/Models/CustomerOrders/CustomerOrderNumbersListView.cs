@@ -1,5 +1,6 @@
 ﻿using SSMO.Models.Documents.Invoice;
 using SSMO.Models.FscTexts;
+using SSMO.Models.Image;
 using SSMO.Services.Curruncies;
 using System;
 using System.Collections.Generic;
@@ -45,6 +46,12 @@ namespace SSMO.Models.CustomerOrders
         public int? FscTextEng { get; set; }
         public ICollection<FscTextViewModel> FscTexts { get; set; }
         public string PaymentTerms { get; set; }
-        public string LoadingAddress { get; set; }       
+        public string LoadingAddress { get; set; }
+        public ICollection<ImageModelViewForAllDocuments> Images { get; set; }
+        public int Footer { get; set; }
+        public int Header { get; set; }
+        public string PlaceOfIssue { get; set; }
+        public decimal? Factoring { get; set; }
+        public decimal? Comission { get; set; }
     }
 }

@@ -49,5 +49,10 @@ namespace SSMO.Models.Reports.Invoice
         public string PaymentTerms { get; set; }
         public string LoadingAddress { get; set; }
         public string DeliveryAddress { get; set; }
+        public string HeaderUrl { get; set; }
+        public string FooterUrl { get; set; }
+        public string PlaceOfIssue { get; set; }
+        public int CurrencyId { get; set; }
+        public string Currency { get; set; }
     }
 }

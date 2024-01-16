@@ -39,6 +39,7 @@ namespace SSMO.Models.Documents.Invoice
         public int GradeId { get; set; }   
         public string Grade { get; set; }
         public List<GradeForInvoiceViewModel> Grades { get; set; }
+        public string HsCode { get; set; }
 
     }
 }

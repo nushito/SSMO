@@ -17,8 +17,8 @@ namespace SSMO.Services.Documents.Invoice
         public string Grade { get; set; }
         public IEnumerable<string> Grades { get; set; }
         public string Unit { get; set; }
-        public string FSCClaim { get; set; }
-        public string FSCSertificate { get; set; }
+        public string FscClaim { get; set; }
+        public string FscCertificate { get; set; }
         public int CustomerOrderId { get; set; }
 
         [Range(0.0, 9999999999999.99999)]
@@ -38,6 +38,6 @@ namespace SSMO.Services.Documents.Invoice
         public decimal DebitNoteAmount { get; set; }
         public decimal DebitNotePrice { get; set; }
         public decimal DebitNoteBgPrice { get; set; }
-        public decimal DebitNoteBgAmount { get; set; }
+        public decimal DebitNoteBgAmount { get; set; }        
     }
 }

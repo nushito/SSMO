@@ -27,14 +27,13 @@ namespace SSMO.Models.Documents.Invoice
         public decimal BgAmount { get; set; }
         public decimal BgPrice { get; set; }
         public decimal SellPrice { get; set; }
-        public decimal DeliveryCost { get; set; }
-        public decimal Profit { get; set; }
+        public decimal DeliveryCost { get; set; }       
         public string VehicleNumber { get; set; }
         public decimal InvoicedQuantity { get; set; }        
-        public ICollection<string> FscCertificates { get; set; }
+        public ICollection<string> FscCertificates { get; set; } = new List<string>();  
         public int CustomerOrderId { get; set; }
         public int PurchaseProductDetailsId { get; set; }
-      
+        public string HsCode { get; set; }
         public int CustomerProductDetailId { get; set; }
     }
 }

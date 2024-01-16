@@ -1,5 +1,6 @@
 ﻿using DocumentFormat.OpenXml.Wordprocessing;
 using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Image;
 using SSMO.Services.Documents.Invoice;
 using System;
 using System.Collections.Generic;
@@ -33,5 +34,8 @@ namespace SSMO.Models.Documents
         public string CreditNoteDeliveryAddress { get; set; }
         public ICollection<InvoiceBankDetailsViewModel> BankDetails { get; set; }
         public string PaymentTerms { get; set; }
+        public ICollection<ImageModelViewForAllDocuments> Images { get; set; }
+        public string FooterUrl { get; set; }
+        public string HeaderUrl { get; set; }
     }
 }

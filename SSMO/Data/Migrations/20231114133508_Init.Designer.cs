@@ -10,8 +10,8 @@ using SSMO.Data;
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231107070351_PaymentDetailsServiceOrder")]
-    partial class PaymentDetailsServiceOrder
+    [Migration("20231114133508_Init")]
+    partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -441,6 +441,9 @@ namespace SSMO.Data.Migrations
                     b.Property<string>("RepresentativePerson")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("VAT")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -796,6 +799,9 @@ namespace SSMO.Data.Migrations
                     b.Property<string>("Incoterms")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("LoadingAddress")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("MyCompanyId")
                         .HasColumnType("int");
 
@@ -902,6 +908,9 @@ namespace SSMO.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("FiscalAgents");
@@ -918,6 +927,9 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FscTextEng")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -938,6 +950,29 @@ namespace SSMO.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Grades");
+                });
+
+            modelBuilder.Entity("SSMO.Data.Models.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ImageTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MyCompanyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MyCompanyId");
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.InvoiceProductDetails", b =>
@@ -1264,6 +1299,9 @@ namespace SSMO.Data.Migrations
 
                     b.Property<int>("GradeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("HsCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("LoadedQuantity")
                         .HasPrecision(18, 5)
@@ -1602,6 +1640,9 @@ namespace SSMO.Data.Migrations
                     b.Property<string>("RepresentativePerson")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("VAT")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -1736,6 +1777,9 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Vat")
@@ -2047,6 +2091,17 @@ namespace SSMO.Data.Migrations
                     b.Navigation("Supplier");
 
                     b.Navigation("SupplierOrder");
+                });
+
+            modelBuilder.Entity("SSMO.Data.Models.Image", b =>
+                {
+                    b.HasOne("SSMO.Data.Models.MyCompany", "MyCompanyName")
+                        .WithMany("Images")
+                        .HasForeignKey("MyCompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MyCompanyName");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.InvoiceProductDetails", b =>
@@ -2461,6 +2516,8 @@ namespace SSMO.Data.Migrations
                     b.Navigation("BankDetails");
 
                     b.Navigation("Documents");
+
+                    b.Navigation("Images");
 
                     b.Navigation("Orders");
 

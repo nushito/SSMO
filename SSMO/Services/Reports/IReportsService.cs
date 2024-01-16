@@ -19,7 +19,7 @@ namespace SSMO.Services.Reports
         SupplierOrdersQueryModel AllSupplierOrders(string name,DateTime startDate, DateTime endDate,
             int currentpage, int supplierOrdersPerPage);
         SupplierOrderDetailsModel SupplierOrderDetail(int id);
-        CustomerOrderDetailsModel CustomerOrderDetails(int id);
+        //CustomerOrderDetailsModel CustomerOrderDetails(int id);
         Task<bool> EditCustomerOrder(int id, string number,
                 System.DateTime date,
                 int myCompanyId,
@@ -39,19 +39,14 @@ namespace SSMO.Services.Reports
         public CustomerOrderPaymentCollectionViewModel CustomerOrdersPaymentDetails(string customerName, int currentpage, int customerOrdersPerPage);
         public SupplierOrderForEditModel SupplierOrderForEditDetails(int supplierOrderId);
 
-        Task<bool> EditSupplierOrder(int supplierOrderId, string supplierOrderNumber,
-               DateTime date,
-               int myCompanyId,
-               string deliveryTerms,
-               string loadingPlace, string deliveryAddress,
-               decimal grossWeight, decimal netWeight,
-              int currencyId, int status, int customerOrderNumber,
-              string fscClaim, string fscCertificate,
-              decimal paidAdvance, bool paidStatus, int? vat,
+        Task<bool> EditSupplierOrder
+            (int supplierOrderId, string supplierOrderNumber, DateTime date,int myCompanyId,
+               string deliveryTerms,string loadingPlace, string deliveryAddress,decimal grossWeight, 
+               decimal netWeight, int currencyId, int status, int customerOrderNumber, int? vat,
               List<ProductsForEditSupplierOrder> products, List<NewProductsForSupplierOrderModel> newProducts);
 
-        public InvoiceReportModel InvoiceCollection(string myCompanyName, DateTime startDate, DateTime endDate, int currentpage, int invoicesPerPage);
-        public InvoiceDetailsViewModel InvoiceDetails(int id);
+        public InvoiceReportModel InvoiceCollection(int myCompanyId, DateTime startDate, DateTime endDate, int currentpage, int invoicesPerPage);
+        public InvoiceDetailsViewModel InvoiceDetails(int id,int header, int footer);
 
         public PurchaseCollectionQueryModel PurchaseInvoices
             (string supplierName, DateTime startDate, DateTime endDate, int currentpage, int invoiceperPage);

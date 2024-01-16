@@ -227,6 +227,7 @@ namespace SSMO.Controllers
                     Quantity = product.OrderedQuantity,
                     Unit = product.Unit,
                     CustomerOrderId = customerorderId,
+                    HsCode = product.HsCode,
                     QuantityAvailableForCustomerOrder = product.QuantityAvailableForCustomerOrder
                 };
                 listProducts.Add(productSupp);
@@ -261,7 +262,7 @@ namespace SSMO.Controllers
 
             foreach (var product in model)
             {       
-                if(product.QuantityAvailableForCustomerOrder == 0) { continue; }
+                if(product.QuantityAvailableForCustomerOrder == 0 || product.SellPrice <= 0.01m) { continue; }
                 else { product.Quantity = product.QuantityAvailableForCustomerOrder; }
 
                 var check = await productService.CreateCustomerOrderProduct
@@ -286,7 +287,6 @@ namespace SSMO.Controllers
 
             return View(printModel);
         }
-
         
     }
 }

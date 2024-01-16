@@ -22,7 +22,7 @@
                     <td>Sheets/pallet</td>
                     <td>Quantity</td>
                     <td>Price</td>
-
+                    <td>HS Code</td>
                 </tr>
             </thead>
             <tbody>
@@ -99,7 +99,6 @@
                                     </select>
                             </div>
                         </td>
-
                         <td class="col-sm-1">
                             <div class="editor-field">
                                 <input asp-for="@Model[i].Pallets" type="number" class="text-box single-line" required="required">
@@ -115,17 +114,21 @@
                               <input asp-for="@Model[i].QuantityAvailableForCustomerOrder" type="number"  min="0.00000" step="0.00001" class="text-box single-line" required="required">
                             </div>
                         </td>
-
                         <td class="col-sm-1">
                             <div class="editor-field">
                                 <input asp-for="@Model[i].SellPrice" type="number" min="0.0000" step="0.0001" class="text-box single-line" required="required">
+                                 <span asp-validation-for="@Model[i].SellPrice" class="small text-danger"></span>
                             </div>
                         </td>
+                        <td class="col-sm-1">
+                             <div class="editor-field">
+                                 <input asp-for="@Model[i].HsCode" type="text" class="text-box single-line" required="required">
+                             </div>
+                         </td>
                     </tr>
                 }
             </tbody>
         </table>
-
         <hr />
         <p>
             <input type="submit" value="Save" class="btn btn-primary mt-3" />

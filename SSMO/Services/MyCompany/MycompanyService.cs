@@ -186,6 +186,7 @@ namespace SSMO.Services.MyCompany
                 .ToList();            
         }
 
+            
         public ICollection<MyCompanyViewModel> GetCompaniesNameAndId()
         {
             return dbContext.MyCompanies

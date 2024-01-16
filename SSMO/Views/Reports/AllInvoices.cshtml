@@ -2,16 +2,16 @@
 @{
     ViewBag.Title = "All Invoices";
 }
-
+<h5>Invoice Collection</h5>
 <form method="get">
     <div class="row">
         <div class="form-group col-md-4">
-            <label asp-for="MyCompanyName"></label>
-            <select asp-for="MyCompanyName" class="form-control">
+            <label asp-for="MyCompanyId">Choose Seller</label>
+            <select asp-for="MyCompanyId" class="form-control">
             <option value="">All</option>
                 @foreach (var name in Model.MyCompanyNames)
                 {
-                    <option value="@name">@name</option>
+                    <option value="@name.Id">@name.Name</option>
                 }
             </select>
         </div>
@@ -51,7 +51,9 @@
            asp-controller="Reports"
            asp-action="AllInvoices"
            asp-route-currentPage="@previouspage"
-           asp-route-myCompanyName="@Model.MyCompanyName"
+           asp-route-myCompanyId="@Model.MyCompanyId"
+           asp-route-startDate = "@Model.StartDate"
+           asp-route-endDate = "@Model.EndDate"
           ><<</a>
     </div>
     
@@ -65,7 +67,9 @@
            asp-controller="Reports"
            asp-action="AllInvoices"
            asp-route-currentPage="@(Model.CurrentPage + 1)"
-           asp-route-myCompanyName="@Model.MyCompanyName"
+           asp-route-myCompanyId="@Model.MyCompanyId"
+           asp-route-startDate = "@Model.StartDate"
+           asp-route-endDate = "@Model.EndDate"
            >>></a>
     </div>
 </div>
@@ -138,21 +142,29 @@
                             <th>
                         @order.DebitToInvoiceDocumentNumber
                             </th>
-                            <th><a asp-controller="Reports" asp-action="InvoiceDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a></th>
+                            <th><a asp-controller="Reports" 
+                                asp-action="InvoiceDetails" 
+                                asp-route-id="@order.Id" 
+                                asp-route-footer="@order.FooterId"
+                                asp-route-header="@order.HeaderId"
+                                class="btn btn-info mr-1" target="_blank">Details</a></th>
                     @if(order.DocumentType == "Invoice")
                     {
-                                    <th> <a asp-controller="Reports" asp-action="EditInvoice" asp-route-id="@order.Id" asp-route-documentType="@order.DocumentType" class="btn btn-info mr-1">Edit</a> </th>
+                       <th> <a asp-controller="Reports" 
+                           asp-action="EditInvoice" 
+                           asp-route-id="@order.Id" 
+                           asp-route-documentType="@order.DocumentType"                           
+                           class="btn btn-info mr-1" target="_blank">Edit</a> </th>
                     }
                     else if(order.DocumentType == "CreditNote")
                     {
-                                    <th> <a asp-controller="Reports" asp-action="EditCreditNote" asp-route-id="@order.Id" asp-route-documentType="@order.DocumentType" class="btn btn-info mr-1">Edit</a> </th>
+                                   <th> <a asp-controller="Reports" asp-action="EditCreditNote" asp-route-id="@order.Id" asp-route-documentType="@order.DocumentType" class="btn btn-info mr-1" target="_blank">Edit</a> </th>
                     }
                     else
                     {
-                                    <th> <a asp-controller="Reports" asp-action="EditDebitNote" asp-route-id="@order.Id" asp-route-documentType="@order.DocumentType" class="btn btn-info mr-1">Edit</a> </th>
-                    }
-                    
-                        </tr>
+                                  <th> <a asp-controller="Reports" asp-action="EditDebitNote" asp-route-id="@order.Id" asp-route-documentType="@order.DocumentType" class="btn btn-info mr-1" target="_blank">Edit</a> </th>
+                    }                    
+                </tr>
             }  
         }                     
     </tbody>

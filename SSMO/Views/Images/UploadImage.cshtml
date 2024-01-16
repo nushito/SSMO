@@ -1,8 +1,20 @@
-﻿
+﻿@using SSMO.Services.MyCompany;
+@inject IMycompanyService service;
+@model MyCompanyChooseViewModel
+
 <div class="mb-3">
     <h5>Upload your images</h5>
 </div>
 <form method="post" enctype="multipart/form-data">
+    <div class="col-md-3 mb-5">
+        <label>Choose Company</label>
+        <select asp-for="Id" class="form-control">
+            @foreach (var item in service.GetCompaniesNameAndId())
+            {
+                <option value="@item.Id">@item.Name</option>
+            }
+        </select>
+    </div>
     <input type="file" name="image" multiple/>
     <button type="submit">Upload</button>
 </form>

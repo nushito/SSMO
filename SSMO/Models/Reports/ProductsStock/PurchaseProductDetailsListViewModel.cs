@@ -13,7 +13,9 @@ namespace SSMO.Models.Reports.ProductsStock
         public string Unit { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
-        public decimal PurchasePrice { get; set; }       
+        public decimal PurchasePrice { get; set; }
+        public string PurchaseCurrency { get; set; }
         public decimal CostPrice { get; set; }
+        public string CostPriceCurrency { get; set; }
     }
 }

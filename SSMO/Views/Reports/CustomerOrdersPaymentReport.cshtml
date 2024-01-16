@@ -69,17 +69,11 @@
                 </th>
                  <th>
                     Amount
-                </th>
-                <th>
-                    Advance Payment
-                </th>
-                <th>
-                    Date of Payment
-                </th>
+                </th>               
                 <th>
                     Balance
                 </th>
-                <th>Following payments</th>
+                <th>Payments</th>
         </tr>
     </thead>
     <tbody>
@@ -103,9 +97,7 @@
                     {
                         <th>Not Paid</th>
                     }
-                    <th> @order.TotalAmount</th>
-                    <th> @order.PaidAvance</th>
-                    <th> @order.DatePaidAmount</th>
+                    <th> @order.TotalAmount</th>                   
                     <th> @order.Balance</th>
                             <th>@if (order.CustomerOrderPayments != null)
                         {
@@ -134,15 +126,9 @@
                                     </th>
                                     <th>
                                         Date
-                                    </th>
+                                    </th>                                                                     
                                     <th>
-                                        Advance Payment
-                                    </th>
-                                    <th>
-                                        Date 
-                                    </th>                                      
-                                    <th>
-                                        Following payments
+                                        Payments
                                     </th>
                                 </tr> 
                             </thead>
@@ -154,9 +140,7 @@
                                     <td>
                                 @invoice.DocumentNumber
                                     </td>
-                                    <td>@invoice.Date</td>
-                                    <td>@invoice.AdvancePayment</td>
-                                    <td>@invoice.DateAdvancePayment</td>
+                                    <td>@invoice.Date</td>                                   
                                     <td>
                                 @if (invoice.Payments != null)
                                 {

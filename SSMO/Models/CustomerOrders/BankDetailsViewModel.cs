@@ -9,6 +9,7 @@ namespace SSMO.Models.CustomerOrders
         public string Iban { get; set; }
         public int CurrencyId { get; set; }
         public string Swift { get; set; }
-        public string CurrencyName { get; set; }       
+        public string CurrencyName { get; set; }
+        public string MyCompanyName { get; set; }
     }
 }

@@ -93,6 +93,11 @@ namespace SSMO.Data.Models
         public FscText FscText { get; set; }
         public string PaymentTerms { get; set; }
         public string LoadingAddress { get; set; }
+        public string PlaceOfIssue { get; set; }
+        public int? HeaderId { get; set; }
+        public Image Header { get; set; }
+        public int? FooterId { get; set; }
+        public Image Footer { get; set; }
         public ICollection<BankDetails> BankDetails { get; set; }        
         public ICollection<CustomerOrder> CustomerOrders { get; set; }
         public ICollection<PurchaseProductDetails> PurchaseProducts { get; set; }

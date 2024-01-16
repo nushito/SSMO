@@ -16,5 +16,6 @@ namespace SSMO.Data.Models
         public ICollection<Payment> Payments { get; set; }
         public ICollection<Payment> PaymentsWithExchangeRate { get; set; }
         public ICollection<ServiceOrder> ServiceOrders { get; set; }
+        public ICollection<PurchaseProductDetails> PurchaseProducts { get; set; } = new List<PurchaseProductDetails>();
     }
 }

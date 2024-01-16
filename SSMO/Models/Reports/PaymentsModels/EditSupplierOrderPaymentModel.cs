@@ -15,7 +15,6 @@ namespace SSMO.Models.Reports.PaymentsModels
 
         public decimal? CurrencyExchangeRate { get; set; }
         public string ActionCalc { get; set; }
-        
-
+       
     }
 }

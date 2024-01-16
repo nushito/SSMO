@@ -3,6 +3,7 @@
 @{
     ViewBag.Title = "Purchase Invoices";   
 }
+<h5>Purchase Invoices Collection</h5>
 <form class="get">
     <div class="row">
         <div class="col-3">
@@ -53,7 +54,7 @@
         <a class="btn btn-primary @(Model.CurrentPage == 1 ? "disabled" : string.Empty)"
         asp-controller="Reports"
         asp-action="AllPurchase"
-        asp-route-currentPage="previousPage"
+        asp-route-currentPage="@previousPage"
         asp-route-supplierName="@Model.Supplier"
         asp-route-startDate="@Model.StartDate"
         asp-route-endDate ="@Model.EndDate"><<</a>
@@ -65,7 +66,7 @@
         <a class="btn btn-primary @(shouldButtonBeDisabled ? "disable" : string.Empty)"
         asp-controller="Reports"
         asp-action="AllPurchase"
-        asp-route-currentPage="@Model.CurrentPage+1"
+        asp-route-currentPage="@(Model.CurrentPage+1)"
         asp-route-supplierName="@Model.Supplier"
         asp-route-startDate="@Model.StartDate"
         asp-route-endDate ="@Model.EndDate">>></a>

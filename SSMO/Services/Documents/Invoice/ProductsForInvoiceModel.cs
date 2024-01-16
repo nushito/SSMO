@@ -33,5 +33,6 @@ namespace SSMO.Services.Documents.Invoice
         public decimal Amount { get; set; }
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
+        public string HsCode { get; set; }
     }
 }

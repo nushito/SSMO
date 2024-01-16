@@ -5,6 +5,8 @@
     ViewBag.Title = "Edit Supplier Order";
 }
 <form method="post">
+    <h5 style="text-transform:capitalize">Edit Supplier Order @Model.Number</h5>
+    <br />
     <div class="row col-md-4">
         <label asp-for="Number"></label>
         <input asp-for="Number" class="form-control" />
@@ -39,19 +41,9 @@
         <label asp-for="GrossWeight"></label>
         <input id="grossweight" asp-for="GrossWeight" type="text" class="form-control" />
         <span asp-validation-for="GrossWeight" class="small text-danger"></span>
-    </div>
-     <div class="row col-md-4">
-        <label asp-for="FSCClaim"></label>
-        <input id="fscClaim" asp-for="FSCClaim" type="text" class="form-control" />
-        <span asp-validation-for="FSCClaim" class="small text-danger"></span>
-    </div>
-      <div class="row col-md-4">
-        <label asp-for="FSCSertificate"></label>
-        <input id="fscCertificate" asp-for="FSCSertificate" type="text" class="form-control" />
-        <span asp-validation-for="FSCSertificate" class="small text-danger"></span>
-    </div>
+    </div>    
     <div class="row col-md-4"> 
-        <label asp-for="CurrencyId"></label>
+        <label asp-for="CurrencyId">Currency</label>
         <select id="currency" asp-for="CurrencyId" class="form-control">
             @foreach (var item in Model.Currencies)
             {
@@ -62,7 +54,7 @@
     </div>
          <div class="row col-md-4">
             <div class="form-group">
-                <label asp-for="MyCompanyId"></label>
+                <label asp-for="MyCompanyId">My Company</label>
                 <select id="mycompany" asp-for="MyCompanyId" class="form-control">
                 @foreach (var company in Model.MyCompanies)
                 {
@@ -71,26 +63,14 @@
                     <span asp-validation-for="MyCompanyId" class="small text-danger"></span>
                 </select>
             </div>
-
         </div>
-
-    <div class="row col-md-4">
-        <label asp-for="PaidAvance"></label>
-        <input asp-for="PaidAvance" type="number" min="0.0000" step="0.00001" class="form-control" />
-        <span asp-validation-for="PaidAvance" class="small text-danger"></span>
-    </div>
-   <div class="row col-md-4">  
-       <label class="form-check-label" asp-for="PaidStatus">Paid</label>
-        <input class="form-check-input" type="checkbox" asp-for="PaidStatus">
-        <span asp-validation-for="PaidStatus" class="small text-danger"></span>
-    </div>
      <div class="row col-md-4">
             <label asp-for="VAT"></label>
             <input asp-for="VAT" min="0" step="1" class="form-control" type="number" />
             <span asp-validation-for="VAT" class="small text-danger"></span>
     </div>
    <div class="row col-md-4">
-            <label asp-for="StatusId"></label>
+            <label asp-for="StatusId">Order Status</label>
             <select asp-for="StatusId" class="form-control">
             @foreach (var status in Model.Statuses)
             {
@@ -114,6 +94,7 @@
                     <td>Sheets/pallet</td>
                     <td>Quantity</td>
                     <td>Purchase Price</td>
+                    <td>HsCode</td>
                 </tr>
             </thead>
             <tbody>
@@ -161,13 +142,13 @@
                             <br>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                 <input asp-for="@Model.Products[i].FSCClaim" class="text-box single-line" placeholder="FSC Claim" aria-label="FSC Claim" value="@Model.Products[i].FSCClaim" >
+                                 <input asp-for="@Model.Products[i].PurchaseFscClaim" class="text-box single-line" placeholder="FSC Claim" aria-label="FSC Claim" value="@Model.Products[i].PurchaseFscClaim" >
                                 </div>
                             </td>
                             <br>
                             <td class="col-sm-1">
                                 <div class="editor-field">
-                                    <input asp-for="@Model.Products[i].FSCSertificate" class="text-box single-line" placeholder="FSC Certificate" aria-label="FSC Certificate" value="@Model.Products[i].FSCSertificate">
+                                    <input asp-for="@Model.Products[i].PurchaseFscCertificate" class="text-box single-line" placeholder="FSC Certificate" aria-label="FSC Certificate" value="@Model.Products[i].PurchaseFscCertificate">
                                 </div>
                             </td>
                             <br>
@@ -205,6 +186,11 @@
                                     <input asp-for="@Model.Products[i].PurchasePrice" type="number" min="0.0000" step="0.0001" class="text-box single-line" aria-label="Purchase Price" value="@Model.Products[i].PurchasePrice" required="required">
                                 </div>
                             </td>
+                            <td class="col-sm-1">
+                                <div class="editor-field">
+                                    <input asp-for="@Model.Products[i].HsCode" type="text" class="text-box single-line" aria-label="HS Code" value="@Model.Products[i].HsCode" required="required">
+                                </div>
+                            </td>
                         </tr>
                 }
             </tbody>
@@ -224,7 +210,8 @@
                         <th>Unit Price</th>      
                         <th>Pallets</th>
                         <th>Sheets per Pallet</th>  
-                        <th class="center">Quantity</th>                        
+                        <th class="center">Quantity</th>      
+                        <th>HS Code</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -304,7 +291,12 @@
                             <div class="editor-field">
                                         <input asp-for="NewProducts.ElementAt(i).Quantity" class="text-box single-line" name="Quantity[0]" value="" required="required">
                             </div>
-                        </td>                            
+                        </td> 
+                             <td>
+                                <div class="editor-field">
+                                    <input name="HsCode[0]" asp-for="NewProducts.ElementAt(i).HsCode" class="text-box single-line" value="" >
+                                </div>
+                            </td>
                         <td>
                             <button type="button" class="btn-danger" onclick="removeTr(0);">Delete</button>
                         </td>
@@ -361,6 +353,9 @@
                                         '<td>' +
                                         '<input class="text-box single-line" name="Quantity[' + counter + ']" value="" required="required" />' +
                                         '</td>' +
+                                        '<td>' +
+                                        '<input class="text-box single-line" name="HsCode[' + counter + ']" value="" required="required" />' +
+                                        '</td>'+
                                         '<td>' +
                                          '<button type="button" class="btn btn-primary" onclick="removeTr(' + counter + ');">Delete</button>' +
                                         '</td>' +

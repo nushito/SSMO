@@ -1,4 +1,5 @@
-﻿using SSMO.Models.Reports.ServiceOrders;
+﻿using SSMO.Models.Reports.PaymentsModels.TransportModels;
+using SSMO.Models.Reports.ServiceOrders;
 using SSMO.Models.ServiceOrders;
 using SSMO.Models.TransportCompany;
 using System;
@@ -37,6 +38,10 @@ namespace SSMO.Services.TransportService
             int? fiscalAgent, int currencyId, int? vat, string driverName, string driverPhone,
             string comment, string weight, string paymentMethod, string paymentTerms, string payer);
         public ServiceOrderDetailsPrintViewModel ServiceOrderPrintDetails(int id);
+        ICollection<TransportCompanySelectViewModel> GetTransportCompanies();
+        ICollection<TransportCompanyPaymentCollectionViewModel> TransportCompanyPaymentCollection
+            (int id, DateTime startDate, DateTime endDate);
 
+        bool ServiceOrderPayment(int number, decimal amount, DateTime date);
     }
 }

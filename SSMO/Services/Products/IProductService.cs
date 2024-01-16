@@ -7,6 +7,7 @@ using SSMO.Models.Products;
 using SSMO.Models.Reports.CreditNote;
 using SSMO.Models.Reports.DebitNote;
 using SSMO.Models.Reports.FSC;
+using SSMO.Models.Reports.Products;
 using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using SSMO.Models.Sizes;
@@ -67,10 +68,14 @@ namespace SSMO.Services.Products
             (int myCompanyId, DateTime startDate, DateTime EndDate, string fscClaim);
         public ICollection<SoldProductsFscCollectionViewModel> SoldProductFscCollection
             (int myCompanyId, DateTime startDate, DateTime EndDate, string fscClaim);
-        public void CalculateCostPriceInDiffCurrency(int purchaseId, string action);
-
+        public void CalculateCostPriceInDiffCurrency
+            (int purchaseId, string action,int supplierOrderId, bool onlyCalculate);
         public decimal ConvertUnitQuantityToDiffUnitQuantity
             (string firstUnit, string secondUnit,decimal quantity, string size, int totalSheets);
-
+        public decimal QuantityM3Conversion
+            (string unit, string size, int totalSheets, decimal invoicedQuantity);
+        public Task<ICollection<AllProductsFullNameModel>> ProductsFullName();
+        Task<ProductsQueryDetailsModel> ProductsReport
+            (int companyId, string productId, int currentpage, int productsPerPage);
     }
 }

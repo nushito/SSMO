@@ -42,7 +42,7 @@ namespace SSMO.Services.CustomerOrderService
 
         public bool AnyCustomerOrderExist();
 
-        public List<CustomerOrdersJsonList> CustomerOrderCollection(int customerorderId);
+        public List<CustomerOrdersJsonList> CustomerOrderCollection(int customerorderId,int mycompanyId);
         public ICollection<CustomerOrderForInvoiceViewModel> AllCustomerOrderNumbers();
 
         public ICollection<CustomerOrderNumbersByCustomerViewModel> CustomerOrderNumbersPerInvoice(int id);

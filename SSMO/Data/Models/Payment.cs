@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace SSMO.Data.Models
 {
@@ -8,6 +10,7 @@ namespace SSMO.Data.Models
         public DateTime Date { get; set; }
         public decimal PaidAmount { get; set; }
         public decimal? NewAmountPerExchangeRate { get; set; }
+        public decimal? UsedAmountForCalculation { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
         public int? CurrencyForCalculationsId { get; set; }
@@ -20,6 +23,6 @@ namespace SSMO.Data.Models
         public int? CustomerOrderId { get; set; }
         public CustomerOrder CustomerOrder { get; set; }
         public int? ServiceOrderId { get; set; }
-        public ServiceOrder ServiceOrder { get; set; }
+        public ServiceOrder ServiceOrder { get; set; }       
     }
 }

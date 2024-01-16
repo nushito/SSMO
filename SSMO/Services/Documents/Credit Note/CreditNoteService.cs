@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DevExpress.Data.ODataLinq.Helpers;
+using DocumentFormat.OpenXml.ExtendedProperties;
 using Microsoft.EntityFrameworkCore;
 using SSMO.Data;
 using SSMO.Data.Enums;
@@ -11,6 +12,7 @@ using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Reports.CreditNote;
 using SSMO.Repository;
 using SSMO.Services.Documents.Invoice;
+using SSMO.Services.Images;
 using SSMO.Services.Products;
 using System;
 using System.Collections.Generic;
@@ -24,16 +26,16 @@ namespace SSMO.Services.Documents.Credit_Note
         private readonly IProductService productService;
         private readonly IDocumentService documentService;
         private readonly IProductRepository productRepository;
+        private readonly IImageService  imageService;
         public CreditNoteService(ApplicationDbContext dbContex, IDocumentService documentService, 
-            IProductService productService, IProductRepository productRepository)
+            IProductService productService, IProductRepository productRepository,IImageService imageService)
         {
             this.dbContext = dbContex;
             this.documentService = documentService;
             this.productService = productService;
             this.productRepository = productRepository; 
-        }
-
-       
+            this.imageService = imageService;
+        }       
         public CreditAndDebitNoteViewModel CreateCreditNote
             (int invoiceId, DateTime date, bool quantityBack, 
             string deliveryAddress, List<AddProductsToCreditAndDebitNoteFormModel> products, string paymentTerms)
@@ -51,8 +53,7 @@ namespace SSMO.Services.Documents.Credit_Note
                 DocumentType = Data.Enums.DocumentTypes.CreditNote,
                 CreditToInvoiceDate = invoiceForCredit.Date,
                 CreditToInvoiceId = invoiceForCredit.Id,
-                SupplierId = invoiceForCredit.SupplierId,
-                SupplierOrderId = invoiceForCredit.SupplierOrderId,
+                SupplierId = invoiceForCredit.SupplierId,               
                 CurrencyId = invoiceForCredit.CurrencyId,
                 CurrencyExchangeRateUsdToBGN = invoiceForCredit.CurrencyExchangeRateUsdToBGN,
                 CustomerId = invoiceForCredit.CustomerId,
@@ -62,7 +63,9 @@ namespace SSMO.Services.Documents.Credit_Note
                 CreditNoteDeliveryAddress = deliveryAddress,               
                 CreditAndDebitNoteProducts = new List<Product>(),
                 BankDetails = invoiceForCredit.BankDetails,
-                PaymentTerms = paymentTerms
+                PaymentTerms = paymentTerms,
+                HeaderId= invoiceForCredit.HeaderId,
+                FooterId = invoiceForCredit.FooterId
             };
 
             var customerOrdersByInvoice = dbContext.CustomerOrders
@@ -91,7 +94,7 @@ namespace SSMO.Services.Documents.Credit_Note
                 if(existProduct != null)
                 {
                     var mainProduct = productRepository.GetMainProduct(existProduct.ProductId);
-
+                    //unity na credit note tryabva da e edin i sasht s fakturiraniya
                     if (product.Quantity > existProduct.InvoicedQuantity)
                     {
                         return null;
@@ -118,13 +121,14 @@ namespace SSMO.Services.Documents.Credit_Note
                                 (mainProduct.Unit.ToString(), product.Unit, product.Quantity, size, existProduct.TotalSheets);
                         }
                         mainProduct.QuantityAvailableForCustomerOrder += product.Quantity;
+                        //todo soldquantity unit ako e razlichno
                         mainProduct.SoldQuantity -= product.Quantity;
-                        //var customerOrderProduct = dbContext.CustomerOrderProductDetails
-                        //    .Where(i => i.ProductId == mainProduct.Id && i.CustomerOrderId == existProduct.CustomerOrderId)
-                        //    .FirstOrDefault();
-                       
+                        var customerOrderProduct = dbContext.CustomerOrderProductDetails
+                            .Where(i => i.ProductId == mainProduct.Id && i.CustomerOrderId == existProduct.CustomerOrderId)
+                            .FirstOrDefault();
+
                         //TODO dali se vrashta v austanding ili nie rachno pravim edit na CO. moje da ne se vrashta nishto ???
-                        //  customerOrderProduct.AutstandingQuantity += product.Quantity;
+                         customerOrderProduct.AutstandingQuantity += product.Quantity;
                     }                    
                 }
                 else
@@ -146,6 +150,8 @@ namespace SSMO.Services.Documents.Credit_Note
                             InvoiceProductDetails = new List<InvoiceProductDetails>(),
                             SupplierOrderId = null
                         };
+                        dbContext.Products.Add(newProduct);
+                        dbContext.SaveChanges();    
                     }
 
                     var invoiceProduct = new InvoiceProductDetails
@@ -190,7 +196,7 @@ namespace SSMO.Services.Documents.Credit_Note
             dbContext.SaveChanges();
 
             var creditNoteForPrint = documentService.PrintCreditAndDebitNote(creditNote.Id);
-            documentService.CreateBgInvoice(creditNote.Id);
+            documentService.CreateBgInvoice(creditNote.Id,creditNote.MyCompanyId);
 
             return creditNoteForPrint;
         }
@@ -198,7 +204,7 @@ namespace SSMO.Services.Documents.Credit_Note
         public bool EditCreditNote
             (int id, DateTime date, string incoterms, string truckNumber, decimal netWeight, 
             decimal grossWeight, decimal deliveryCost, decimal currencyExchangeRate, string comment, 
-            IList<EditProductForCreditNoteViewModel> products, string paymentTerms)
+            IList<EditProductForCreditNoteViewModel> products, string paymentTerms, int invoiceId)
         {
             if(id == 0) { return false; }
 
@@ -217,17 +223,19 @@ namespace SSMO.Services.Documents.Credit_Note
             creditNote.Comment= comment;
             creditNote.Amount = 0m;
             creditNote.PaymentTerms= paymentTerms;  
+            creditNote.CreditToInvoiceId= invoiceId;
 
             foreach (var product in products)
             {
                 var productForEdit = dbContext.InvoiceProductDetails
                     .Where(a => a.Id == product.Id)
                     .FirstOrDefault();
+
                 var mainProduct = productRepository.GetMainProduct(product.ProductId);
 
                 mainProduct.QuantityAvailableForCustomerOrder += product.CreditNoteQuantity-productForEdit.CreditNoteQuantity;
                 mainProduct.SoldQuantity -= product.CreditNoteQuantity + productForEdit.CreditNoteQuantity;
-
+                //TODO sold q ne pokazva vqrno ako stava vapros za usluga , a ne produkt
                 productForEdit.CreditNotePallets = product.CreditNotePallets;
                 productForEdit.CreditNoteSheetsPerPallet = product.CreditNoteSheetsPerPallet;
                 productForEdit.CreditNoteQuantity = product.CreditNoteQuantity;
@@ -239,10 +247,10 @@ namespace SSMO.Services.Documents.Credit_Note
                 productForEdit.CreditNoteBgPrice = product.CreditNotePrice * currencyExchangeRate;
                 productForEdit.CreditNoteProductAmount = product.CreditNotePrice * product.CreditNoteQuantity;
                 productForEdit.CreditNoteBgAmount = productForEdit.CreditNoteProductAmount * currencyExchangeRate;
-
+                
                 creditNote.Amount += product.CreditNotePrice * product.CreditNoteQuantity;
 
-                    if (mainProduct.Unit != productForEdit.Unit)
+                    if (mainProduct.Unit != productForEdit.Unit && !mainProduct.Size.ToString().Equals("-"))
                     {
                         var size = productService.GetSizeName(mainProduct.SizeId);
 
@@ -250,19 +258,19 @@ namespace SSMO.Services.Documents.Credit_Note
                             (mainProduct.Unit.ToString(), productForEdit.Unit.ToString(), product.CreditNoteQuantity, size, product.TotalSheets);
                     }
                     
-                    //var customerOrderProduct = dbContext.CustomerOrderProductDetails
-                    //    .Where(i => i.ProductId == mainProduct.Id && i.CustomerOrderId == existProduct.CustomerOrderId)
-                    //    .FirstOrDefault();
+                    var customerOrderProduct = dbContext.CustomerOrderProductDetails
+                        .Where(i => i.ProductId == mainProduct.Id && i.CustomerOrderId == productForEdit.CustomerOrderId)
+                        .FirstOrDefault();
 
                     //TODO dali se vrashta v austanding ili nie rachno pravim edit na CO. moje da ne se vrashta nishto ???
-                    //  customerOrderProduct.AutstandingQuantity += product.Quantity;
+                     customerOrderProduct.AutstandingQuantity += product.CreditNoteQuantity;
               
                 // creditNote.TotalQuantity += product.CreditNoteQuantity;               
             }
 
             creditNote.VatAmount = creditNote.Amount * creditNote.Vat / 100;
             creditNote.CreditNoteTotalAmount = creditNote.Amount + creditNote.VatAmount ?? 0;
-            documentService.EditBgInvoice(creditNote.DocumentNumber);
+            documentService.EditBgInvoice(creditNote.DocumentNumber,creditNote.MyCompanyId);
 
             dbContext.SaveChanges();
             return true;
@@ -371,7 +379,8 @@ namespace SSMO.Services.Documents.Credit_Note
 
             invoice.CreditNoteTotalAmount = creditNote.TotalAmount;
             
-            dbContext.SaveChanges();    
+            dbContext.SaveChanges();
+            documentService.EditBgInvoice(creditNote.DocumentNumber, creditNote.MyCompanyId);
 
             return true;
         }
@@ -420,11 +429,14 @@ namespace SSMO.Services.Documents.Credit_Note
                 NetWeight = creditNote.NetWeight,
                 Products = new List<EditProductForCreditNoteViewModel>(),
                 InvoiceNumbers = new List<InvoiceNumbersForEditedCreditNoteViewModel>(),
-                PaymentTerms = creditNote.PaymentTerms
+                PaymentTerms = creditNote.PaymentTerms,
+                HeaderUrl = imageService.HeaderUrl(invoice.HeaderId??0),
+                FooterUrl = imageService.FooterUrl(invoice.FooterId??0)
             };
 
             var productsListFromEditInvoice = dbContext.InvoiceProductDetails
-                  .Where(cd => cd.CreditNoteId == id ).ToList();
+                  .Where(cd => cd.CreditNoteId == id && cd.CreditNoteQuantity > 0)
+                  .ToList();
 
             if (productsListFromEditInvoice.Any())
             {

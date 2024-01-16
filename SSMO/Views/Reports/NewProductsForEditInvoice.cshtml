@@ -9,6 +9,7 @@
                 <td>Grade</td>
                 <td>FSC claim</td>
                 <td>FSC certificate</td>
+                <td>HS Code</td>
                 <td>Unit</td>
                 <td>Pallets</td>
                 <td>Sheets/pallet</td>
@@ -58,7 +59,6 @@
                                <span asp-validation-for="@Model[i].FscClaim" class="small text-danger"></span>
                           </div>
                         </td>
-
                         <td class="col-sm-1">
                             <div class="editor-field">
                                 <select asp-for="@Model[i].FscCertificate" >
@@ -68,6 +68,11 @@
                                 </select>
                             </div>
                         </td>
+                        <td class="col-sm-1">
+                            <div class="editor-field">                              
+                                <input asp-for="@Model[i].HsCode" value="@Model[i].HsCode" required="required">
+                                <span asp-validation-for="@Model[i].HsCode" class="small text-danger"></span>
+                            </div>
                         <td class="col-sm-1">
                                 <div class="editor-field">
                                  <input asp-for="@Model[i].Unit" value="@Model[i].Unit" required="required">

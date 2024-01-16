@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using DocumentFormat.OpenXml.Presentation;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using SSMO.Data.Enums;
@@ -454,14 +455,12 @@ namespace SSMO.Data
                 .HasForeignKey(s => s.SupplierOrderId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
-
          
             builder.Entity<Document>()
                .HasOne(s => s.Supplier)
                .WithMany(d => d.Documents)
                .HasForeignKey(s => s.SupplierId)
                .OnDelete(DeleteBehavior.Restrict);
-
 
             builder.Entity<Document>()
                 .HasOne(s => s.CostPriceCurrency)
@@ -470,6 +469,19 @@ namespace SSMO.Data
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            //builder.Entity<Document> ()
+            //    .HasOne(s => s.Header)
+            //    .WithMany(d=>d.HeaderDocuments)
+            //    .HasForeignKey(h=>h.HeaderId)
+            //    .IsRequired(false)
+            //    .OnDelete(DeleteBehavior.Restrict);
+
+            //builder.Entity<Document>()
+            // .HasOne(s => s.Footer)
+            // .WithMany(d => d.FooterDocuments)
+            // .HasForeignKey(h => h.FooterId)
+            // .IsRequired(false)
+            // .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<Description>()
                 .HasMany(a => a.Products)
@@ -494,7 +506,7 @@ namespace SSMO.Data
                 .WithOne(a=>a.Currency)
                 .HasForeignKey(a=>a.CurrencyId)
                 .OnDelete(DeleteBehavior.Restrict);
-
+           
             builder.Entity<CustomerOrderProductDetails>()
                 .HasOne(a=>a.Product)
                 .WithMany(a=>a.CustomerOrderProductDetails)
@@ -541,6 +553,12 @@ namespace SSMO.Data
                 .HasPrecision(18, 4);
 
             builder.Entity<PurchaseProductDetails>()
+                .Property(a => a.CalculationCurrencyPrice)
+                .HasColumnType("decimal")
+                .IsRequired(false)
+                .HasPrecision(18, 4);
+
+            builder.Entity<PurchaseProductDetails>()
                 .Property(a => a.Quantity)
                 .HasColumnType("decimal")
                 .HasPrecision(18, 5);
@@ -570,6 +588,13 @@ namespace SSMO.Data
                 .HasOne(s=>s.SupplierOrder)
                 .WithMany(p=>p.PurchaseProductDetails)
                 .HasForeignKey(s=>s.SupplierOrderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<PurchaseProductDetails>()
+                .HasOne(s => s.CostPriceCurrency)
+                .WithMany(p=>p.PurchaseProducts)
+                .HasForeignKey(s=>s.CostPriceCurrencyId)
+                .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
             builder.Entity<InvoiceProductDetails>()
@@ -744,6 +769,11 @@ namespace SSMO.Data
                .HasPrecision(18, 2);
 
             builder.Entity<Payment>()
+               .Property(a => a.UsedAmountForCalculation)
+               .HasColumnType("decimal")
+               .HasPrecision(18, 2);
+
+            builder.Entity<Payment>()
                .Property(a => a.NewAmountPerExchangeRate)
                .HasColumnType("decimal")
                .IsRequired(false)
@@ -782,6 +812,26 @@ namespace SSMO.Data
             .HasForeignKey(d => d.FscTextId)
             .IsRequired(false)
             .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Image>()
+                .HasOne(m => m.MyCompanyName)
+                .WithMany(s => s.Images)
+                .HasForeignKey(k => k.MyCompanyId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Image>()
+                .HasMany(d=>d.FooterDocuments)
+                .WithOne(i=>i.Footer)
+                .HasForeignKey(i=> i.FooterId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Image>()
+                .HasMany(d => d.HeaderDocuments)
+                .WithOne(i => i.Header)
+                .HasForeignKey(i => i.HeaderId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
 
             base.OnModelCreating(builder);
         }

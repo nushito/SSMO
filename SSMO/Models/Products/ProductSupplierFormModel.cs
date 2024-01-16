@@ -32,7 +32,8 @@ namespace SSMO.Models.Products
         [Range(0.0, 9999999999999.99999)]
         public decimal OrderedQuantity { get; set; }
         public int SheetsPerPallet { get; set; }
-      
+        public string HsCode { get; set; }
+
         public IEnumerable<DescriptionForProductSearchModel> Descriptions { get; set; }
        
         public IEnumerable<SizeForProductSearchModel> Sizes { get; set; }

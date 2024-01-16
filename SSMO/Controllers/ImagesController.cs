@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SSMO.Data;
+using SSMO.Models.Image;
 using SSMO.Services.Images;
 using System;
 using System.Collections.Generic;
@@ -26,14 +27,15 @@ namespace SSMO.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UploadImage(IEnumerable<IFormFile> image)
+        public async Task<IActionResult> UploadImage
+            (IEnumerable<IFormFile> image, MyCompanyChooseViewModel model)
         {
             foreach (var file in image)
             {
-               await imageService.NewImage(file);
+               await imageService.NewImage(file,model.Id);
             }
-           
-            return View("Index");
+
+            return RedirectToAction("Index", "Home");
         }
 
        // [HttpPost]

@@ -11,6 +11,7 @@ using SSMO.Models.Products;
 using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Repository;
+using SSMO.Services.MyCompany;
 using SSMO.Services.Products;
 using SSMO.Services.TransportService;
 using System;
@@ -26,13 +27,16 @@ namespace SSMO.Services.CustomerOrderService
         private readonly IConfigurationProvider mapper;
         private readonly IProductService productService;
         private readonly IProductRepository productRepository;
+        private readonly IMycompanyService mycompanyService;
         public CustomerOrderService(ApplicationDbContext dbContext, IConfigurationProvider mapper,
-            IProductService productService,IProductRepository productRepository)
+            IProductService productService,IProductRepository productRepository,
+            IMycompanyService mycompanyService)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
             this.productService = productService;
             this.productRepository = productRepository;
+            this.mycompanyService = mycompanyService;
         }
 
         public bool CheckOrderNumberExist(int number)
@@ -128,34 +132,21 @@ namespace SSMO.Services.CustomerOrderService
             thisorder.SubTotal = thisorder.Amount * thisorder.Vat / 100 ?? 0;
 
             thisorder.TotalAmount = (decimal)(thisorder.Amount + thisorder.SubTotal);
-
-            if(thisorder.PaidAmountStatus == false)
-            {
-                thisorder.Balance = thisorder.TotalAmount - thisorder.PaidAvance;
-            }
-            else
-            {
-                thisorder.Balance = 0;
-            }
-
+           
             thisorder.TotalQuantity = thisorder.CustomerOrderProducts.Sum(a=>a.Quantity);
             thisorder.TotalPallets = thisorder.CustomerOrderProducts.Sum(a => a.Pallets);
             thisorder.TotalSheets = thisorder.CustomerOrderProducts.Sum(a => a.TotalSheets);
 
             dbContext.SaveChanges();
-
         }
-
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id)
         {
             return dbContext.CustomerOrders.Where(a => a.Id == id).FirstOrDefault();
         }
-
         public Data.Models.CustomerOrder OrderPerNumber(int number)
         {
             return dbContext.CustomerOrders.Where(a => a.OrderConfirmationNumber == number).FirstOrDefault();
         }
-
         public bool AnyCustomerOrderExist()
         {
             var anyCustomerOrders = dbContext.CustomerOrders.Any();
@@ -166,7 +157,6 @@ namespace SSMO.Services.CustomerOrderService
 
             return true;
         }
-
         public async Task<int> CreateFirstOrder(int number, string num, DateTime date, 
             int customerId, int company, string deliveryTerms, string loadingAddress, 
             string deliveryAddress, int currency, string origin, 
@@ -236,7 +226,6 @@ namespace SSMO.Services.CustomerOrderService
            await dbContext.SaveChangesAsync();
             return order.Id;
         }
-
         public ICollection<CustomerOrderForInvoiceViewModel> AllCustomerOrderNumbers()
         {
             return dbContext.CustomerOrders
@@ -248,7 +237,6 @@ namespace SSMO.Services.CustomerOrderService
                 })
                 .ToList();
         }
-
         public EditCustomerOrderPaymentModel GetCustomerOrderPaymentForEdit(int orderConfirmationNumber)
         {
             var customerOrder = dbContext.CustomerOrders
@@ -258,7 +246,6 @@ namespace SSMO.Services.CustomerOrderService
 
             return customerOrderforEdit;
         }
-
         public bool EditCustomerOrdersPayment(int orderConfirmationNumber, bool paidStatus, decimal paidAdvance, DateTime date)
         {
             if (orderConfirmationNumber == 0)
@@ -269,6 +256,10 @@ namespace SSMO.Services.CustomerOrderService
             var customerOrder = dbContext.CustomerOrders
                 .Where(num => num.OrderConfirmationNumber == orderConfirmationNumber)
                 .FirstOrDefault();
+
+            var invoices = dbContext.Documents
+                .Where(a=>a.CustomerOrders.Select(i=>i.Id).Contains(customerOrder.Id))
+                .ToList();
            
             customerOrder.PaidAmountStatus = paidStatus;            
             customerOrder.Balance = customerOrder.TotalAmount - customerOrder.PaidAvance;
@@ -277,12 +268,17 @@ namespace SSMO.Services.CustomerOrderService
             {
                  PaidAmount = paidAdvance,
                  Date= DateTime.Now,
-                 CustomerOrderId = customerOrder.Id
+                 CustomerOrderId = customerOrder.Id,
+                 CurrencyId = customerOrder.CurrencyId
             };
                        
             if (customerOrder.Balance == 0)
             {
-                customerOrder.PaidAmountStatus = true;
+                customerOrder.PaidAmountStatus = true;     
+                if(invoices != null)
+                {
+                    invoices.ForEach(a=>a.PaidStatus = true);
+                }
             }
             else
             {
@@ -318,10 +314,11 @@ namespace SSMO.Services.CustomerOrderService
                 .Select(n=>n.OrderConfirmationNumber)
                 .FirstOrDefault();
         }
-        public List<CustomerOrdersJsonList> CustomerOrderCollection(int customerId)
+        public List<CustomerOrdersJsonList> CustomerOrderCollection
+            (int customerId,int mycompanyId)
         {
             return dbContext.CustomerOrders
-                .Where(c=>c.CustomerId == customerId && c.CustomerOrderProducts.Where(a=>a.AutstandingQuantity > 0.01M).Count() > 0)
+                .Where(c=>c.CustomerId == customerId && c.MyCompanyId == mycompanyId && c.CustomerOrderProducts.Where(a=>a.AutstandingQuantity > 0.01M).Count() > 0)
                 .Select(i=> new CustomerOrdersJsonList
                 {
                     CustomerOrderId = i.Id,
@@ -339,7 +336,7 @@ namespace SSMO.Services.CustomerOrderService
                 .Where(i => i.Id == id)                
                 .FirstOrDefault();
            
-            if(customerOrderAustandingQuantity.Sum() >= 0.001m)           
+            if(customerOrderAustandingQuantity.Sum() <= 0.001m)           
             {
                 customerOrder.StatusId = dbContext.Statuses
                     .Where(n=>n.Name == "Finished")
@@ -370,6 +367,7 @@ namespace SSMO.Services.CustomerOrderService
                     Iban = a.Iban,
                     Id = a.Id,
                     CurrencyId = a.CurrencyId,
+                    MyCompanyName = mycompanyService.GetCompanyName(a.CompanyId)
                 }).ToList();
 
             foreach (var bank in banks)
@@ -393,6 +391,9 @@ namespace SSMO.Services.CustomerOrderService
             {
                 return null;
             }
+            var currency = dbContext.Currencies
+                .Where(i=>i.Id == order.CurrencyId)
+                .Select(order=> order.Name) .FirstOrDefault();
 
             var model = new CustomerOrderPrintViewModel()
             {
@@ -415,6 +416,7 @@ namespace SSMO.Services.CustomerOrderService
                 BankDetails = new List<BankDetailsViewModel>(),
                 PaymentTerms = order.PaymentTerms,
                 Eta = order.Eta,
+                Currency = currency
             };
 
             var myCompany = dbContext.MyCompanies
@@ -484,7 +486,7 @@ namespace SSMO.Services.CustomerOrderService
 
             model.Products = dbContext.CustomerOrderProductDetails
                 .Where(i=>i.CustomerOrderId == order.Id)
-                .ProjectTo< ProductCustomerFormModel >(mapper)
+                .ProjectTo<ProductCustomerFormModel>(mapper)
                 .ToList();
 
             foreach (var product in model.Products)
@@ -494,6 +496,11 @@ namespace SSMO.Services.CustomerOrderService
                 product.Description = productService.GetDescriptionName(mainProduct.DescriptionId);
                 product.Size = productService.GetSizeName(mainProduct.SizeId);
                 product.Grade = productService.GetGradeName(mainProduct.GradeId);
+                product.HsCode = mainProduct.HsCode;
+                if(product.Unit == Data.Enums.Unit.pcs.ToString() || product.Unit == Data.Enums.Unit.sheets.ToString())
+                {
+                    product.Quantity = Math.Round(product.Quantity, 0);
+                }
             }
 
             if(order.FiscalAgentId != null)

@@ -7,11 +7,9 @@ namespace SSMO.Models.Reports.PaymentsModels
     {
         public int Id { get; set; }
         public int OrderConfirmationNumber { get; set; }
-        public DateTime Date { get; set; }
-        public decimal PaidAvance { get; set; }
+        public DateTime Date { get; set; }        
         public decimal Balance { get; set; }
-        public decimal TotalAmount { get; set; }
-        public DateTime DatePaidAmount { get; set; }
+        public decimal TotalAmount { get; set; }       
         public bool PaidStatus { get; set; }
         public string SupplierName { get; set; }
         public IEnumerable<CustomerOrderPaymentsDetailsViewModel> CustomerOrderPayments { get; set; }

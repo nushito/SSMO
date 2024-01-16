@@ -22,18 +22,16 @@ namespace SSMO.Services.Documents.Purchase
             string incoterms, string deliveryAddress, 
             string shippingLine, string eta, bool delayCostCalc, int costPriceCurrencyId);
        
-
         public PurchaseInvoiceDetailsViewModel PurchaseDetails(int id);
 
         public EditPurchaseViewModel PurchaseDetailsForEdit(int id);    
         public Task<bool> EditPurchaseInvoice(int id, string number,DateTime date, int supplierOrderId, 
-            int vat, decimal netWeight, decimal grossWeight, string truckNumber, string swb, decimal purchaseTransportCost,
+            int vat, int currency, decimal netWeight, decimal grossWeight, string truckNumber, string swb, decimal purchaseTransportCost,
             decimal bankExpenses, decimal duty, decimal customsExpenses, decimal factoring, decimal fiscalAgentExpenses, 
             decimal procentComission, decimal otherExpenses, List<PurchaseProductsForEditFormModel> purchaseProducts,
-            string deliveryAddress, string shippingLine, string eta);
+            string deliveryAddress, string shippingLine, string eta, int costPriceCurrencyId, bool delayCostCalc);
 
         public List<PurchaseProductAsSupplierOrderViewModel> Products(int id);
-        public IList<PurchaseProductsForDebitNoteViewModel> PurchaseProducts();
-
+        public IList<PurchaseProductsForDebitNoteViewModel> PurchaseProducts(int? invoiceId);
     }
 }

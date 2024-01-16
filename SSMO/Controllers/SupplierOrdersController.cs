@@ -74,7 +74,8 @@ namespace SSMO.Controllers
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> AddSupplierConfirmation(SupplierOrderFormModel model, IFormCollection collections)
+        public async Task<IActionResult> AddSupplierConfirmation
+            (SupplierOrderFormModel model, IFormCollection collections)
         {
             string userId = this.User.UserId();
             string userIdMyCompany = myCompanyService.GetUserIdMyCompanyById(model.MyCompanyId);
@@ -139,6 +140,7 @@ namespace SSMO.Controllers
                 var pallets = collections["Pallets["+i+ "]"];   
                 var sheetsPerPallet = collections["SheetsPerPallet[" + i+ "]"];
                 var quantity = collections["Quantity[" + i + "]"].ToString();
+                var hsCode = collections["HsCode["+i+"]"].ToString();
                 var product = new ProductSupplierFormModel
                 {
                     DescriptionId = int.Parse(description.ToString()),
@@ -150,7 +152,8 @@ namespace SSMO.Controllers
                     PurchaseFscCertificate = fscCertificate,
                     Pallets = int.Parse(pallets.ToString()),
                     SheetsPerPallet = int.Parse(sheetsPerPallet.ToString()),
-                    Quantity = decimal.Parse(quantity.ToString())
+                    Quantity = decimal.Parse(quantity.ToString()),
+                    HsCode = hsCode
                 };
                 model.ProductList.Add(product);
             }

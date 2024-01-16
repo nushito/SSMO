@@ -27,5 +27,7 @@ namespace SSMO.Models.Reports.Invoice
         public int DebitToInvoiceDocumentNumber { get; set; }
         public DateTime DebitToInvoiceDate { get; set; }
         public decimal DebitNoteTotalAmount { get; set; }
+        public int HeaderId { get; set; }
+        public int FooterId { get; set; }
     }
 }

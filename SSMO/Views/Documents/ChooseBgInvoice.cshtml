@@ -17,7 +17,18 @@
 
             </select>
         </div>
-    </div>
+        <div class="row col-md-4 mb-3">
+            <label asp-for="MyCompanyId">Seller</label>
+            <select name= "MyCompanyId" asp-for="MyCompanyId" class="form-control">
+            <option value="">All</option>
+                @foreach (var myCompany in Model.MyCompanies)
+                {
+                       <option value="@myCompany.Id">@myCompany.Name</option>
+                }
+
+            </select>
+        </div>
+ </div>
     <hr /> 
     <input type="submit" value="BG Invoice" class="btn btn-primary mt-3" 
                asp-controller="Documents" 

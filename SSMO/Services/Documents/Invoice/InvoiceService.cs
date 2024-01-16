@@ -9,11 +9,15 @@ using SSMO.Infrastructure;
 using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.CreditNote;
 using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Documents.Packing_List;
 using SSMO.Models.FscTexts;
+using SSMO.Models.Image;
 using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Repository;
 using SSMO.Services.CustomerOrderService;
+using SSMO.Services.FscTextDocuments;
+using SSMO.Services.Images;
 using SSMO.Services.Products;
 using System;
 using System.Collections.Generic;
@@ -32,12 +36,14 @@ namespace SSMO.Services.Documents.Invoice
         private readonly IDocumentService documentService;
         private readonly HttpContextUserIdExtension httpContextAccessor;
         private readonly IProductRepository productRepository;
-
+        private readonly IImageService imageService;
+        private readonly IFscTextService fscTextService;
         public InvoiceService
             (ApplicationDbContext dbContext, IMapper mapper,
             IProductService productSevice, ICurrency currencyService,
             ICustomerOrderService customerOrderService, IDocumentService documentService,
-            HttpContextUserIdExtension httpContextUserIdExtension, IProductRepository productRepository)
+            HttpContextUserIdExtension httpContextUserIdExtension, IProductRepository productRepository,
+            IImageService imageService, IFscTextService fscTextService)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
@@ -45,8 +51,10 @@ namespace SSMO.Services.Documents.Invoice
             this.currencyService = currencyService;
             this.customerOrdersSrvice = customerOrderService;
             this.documentService = documentService;
-            this.httpContextAccessor = httpContextUserIdExtension;  
+            this.httpContextAccessor = httpContextUserIdExtension;
             this.productRepository = productRepository;
+            this.imageService = imageService;
+            this.fscTextService = fscTextService;
         }
         public bool CheckFirstInvoice(int myCompanyId)
         {
@@ -68,7 +76,8 @@ namespace SSMO.Services.Documents.Invoice
             decimal netWeight, decimal grossWeight, string incoterms,int customerId, int currencyId, int vat, 
             int myCompanyId, string comment, string deliveryAddress,
             string dealTypeEng, string dealTypeBg, string descriptionEng, string descriptionBg, List<int> banks, 
-            int? fiscalAgent, int? fscText, string paymentTerms, string loadingAddress)
+            int? fiscalAgent, int? fscText, string paymentTerms, string loadingAddress,string placeOfIssue, 
+            int header, int footer, decimal? factoring, decimal? comission)
         {
             var loggedUser = httpContextAccessor.ContextAccessUserId();
             var myCompany = dbContext.MyCompanies
@@ -116,7 +125,12 @@ namespace SSMO.Services.Documents.Invoice
                 DealDescriptionBg = descriptionBg,
                 BankDetails = new List<BankDetails>(),
                 PaymentTerms = paymentTerms,
-                LoadingAddress = loadingAddress
+                LoadingAddress = loadingAddress,
+                PlaceOfIssue = placeOfIssue,
+                HeaderId = header,
+                FooterId = footer,
+                Factoring = (decimal)factoring,
+                ProcentComission = (decimal)comission
             };
 
             if (CheckFirstInvoice(myCompanyId))
@@ -146,7 +160,7 @@ namespace SSMO.Services.Documents.Invoice
            
             bankList.ForEach(a => invoiceCreate.BankDetails.Add(a));
 
-            invoiceCreate.Amount = products.Where(q=>q.InvoicedQuantity > 0).Sum(o => o.Amount);
+            invoiceCreate.Amount = products.Where(q=>q.InvoicedQuantity > 0).Sum(o => o.Amount)+ serviceProducts.Where(q => q.InvoicedQuantity > 0).Sum(o => o.InvoicedQuantity*o.SellPrice);
             invoiceCreate.VatAmount = invoiceCreate.Amount * vat / 100;
             invoiceCreate.TotalAmount = invoiceCreate.Amount + invoiceCreate.VatAmount ?? 0;
             
@@ -233,11 +247,11 @@ namespace SSMO.Services.Documents.Invoice
 
                 invoiceProduct.TotalSheets = invoiceProduct.Pallets * invoiceProduct.SheetsPerPallet;               
                 invoiceProduct.Amount = invoiceProduct.SellPrice * invoiceProduct.InvoicedQuantity;
-                invoiceProduct.BgAmount = invoiceProduct.BgPrice * invoiceProduct.InvoicedQuantity;               
-                invoiceCreate.SupplierOrderId = supplierOrder.Id;
+                invoiceProduct.BgAmount = invoiceProduct.BgPrice * invoiceProduct.InvoicedQuantity;              
                 mainProduct.InvoiceProductDetails.Add(invoiceProduct);
                 invoiceCreate.InvoiceProducts.Add(invoiceProduct);                
             }
+
           await  dbContext.SaveChangesAsync();
 
             foreach (var product in invoiceCreate.InvoiceProducts)
@@ -251,8 +265,14 @@ namespace SSMO.Services.Documents.Invoice
                 product.DeliveryCost = productService.CalculateDeliveryCostOfTheProductInCo
                    (product.InvoicedQuantity,product.QuantityM3ForCalc, invoiceCreate.TotalQuantity, 
                    deliveryCost, product.Unit, size);
+              
 
-                product.Profit = (product.Amount - purchaseProductDetail.CostPrice*purchaseProductDetail.Quantity)- product.DeliveryCost;
+                var expensesFactoringPerProduct = ((factoring * invoiceCreate.TotalAmount) / 100)
+                    / invoiceCreate.TotalQuantity * product.QuantityM3ForCalc;
+
+                var comissionExpenses = (comission/invoiceCreate.TotalQuantity)*product.QuantityM3ForCalc;
+
+                product.Profit = (decimal)((product.Amount - (purchaseProductDetail.CostPrice* product.InvoicedQuantity)) - product.DeliveryCost - expensesFactoringPerProduct - comissionExpenses);
             }
 
                 if(serviceProducts.Count > 0)
@@ -276,7 +296,6 @@ namespace SSMO.Services.Documents.Invoice
                             InvoiceProductDetails = new List<InvoiceProductDetails>(),
                             SupplierOrderId = null
                         };
-
                       dbContext.Products.Add(product);                       
                     }
 
@@ -303,7 +322,6 @@ namespace SSMO.Services.Documents.Invoice
                     };
 
                     await dbContext.InvoiceProductDetails.AddAsync(newServiceProduct);
-                    invoiceCreate.Amount += serviceProduct.InvoicedQuantity*serviceProduct.SellPrice;
                 }
             }
            
@@ -397,12 +415,11 @@ namespace SSMO.Services.Documents.Invoice
                 invoiceForPrint.FscCertificate = myCompany.FscSertificate;
             }
 
-
             invoiceForPrint.Products = this.mapper.Map<ICollection<ProductsForInvoiceModel>>(products.Where(a => a.InvoicedQuantity != 0).ToList());
             invoiceForPrint.ServiceProducts = this.mapper.Map<ICollection<ServiceProductForInvoiceFormModel>>(serviceProducts.Where(q=>q.InvoicedQuantity !=0).ToList());   
             
             foreach (var product in invoiceForPrint.Products)
-            {
+            {                
                 product.Description = productService.GetDescriptionName(product.DescriptionId);
                 product.Grade = productService.GetGradeName(product.GradeId);
                 product.Size = productService.GetSizeName(product.SizeId);
@@ -418,7 +435,7 @@ namespace SSMO.Services.Documents.Invoice
           //  dbContext.SaveChanges();            
             
             CreatePackingListForThisInvoice(invoiceCreate.Id);
-            documentService.CreateBgInvoice(invoiceCreate.Id);
+            documentService.CreateBgInvoice(invoiceCreate.Id,invoiceCreate.MyCompanyId);
             return invoiceForPrint;
         }
 
@@ -446,11 +463,12 @@ namespace SSMO.Services.Documents.Invoice
                 NetWeight = invoice.NetWeight,
                 GrossWeight = invoice.GrossWeight,
                 CurrencyId = invoice.CurrencyId,
-                CustomerOrders = invoice.CustomerOrders,
-                SupplierOrderId = invoice.SupplierOrderId,
+                CustomerOrders = invoice.CustomerOrders,              
                 TotalQuantity= invoice.TotalQuantity,
                 DeliveryAddress = invoice.DeliveryAddress,
-                LoadingAddress = invoice.LoadingAddress
+                LoadingAddress = invoice.LoadingAddress,
+                HeaderId = invoice.HeaderId,
+                FooterId = invoice.FooterId
             };
 
             dbContext.Documents.Add(packingList);
@@ -471,13 +489,12 @@ namespace SSMO.Services.Documents.Invoice
             packingList.Date = invoice.Date;
             packingList.CustomerId = invoice.CustomerId;
             packingList.CustomerOrders = invoice.CustomerOrders;
-            packingList.InvoiceProducts = invoice.InvoiceProducts;
+           // packingList.InvoiceProducts = invoice.InvoiceProducts;
             packingList.TruckNumber = invoice.TruckNumber;
             packingList.Incoterms = invoice.Incoterms;
             packingList.MyCompanyId = invoice.MyCompanyId;
             packingList.GrossWeight = invoice.GrossWeight;
-            packingList.NetWeight = invoice.NetWeight;
-            packingList.SupplierOrderId = invoice.SupplierOrderId;
+            packingList.NetWeight = invoice.NetWeight;           
             packingList.DeliveryAddress = invoice.DeliveryAddress;
             packingList.LoadingAddress = invoice.LoadingAddress;
 
@@ -530,17 +547,20 @@ namespace SSMO.Services.Documents.Invoice
                 .Where(i => i.DocumentNumber == documentNumber && i.DocumentType == DocumentTypes.Invoice)
                 .FirstOrDefault();
 
-            var customerOrder = dbContext.CustomerOrders
+            var customerOrders = dbContext.CustomerOrders
                 .Where(i => i.Id == customerOrderId)
-                .FirstOrDefault();
+                .ToList();
 
-            if(customerOrder != null )
+            if(customerOrders != null )
             {
-                customerOrder.Balance -= paidAdvance;
-                if(customerOrder.Balance < 0.001m)
+                foreach (var customerOrder in customerOrders)
                 {
-                    customerOrder.PaidAmountStatus = true;
-                }
+                    customerOrder.Balance -= paidAdvance;
+                    if (customerOrder.Balance < 0.001m)
+                    {
+                        customerOrder.PaidAmountStatus = true;
+                    }
+                }              
             }
 
             var payment = new Payment
@@ -610,7 +630,9 @@ namespace SSMO.Services.Documents.Invoice
                 .FirstOrDefault();
 
             var products = dbContext.InvoiceProductDetails
-                .Where(i => i.InvoiceId == invoice.Id);
+                .Where(i => i.InvoiceId == invoice.Id || 
+                i.CreditNoteId == invoice.Id || 
+                i.DebitNoteId == invoice.Id);
 
             var agent = dbContext.FiscalAgents
                 .Where(i => i.Id == invoice.FiscalAgentId)
@@ -630,6 +652,7 @@ namespace SSMO.Services.Documents.Invoice
                 Amount = invoice.Amount * currencyExchange,
                 Vat = invoice.Vat,
                 VatAmount = invoice.Amount * currencyExchange * invoice.Vat / 100 ?? 0,    
+                CurrencyExchangeRateUsdToBGN = invoice.CurrencyExchangeRateUsdToBGN,
                 DealTypeBg= invoice.DealTypeBg,
                 DealDescriptionBg= invoice.DealDescriptionBg,               
                 BgProducts = new List<BGProductsForBGInvoiceViewModel>(),
@@ -655,7 +678,8 @@ namespace SSMO.Services.Documents.Invoice
                     BgCity = mycompanyAddress.BgCity,
                     BgCountry = mycompanyAddress.Bgcountry,
                     BgStreet = mycompanyAddress.BgStreet
-                }
+                },
+                PlaceOfIssue = invoice.PlaceOfIssue
             };
 
             if(agent != null)
@@ -728,6 +752,10 @@ namespace SSMO.Services.Documents.Invoice
                     .Select(bgN => bgN.Name)
                     .FirstOrDefault();
 
+                if (product.Unit == Data.Enums.Unit.pcs.ToString() || product.Unit == Data.Enums.Unit.sheets.ToString())
+                {
+                    product.InvoicedQuantity = Math.Round(product.InvoicedQuantity, 0);
+                }
                 bgInvoiceForPrint.BgProducts.Add(product);
             }
 
@@ -768,16 +796,15 @@ namespace SSMO.Services.Documents.Invoice
                 DocumentType = invoice.DocumentType.ToString(),
                 CompanyBankDetails = new List<BankDetailsViewModel>(),
                 PaymentTerms = invoice.PaymentTerms,
-                FscTexts = dbContext.FscTexts                    
-                    .Select(n => new FscTextViewModel{
-                      FscTextEng = n.FscTextEng,
-                      Id = n.Id,
-                      FscTextBg = n.FscTextBg 
-                    })
-                    .ToList()   ,
+                FiscalAgents = documentService.GetFiscalAgents(),
+                FscTexts = fscTextService.GetAllFscTexts(),
                 LoadingAddress = invoice.LoadingAddress,
-                DeliveryAddress = invoice.DeliveryAddress
-        };
+                DeliveryAddress = invoice.DeliveryAddress,
+                Images = imageService.ImageCollection(myCompany.Id),
+                Factoring = invoice.Factoring,
+                Comission = invoice.ProcentComission,
+                MyCompanyId = invoice.MyCompanyId
+              };
 
             if(fiscalAgent != null)
             {
@@ -821,7 +848,9 @@ namespace SSMO.Services.Documents.Invoice
 
                 var productForEdit = new EditProductForCompanyInvoicesViewModel
                 {
+                    Id = product.Id,
                     Description = productService.GetDescriptionName(mainProduct.DescriptionId),
+                    DescriptionId = mainProduct.DescriptionId,
                     Grade = productService.GetGradeName(mainProduct.GradeId),
                     Size = productService.GetSizeName(mainProduct.SizeId),
                     Descriptions = productService.DescriptionIdAndNameList(),
@@ -839,18 +868,21 @@ namespace SSMO.Services.Documents.Invoice
                     Pallets = product.Pallets,
                     SellPrice = product.SellPrice,
                     SheetsPerPallet = product.SheetsPerPallet,
-                    PurchaseProductDetailsId = product.PurchaseProductDetailsId ?? 0,
-                    DescriptionId = mainProduct.DescriptionId,
+                    PurchaseProductDetailsId = product.PurchaseProductDetailsId ?? 0,                   
                     GradeId = mainProduct.GradeId,
                     SizeId = mainProduct.SizeId,
                     VehicleNumber = product.VehicleNumber,
                     ProductId = product.ProductId,
                     TotalSheets = product.TotalSheets,
-                    CustomerProductDetailId = customerProductDetail
+                    CustomerProductDetailId = customerProductDetail,
+                    HsCode = mainProduct.HsCode
                 };
+                if (product.Unit == Data.Enums.Unit.pcs || product.Unit == Data.Enums.Unit.sheets)
+                {
+                    product.InvoicedQuantity = Math.Round(product.InvoicedQuantity, 0);
+                }
                 invoiceForEdit.Products.Add(productForEdit);
-            }
-            //var invoicedProducts = mapper.ProjectTo<EditProductForCreditAndDebitViewModel>(productsList).ToList();
+            }            
             return invoiceForEdit;
         }
         public async Task<bool> EditInvoice
@@ -858,12 +890,13 @@ namespace SSMO.Services.Documents.Invoice
             decimal deliveryCost, int orderConfirmationNumber, string truckNumber,
             ICollection<EditProductForCompanyInvoicesViewModel> products,
             string incoterms, string comment, List<int> banks, int? fiscalAgentId, 
-            int? fscText, string paymentTerms, string deliveryAddress, string loadingAddress)
+            int? fscText, string paymentTerms, string deliveryAddress, 
+            string loadingAddress, decimal? factoring, decimal? comission)
         {
             if (id == 0) return false;
 
             var invoice = dbContext.Documents               
-               .Where(i => i.Id == id & i.DocumentType == Data.Enums.DocumentTypes.Invoice)
+               .Where(i => i.Id == id)
                .Include(s=>s.BankDetails)             
                .FirstOrDefault();
 
@@ -886,46 +919,64 @@ namespace SSMO.Services.Documents.Invoice
             invoice.PaymentTerms= paymentTerms;
             invoice.DeliveryAddress = deliveryAddress;
             invoice.LoadingAddress = loadingAddress;
+            invoice.Factoring = (decimal)factoring;
+            invoice.ProcentComission = (decimal)comission;
 
             var oldBanks = invoice.BankDetails.ToList();
-            if (oldBanks != null)
-            {
-                oldBanks.ForEach(i => invoice.BankDetails.Remove(i));
-            }
+
+            oldBanks?.ForEach(i => invoice.BankDetails.Remove(i));
 
             bankDetails.ForEach(i => invoice.BankDetails.Add(i));
 
-            if (invoice.DocumentType == DocumentTypes.Invoice)
-            {
-                 foreach (var product in products)
-                 {                    
-                    var productForEdit = dbContext.InvoiceProductDetails.
-                            Where(co => co.ProductId == product.ProductId)
-                            .FirstOrDefault();
-
-                    var mainProduct = productRepository.GetMainProduct(product.ProductId);
-
-                    var size = productService.GetSizeName(mainProduct.SizeId);
-                    
-                    var customerOrderDetail = dbContext.CustomerOrderProductDetails
-                            .Where(a => a.Id == productForEdit.CustomerOrderProductDetailsId)
-                            .FirstOrDefault();
-
-                    if(customerOrderDetail != null)
-                    {
-                        customerOrderDetail.AutstandingQuantity += productForEdit.InvoicedQuantity;
-                        customerOrderDetail.AutstandingQuantity -= product.InvoicedQuantity;
-                    }                   
-
-                    productService.ClearProductQuantityWhenDealIsFinished
-                        (product.ProductId, product.InvoicedQuantity, productForEdit.InvoicedQuantity);
-
-                    var customerOrder = dbContext.CustomerOrders
-                        .Where(a => a.Id == productForEdit.CustomerOrderId)
+            foreach (var product in products)
+                {                    
+                var productForEdit = dbContext.InvoiceProductDetails.
+                        Where(co => co.Id == product.Id)
                         .FirstOrDefault();
 
-                    if(customerOrder.CustomerOrderProducts
-                        .Where(a=>a.CustomerOrderId == customerOrder.Id).Sum(a=>a.AutstandingQuantity) == 0)
+                var mainProduct = productRepository.GetMainProduct(product.ProductId);
+
+                var size = productService.GetSizeName(mainProduct.SizeId);
+                    
+                var customerOrderDetail = dbContext.CustomerOrderProductDetails
+                        .Where(a => a.Id == productForEdit.CustomerOrderProductDetailsId)
+                        .FirstOrDefault();
+
+                if (customerOrderDetail != null)
+                {
+                    customerOrderDetail.AutstandingQuantity += productForEdit.InvoicedQuantity;
+                    customerOrderDetail.AutstandingQuantity -= product.InvoicedQuantity;
+                }
+
+                productForEdit.VehicleNumber = product.VehicleNumber;
+                productForEdit.Pallets = product.Pallets;
+                productForEdit.SheetsPerPallet = product.SheetsPerPallet;
+                productForEdit.TotalSheets = product.Pallets * product.SheetsPerPallet;
+                productForEdit.InvoicedQuantity = product.InvoicedQuantity;
+                productForEdit.Amount = product.InvoicedQuantity * product.SellPrice;
+                productForEdit.BgPrice = product.SellPrice * currencyExchangeRate;
+                productForEdit.BgAmount = product.BgPrice * product.InvoicedQuantity;
+
+                productService.ClearProductQuantityWhenDealIsFinished
+                    (product.ProductId, product.InvoicedQuantity, productForEdit.InvoicedQuantity);
+
+                if(size != "-")
+                {
+                    productForEdit.QuantityM3ForCalc = productService.QuantityM3Conversion
+                                        (productForEdit.Unit.ToString(), size, productForEdit.TotalSheets, product.InvoicedQuantity);
+                }
+
+                var customerOrder = dbContext.CustomerOrders
+                    .Where(a => a.Id == productForEdit.CustomerOrderId)
+                    .FirstOrDefault();
+                //proveryavame dali vsichko po CO e veche invoiced i mu smenyame status
+                if (productForEdit.CustomerOrderProductDetailsId != null)
+                {
+                    var customerOrderProductsSum = customerOrder.CustomerOrderProducts
+                                        .Where(a => a.CustomerOrderId == customerOrder.Id)
+                                        .Sum(a => a.AutstandingQuantity);
+
+                    if (customerOrderProductsSum == 0)
                     {
                         customerOrder.StatusId = dbContext.Statuses
                         .Where(s => s.Name == "Finished")
@@ -939,59 +990,52 @@ namespace SSMO.Services.Documents.Invoice
                         .Select(i => i.Id)
                         .FirstOrDefault();
                     }
-
-                    productForEdit.InvoicedQuantity = product.InvoicedQuantity;
-
-                    if(productForEdit.Unit != Unit.m3 && (size != "-" || size != "None"))
-                    {
-                        productForEdit.QuantityM3ForCalc = productService.ConvertStringSizeToQubicMeters(size);
-                    }
-                    else if(!String.Equals(size,"-") || !String.Equals(size, "None"))
-                    {
-                        productForEdit.QuantityM3ForCalc = product.InvoicedQuantity; 
-                    }
-
-                    invoice.TotalQuantity += productForEdit.QuantityM3ForCalc;
-                   
-                    productForEdit.VehicleNumber = product.VehicleNumber;
-                    productForEdit.Pallets = product.Pallets;
-                    productForEdit.SheetsPerPallet= product.SheetsPerPallet;    
-                    productForEdit.TotalSheets = product.Pallets*product.SheetsPerPallet;
-                    productForEdit.Amount = product.InvoicedQuantity * product.SellPrice;
-                    productForEdit.BgPrice = product.SellPrice * currencyExchangeRate;
-                    productForEdit.BgAmount = product.BgPrice * product.InvoicedQuantity;
-                    invoice.Amount += productForEdit.Amount;                    
                 }
 
-                foreach (var product in invoice.InvoiceProducts)
+                invoice.TotalQuantity += productForEdit.QuantityM3ForCalc;                   
+                    
+                invoice.Amount += productForEdit.Amount;                       
+                 
+                await dbContext.SaveChangesAsync();
+            }
+
+            foreach (var item in products)
+            {
+                var updatedProduct = dbContext.InvoiceProductDetails
+                        .Where(co => co.Id == item.Id)
+                        .FirstOrDefault();
+
+                var mainProduct = productRepository.GetMainProduct(item.ProductId);
+
+                var size = productService.GetSizeName(mainProduct.SizeId);
+
+                if (updatedProduct.QuantityM3ForCalc > 0.001m)
                 {
-                    if(product.QuantityM3ForCalc != 0)
-                    {
-                        var purchaseProductDetail = dbContext.PurchaseProductDetails
-                    .Where(a => a.Id == product.PurchaseProductDetailsId).FirstOrDefault();
-                        var mainProduct = productRepository.GetMainProduct(product.ProductId);
+                    var purchaseProductDetail = dbContext.PurchaseProductDetails
+                        .Where(a => a.Id == item.PurchaseProductDetailsId)
+                        .FirstOrDefault(); 
 
-                        var size = productService.GetSizeName(mainProduct.SizeId);
+                    updatedProduct.DeliveryCost = productService.CalculateDeliveryCostOfTheProductInCo
+                        (updatedProduct.InvoicedQuantity, updatedProduct.QuantityM3ForCalc, invoice.TotalQuantity,
+                        deliveryCost, updatedProduct.Unit, size);
 
-                        product.DeliveryCost = productService.CalculateDeliveryCostOfTheProductInCo
-                            (product.InvoicedQuantity, product.QuantityM3ForCalc, invoice.TotalQuantity,
-                            deliveryCost, product.Unit, size);
+                    var expensesFactoringPerProduct = (((factoring * invoice.TotalAmount) / 100)
+                   / invoice.TotalQuantity) * updatedProduct.QuantityM3ForCalc;
 
-                        product.Profit = (product.Amount - purchaseProductDetail.CostPrice * purchaseProductDetail.Quantity) - product.DeliveryCost;
-                    }
+                    var comissionExpenses = (comission / invoice.TotalQuantity) * updatedProduct.QuantityM3ForCalc;
+
+                    updatedProduct.Profit = (decimal)((updatedProduct.Amount - (purchaseProductDetail.CostPrice * updatedProduct.InvoicedQuantity)) - updatedProduct.DeliveryCost - expensesFactoringPerProduct - comissionExpenses);
                 }
-                    invoice.VatAmount = invoice.Amount*invoice.Vat/100;
-                    invoice.TotalAmount = (decimal)(invoice.Amount + invoice.VatAmount);
-
-                EditPackingList(invoice.Id);
-                documentService.EditBgInvoice(invoice.DocumentNumber);
+            }
+                invoice.VatAmount = invoice.Amount*invoice.Vat/100;
+                invoice.TotalAmount = (decimal)(invoice.Amount + invoice.VatAmount);
 
                   await dbContext.SaveChangesAsync();  
-            }
-            await dbContext.SaveChangesAsync();
+           
+            EditPackingList(invoice.Id);
+            documentService.EditBgInvoice(invoice.DocumentNumber,invoice.MyCompanyId);
             return true;
         }
-
         public ICollection<CustomerCollectionForChoosingNewOrderForInvoiceEditViewModel> CustomersForeEditInvoice()
         {
            return dbContext.Customers
@@ -1001,5 +1045,15 @@ namespace SSMO.Services.Documents.Invoice
                      Name= i.Name,
                 }).ToList();
         }
+
+        public ICollection<PackingListJsonCollection> GetPackingListNumbers(int id)
+        => dbContext.Documents
+            .Where(type => type.DocumentType == Data.Enums.DocumentTypes.PackingList && type.MyCompanyId == id)
+            .Select(num => new PackingListJsonCollection
+            {
+                PackingListId = num.Id,
+                PackingListNumber = num.DocumentNumber
+            })
+            .ToList();       
     }
 }

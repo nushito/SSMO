@@ -25,6 +25,7 @@ namespace SSMO.Services.Products
         public int Pallets { get; set; }
         public int SheetsPerPallet { get; set; }
         public int SupplierOrderId { get; set; }
+        public string HsCode { get; set; }
 
     }
 }

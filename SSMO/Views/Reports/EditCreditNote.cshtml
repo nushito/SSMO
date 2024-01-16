@@ -59,6 +59,8 @@
                     <th>FSC Certificate</th>
                     <th>Unit</th>
                     <th>Quantity </th>  
+                    <th>Pallets</th>
+                    <th>Sheets/Pallet</th>
                     <th>Unit Price</th>                                                                    
                 </tr>
             </thead>
@@ -127,6 +129,16 @@
                                 <input asp-for="@Model.Products[i].CreditNoteQuantity" value="@Model.Products[i].CreditNoteQuantity" type="number" class="text-box single-line"/>
                             </div>
                         </td>
+                        <td class="col col-m-1">
+                            <div class="editor-field">
+                                <input asp-for="@Model.Products[i].CreditNotePallets" value="@Model.Products[i].CreditNotePallets" type="number" class="text-box single-line"/>
+                            </div>
+                        </td>
+                        <td class="col col-m-1">
+                            <div class="editor-field">
+                                        <input asp-for="@Model.Products[i].CreditNoteSheetsPerPallet" value="@Model.Products[i].CreditNoteSheetsPerPallet" type="number" class="text-box single-line"/>
+                            </div>
+                        </td>
                             <td class="col col-m-1">
                             <div class="editor-field">
                                     <input asp-for="@Model.Products[i].CreditNotePrice" value="@Model.Products[i].CreditNotePrice" type="number" class="text-box single-line"/>
@@ -148,8 +160,7 @@
                 }
            </select> 
         </div>              
-    </div>     
-
+    </div>  
    <table>
      <tr class="row">
        <td class="col"> <input type="submit" name="Command" value="Save" class="btn btn-primary mt-3" /></td> 

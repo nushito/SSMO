@@ -44,10 +44,11 @@ namespace SSMO.Models.Documents.Invoice
         public string DeliveryAddress { get; set; }
         public string LoadingAddress { get; set; }
         public string PaymentTerms { get; set; }
-        public ImageModelViewForAllDocuments Header { get; set; }
-        public ImageModelViewForAllDocuments Footer { get; set; }
+        public string HeaderUrl { get; set; }
+        public string FooterUrl { get; set; }
         public ICollection<InvoiceBankDetailsViewModel> CompanyBankDetails { get; set; }
         public IEnumerable<ProductsForInvoiceModel> Products { get; set; }
         public IEnumerable<ServiceProductForInvoiceFormModel> ServiceProducts { get; set; }
+        public string PlaceOfIssue { get;  set; }
     }
 }

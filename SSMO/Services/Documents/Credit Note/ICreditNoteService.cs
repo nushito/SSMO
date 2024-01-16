@@ -17,7 +17,7 @@ namespace SSMO.Services.Documents.Credit_Note
         public List<InvoiceNumbersForEditedCreditNoteViewModel> InvoiceNumbers();
         public bool EditCreditNote(int id, DateTime date, string incoterms, string truckNumber, decimal netWeight,
             decimal grossWeight, decimal deliveryCost, decimal currencyExchangeRate, string comment, 
-            IList<EditProductForCreditNoteViewModel> products, string paymentTerms);
+            IList<EditProductForCreditNoteViewModel> products, string paymentTerms, int invoiceId);
 
         public bool AddNewProductsToCreditNoteWhenEdit(int id, int invoiceId,
             List<ProductForCreditNoteViewModelPerInvoice> productsFromInvoice, 

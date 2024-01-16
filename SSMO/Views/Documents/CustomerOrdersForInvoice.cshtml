@@ -37,7 +37,8 @@
 </form>
 
 @section Scripts {
-        <script type="text/javascript">
+        <script type="text/javascript" src="~/js/getCustomerOrdersByCustomerName.js"></script>
+       @* <script type="text/javascript">
                 $(document).ready
                 (
                         function() 
@@ -46,11 +47,12 @@
                         $("#CustomerId").change(function() {                        
                             $("#CustomerOrderNumber option").remove();
                             var customerId = $(this).val(); 
+                            var mycompanyId = $("#MyCompanyId").val();
                             $.ajax({
                                 type: 'GET',
                                 url: "/Documents/GetCustomerOrders", 
                                 dataType: 'json',
-                                data: { id: customerId },
+                                data: { id: customerId,myCompanyId: mycompanyId },
                                 success: function(selectedCustomerOrders) {                           
                                     $("#CustomerOrderNumber").append('<option value="' + "0" + '">' + "Select CustomerOrderNumber" + '</option>');
                                     debugger;
@@ -70,7 +72,7 @@
                         }
                     );
 
-         </script>
+         </script>*@
 }
 
 

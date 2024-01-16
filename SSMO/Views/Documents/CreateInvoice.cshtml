@@ -3,7 +3,9 @@
     ViewBag.Title = "New Invoice";
     var i = 0;
 }
-
+<div>
+    <img src="@Model.HeaderUrl" />
+</div>
 <div class="card">
   <div class="card-body">
     <div class="container mb-5 mt-3">
@@ -91,10 +93,11 @@
                             <th scope="col">Size</th>
                             <th scope="col">FSC Claim</th>
                             <th scope="col">FSC Certificate</th>
+                            <th scope="col">HS Code</th>
                             <th scope="col">Unit</th>
                             <th scope="col">Qty</th>
                             <th scope="col">Unit Price</th>
-                            <th scope="col">Amount</th>
+                            <th scope="col">Amount @Model.Currency</th>
               </tr>
             </thead>
             <tbody>
@@ -108,6 +111,7 @@
                             <td>@product.Size</td>
                             <td>@product.FSCClaim</td>
                             <td>@product.FSCSertificate</td>
+                            <td>@product.HsCode</td>
                             <td>@product.Unit</td>
                             <td>@product.InvoicedQuantity</td>
                             <td>@product.SellPrice</td>
@@ -126,6 +130,7 @@
                         <td>@product.Size</td>
                         <td>@product.FscClaim</td>
                         <td>@product.FscCertificate</td>
+                        <td>-</td>
                         <td>@product.Unit</td>
                         <td>@product.InvoicedQuantity</td>
                         <td>@product.SellPrice</td>
@@ -138,11 +143,11 @@
           </table>
         </div>
         <div class="row">          
-          <div class="col-xl-3">
+          <div class="col-xl-6">
             <ul class="list-unstyled">
               <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
               <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
-            <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.TotalAmount.ToString("N2")</span></li>
+            <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.TotalAmount.ToString("N2") @Model.Currency</span></li>
           </ul>
           </div>
         </div>
@@ -166,7 +171,8 @@
                 <td class="px-3 mr-5">
                     Event Date: @Model.Date.ToShortDateString() <br />
                     Deal Type: @Model.DealTypeEng <br />
-                   Description of the deal: @Model.DealDescriptionEng
+                    Description of the deal: @Model.DealDescriptionEng<br />
+                    Place of Issue: @Model.PlaceOfIssue
                 </td>
                 <td class="px-3 mr-5">
                     Payment Terms: @Model.PaymentTerms
@@ -188,4 +194,7 @@
       </div>
     </div>
   </div>
+</div>
+<div>
+    <img src="@Model.FooterUrl" />
 </div>

@@ -1,4 +1,5 @@
 ﻿using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Image;
 using SSMO.Models.Reports.CreditNote;
 using SSMO.Models.Reports.Invoice;
 using System;
@@ -25,5 +26,7 @@ namespace SSMO.Models.Documents.CreditNote
         public string Comment { get; set; }
         public IList<EditProductForCreditNoteViewModel> Products { get; set; }
         public string PaymentTerms { get; set; }
+        public string HeaderUrl { get; set; }
+        public string FooterUrl { get; set; }        
     }
 }

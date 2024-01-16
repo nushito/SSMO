@@ -28,7 +28,8 @@ namespace SSMO.Models.Reports.SupplierOrderReportForEdit
         public int Pallets { get; set; }
         [Range(0.0, 9999999999999.99999)]
         public decimal Quantity { get; set; }
-        public int SheetsPerPallet { get; set; }     
+        public int SheetsPerPallet { get; set; }
+        public string HsCode { get; set; }
         public IEnumerable<DescriptionForProductSearchModel> Descriptions { get; set; }
         public IEnumerable<SizeForProductSearchModel> Sizes { get; set; }
         public IEnumerable<GradeForProductSearchModel> Grades { get; set; }

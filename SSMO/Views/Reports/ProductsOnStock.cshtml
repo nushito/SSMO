@@ -83,7 +83,7 @@
         <a class="btn btn-primary float-sm-right @(shouldButtonBeDisabled ? "disabled" : string.Empty)" style="margin-top: 10px"
            asp-controller="Reports"
            asp-action="ProductsOnStock"
-           asp-route-currentPage="@previouspage"
+           asp-route-currentPage="@(Model.CurrentPage+1)"
            asp-route-descriptionId="@Model.DescriptionId"
            asp-route-gradeId="@Model.GradeId"
            asp-route-sizeId="@Model.SizeId">>></a>
@@ -159,7 +159,7 @@
                                         Purchase Price
                                     </th>
                                     <th scope="col">
-                                        Cost Price
+                                        Cost Price 
                                     </th>
                                 </tr>
                             </thead>
@@ -189,10 +189,10 @@
                                         @purchase.Pallets x @purchase.SheetsPerPallet
                                     </td>
                                     <td>
-                                        @purchase.PurchasePrice
+                                        @purchase.PurchasePrice @purchase.PurchaseCurrency
                                     </td>
                                     <td>
-                                        @purchase.CostPrice
+                                        @purchase.CostPrice @purchase.CostPriceCurrency
                                     </td>
                                 </tr>
                                 }    
@@ -243,7 +243,7 @@
                                             @order.DeliveryAddress
                                                 </td>  
                                                 <td>
-                                            @order.Price
+                                            @order.Price @order.Currency
                                                 </td>
                                                 
                                             </tr>

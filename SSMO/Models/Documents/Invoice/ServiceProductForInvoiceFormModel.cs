@@ -29,6 +29,6 @@ namespace SSMO.Models.Documents.Invoice
         public int GradeId { get; set; }
         [Required]
         public string Grade { get; set; }
-        public List<GradeForInvoiceViewModel> Grades { get; set; }
+        public List<GradeForInvoiceViewModel> Grades { get; set; }       
     }
 }

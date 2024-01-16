@@ -2,6 +2,7 @@
 @{
     ViewBag.Title = "Service Orders";
 }
+<h5>Service Orders</h5>
 <form method="get">
     <h2 style="align-self:center">Service Orders</h2>
      <div class="row">
@@ -133,7 +134,7 @@
                         @order.Customer/@order.CustomerOrderNumber
                         </th>
                         <td>
-                             <a asp-controller="Reports" asp-action="ServiceOrderDetail" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
+                             <a asp-controller="Reports" asp-action="ServiceOrderDetail" asp-route-id="@order.Id" class="btn btn-info mr-1" target="_blank">Details</a>
                         </td>
                         <td>
                             <a asp-controller="Reports" asp-action="EditServiceOrder" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>

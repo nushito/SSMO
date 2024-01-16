@@ -10,8 +10,8 @@ using SSMO.Data;
 namespace SSMO.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20231101122051_BalanceServiceOrder")]
-    partial class BalanceServiceOrder
+    [Migration("20240102145601_CalculationPricePurchaseProduct")]
+    partial class CalculationPricePurchaseProduct
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -316,6 +316,24 @@ namespace SSMO.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("CorrespondBgCity")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CorrespondBgCountry")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CorrespondBgStreet")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CorrespondCity")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CorrespondCountry")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CorrespondStreet")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Country")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -421,6 +439,9 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RepresentativePerson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VAT")
@@ -766,6 +787,9 @@ namespace SSMO.Data.Migrations
                     b.Property<int?>("FiscalAgentId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("FooterId")
+                        .HasColumnType("int");
+
                     b.Property<string>("FscClaim")
                         .HasColumnType("nvarchar(max)");
 
@@ -775,7 +799,13 @@ namespace SSMO.Data.Migrations
                     b.Property<decimal>("GrossWeight")
                         .HasColumnType("decimal");
 
+                    b.Property<int?>("HeaderId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Incoterms")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LoadingAddress")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("MyCompanyId")
@@ -796,6 +826,9 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("PaymentTerms")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PlaceOfIssue")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("ProcentComission")
@@ -852,7 +885,11 @@ namespace SSMO.Data.Migrations
 
                     b.HasIndex("FiscalAgentId");
 
+                    b.HasIndex("FooterId");
+
                     b.HasIndex("FscTextId");
+
+                    b.HasIndex("HeaderId");
 
                     b.HasIndex("MyCompanyId");
 
@@ -884,6 +921,9 @@ namespace SSMO.Data.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("FiscalAgents");
@@ -900,6 +940,9 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FscTextEng")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -920,6 +963,29 @@ namespace SSMO.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Grades");
+                });
+
+            modelBuilder.Entity("SSMO.Data.Models.Image", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ImageTitle")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MyCompanyId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("MyCompanyId");
+
+                    b.ToTable("Images");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.InvoiceProductDetails", b =>
@@ -1171,6 +1237,10 @@ namespace SSMO.Data.Migrations
                     b.Property<int?>("SupplierOrderId")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("UsedAmountForCalculation")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CurrencyForCalculationsId");
@@ -1246,6 +1316,9 @@ namespace SSMO.Data.Migrations
 
                     b.Property<int>("GradeId")
                         .HasColumnType("int");
+
+                    b.Property<string>("HsCode")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("LoadedQuantity")
                         .HasPrecision(18, 5)
@@ -1350,9 +1423,16 @@ namespace SSMO.Data.Migrations
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
 
+                    b.Property<decimal?>("CalculationCurrencyPrice")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
                     b.Property<decimal>("CostPrice")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
+
+                    b.Property<int?>("CostPriceCurrencyId")
+                        .HasColumnType("int");
 
                     b.Property<string>("FscCertificate")
                         .HasColumnType("nvarchar(max)");
@@ -1397,6 +1477,8 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CostPriceCurrencyId");
 
                     b.HasIndex("ProductId");
 
@@ -1462,6 +1544,9 @@ namespace SSMO.Data.Migrations
                     b.Property<int?>("FiscalAgentId")
                         .HasColumnType("int");
 
+                    b.Property<string>("GrossWeight")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LoadingAddress")
                         .HasColumnType("nvarchar(max)");
 
@@ -1473,6 +1558,15 @@ namespace SSMO.Data.Migrations
 
                     b.Property<bool>("Paid")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Payer")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentMethod")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PaymentTerms")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("SupplierOrderId")
                         .HasColumnType("int");
@@ -1570,6 +1664,9 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RepresentativePerson")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("VAT")
@@ -1706,6 +1803,9 @@ namespace SSMO.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Vat")
@@ -1977,9 +2077,19 @@ namespace SSMO.Data.Migrations
                         .HasForeignKey("FiscalAgentId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.HasOne("SSMO.Data.Models.Image", "Footer")
+                        .WithMany("FooterDocuments")
+                        .HasForeignKey("FooterId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SSMO.Data.Models.FscText", "FscText")
                         .WithMany("Documents")
                         .HasForeignKey("FscTextId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("SSMO.Data.Models.Image", "Header")
+                        .WithMany("HeaderDocuments")
+                        .HasForeignKey("HeaderId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("SSMO.Data.Models.MyCompany", "MyCompany")
@@ -2010,13 +2120,28 @@ namespace SSMO.Data.Migrations
 
                     b.Navigation("Fiscalagent");
 
+                    b.Navigation("Footer");
+
                     b.Navigation("FscText");
+
+                    b.Navigation("Header");
 
                     b.Navigation("MyCompany");
 
                     b.Navigation("Supplier");
 
                     b.Navigation("SupplierOrder");
+                });
+
+            modelBuilder.Entity("SSMO.Data.Models.Image", b =>
+                {
+                    b.HasOne("SSMO.Data.Models.MyCompany", "MyCompanyName")
+                        .WithMany("Images")
+                        .HasForeignKey("MyCompanyId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("MyCompanyName");
                 });
 
             modelBuilder.Entity("SSMO.Data.Models.InvoiceProductDetails", b =>
@@ -2181,6 +2306,11 @@ namespace SSMO.Data.Migrations
 
             modelBuilder.Entity("SSMO.Data.Models.PurchaseProductDetails", b =>
                 {
+                    b.HasOne("SSMO.Data.Models.Currency", "CostPriceCurrency")
+                        .WithMany("PurchaseProducts")
+                        .HasForeignKey("CostPriceCurrencyId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.HasOne("SSMO.Data.Models.Product", "Product")
                         .WithMany("PurchaseProductDetails")
                         .HasForeignKey("ProductId")
@@ -2198,6 +2328,8 @@ namespace SSMO.Data.Migrations
                         .HasForeignKey("SupplierOrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("CostPriceCurrency");
 
                     b.Navigation("Product");
 
@@ -2353,6 +2485,8 @@ namespace SSMO.Data.Migrations
 
                     b.Navigation("PaymentsWithExchangeRate");
 
+                    b.Navigation("PurchaseProducts");
+
                     b.Navigation("ServiceOrders");
 
                     b.Navigation("SupplierOrders");
@@ -2426,11 +2560,20 @@ namespace SSMO.Data.Migrations
                     b.Navigation("Products");
                 });
 
+            modelBuilder.Entity("SSMO.Data.Models.Image", b =>
+                {
+                    b.Navigation("FooterDocuments");
+
+                    b.Navigation("HeaderDocuments");
+                });
+
             modelBuilder.Entity("SSMO.Data.Models.MyCompany", b =>
                 {
                     b.Navigation("BankDetails");
 
                     b.Navigation("Documents");
+
+                    b.Navigation("Images");
 
                     b.Navigation("Orders");
 

@@ -26,6 +26,8 @@ using SSMO.Repository;
 using SSMO.Services.CustomerOrder.Models;
 using SSMO.Models.Reports.ServiceOrders;
 using DocumentFormat.OpenXml.Wordprocessing;
+using SSMO.Services.Images;
+using DocumentFormat.OpenXml.InkML;
 
 namespace SSMO.Services.Reports
 {
@@ -40,13 +42,13 @@ namespace SSMO.Services.Reports
         private readonly ICustomerOrderService customerOrderService;
         private readonly ISupplierService supplierService;
         private readonly IProductRepository productRepository;
-
+        private readonly IImageService imageService;
         public ReportsService
             (ApplicationDbContext context, IConfigurationProvider mapper,
             IProductService productService, IInvoiceService invoiceService,
             ISupplierOrderService supplierOrderService, IMycompanyService mycompanyService,
             ICustomerOrderService customerOrderService, ISupplierService supplierService,
-            IProductRepository productRepository)
+            IProductRepository productRepository, IImageService imageService)
         {
             dbcontext = context;
             this.mapper = mapper;//.ConfigurationProvider;
@@ -57,6 +59,7 @@ namespace SSMO.Services.Reports
             this.customerOrderService = customerOrderService;
             this.supplierService = supplierService;
             this.productRepository = productRepository;
+            this.imageService = imageService;
         }
         public CustomerOrdersQueryModel AllCustomerOrders
             (string customerName, DateTime startDate, DateTime endDate,
@@ -164,8 +167,7 @@ namespace SSMO.Services.Reports
                                .Select(i => new CustomerOrdersPaymentDetailsPerInvoice
                                {
                                    Id = i.Id,
-                                   OrderConfirmationNumber = i.OrderConfirmationNumber,
-                                   PaidAvance = i.PaidAvance,    
+                                   OrderConfirmationNumber = i.OrderConfirmationNumber,                                   
                                    Payments = i.Payments.Select(a=> new PaymentViewModel
                                    {
                                        PaidAmount = a.PaidAmount,
@@ -222,61 +224,61 @@ namespace SSMO.Services.Reports
 
             return purchaseInvoiceCollection;
         }
-        public CustomerOrderDetailsModel CustomerOrderDetails(int id)
-        {
-            var findorder = dbcontext.CustomerOrders.Where(a => a.Id == id);
-            CustomerOrderDetailsModel order = findorder.ProjectTo<CustomerOrderDetailsModel>(mapper).FirstOrDefault();
+        //public CustomerOrderDetailsModel CustomerOrderDetails(int id)
+        //{
+        //    var findorder = dbcontext.CustomerOrders.Where(a => a.Id == id);
+        //    CustomerOrderDetailsModel order = findorder.ProjectTo<CustomerOrderDetailsModel>(mapper).FirstOrDefault();
 
-            var products = dbcontext.CustomerOrderProductDetails
-                .Where(i => i.CustomerOrderId == id);
+        //    var products = dbcontext.CustomerOrderProductDetails
+        //        .Where(i => i.CustomerOrderId == id);
             
-           order.Products = products.ProjectTo<ProductsForCustomerOrderDetailsViewModel>(mapper).ToList();
+        //   order.Products = products.ProjectTo<ProductsForCustomerOrderDetailsViewModel>(mapper).ToList();
 
-            foreach (var product in order.Products)
-            {
-                var mainProduct = dbcontext.Products
-                    .Where(i => i.Id == product.ProductId)
-                    .FirstOrDefault();
+        //    foreach (var product in order.Products)
+        //    {
+        //        var mainProduct = dbcontext.Products
+        //            .Where(i => i.Id == product.ProductId)
+        //            .FirstOrDefault();
 
-                product.DescriptionName = productService.GetDescriptionName(mainProduct.DescriptionId);
-                product.GradeName = productService.GetGradeName(mainProduct.GradeId);
-                product.SizeName = productService.GetSizeName(mainProduct.SizeId);
+        //        product.DescriptionName = productService.GetDescriptionName(mainProduct.DescriptionId);
+        //        product.GradeName = productService.GetGradeName(mainProduct.GradeId);
+        //        product.SizeName = productService.GetSizeName(mainProduct.SizeId);
 
-                var supplierId = dbcontext.SupplierOrders
-                    .Where(i => i.Id == product.SupplierOrderId)
-                    .Select(i => i.SupplierId).FirstOrDefault();
-
-
-               product.SupplierOrderNumber = dbcontext.SupplierOrders
-                    .Where(i => i.Id == product.SupplierOrderId)
-                    .Select(i => i.Number).FirstOrDefault();
+        //        var supplierId = dbcontext.SupplierOrders
+        //            .Where(i => i.Id == product.SupplierOrderId)
+        //            .Select(i => i.SupplierId).FirstOrDefault();
 
 
-                product.SupplierName = dbcontext.Suppliers
-                    .Where(i=>i.Id == supplierId)
-                    .Select(n=>n.Name).FirstOrDefault();
-            }
+        //       product.SupplierOrderNumber = dbcontext.SupplierOrders
+        //            .Where(i => i.Id == product.SupplierOrderId)
+        //            .Select(i => i.Number).FirstOrDefault();
 
-            var myCompanyId = findorder.
-                Select(id => id.MyCompanyId).
-                FirstOrDefault();
 
-            var myCompanyName = dbcontext.MyCompanies
-                .Where(id => id.Id == myCompanyId)
-                .Select(n => n.Name)
-                .FirstOrDefault();
+        //        product.SupplierName = dbcontext.Suppliers
+        //            .Where(i=>i.Id == supplierId)
+        //            .Select(n=>n.Name).FirstOrDefault();
+        //    }
 
-            order.MyCompanyName = myCompanyName;
+        //    var myCompanyId = findorder.
+        //        Select(id => id.MyCompanyId).
+        //        FirstOrDefault();
 
-            if(order.FIscalAgentId != 0)
-            {
-                order.FiscalAgentName = dbcontext.FiscalAgents
-                    .Where(i=>i.Id == order.FIscalAgentId)
-                    .Select(n=>n.Name)
-                    .FirstOrDefault();
-            }
-            return order;
-        }
+        //    var myCompanyName = dbcontext.MyCompanies
+        //        .Where(id => id.Id == myCompanyId)
+        //        .Select(n => n.Name)
+        //        .FirstOrDefault();
+
+        //    order.MyCompanyName = myCompanyName;
+
+        //    if(order.FIscalAgentId != 0)
+        //    {
+        //        order.FiscalAgentName = dbcontext.FiscalAgents
+        //            .Where(i=>i.Id == order.FIscalAgentId)
+        //            .Select(n=>n.Name)
+        //            .FirstOrDefault();
+        //    }
+        //    return order;
+        //}
 
         public async Task<bool> EditCustomerOrder(int id,
             string number, System.DateTime date,
@@ -296,6 +298,9 @@ namespace SSMO.Services.Reports
             {
                 return false;
             }
+
+            var oldBalance = order.Balance;
+            var oldTotalAmount = order.TotalAmount;
 
             order.CustomerPoNumber = number;
             order.Date = date;
@@ -346,11 +351,15 @@ namespace SSMO.Services.Reports
                                        .FirstOrDefault();
                     var oldQuantity = productPerCorder.Quantity;
                     var oldTotalSheets = productPerCorder.TotalSheets;
-
+                  
                     if (product.Quantity == 0)
                     {
-                        productPerCorder.Quantity = 0;
-                        productPerCorder.AutstandingQuantity = 0;
+                        dbcontext.CustomerOrderProductDetails.Remove(productPerCorder); 
+                        dbcontext.SaveChanges();  
+
+                        //productPerCorder.Quantity = 0;
+                        //productPerCorder.AutstandingQuantity = 0;
+                        //productPerCorder.CustomerOrderId = 0;
                         continue;
                     }
                     else
@@ -371,6 +380,8 @@ namespace SSMO.Services.Reports
                         productPerCorder.Quantity = product.Quantity;
                         productPerCorder.TotalSheets = product.Pallets * product.SheetsPerPallet;
                         productPerCorder.Amount = Math.Round(product.SellPrice * product.Quantity, 5);
+                        productPerCorder.FscCertificate = product.FscCertificate;
+                        productPerCorder.FscClaim = product.FSCClaim;
 
                         if(invoicedQuantity > 0m)
                         {
@@ -398,13 +409,13 @@ namespace SSMO.Services.Reports
                 }
             }
 
-                order.SubTotal = order.Amount * order.Vat / 100 ?? 0;
-                order.TotalAmount = order.Amount + order.SubTotal;                
+            order.SubTotal = order.Amount * order.Vat / 100 ?? 0;
+            order.TotalAmount = order.Amount + order.SubTotal;
+            order.Balance = oldBalance - oldTotalAmount + order.TotalAmount;
 
             await dbcontext.SaveChangesAsync();
 
             bankDetails.ForEach(i => order.BankDetails.Add(i));
-
             await dbcontext.SaveChangesAsync();
             return true;
         }
@@ -481,8 +492,6 @@ namespace SSMO.Services.Reports
                     {
                         var detail = new CustomerOrderInvoicesPaymentDetailsViewModel
                         {
-                            AdvancePayment = invoice.PaidAvance,
-                            DateAdvancePayment = invoice.DatePaidAmount,
                             DocumentNumber = invoice.DocumentNumber,
                             Date = invoice.Date,
                             Payments = new List<CustomerOrderInvoicesPaymentCollectionViewModel>()
@@ -559,13 +568,10 @@ namespace SSMO.Services.Reports
                 Number = supplierOrder.Number,
                 Amount = supplierOrder.Amount,
                 CurrencyId = supplierOrder.CurrencyId,
-                Date = supplierOrder.Date,
-                DatePaidAmount = supplierOrder.DatePaidAmount,
+                Date = supplierOrder.Date,                
                 DeliveryAddress = supplierOrder.DeliveryAddress,
                 LoadingAddress = supplierOrder.LoadingAddress,
-                DeliveryTerms = supplierOrder.DeliveryTerms,
-                FSCClaim = supplierOrder.FscClaim,
-                FSCSertificate = supplierOrder.FscSertificate,
+                DeliveryTerms = supplierOrder.DeliveryTerms,                
                 GrossWeight = supplierOrder.GrossWeight,
                 TotalQuantity = supplierOrder.TotalQuantity,
                 MyCompanyId = supplierOrder.MyCompanyId,
@@ -582,8 +588,7 @@ namespace SSMO.Services.Reports
             DateTime date, int myCompanyId, string deliveryTerms,
             string loadingPlace, string deliveryAddress,
             decimal grossWeight, decimal netWeight, int currencyId,
-            int status, int customerOrderNumber, string fscClaim, string fscCertificate,
-            decimal paidAdvance, bool paidStatus, int? vat, List<ProductsForEditSupplierOrder> products, 
+            int status, int customerOrderNumber, int? vat, List<ProductsForEditSupplierOrder> products, 
             List<NewProductsForSupplierOrderModel> newProducts)
         {
             if (supplierOrderNumber == null) return false;
@@ -603,10 +608,7 @@ namespace SSMO.Services.Reports
             supplierOrder.GrossWeight = grossWeight;
             supplierOrder.NetWeight = netWeight;
             supplierOrder.CurrencyId = currencyId;
-            supplierOrder.StatusId = status;
-            supplierOrder.FscClaim = fscClaim;
-            supplierOrder.FscSertificate = fscCertificate;
-            supplierOrder.PaidStatus = paidStatus;
+            supplierOrder.StatusId = status;           
             supplierOrder.Amount = 0;
 
             if (products.Count != 0)
@@ -623,6 +625,8 @@ namespace SSMO.Services.Reports
                         continue;
                     }
 
+                    product.PurchaseFscClaim = item.PurchaseFscClaim;
+                    product.PurchaseFscCertificate= item.PurchaseFscCertificate;
                     product.DescriptionId = item.DescriptionId;
                     product.GradeId = item.GradeId;
                     product.SizeId = item.SizeId;
@@ -632,26 +636,47 @@ namespace SSMO.Services.Reports
                     product.Unit = Enum.Parse<Unit>(item.Unit);
                     product.TotalSheets = item.Pallets * item.SheetsPerPallet;
                     product.Amount = item.OrderedQuantity * item.PurchasePrice;
+                    product.HsCode = item.HsCode;
                     product.OrderedQuantity = item.OrderedQuantity;
                     product.QuantityLeftForPurchaseLoading = item.OrderedQuantity - product.LoadedQuantity;
+
+                    var size = dbcontext.Sizes.Where(a => a.Id == item.SizeId).Select(n => n.Name).FirstOrDefault();
+
+                    if (!String.Equals(item.Unit.ToString(), Data.Enums.Unit.m3.ToString()) && !String.Equals(size, "-"))
+                    {
+                        var sum = productService.ConvertStringSizeToQubicMeters(size);
+
+                        product.QuantityM3 = Math.Round(sum * product.Pallets * product.SheetsPerPallet, 5);
+
+                    }
+                    else if (!String.Equals(size, "-"))
+                    {
+                        product.QuantityM3 = item.OrderedQuantity;
+                    }
 
                     var sumProductInCustomerOrders = dbcontext.CustomerOrderProductDetails
                         .Where(p => p.ProductId == item.Id)
                         .Sum(q => q.Quantity);
                     product.QuantityAvailableForCustomerOrder = item.OrderedQuantity - sumProductInCustomerOrders;
                     supplierOrder.Amount += product.Amount;
-                }
-
-                if(newProducts.Count > 0)
-                {
-                    foreach (var item in newProducts)
-                    {
-                        productService.CreateNewProductOnEditSupplierOrder(item);
-                    }
-                }
-
-               await supplierOrderService.TotalAmountAndQuantitySum(supplierOrderId);
+                }                
             }
+
+            if (newProducts.Count > 0)
+            {
+                foreach (var item in newProducts)
+                {
+                    productService.CreateNewProductOnEditSupplierOrder(item);
+                }
+            }
+
+            await supplierOrderService.TotalAmountAndQuantitySum(supplierOrderId);
+
+            var payments = dbcontext.Payments
+                .Where(i => i.SupplierOrderId == supplierOrderId)
+                .Sum(a => a.PaidAmount);
+
+            supplierOrder.Balance = supplierOrder.TotalAmount - payments;
 
             await dbcontext.SaveChangesAsync();
             return true;
@@ -721,18 +746,14 @@ namespace SSMO.Services.Reports
         }
 
         public InvoiceReportModel InvoiceCollection
-            (string myCompanyName, DateTime startDate, DateTime endDate, int currentpage =1, int invoicesPerPage = int.MaxValue)
-        {
-            if (myCompanyName == null) return new InvoiceReportModel();
-
-            var companyId = myCompanyService.GetMyCompanyId(myCompanyName);
-
+            (int myCompanyId, DateTime startDate, DateTime endDate, int currentpage =1, int invoicesPerPage = int.MaxValue)
+        {          
             var invoices = dbcontext.Documents
                 .Where(type => type.DocumentType == DocumentTypes.Invoice || 
                        type.DocumentType == DocumentTypes.CreditNote || 
                        type.DocumentType == DocumentTypes.DebitNote &&
                        type.Date >= startDate && type.Date <= endDate)
-                .Where(m => m.MyCompanyId == companyId).OrderByDescending(d=>d.DocumentNumber);
+                .Where(m => m.MyCompanyId == myCompanyId).OrderByDescending(d=>d.DocumentNumber);
            
             var invoiceDetailsCollection = invoices.ProjectTo<InvoiceCollectionViewModel>(this.mapper).ToList();
 
@@ -743,6 +764,7 @@ namespace SSMO.Services.Reports
                     invoice.CreditToInvoiceDocumentNumber = dbcontext.Documents
                         .Where(id=>id.Id == invoice.CreditToInvoiceId)
                         .Select(n=>n.DocumentNumber).FirstOrDefault();
+
                     invoice.TotalAmount = invoice.CreditNoteTotalAmount;
                 }
                 else if(invoice.DebitToInvoiceId != 0)
@@ -763,7 +785,7 @@ namespace SSMO.Services.Reports
             };
 
             foreach (var invoice in collection.InvoiceCollection)
-            {
+            {                
                 foreach (var order in invoice.CustomerOrders)
                 {
                     var customerOrderNumber = customerOrderService.CustomerOrderNumberById(order.Id);
@@ -778,7 +800,7 @@ namespace SSMO.Services.Reports
             return collection;
         }
 
-        public InvoiceDetailsViewModel InvoiceDetails(int id)
+        public InvoiceDetailsViewModel InvoiceDetails(int id, int header, int footer)
         {
             var invoice = dbcontext.Documents
                 .Include(b=>b.BankDetails)
@@ -836,6 +858,11 @@ namespace SSMO.Services.Reports
                 product.Description = productService.GetDescriptionName(mainProduct.DescriptionId);
                 product.Size = productService.GetSizeName(mainProduct.SizeId);
                 product.Grade = productService.GetGradeName(mainProduct.GradeId);
+                product.HsCode = mainProduct.HsCode;
+                if (product.Unit == Data.Enums.Unit.pcs || product.Unit == Data.Enums.Unit.sheets)
+                {
+                    product.InvoicedQuantity = Math.Round(product.InvoicedQuantity, 0);
+                }
             }
 
             invoiceDetails.Products = productsDetails;
@@ -890,10 +917,14 @@ namespace SSMO.Services.Reports
             invoiceDetails.OrderConfirmationNumber = customerOrders.Select(a => a.OrderConfirmationNumber).ToList();
 
             invoiceDetails.CustomerPoNumbers = customerOrders.Select(a => a.CustomerPoNumber).ToList();
+            invoiceDetails.HeaderUrl = imageService.HeaderUrl(header);
+            invoiceDetails.FooterUrl = imageService.FooterUrl(footer);
+            invoiceDetails.Currency = dbcontext.Currencies
+                .Where(i=>i.Id == invoiceDetails.CurrencyId)
+                .Select(a=>a.Name).FirstOrDefault();
 
             return invoiceDetails;
         }
-
         public PurchaseCollectionQueryModel PurchaseInvoices
             (string supplierName, DateTime startDate, DateTime endDate, int currentpage = 1, int invoiceperPage = int.MaxValue)
         {

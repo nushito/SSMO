@@ -2,10 +2,11 @@
 @{
     ViewBag.Title = "Supplier Orders";
 }
+<h5>Supplier Specification Collection</h5>
 <form method="get">
     <div class="row">
         <div class="form-group col-md-4">
-            <label asp-for="SupplierName"></label>
+            <label asp-for="SupplierName">Choose Supplier</label>
             <select asp-for="SupplierName" class="form-control">
                 <option value="">All</option>
                 @foreach (var supplierName in Model.SupplierNames)
@@ -68,7 +69,7 @@
 </div>
 
 <table class="table">
-    <thead class="row">
+    <thead>
         <tr>
             <th >
             Supplier Order Number
@@ -92,7 +93,7 @@
         {
             @foreach (var order in Model.SupplierOrderCollection)
             {
-                        <tr class="row">
+                        <tr>
                             <td >
                         @order.SupplierOrderNumber
                             </td>
@@ -109,10 +110,10 @@
                         @order.StatusName
                             </td>
                            <td>
-                            <a asp-controller="Reports" asp-action="SupplierOrderDetails" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
+                            <a asp-controller="Reports" asp-action="SupplierOrderDetails" asp-route-id="@order.Id" class="btn btn-info mr-1" target="_blank">Details</a>
                            </td>
                            <td>
-                            <a asp-controller="Reports" asp-action="SupplierOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
+                              <a asp-controller="Reports" asp-action="SupplierOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1" target="_blank">Edit</a>
                            </td>
                         </tr>                       
             }

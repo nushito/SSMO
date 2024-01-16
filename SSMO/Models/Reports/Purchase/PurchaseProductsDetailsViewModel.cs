@@ -13,6 +13,7 @@
         public string FscCertificate { get; set; }
         public decimal PurchasePrice { get; set; }
         public decimal CostPrice { get; set; }
+        public string CostPriceCurrency { get; set; }
         public int TotalSheets { get; set; }
         public decimal Amount { get; set; }        
     }

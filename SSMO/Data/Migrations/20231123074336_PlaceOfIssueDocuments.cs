@@ -2,12 +2,12 @@
 
 namespace SSMO.Data.Migrations
 {
-    public partial class DocumentLoadingAddress : Migration
+    public partial class PlaceOfIssueDocuments : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<string>(
-                name: "LoadingAddress",
+                name: "PlaceOfIssue",
                 table: "Documents",
                 type: "nvarchar(max)",
                 nullable: true);
@@ -16,7 +16,7 @@ namespace SSMO.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "LoadingAddress",
+                name: "PlaceOfIssue",
                 table: "Documents");
         }
     }

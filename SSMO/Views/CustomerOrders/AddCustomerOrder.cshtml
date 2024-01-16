@@ -11,7 +11,7 @@
 
  <form enctype="multipart/form-data" method="post" >
     <h4>New Customer Order</h4>    
-     <div class="form-group row col-md-4">
+     <div class="form-group row col-md-4 mb-4">
         <label class="mr-1" asp-for="Type">Choose type<span></span> </label>
         <select asp-for="Type">
            <option value="Order Confirmation">Order Confirmation</option>
@@ -26,19 +26,18 @@
         <span asp-validation-for="OrderConfirmationNumber" class="small text-danger"></span>
     </div>
         }       
-     <div class="row col-md-4">
+     <div class="row col-md-4 mb-4">
         <label asp-for="CustomerPoNumber"></label>
         <input asp-for="CustomerPoNumber" class="form-control"/>
         <span asp-validation-for="CustomerPoNumber" class="small text-danger"></span>
     </div>
-    <div class="row row col-md-4">
+    <div class="row row col-md-4 mb-4">
         <label asp-for="Date"></label>
         <input itemid="date" asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
         <span asp-validation-for="Date" class="small text-danger"></span>
     </div>
-    <div class="form-group row col-md-4">
-        <div class="form-group col-md-4">
-            <div class="form-group">
+    <div class="form-group row col-md-4 mb-4">
+        <td class="form-group col-md-4">          
                 <label >Customer</label>
                 <select id="client" asp-for="CustomerId" class="form-control">
                 <option value="">All</option>
@@ -47,12 +46,10 @@
                             <option value="@item.Id">@item.Name</option>                        
                     }
                     <span asp-validation-for="CustomerId" class="small text-danger"></span>
-                </select>
-            </div>
+                </select>           
 
-        </div>
-        <div class="form-group col-md-6">
-            <div class="form-group">
+        </td>
+        <td class="form-group col-md-6 mb-4">           
                 <label >My Company</label>
                 <select id="mycompany" asp-for="MyCompanyId" class="form-control">
                 <option value="">All</option>
@@ -61,36 +58,35 @@
                             <option value="@company.Id">@company.Name</option>
                     }
                     <span asp-validation-for="MyCompanyId" class="small text-danger"></span>
-                </select>
-            </div>            
-        </div>    
+                </select>                       
+        </td>    
     </div>
-    <div class="form-group row col-md-4">
+    <div class="form-group row col-md-4 mb-4">
         <label asp-for="DeliveryTerms"></label>
         <input id="deliveryterms" asp-for="DeliveryTerms" type="text" class="form-control" placeholder="Delivery Terms" />
         <span asp-validation-for="DeliveryTerms" class="small text-danger"></span>
     </div>
-    <div class="form-group row col-md-4">
+    <div class="form-group row col-md-4 mb-4">
         <label asp-for="LoadingPlace"></label>
         <input id="loadingplace" asp-for="LoadingPlace" type="text" class="form-control" placeholder="Loading place" />       
     </div>
 
-    <div class="form-group row col-md-4">
+    <div class="form-group row col-md-4 mb-4">
         <label asp-for="DeliveryAddress"></label>
         <input id="deliveryaddress" asp-for="DeliveryAddress" type="text" class="form-control" placeholder="Delivery address" />       
     </div>
-     <div class="form-group row col-md-8">
-         <td class="col-md-4">
+     <div class="form-group row col-md-3 mb-4">
+         <td class="col-md-3">
          <label asp-for="Eta">ETA</label>
         <input  asp-for="Eta" type="text" class="form-control" placeholder="Estimate time of arrival" />       
          </td>
-        <td class="col-md-4">
+        <td class="col-md-3">
          <label asp-for="Etd">ETD</label>
         <input  asp-for="Etd" type="text" class="form-control" placeholder="Estimate time of depart" />       
          </td>
     </div>
 
-    <div class="form-group row col-md-4">
+    <div class="form-group row col-md-4 mb-4">
         <label asp-for="Currency"></label>
         <select id="currency" asp-for="CurrencyId" class="form-control">
             @foreach (var item in Model.Currencies )
@@ -99,21 +95,20 @@
             }
         </select>
     </div>
-    <div class="form-group row col-md-4">
+    <div class="form-group row col-md-4 mb-4">
         <label asp-for="PaymentTerms">Payment Terms</label>
         <input asp-for="PaymentTerms" type="text" class="form-control" placeholder="Payment Terms"/>
     </div>
-    <div class="form-group row col-md-4">
+    <div class="form-group row" style="display:inline-block">
         <label asp-for="ChosenBanks">Choose Banks</label>
         <select asp-for="ChosenBanks" class="form-control" multiple>
             @foreach (var item in Model.BankDetails)
             {
-               <option value="@item.Id">@item.CurrencyName:@item.BankName - @item.Iban</option>
+               <option value="@item.Id">@item.MyCompanyName - @item.CurrencyName:@item.BankName - @item.Iban</option>
             } 
         </select>
     </div>    
-    <div class="form-group row col-md-4">
-       
+    <div class="form-group row col-md-4 mb-4">       
         <label>Choose Fiscal Agent</label>
         <select asp-for="@Model.FiscalAgentId" class="form-control">
             <option value="">-</option>
@@ -123,33 +118,32 @@
                 }
         </select> 
     </div>
-    <div class="form-group row col-md-4">
+    <div class="form-group row col-md-4 mb-4">
         <label asp-for="Origin"></label>
         <input asp-for="Origin" type="text" class="form-control" />
         <span asp-validation-for="Origin" class="small text-danger"></span>
     </div>
-    <div class="form-group row col-md-4">
+    <div class="form-group row col-md-4 mb-4">
         <td>
             <label asp-for="Vat"></label>
             <input asp-for="Vat"  min="0" step="1" class="form-control" type="number" />
-        </td>
-      
-             <td><label >Status</label>
-                <select  asp-for="StatusId" class="form-control">
-                    @foreach (var status in Model.Statuses)
-                    {
-                        <option value="@status.Id">@status.Name</option>
-                    }
-                    <span asp-validation-for="StatusId" class="small text-danger"></span>
-                </select>
-             </td>          
+        </td>      
+        <td><label >Status</label>
+            <select  asp-for="StatusId" class="form-control">
+                @foreach (var status in Model.Statuses)
+                {
+                    <option value="@status.Id">@status.Name</option>
+                }
+                <span asp-validation-for="StatusId" class="small text-danger"></span>
+            </select>
+        </td>          
     </div>
-    <div class="form-group row col-md-4">
+    <div class="form-group row col-md-4 mb-4">
         <label asp-for="Comment"></label>
             <input asp-for="Comment" class="form-control" type="text" />
     </div>
      <div class="row">
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-4 mb-4">
             <label asp-for="DealType">Deal Type Eng</label>
             <select asp-for="DealType" class="form-control">
             <option value="-">-</option>
@@ -159,7 +153,7 @@
            <option value="0% VAT according to article 141 2006/112/ЕО from Bulgarian VAT Law">0% VAT according to article 141 2006/112/ЕО from Bulgarian VAT Law</option>    
          </select>
     </div>
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-4 mb-4">
             <label asp-for="DealDescription">Deal Description</label>
             <select asp-for="DealDescription" class="form-control">
             <option value="-">-</option>
@@ -169,7 +163,7 @@
           </select>
         </div>
     </div>
-     <div class="form-group row col-md-4">
+     <div class="form-group row col-md-4 mb-4">
         <label>Fsc Text</label>
         <select asp-for="@Model.FscText" class="form-control">
             <option value="">-</option>

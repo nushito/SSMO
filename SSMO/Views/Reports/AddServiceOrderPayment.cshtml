@@ -1,0 +1,21 @@
+﻿@model NewPaymentServiceOrderViewModel
+@{
+    ViewBag.Title = "Add Payment for Service Order";
+}
+
+<form method="post">
+    <div class="col-md-3 m-2">
+        @Model.Number
+    </div>
+    <div class="col-md-3 mb-2">
+        <label>Amount</label>
+        <input asp-for="Amount" type="number" min="0.00" step="0.01" class="form-control"/>
+    </div>
+    <div class="col-md-3 mb-2">
+        <label>Date</label>
+        <input asp-for="Date" type="date" class="form-control"/>
+    </div>
+    <div class="row">
+        <input type="submit" class="btn btn-info" value="Save" />
+    </div>
+</form>

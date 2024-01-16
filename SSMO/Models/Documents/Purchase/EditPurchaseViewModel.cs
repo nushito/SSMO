@@ -1,4 +1,5 @@
 ﻿using SSMO.Models.Reports.Purchase;
+using SSMO.Services.Curruncies;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace SSMO.Models.Documents.Purchase
         public int SupplierOrderId { get; set; }
         public ICollection<SupplierOrdersListForPurchaseEditModel> SupplierOrders { get; set; }
         public int Vat { get; set; }
+        public int Currency { get; set; }
         public string Incoterms { get; set; }
         public decimal NetWeight { get; set; }
         public decimal GrossWeight { get; set; }
@@ -28,6 +30,9 @@ namespace SSMO.Models.Documents.Purchase
         public decimal FiscalAgentExpenses { get; set; }
         public decimal ProcentComission { get; set; }
         public decimal OtherExpenses { get; set; }
+        public bool DelayCostCalculation { get; set; }
+        public int CostPriceCurrency { get; set; }
+        public ICollection<GetCurrencyModel> Currencies { get; set; }
         public List<PurchaseProductsForEditFormModel> PurchaseProducts { get; set; }
     }
 }

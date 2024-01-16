@@ -72,13 +72,15 @@
                        
               </div>
             </div>
+            <div class="col-xl-4">
+               Loading Address: @Model.LoadingPlace <br />
+           </div> 
+            <div class="col-xl-4">
+               Delivery address: @Model.DeliveryAddress<br />               
+           </div>
            <div class="col-xl-4">
                Delivery Period: @Model.Eta <br />
-           </div>    
-            <div class="col-xl-4">
-               Ship to address: @Model.DeliveryAddress<br />
-               
-           </div>
+           </div>   
             <div class="row my-2 mx-1 justify-content-center">
               <table class="table table-striped table-borderless">
                 <thead style="background-color:#84B0CA ;" class="text-white">
@@ -89,10 +91,13 @@
                                 <th scope="col">Size</th>
                                 <th scope="col">FSC Claim</th>
                                 <th scope="col">FSC Certificate</th>
+                                <th scope="col">HS Code</th>
+                                <th scope="col">Pallets</th>
+                                 <th scope="col">Sheets per Pallet</th>
                                 <th scope="col">Unit</th>
-                                <th scope="col">Qty</th>
-                                <th scope="col">Unit Price</th>
-                                <th scope="col">Amount</th>
+                                <th scope="col">Qty</th>                                 
+                                <th scope="col">Unit Price</th>                                
+                                <th scope="col">Amount (@Model.Currency)</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -106,31 +111,32 @@
                                 <td>@product.Size</td>
                                 <td>@product.FSCClaim</td>
                                 <td>@product.FscCertificate</td>
+                                <td>@product.HsCode</td>
+                                 <td>@product.Pallets</td>
+                                <td>@product.SheetsPerPallet</td>
                                 <td>@product.Unit</td>
-                                <td>@product.Quantity</td>
-                                <td>@product.SellPrice</td>
+                                <td>@product.Quantity</td>                               
+                                <td>@product.SellPrice</td>                               
                                 <td>@product.Amount.ToString("N2")</td>
                             </tr>
-                            }
-                           
+                            }                           
             </tbody>
           </table>
         </div>
         <div class="row">
 
-          <div class="col-xl-3">
+          <div class="col-xl-6">
             <ul class="list-unstyled">
               <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
               <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.Vat: </span>@Model.SubTotal.ToString("N2")</li>            
-            <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.TotalAmount.ToString("N2")</span></li>
+            <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.TotalAmount.ToString("N2") @Model.Currency</span></li>
           </ul>
           </div>
         </div>
         <hr>
          <div>
-             <ul class="list-unstyled">
-             <li class="text-muted">Net Weight: <span style="color:#5d9fc5 ;">-</span></li>
-               <li class="text-muted">Gross Weight: <span style="color:#5d9fc5 ;">-</span></li>
+             <ul class="list-unstyled">   
+                 <li>@Model.FscText</li><br />
                 <li>Notes: @Model.Comment</li>
                 <li>Country of origin:@Model.Origin</li>
          </ul>

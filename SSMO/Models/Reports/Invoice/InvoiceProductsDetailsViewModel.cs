@@ -43,5 +43,6 @@ namespace SSMO.Models.Reports.Invoice
         public decimal DebitNoteBgPrice { get; set; }
         public decimal DebitNoteBgAmount { get; set; }
         public int? PurchaseProductDetailsId { get; set; }
+        public string HsCode { get; set; }
     }
 }

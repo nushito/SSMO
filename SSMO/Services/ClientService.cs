@@ -5,6 +5,7 @@ using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Reports.FSC;
 using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
+using SSMO.Models.Reports.Products;
 using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.ServiceOrders;
 using SSMO.Services.Documents.Invoice;
@@ -22,6 +23,7 @@ namespace SSMO.Services
         private static CustomerInvoicePaymentsReportsViewModel _customerInvoicePayments;
         private static CustomerOrderPrintViewModel _customerOrderPrint;
         private static ServiceOrderDetailsPrintViewModel _serviceOrder;
+        private static ICollection<ProductPurchaseDetails> _products;
         public static void AddClient(InvoiceDetailsViewModel clientModel)
         {
             _clientModel = clientModel;
@@ -98,6 +100,16 @@ namespace SSMO.Services
         public static ServiceOrderDetailsPrintViewModel GetServiceOrder()
         {
             return _serviceOrder;
+        }
+
+        public static void AddProductDetails(ICollection<ProductPurchaseDetails> products)
+        {
+            _products = products;
+        }
+
+        public static ICollection<ProductPurchaseDetails> GetProductDetails()
+        {
+            return _products;
         }
 
     }

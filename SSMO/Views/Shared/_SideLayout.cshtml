@@ -123,8 +123,9 @@
                             </button>
                             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                                 <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="InvoicePaymentReport">Invoice</a>                                
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="CustomerOrdersPaymentReport">Customer Order</a>
-                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="SupplierOrdersPaymentReport">Debit to Suppliers</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="CustomerOrdersPaymentReport">Customers Payments</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="SupplierOrdersPaymentReport">Debit/Payments to Suppliers</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Reports" asp-action="ServiceOrderPaymentReport">Service/Transport Payments</a>
                             </div>
                         </div>
                      </li>
@@ -167,7 +168,12 @@
                                 <span>Service Orders Reports</span>
                             </a>
                         </li>
-
+                        <li class="nav-item active">
+                            <a href="~/Reports/Products" class="nav-link">
+                                <i class="fas fa-fw fa-tachometer-alt"></i>
+                                <span>Products Details</span>
+                            </a>
+                        </li>
                     <li class="nav-item active">
                         <a href="~/Reports/ProductsOnStock" class="nav-link">
                             <i class="fas fa-fw fa-tachometer-alt"></i>

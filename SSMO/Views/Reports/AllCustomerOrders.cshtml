@@ -1,5 +1,5 @@
 ﻿@model CustomerOrderReportAll
-
+<h5>Customer Orders Collection</h5>
 <form method="get">
     <div class="row">
         <div class="form-group col-md-4">
@@ -115,8 +115,8 @@
              <div class="col">
                     @order.StatusName
             </div>
-                    <a asp-controller="Reports" asp-action="CustomerOrderDetailsPrint" asp-route-id="@order.Id" class="btn btn-info mr-1">Details</a>
-            <a asp-controller="Reports" asp-action="CustomerOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Edit</a>
+            <a asp-controller="Reports" asp-action="CustomerOrderDetailsPrint" asp-route-id="@order.Id" class="btn btn-info mr-1" target="_blank">Details</a>
+            <a asp-controller="Reports" asp-action="CustomerOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1" target="_blank">Edit</a>
             </div>
             <hr />
         }

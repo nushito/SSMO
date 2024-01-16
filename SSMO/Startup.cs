@@ -96,14 +96,16 @@ namespace SSMO
             services.AddTransient<IPurchaseService, PurchaseService>();
             services.AddTransient<IInvoiceService, InvoiceService>();
             services.AddTransient<ICreditNoteService, CreditNoteService>();
-            services.AddTransient<IDebitNoteService, DebitNoteService>();
-            services.AddTransient<IProductRepository, ProductRepository>();            
+            services.AddTransient<IDebitNoteService, DebitNoteService>();           
             services.AddTransient<IFscTextService, FscTextService>();  
             services.AddTransient<ITransportService, TransportService>();   
             services.AddTransient<IAddressService, AddressService>();   
             services.AddTransient<IFiscalAgentService, FiscalAgentService>();
-            services.AddTransient<IImageService, ImageService>();   
+            services.AddTransient<IImageService, ImageService>();
 
+            services.AddScoped<IProductRepository,ProductRepository>();
+            services.AddScoped<ICustomerOrderRepository, CustomerOrderRepository>();
+            services.AddScoped<ISupplierOrderRepository, SupplierOrderRepository>();
             services.AddScoped<IViewRenderService, ViewRenderService>();
             services.AddScoped<IHtmlToPdfConverter, HtmlToPdfConverter>();
             services.AddScoped<HttpContextUserIdExtension>();

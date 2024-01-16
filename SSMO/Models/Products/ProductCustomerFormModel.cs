@@ -36,6 +36,7 @@ namespace SSMO.Models.Products
         public int SheetsPerPallet { get; set; }
         public int SupplierOrderId { get; set; }
         public decimal QuantityAvailableForCustomerOrder { get; set; }
+        public string HsCode { get; set; }
 
     }
 }

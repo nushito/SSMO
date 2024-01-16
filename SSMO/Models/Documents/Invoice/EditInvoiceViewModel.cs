@@ -1,6 +1,7 @@
 ﻿
 using SSMO.Models.CustomerOrders;
 using SSMO.Models.FscTexts;
+using SSMO.Models.Image;
 using SSMO.Models.Reports.Invoice;
 using System;
 using System.Collections.Generic;
@@ -38,5 +39,12 @@ namespace SSMO.Models.Documents.Invoice
         public string PaymentTerms { get; set; }
         public string DeliveryAddress { get; set; }
         public string LoadingAddress { get; set; }
+        public int Header { get; set; }
+        public int Footer { get; set; }
+        public ICollection<ImageModelViewForAllDocuments> Images { get; set; }
+        public string PlaceOfIssue { get; set; }
+        public decimal? Factoring { get; set; }
+        public decimal? Comission { get; set; }
+        public int MyCompanyId { get; set; }
     }
 }
