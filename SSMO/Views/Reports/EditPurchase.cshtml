@@ -74,7 +74,14 @@
         <input asp-for="NetWeight"min="0.0000" step="0.0001" type="number" class="form-control" >
         <span asp-validation-for="NetWeight" class="small text-danger"></span>
     </div>
-
+    <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="Origin">Origin</label>
+        <input asp-for="Origin" type="text" class="form-control" >        
+    </div>
+    <div class="form-group  offset-3 mb-2 col-md-3">
+        <label asp-for="CustomsImportDeclaration">Customs Import Declaration</label>
+        <input asp-for="CustomsImportDeclaration" type="text" class="form-control" >        
+    </div>
      <div class="form-group  offset-3 mb-2 col-md-3">
         <label asp-for="GrossWeight">Gross Weight</label>
         <input asp-for="GrossWeight" min="0.0000" step="0.0001" type="number" class="form-control" >

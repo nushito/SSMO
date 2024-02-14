@@ -140,45 +140,45 @@
     <tbody>
         @foreach (var product in Model.Products)
         {
-            <tr>
-                    <td class="col-sm-1">
-                    @product.Description
-                </td>
-                    <td class="col-sm-1">
-                    @product.Grade
-                </td>
-                    <td class="col-sm-1">
-                    @product.Size
-                </td>
-                    <td class="col-sm-1">
-                    @product.FscCertificate
-                </td>
-                    <td class="col-sm-1">
-                    @product.FscClaim
-                </td>
-                    <td class="col-sm-1">
-                    @product.Unit
-                </td >
-                    <td class="col-sm-1">
-                    @product.Quantity
-                </td>
-                    <td class="col-sm-1">
-                    @product.Pallets
-                </td>
-                    <td class="col-sm-1">
-                    @product.SheetsPerPallet
-                </td>
-                     <td class="col-sm-1">
-                    @product.TotalSheets
-                    </td>
-                    <td class="col-sm-1">
-                    @product.PurchasePrice
-                </td>
+                <tr>
                         <td class="col-sm-1">
-                    @product.CostPrice @product.CostPriceCurrency
+                    @product.Description
                     </td>
-            </tr>
-            <hr />
+                        <td class="col-sm-1">
+                    @product.Grade
+                    </td>
+                        <td class="col-sm-1">
+                    @product.Size
+                    </td>
+                        <td class="col-sm-1">
+                    @product.FscCertificate
+                    </td>
+                        <td class="col-sm-1">
+                    @product.FscClaim
+                    </td>
+                        <td class="col-sm-1">
+                    @product.Unit
+                    </td >
+                        <td class="col-sm-1">
+                    @product.Quantity
+                    </td>
+                        <td class="col-sm-1">
+                    @product.Pallets
+                    </td>
+                        <td class="col-sm-1">
+                    @product.SheetsPerPallet
+                    </td>
+                         <td class="col-sm-1">
+                    @product.TotalSheets
+                        </td>
+                        <td class="col-sm-1">
+                    @product.PurchasePrice
+                    </td>
+                            <td class="col-sm-1">
+                    @product.CostPrice @product.CostPriceCurrency
+                        </td>
+                </tr>
+                <hr />
         }
     </tbody>
 </table>

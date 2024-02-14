@@ -4,15 +4,16 @@ var page = require('webpage').create(),
     address,
     output;
 
-console.log('Usage: rasterize.js [URL] [filename] [paperformat]');
+console.log('Usage: rasterize.js [URL] [filename] [paperformat][orientation]');
 address = system.args[1];
 output = system.args[2];
 
-page.viewportSize = { width: 600, height: 600 };
+page.viewportSize = { width: 800, height: 600 };
 
 page.paperSize = {
     format: system.args[3],
-    orientation: 'portrait',
+    orientation: system.args[4],
+    /*orientation: 'portrait',*/
     margin: '0.5cm',
     footer: {
         height: "0.5cm",

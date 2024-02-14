@@ -35,6 +35,7 @@ namespace SSMO.Data.Models
         public decimal TotalAmount  { get; set; }
         public string FscClaim { get; set; }
         public string FscSertificate { get; set; }
+        public string Comment { get; set; }
         public int? VAT { get; set; }
         public decimal? VatAmount { get; set; }
         public decimal NetWeight { get; set; }

@@ -9,6 +9,8 @@ namespace SSMO.Models.Reports.PaymentsModels
         public int TotalCustomerOrders { get; set; }
         public int OrderConfirmationNumber { get; set; }
         public string CustomerName { get; set; }
+        public int MyCompanyId { get; init; }
+        public IEnumerable<MyCompaniesForReportViewModel> MyCompanyNames { get; set; }
         public IEnumerable<string> CustomerNames { get; set; }
         public IEnumerable<CustomerOrderDetailsPaymentModel> CustomerOrdersPaymentCollection { get; set; }
        

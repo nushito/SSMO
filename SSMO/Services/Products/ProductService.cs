@@ -22,6 +22,7 @@ using SSMO.Models.Reports.ProductsStock;
 using SSMO.Models.Reports.SupplierOrderReportForEdit;
 using SSMO.Models.Sizes;
 using SSMO.Repository;
+using SSMO.Services.MyCompany;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,12 +37,14 @@ namespace SSMO.Services.Products
         private readonly ApplicationDbContext dbContext;
         private readonly IConfigurationProvider mapper;
         private readonly IProductRepository productRepository;
-
-        public ProductService(ApplicationDbContext dbContext, IMapper mapper, IProductRepository productRepository)
+        private readonly IMycompanyService mycompanyService;
+        public ProductService(ApplicationDbContext dbContext, IMapper mapper, 
+            IProductRepository productRepository,IMycompanyService mycompanyService)
         {
             this.dbContext = dbContext;
             this.mapper = mapper.ConfigurationProvider;
             this.productRepository = productRepository;
+            this.mycompanyService = mycompanyService;
         }
         public async Task CreateProduct(ProductSupplierFormModel model, int supplierOrderId)
         {
@@ -381,7 +384,7 @@ namespace SSMO.Services.Products
               
             if (descriptionId != null)
             {
-                products = products
+                products = (IOrderedQueryable<Product>)products
                          .Where(d => d.DescriptionId == descriptionId);
             }
 
@@ -399,7 +402,7 @@ namespace SSMO.Services.Products
 
             var productsOnStok = new List<ProductAvailabilityDetailsViewModel>();          
 
-            foreach (var product in products.ToList())
+            foreach (var product in products.OrderBy(i=>i.Id).ToList())
             {
                 var statusId = dbContext.Statuses
                     .Where(n=>n.Name == "Active")
@@ -421,8 +424,10 @@ namespace SSMO.Services.Products
                     Size = GetSizeName(product.SizeId),
                     Grade = GetGradeName(product.GradeId),
                     LoadedQuantity = product.LoadedQuantity,
-                    QuantityOnStock = product.LoadedQuantity - product.SoldQuantity,        
+                    QuantityOnStock = product.LoadedQuantity - product.SoldQuantity,    
+                    Unit = product.Unit.ToString(),
                     SupplierName = supplierName,
+                    SupplierOrderNumber = supplierOrder.Number,
                     CustomerProductsDetails = new List<ProductDetailsForEachCustomerOrderViewModel>(),
                     PurchaseProductDetails = new List<PurchaseProductDetailsListViewModel>()
                 };
@@ -461,9 +466,10 @@ namespace SSMO.Services.Products
                         .Select(n=>n.Name).FirstOrDefault(),
                         PurchaseCurrency = dbContext.Currencies
                         .Where(i => i.Id == purchase.CurrencyId)
-                        .Select(n => n.Name).FirstOrDefault()
-                    };
-                    
+                        .Select(n => n.Name).FirstOrDefault(),
+                        VehicleNumber = purchaseDetail.VehicleNumber,
+                        MyCompanyName = mycompanyService.GetCompanyName(purchase.MyCompanyId)
+                    };                    
                     availableProduct.PurchaseProductDetails.Add(productDetail);
                 }
 
@@ -476,7 +482,7 @@ namespace SSMO.Services.Products
                     var customerName = dbContext.Customers
                       .Where(o => o.Id == customerOrder.CustomerId)
                       .Select(n => n.Name)
-                      .FirstOrDefault();
+                      .FirstOrDefault();                    
 
                     var customerDetail = new ProductDetailsForEachCustomerOrderViewModel
                     {
@@ -487,7 +493,13 @@ namespace SSMO.Services.Products
                         Price = order.SellPrice,
                         Currency = dbContext.Currencies
                           .Where(i => i.Id == customerOrder.CurrencyId)
-                          .Select(n => n.Name).FirstOrDefault()
+                          .Select(n => n.Name).FirstOrDefault(),
+                        Unit = order.Unit.ToString(),
+                        Pallets = order.Pallets,
+                        SheetsPerPallet = order.SheetsPerPallet,
+                        Quantity = order.Quantity,
+                        AutstandingQuantity = order.AutstandingQuantity,
+                        MyCompanyName = mycompanyService.GetCompanyName(customerOrder.MyCompanyId)
                     };
                     availableProduct.CustomerProductsDetails.Add(customerDetail);
                 }
@@ -787,9 +799,13 @@ namespace SSMO.Services.Products
                    (product.InvoicedQuantity,product.QuantityM3ForCalc, invoice.TotalQuantity, 
                    invoice.DeliveryTrasnportCost,product.Unit,size);
 
-               // product.Profit = (product.Amount - purchaseProductDetail.CostPrice * purchaseProductDetail.Quantity) - product.DeliveryCost;
-                product.Profit = (product.SellPrice - purchaseProductDetailCostPrice) * 
-                    product.InvoicedQuantity - product.DeliveryCost;
+                var expensesFactoringPerProduct = (((invoice.Factoring * invoice.TotalAmount) / 100)
+                  / invoice.TotalQuantity) * product.QuantityM3ForCalc;
+
+                var allExpenses = ((invoice.ProcentComission + invoice.BankExpenses + invoice.FiscalAgentExpenses + invoice.CustomsExpenses + invoice.Duty + invoice.OtherExpenses) / invoice.TotalQuantity) * product.QuantityM3ForCalc;
+
+                product.Profit = (decimal)((product.Amount - (purchaseProductDetailCostPrice * product.InvoicedQuantity)) - product.DeliveryCost - expensesFactoringPerProduct - allExpenses);
+
             }
 
             invoice.Amount += invoice.InvoiceProducts.Sum(a=>a.Amount);

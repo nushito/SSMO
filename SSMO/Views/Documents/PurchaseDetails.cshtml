@@ -19,16 +19,26 @@
              <input asp-for="Date" type="date" class="form-control" >
              <span asp-validation-for="Date" class="small text-danger"></span>
             </td>
-        </tr>      
+        </tr>   
+        <tr>
+            <td class="col-sm-auto">
+              <label class="form-check-label" asp-for="Origin"> Origin of the Goods</label>    
+               <input class="form-control" type="text" asp-for="Origin">
+            </td>
+        </tr>
         <tr>
               <td class="col-sm-auto">
               <label class="form-check-label" asp-for="Incoterms"> Incoterms </label>    
        <input class="form-control" type="text" asp-for="Incoterms">
             </td>
-            <td class="col-sm-auto">
+         <td class="col-sm-auto">
              <label class="form-check-label" asp-for="DeliveryAddress"> Delivery address </label>    
-       <input class="form-control" type="text" asp-for="DeliveryAddress">
-            </td>
+             <input class="form-control" type="text" asp-for="DeliveryAddress">
+         </td>
+         <td class="col-sm-auto">
+             <label class="form-check-label" asp-for="LoadingAddress"> Loading address </label>    
+             <input class="form-control" type="text" asp-for="LoadingAddress">
+         </td>
             <td class="col-sm-auto">
                   <label class="form-check-label" asp-for="Vat"> VAT </label>    
        <input class="form-control" min="0" step="1" type="number" asp-for="Vat">

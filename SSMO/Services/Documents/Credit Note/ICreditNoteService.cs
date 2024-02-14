@@ -11,13 +11,15 @@ namespace SSMO.Services.Documents.Credit_Note
     {
         public CreditAndDebitNoteViewModel CreateCreditNote
             (int invoiceId, DateTime date, bool quantityBack, string deliveryAddress, 
-            List<AddProductsToCreditAndDebitNoteFormModel> products, string paymentTerms);
+            string loadingAddress, List<AddProductsToCreditAndDebitNoteFormModel> products, 
+            string paymentTerms);
 
         public EditCreditNoteViewModel ViewCreditNoteForEdit(int id);
         public List<InvoiceNumbersForEditedCreditNoteViewModel> InvoiceNumbers();
         public bool EditCreditNote(int id, DateTime date, string incoterms, string truckNumber, decimal netWeight,
             decimal grossWeight, decimal deliveryCost, decimal currencyExchangeRate, string comment, 
-            IList<EditProductForCreditNoteViewModel> products, string paymentTerms, int invoiceId);
+            IList<EditProductForCreditNoteViewModel> products, string paymentTerms, int invoiceId,
+            string dealType, string dealDescription,string deliveryAddress,string loadingAddress);
 
         public bool AddNewProductsToCreditNoteWhenEdit(int id, int invoiceId,
             List<ProductForCreditNoteViewModelPerInvoice> productsFromInvoice, 

@@ -8,6 +8,8 @@ namespace SSMO.Models.Reports.PaymentsModels
         public int CurrentPage { get; init; } = 1;
         public int TotalCustomerInvoices { get; set; }
         public string CustomerName { get; set; }
+        public int MyCompanyId { get; init; }
+        public IEnumerable<MyCompaniesForReportViewModel> MyCompanyNames { get; set; }
         public IEnumerable<string> CustomerNames { get; set; }
         public IEnumerable<CustomerInvoicePaymentDetailsModel> CustomerPaymentCollection { get; set; }
     }

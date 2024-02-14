@@ -47,8 +47,8 @@ namespace SSMO.Services.Documents.Purchase
             decimal duty, decimal factoring, decimal customsExpenses, decimal fiscalAgentExpenses,
             decimal procentComission, decimal purchaseTransportCost, decimal bankExpenses, decimal otherExpenses, 
             int vat, string truckNumber, string swb,List<PurchaseProductAsSupplierOrderViewModel> products, 
-            string incoterms,  string deliveryAddress, string shippingLine, string eta, 
-            bool delayCostCalc, int costPriceCurrencyId)
+            string incoterms,  string deliveryAddress, string loadingAddress, string shippingLine, string eta, 
+            bool delayCostCalc, int costPriceCurrencyId, string origin)
         {
             var supplierOrder = dbContext.SupplierOrders.FirstOrDefault
                 (o => o.Id == id);
@@ -62,6 +62,7 @@ namespace SSMO.Services.Documents.Purchase
                 Date = date,
                 DocumentType = Data.Enums.DocumentTypes.Purchase,
                 DeliveryAddress= deliveryAddress,
+                LoadingAddress = loadingAddress,
                 SupplierOrder = supplierOrder,
                 SupplierOrderId = supplierOrder.Id,                
                 NetWeight = netWeight,
@@ -84,7 +85,9 @@ namespace SSMO.Services.Documents.Purchase
                 SupplierId = supplierOrder.SupplierId,
                 MyCompanyId = supplierOrder.MyCompanyId,
                 PurchaseProducts = new List<PurchaseProductDetails>(),
-                CustomerOrderProducts = new List<CustomerOrderProductDetails>()                
+                CustomerOrderProducts = new List<CustomerOrderProductDetails>(),
+                //Origin = origin
+               
             };
 
             if(costPriceCurrencyId != 0)
@@ -182,8 +185,7 @@ namespace SSMO.Services.Documents.Purchase
                 return false;
             }
 
-            //izchislqva se razhodite i sebestoinostta na produktite ako ne e izbrano da se napravi na po-kasen etap
-            if (delayCostCalc == false)
+            //izchislqva se razhodite i sebestoinostta na produktite ako ne e izbrano da se napravi na po-kasen etap v Payments s prevalutirane, kogato sa napraveni vsichki plashtaniq
             {
                 var expenses = purchase.Duty + purchase.Factoring * purchase.Amount / 100 +
                       purchase.CustomsExpenses + purchase.FiscalAgentExpenses +
@@ -255,7 +257,8 @@ namespace SSMO.Services.Documents.Purchase
             decimal purchaseTransportCost, decimal bankExpenses, decimal duty, decimal customsExpenses, 
             decimal factoring, decimal fiscalAgentExpenses, decimal procentComission, decimal otherExpenses, 
             List<PurchaseProductsForEditFormModel> purchaseProducts, string deliveryAddress, 
-            string shippingLine, string eta, int costPriceCurrencyId, bool delayCostCalc)
+            string shippingLine, string eta, int costPriceCurrencyId, bool delayCostCalc, 
+            string origin, string customsDeclaration)
         {
             if(id == 0) { return false; }   
 
@@ -286,6 +289,8 @@ namespace SSMO.Services.Documents.Purchase
             purchaseInvoiceForEdit.ShippingLine= shippingLine;
             purchaseInvoiceForEdit.Eta = eta;
             purchaseInvoiceForEdit.CurrencyId = currency;
+            purchaseInvoiceForEdit.Origin = origin;
+            purchaseInvoiceForEdit.CustomsImportDeclaration = customsDeclaration;
 
             if (costPriceCurrencyId != 0)
             {
@@ -492,6 +497,7 @@ namespace SSMO.Services.Documents.Purchase
                 Incoterms = purchaseInvoice.Incoterms,
                 NetWeight = purchaseInvoice.NetWeight,
                 DeliveryAddress = purchaseInvoice.DeliveryAddress,
+                LoaddingAddress = purchaseInvoice.LoadingAddress,
                 PurchaseNumber = purchaseInvoice.PurchaseNumber,
                 OtherExpenses = purchaseInvoice.OtherExpenses,
                 ProcentComission = purchaseInvoice.ProcentComission,
@@ -503,6 +509,8 @@ namespace SSMO.Services.Documents.Purchase
                 Eta = purchaseInvoice.Eta,
                 Vat = purchaseInvoice.Vat ?? 0,
                 TotalAmount = purchaseInvoice.TotalAmount,
+                Origin = purchaseInvoice.Origin,
+                CustomsImportDeclaration = purchaseInvoice.CustomsImportDeclaration,
                 Products = new List<PurchaseProductsDetailsViewModel>()
             };
 

@@ -32,7 +32,7 @@ namespace SSMO.Services.SupplierOrders
 
         public async Task<int> CreateSupplierOrder(int myCompanyId, int supplierId, DateTime Date, 
             string number, int statusId, int currencyId, string fscClaim, int vat,            
-            string loadingAddress, string deliveryAddress, string deliveryTerms)
+            string loadingAddress, string deliveryAddress, string deliveryTerms,string comment)
         {
             
             var thisSupplier = dbContext.Suppliers.Where(a=>a.Id == supplierId).FirstOrDefault();   
@@ -51,7 +51,8 @@ namespace SSMO.Services.SupplierOrders
                 Products = new List<Product>(),                
                 LoadingAddress = loadingAddress,
                 DeliveryAddress = deliveryAddress,
-                DeliveryTerms = deliveryTerms
+                DeliveryTerms = deliveryTerms,
+                Comment = comment 
             };
           
           await dbContext.SupplierOrders.AddAsync(supplierSpec);
@@ -232,7 +233,7 @@ namespace SSMO.Services.SupplierOrders
         }
 
         public SupplierOrderPaymentCollectionModel GetSupplierOrders
-            (string supplierName, DateTime startDate, DateTime endDate, int currentpage, int supplierOrdersPerPage)
+            (string supplierName, int myCompanyId, DateTime startDate, DateTime endDate, int currentpage, int supplierOrdersPerPage)
         {
             if(String.IsNullOrEmpty(supplierName))
             {
@@ -245,7 +246,10 @@ namespace SSMO.Services.SupplierOrders
                 .FirstOrDefault();
 
             var supplierOrders = dbContext.SupplierOrders
-                .Where(sup=>sup.SupplierId == supplierId && sup.Date >= startDate && sup.Date <= endDate);
+                .Where(sup=>sup.SupplierId == supplierId 
+                && sup.Date >= startDate 
+                && sup.Date <= endDate
+                && sup.MyCompanyId == myCompanyId);
 
             var supplierOrdersCollection = supplierOrders.ProjectTo<SupplierOrdersPaymentDetailsModel>(mapper).ToList();
 

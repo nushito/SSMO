@@ -15,6 +15,14 @@
         <input asp-for="Incoterms" type="text" class="form-control" >
     </div>
      <div class="row col-md-4">
+        <label asp-for="DeliveryAddress">Delivery Address</label>
+        <input asp-for="DeliveryAddress" type="text" class="form-control" >
+    </div>
+      <div class="row col-md-4">
+        <label asp-for="LoadingAddress">Loading Address</label>
+        <input asp-for="LoadingAddress" type="text" class="form-control" >
+    </div>
+     <div class="row col-md-4">
         <label asp-for="Vat">Vat</label>
         <input asp-for="Vat" type="number" class="form-control">
     </div>
@@ -25,6 +33,27 @@
      <div class="row col-md-4">
         <label asp-for="PaymentTerms">Payment Terms</label>
         <input asp-for="PaymentTerms" type="text" class="form-control">
+    </div>
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="DealType">Deal Type Eng</label>
+            <select asp-for="DealType" class="form-control">
+            <option value="-">-</option>
+            <option value="0% VAT according to article 21, p.2 from Bulgarian VAT Law">0% VAT according to article 21, p.2 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article.69, p.2 from Bulgarian VAT Law">0% VAT according to article.69, p.2 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article 53, p.1 from Bulgarian VAT Law">0% VAT according to article 53, p.1 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article 141 2006/112/ЕО from Bulgarian VAT Law">0% VAT according to article 141 2006/112/ЕО from Bulgarian VAT Law</option>    
+         </select>
+    </div>
+        <div class="form-group col-md-4">
+            <label asp-for="DescriptionType">Deal Description</label>
+            <select asp-for="DescriptionType" class="form-control">
+            <option value="-">-</option>
+            <option value="Participates in a VIES declaration">Participates in a VIES declaration</option>
+           <option value=" 	Agent in Third party"> 	Agent in Third party</option>
+            <option value="Participates in a VIES declaration, but not in Intrastat Declaration">Participates in a VIES declaration, but not in Intrastat Declaration</option>
+          </select>
+        </div>
     </div>
       <div class="row col-md-4">
         <label asp-for="Comment">Comment</label>

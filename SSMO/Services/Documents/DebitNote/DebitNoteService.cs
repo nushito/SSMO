@@ -193,7 +193,7 @@ namespace SSMO.Services.Documents.DebitNote
         }
 
         public CreditAndDebitNoteViewModel CreateDebitNote
-            (int invoiceId, DateTime date,string deliveryAddress, 
+            (int invoiceId, DateTime date,string deliveryAddress, string loadingAddress,
             List<AddProductsToCreditAndDebitNoteFormModel> products, 
             List<PurchaseProductsForDebitNoteViewModel> availableProducts, string paymentTerms)
         {
@@ -221,7 +221,11 @@ namespace SSMO.Services.Documents.DebitNote
                 InvoiceProducts = new List<InvoiceProductDetails>(),
                 PaymentTerms = paymentTerms,
                 HeaderId = invoiceForDebit.HeaderId,
-                FooterId = invoiceForDebit.FooterId
+                FooterId = invoiceForDebit.FooterId,
+                DealTypeEng = invoiceForDebit.DealTypeEng,
+                DealDescriptionEng = invoiceForDebit.DealDescriptionEng,
+                PlaceOfIssue = invoiceForDebit.PlaceOfIssue,
+                LoadingAddress = loadingAddress
             };
 
             dbContext.Documents.Add(debitNote);
@@ -345,7 +349,8 @@ namespace SSMO.Services.Documents.DebitNote
 
         public bool EditDebitNote
             (int id, DateTime date, string incoterms,string comment, 
-            List<EditProductForDebitNoteViewModel> products, string paymentTerms)
+            List<EditProductForDebitNoteViewModel> products, string paymentTerms,
+            string dealType, string descriptionType, string deliveryAddress, string loadingAddress)
         {
             var debitNoteForEdit = dbContext.Documents.Find(id);
 
@@ -353,6 +358,10 @@ namespace SSMO.Services.Documents.DebitNote
             debitNoteForEdit.Incoterms= incoterms;
             debitNoteForEdit.Amount = 0; //TODO dali e dobre da zanulim?
             debitNoteForEdit.PaymentTerms= paymentTerms;
+            debitNoteForEdit.DealTypeEng = dealType;
+            debitNoteForEdit.DealDescriptionEng= descriptionType;
+            debitNoteForEdit.DeliveryAddress = deliveryAddress;
+            debitNoteForEdit.LoadingAddress = loadingAddress;
 
         if(products != null)
             {
@@ -440,6 +449,10 @@ namespace SSMO.Services.Documents.DebitNote
                 InvoiceNumber = invoice.DocumentNumber,
                 DebitNoteInvoicenumbers = GetInvoiceNumbers(),
                 PaymentTerms = debitNote.PaymentTerms,
+                DeliveryAddress = debitNote.DeliveryAddress,
+                LoadingAddress = debitNote.LoadingAddress,
+                DealType = debitNote.DealTypeEng,
+                DescriptionType = debitNote.DealDescriptionEng,
                 HeaderUrl = imageService.HeaderUrl(invoice.HeaderId??0),
                 FooterUrl = imageService.FooterUrl(invoice.FooterId ?? 0)
             };

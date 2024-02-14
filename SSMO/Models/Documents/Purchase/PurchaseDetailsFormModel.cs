@@ -16,7 +16,8 @@ namespace SSMO.Models.Documents.Purchase
         public int SupplierOrderId { get; set; }
         public string FSCClaim { get; set; }
         public string FSCSertificate { get; set; }
-        public string SupplierFSCCertificate { get; set; }        
+        public string SupplierFSCCertificate { get; set; }
+        public string Origin { get; set; }
         public decimal Amount { get; set; }
         public decimal NetWeight { get; set; }
         public decimal GrossWeight { get; set; }
@@ -26,6 +27,7 @@ namespace SSMO.Models.Documents.Purchase
         public decimal FiscalAgentExpenses { get; set; }
         public string TruckNumber { get; set; }
         public string DeliveryAddress { get; set; }
+        public string LoadingAddress { get; set; }
         public string Swb { get; set; }
         public string ShippingLine { get; set; }
         public string Eta { get; set; }

@@ -38,7 +38,8 @@ namespace SSMO.Services.Documents.Credit_Note
         }       
         public CreditAndDebitNoteViewModel CreateCreditNote
             (int invoiceId, DateTime date, bool quantityBack, 
-            string deliveryAddress, List<AddProductsToCreditAndDebitNoteFormModel> products, string paymentTerms)
+            string deliveryAddress, string loadingAddress,
+            List<AddProductsToCreditAndDebitNoteFormModel> products, string paymentTerms)
         {
             var invoiceForCredit = dbContext.Documents
                 .Include(a=>a.BankDetails)
@@ -64,6 +65,10 @@ namespace SSMO.Services.Documents.Credit_Note
                 CreditAndDebitNoteProducts = new List<Product>(),
                 BankDetails = invoiceForCredit.BankDetails,
                 PaymentTerms = paymentTerms,
+                LoadingAddress = loadingAddress,
+                DealTypeEng = invoiceForCredit.DealTypeEng,
+                DealDescriptionEng = invoiceForCredit.DealDescriptionEng,
+                PlaceOfIssue = invoiceForCredit.PlaceOfIssue,
                 HeaderId= invoiceForCredit.HeaderId,
                 FooterId = invoiceForCredit.FooterId
             };
@@ -204,7 +209,8 @@ namespace SSMO.Services.Documents.Credit_Note
         public bool EditCreditNote
             (int id, DateTime date, string incoterms, string truckNumber, decimal netWeight, 
             decimal grossWeight, decimal deliveryCost, decimal currencyExchangeRate, string comment, 
-            IList<EditProductForCreditNoteViewModel> products, string paymentTerms, int invoiceId)
+            IList<EditProductForCreditNoteViewModel> products, string paymentTerms, int invoiceId,
+            string dealType, string dealDescription, string deliveryAddress, string loadingAddress)
         {
             if(id == 0) { return false; }
 
@@ -224,6 +230,10 @@ namespace SSMO.Services.Documents.Credit_Note
             creditNote.Amount = 0m;
             creditNote.PaymentTerms= paymentTerms;  
             creditNote.CreditToInvoiceId= invoiceId;
+            creditNote.DealDescriptionEng = dealDescription;
+            creditNote.DealTypeEng = dealType;
+            creditNote.DeliveryAddress= deliveryAddress;
+            creditNote.LoadingAddress= loadingAddress;
 
             foreach (var product in products)
             {
@@ -423,6 +433,8 @@ namespace SSMO.Services.Documents.Credit_Note
                 //  CustomerOrders = creditNote.CustomerOrders
                 DeliveryCost = creditNote.DeliveryTrasnportCost,
                 Incoterms = creditNote.Incoterms,
+                DeliveryAddress = creditNote.DeliveryAddress,
+                LoadingAddress= creditNote.LoadingAddress,
                 TruckNumber = creditNote.TruckNumber,
                 CurrencyExchangeRate = creditNote.CurrencyExchangeRateUsdToBGN,
                 GrossWeight = creditNote.GrossWeight,
@@ -430,6 +442,8 @@ namespace SSMO.Services.Documents.Credit_Note
                 Products = new List<EditProductForCreditNoteViewModel>(),
                 InvoiceNumbers = new List<InvoiceNumbersForEditedCreditNoteViewModel>(),
                 PaymentTerms = creditNote.PaymentTerms,
+                DealDescription = creditNote.DealDescriptionEng,
+                DealType = creditNote.DealTypeEng,
                 HeaderUrl = imageService.HeaderUrl(invoice.HeaderId??0),
                 FooterUrl = imageService.FooterUrl(invoice.FooterId??0)
             };

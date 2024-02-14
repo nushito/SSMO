@@ -17,11 +17,12 @@ namespace SSMO.Services.SupplierOrders
                 DateTime Date,
                 string number,              
                 int statusId, int currencyId, string fscClaim, int vat,                 
-                string loadingAddress, string deliveryAddress, string deliveryTerms);
+                string loadingAddress, string deliveryAddress, string deliveryTerms,
+                string comment);
         Task TotalAmountAndQuantitySum(int supplierOrderId);
 
         public SupplierOrderPaymentCollectionModel GetSupplierOrders
-            (string supplierName,DateTime startDate, DateTime endDate, int currentpage, int supplierOrdersPerPage);
+            (string supplierName,int myCompanyId,DateTime startDate, DateTime endDate, int currentpage, int supplierOrdersPerPage);
 
         public EditSupplierOrderPaymentModel GetPaymentsPerOrderForEdit(int id);
 

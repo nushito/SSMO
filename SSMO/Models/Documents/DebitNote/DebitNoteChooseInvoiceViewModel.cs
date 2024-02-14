@@ -12,9 +12,11 @@ namespace SSMO.Models.Documents.DebitNote
         public ICollection<MyCompaniesForReportViewModel> MyCompanies { get; set; }
         public DateTime Date { get; set; }
         public int InvoiceId { get; set; }
+        public string ChoosenInvoice { get; set; }
         public ICollection<int> InvoiceNumbers { get; set; }
         public bool MoreQuantity { get; set; }
         public string DeliveryAddress { get; set; }
+        public string LoadingAddress { get; set; }
         public string PaymentTerms { get; set; }
         public IList<PurchaseProductsForDebitNoteViewModel> PurchaseProducts { get; set; }
         public ICollection<AddProductsToCreditAndDebitNoteFormModel> Products { get; set; }

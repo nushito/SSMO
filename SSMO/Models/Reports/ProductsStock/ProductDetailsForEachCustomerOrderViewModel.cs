@@ -14,5 +14,11 @@ namespace SSMO.Models.Reports.ProductsStock
         public string DeliveryAddress { get; set; }       
         public decimal Price { get; set; }
         public string Currency { get; set; }
+        public int Pallets { get; set; }
+        public int SheetsPerPallet { get; set; }
+        public decimal Quantity { get; set; }
+        public string Unit { get; set; }
+        public decimal AutstandingQuantity { get; set; }
+        public string MyCompanyName { get; set; }
     }
 }

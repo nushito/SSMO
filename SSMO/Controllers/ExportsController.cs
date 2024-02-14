@@ -1,74 +1,118 @@
-﻿//using System.IO;
-//using System;
-//using System.Web.Mvc;
-//using Syncfusion.HtmlConverter;
-//using Syncfusion.Pdf;
-//using System.Text;
-//using System.Text.RegularExpressions;
-//using System.Web.Helpers;
-//using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
+using SSMO.Services.ViewRenderService;
+using System.Threading.Tasks;
+using System;
+using SSMO.Models.CustomerOrders;
+using DevExpress.Utils;
+using System.IO;
+using System.Reflection.Metadata;
+using iTextSharp.text.html.simpleparser;
+using iTextSharp.text.pdf;
+using System.Web;
 
-//namespace SSMO.Controllers
-//{
-    
-//    public class ExportsController : Controller
-//    {
-//        private readonly IHttpContextAccessor httpContextAccessor;
-//        public ExportsController(IHttpContextAccessor httpContextAccessor)
-//        {
-//            this.httpContextAccessor = httpContextAccessor;
-//        }
+namespace ssmo.controllers
+{    
+    public class Exportscontroller
+    {
+        private readonly IViewRenderService viewRenderService;
+        private readonly IHtmlToPdfConverter htmlToPdfConverter;
+        private readonly IHostingEnvironment environment;
+        public Exportscontroller(IViewRenderService viewRenderService,
+         IHtmlToPdfConverter htmlToPdfConverter,
+         IHostingEnvironment environment)
+        {
+            this.viewRenderService = viewRenderService;
+            this.htmlToPdfConverter = htmlToPdfConverter;
+            this.environment = environment;
+        }
 
-//        public ActionResult Pdf()
-//        {
-//            ViewEngineResult viewResult = ViewEngines.Engines.FindView(ControllerContext, "PrintCustomerOrder", "");
-//            string html = GetHtmlFromView(ControllerContext, viewResult, "PrintCustomerOrder", "");
-//            string baseUrl = string.Empty;
+        protected void pdfExport(object sender, EventArgs e)
+        {
+            //Response.ContentType = "application/pdf";
+            //Response.AddHeader("content-disposition", "attachment;filename=TestPage.pdf");
+            //Response.Cache.SetCacheability(HttpCacheability.NoCache);
+            //StringWriter sw = new StringWriter();
+            //HtmlTextWriter hw = new HtmlTextWriter(sw);
+            //this.Page.RenderControl(hw);
+            //StringReader sr = new StringReader(sw.ToString());
+            //Document pdfDoc = new Document(PageSize.A4, 10f, 10f, 100f, 0f);
+            //HTMLWorker htmlparser = new HTMLWorker(pdfDoc);
+            //PdfWriter.GetInstance(pdfDoc, Response.OutputStream);
+            //pdfDoc.Open();
+            //htmlparser.Parse(sr);
+            //pdfDoc.Close();
+            //Response.Write(pdfDoc);
+            //Response.End();
+        }
 
-//            //Convert the HTML string to PDF using WebKit
-//            HtmlToPdfConverter htmlConverter = new HtmlToPdfConverter();
+        //[HttpGet]
+        //public async Task<IActionResult> GetPdf(CustomerOrderPrintViewModel input)
+        //{
+        //    var model = this.GetViewModel(input);
+        //    var htmlData = await this.viewRenderService.RenderToStringAsync("~/Views/CustomerOrders/PrintCustomerOrder.cshtml", model);
+        //    var fileContents = this.htmlToPdfConverter.Convert(this.environment.ContentRootPath, htmlData);
+        //    return this.File(fileContents, "application/pdf");
+        //}
 
-//            //Convert HTML string to PDF
-//            var document = htmlConverter.Convert(html, baseUrl);
 
-//            MemoryStream stream = new MemoryStream();
+    }
+    //        private readonly IHttpContextAccessor httpContextAccessor;
+    //        public ExportsController(IHttpContextAccessor httpContextAccessor)
+    //        {
+    //            this.httpContextAccessor = httpContextAccessor;
+    //        }
 
-//            //Save and close the PDF document 
-//            document.Save(stream);
-//            document.Close(true);
+    //        public ActionResult Pdf()
+    //        {
+    //            ViewEngineResult viewResult = ViewEngines.Engines.FindView(ControllerContext, "PrintCustomerOrder", "");
+    //            string html = GetHtmlFromView(ControllerContext, viewResult, "PrintCustomerOrder", "");
+    //            string baseUrl = string.Empty;
 
-//            return File(stream.ToArray(), "application/pdf", "ViewAsPdf.pdf");
-//        }
+    //            //Convert the HTML string to PDF using WebKit
+    //            HtmlToPdfConverter htmlConverter = new HtmlToPdfConverter();
 
-//        private string GetHtmlFromView
-//            (ControllerContext controllerContext, ViewEngineResult viewResult, string viewName, object model)
-//        {
-//            controllerContext.Controller.ViewData.Model = model;
-//            using (StringWriter sw = new StringWriter())
-//            {
-//                // view not found, throw an exception with searched locations
-//                if (viewResult.View == null)
-//                {
-//                    var locations = new StringBuilder();
-//                    locations.AppendLine();
+    //            //Convert HTML string to PDF
+    //            var document = htmlConverter.Convert(html, baseUrl);
 
-//                    foreach (string location in viewResult.SearchedLocations)
-//                    {
-//                        locations.AppendLine(location);
-//                    }
-//                    throw new InvalidOperationException(
-//                    string.Format(
-//                    "The view '{0}' or its master was not found, searched locations: {1}", viewName, locations));
-//                }
-//                ViewContext viewContext = new ViewContext(controllerContext, viewResult.View, controllerContext.Controller.ViewData, controllerContext.Controller.TempData, sw);
-//                viewResult.View.Render(viewContext, sw);
+    //            MemoryStream stream = new MemoryStream();
 
-//                string html = sw.GetStringBuilder().ToString();     
-                
-//                string baseUrl = string.Format("{0}://{1}", httpContextAccessor.HttpContext.Request.Scheme, httpContextAccessor.HttpContext.Request.Host);
-//                html = Regex.Replace(html, "<head>", string.Format("<head><base href=\"{0}\" />", baseUrl), RegexOptions.IgnoreCase);
-//                return html;
-//            }
-//        }
-//    }
-//}
+    //            //Save and close the PDF document 
+    //            document.Save(stream);
+    //            document.Close(true);
+
+    //            return File(stream.ToArray(), "application/pdf", "ViewAsPdf.pdf");
+    //        }
+
+    //        private string GetHtmlFromView
+    //            (ControllerContext controllerContext, ViewEngineResult viewResult, string viewName, object model)
+    //        {
+    //            controllerContext.Controller.ViewData.Model = model;
+    //            using (StringWriter sw = new StringWriter())
+    //            {
+    //                // view not found, throw an exception with searched locations
+    //                if (viewResult.View == null)
+    //                {
+    //                    var locations = new StringBuilder();
+    //                    locations.AppendLine();
+
+    //                    foreach (string location in viewResult.SearchedLocations)
+    //                    {
+    //                        locations.AppendLine(location);
+    //                    }
+    //                    throw new InvalidOperationException(
+    //                    string.Format(
+    //                    "The view '{0}' or its master was not found, searched locations: {1}", viewName, locations));
+    //                }
+    //                ViewContext viewContext = new ViewContext(controllerContext, viewResult.View, controllerContext.Controller.ViewData, controllerContext.Controller.TempData, sw);
+    //                viewResult.View.Render(viewContext, sw);
+
+    //                string html = sw.GetStringBuilder().ToString();     
+
+    //                string baseUrl = string.Format("{0}://{1}", httpContextAccessor.HttpContext.Request.Scheme, httpContextAccessor.HttpContext.Request.Host);
+    //                html = Regex.Replace(html, "<head>", string.Format("<head><base href=\"{0}\" />", baseUrl), RegexOptions.IgnoreCase);
+    //                return html;
+    //            }
+    //        }
+    //    }
+}

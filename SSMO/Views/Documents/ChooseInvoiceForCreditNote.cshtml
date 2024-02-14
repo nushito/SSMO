@@ -24,9 +24,9 @@
              <label asp-for="InvoiceId" class="control-label"> Select Invoice</label>
              <select class="form-control" id="InvoiceNumber" name="InvoiceId" asp-for="InvoiceId" asp-items="@(new SelectList(string.Empty,"InvoiceId", "InvoiceNumber"))"></select>               
         </div>    
-        <div class="row col-md-4">
+        <div class="row col-md-4" id="datepicker">
             <label asp-for="Date" >Date Credit note</label>
-            <input itemid="date" asp-for="Date" name="Date" type="date" id="datepicker" class="form-control"/> 
+            <input itemid="date" asp-for="Date" name="Date" type="date" value="@DateTime.Now.ToString("dd-MM-yyyy")" id="datepicker" class="form-control"/> 
             <span asp-validation-for="Date" class="small text-danger"></span>
         </div>
 
@@ -34,6 +34,11 @@
             <label asp-for="CreditNoteDeliveryAddress" >Delivery Address</label>
             <input asp-for="CreditNoteDeliveryAddress" type="text" class="form-control"/> 
             <span asp-validation-for="CreditNoteDeliveryAddress" class="small text-danger"></span>
+        </div>
+         <div class="row col-md-4">
+            <label asp-for="LoadingAddress" >Loading Address</label>
+            <input asp-for="LoadingAddress" type="text" class="form-control"/> 
+            <span asp-validation-for="LoadingAddress" class="small text-danger"></span>
         </div>
         <div class="row col-md-4">
            <label asp-for="PaymentTerms">Payment Terms</label>
@@ -163,11 +168,8 @@
     </div>
 </form>
 
- 
 
 @section Scripts {
-    
-       
     <script type="text/javascript">
             $(document).ready(function() {
                 //Dropdownlist Selectedchange event

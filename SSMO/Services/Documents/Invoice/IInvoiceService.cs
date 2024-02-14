@@ -36,10 +36,14 @@ namespace SSMO.Services.Documents.Invoice
           ICollection<EditProductForCompanyInvoicesViewModel> products,
           string incoterms, string comment, List<int> banks, int? fiscalAgentId, 
           int? fscText, string paymentTerms, string deliveryAddress,
-          string loadingAddress, decimal? factoring, decimal? comission);
+          string loadingAddress, decimal? factoring, decimal? comission, 
+          string dealType, string dealDescription,string customsDeclaration,
+          decimal? bankExpenses, decimal? fiscalAgentExpenses, decimal? customsExpenses,
+            decimal? duty, decimal? otherExpenses);
 
         public void EditPackingList(int id);
 
+        public Task<string> GetInvoiceNumber(int id);
         public ICollection<CustomerCollectionForChoosingNewOrderForInvoiceEditViewModel> CustomersForeEditInvoice();
 
     }

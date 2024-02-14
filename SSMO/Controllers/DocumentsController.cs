@@ -181,9 +181,9 @@ namespace SSMO.Controllers
                 model.ProcentComission, model.PurchaseTransportCost,
                 model.BankExpenses, model.OtherExpenses, model.Vat,
                 model.TruckNumber,model.Swb, model.ProductDetails, model.Incoterms,
-                model.DeliveryAddress, 
+                model.DeliveryAddress, model.LoadingAddress,
                 model.ShippingLine, model.Eta, model.DelayCostCalculation,
-                model.CostPriceCurrency);
+                model.CostPriceCurrency,model.Origin);
 
             if (!purchase)
             {
@@ -623,13 +623,18 @@ namespace SSMO.Controllers
             TempData["products"] = JsonConvert.SerializeObject(model.Products);
 
             return RedirectToAction("CreateCreditNote",
-                new { invoiceId = model.InvoiceId, date = model.Date, quantityBack = model.QuantityBack, 
-                    deliveryAddress = model.CreditNoteDeliveryAddress, paymentTerms = model.PaymentTerms});
+                new { invoiceId = model.InvoiceId, date = model.Date, 
+                    quantityBack = model.QuantityBack, 
+                    deliveryAddress = model.CreditNoteDeliveryAddress, 
+                    loadingAddress = model.LoadingAddress,
+                    paymentTerms = model.PaymentTerms});
         }
 
         //sazdava se kreditno
         public IActionResult CreateCreditNote
-            (int invoiceId, DateTime date, bool quantityBack, string deliveryAddress, string paymentTerms)
+            (int invoiceId, DateTime date, bool quantityBack, 
+            string deliveryAddress, string loadingAddress,
+            string paymentTerms)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
@@ -638,29 +643,23 @@ namespace SSMO.Controllers
          
             List<AddProductsToCreditAndDebitNoteFormModel> productsForCredit = JsonConvert.DeserializeObject<List<AddProductsToCreditAndDebitNoteFormModel>>(TempData["products"].ToString());
             var creditNote = creditNoteService.CreateCreditNote
-                (invoiceId, date, quantityBack, deliveryAddress, productsForCredit, paymentTerms);
+                (invoiceId, date, quantityBack, deliveryAddress,loadingAddress, productsForCredit, paymentTerms);
 
             return View(creditNote);  
         }
 
         //izbira se faktura za debitno
         [HttpGet]
-        public IActionResult ChooseInvoiceForDebitNote(DebitNoteChooseInvoiceViewModel model)
+        public async Task<IActionResult> ChooseInvoiceForDebitNote(DebitNoteChooseInvoiceViewModel model)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
-            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
-         
-            //var model = new DebitNoteChooseInvoiceViewModel
-            //{
-            //    MyCompanies = mycompanyService.GetAllCompanies(),
-            //    Products = new List<AddProductsToCreditAndDebitNoteFormModel>(),
-            //    PurchaseProducts = new List<PurchaseProductsForDebitNoteViewModel>()
-            //   // PurchaseProducts = purchaseService.PurchaseProducts()
-            //};
+            if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }         
+            
             model.MyCompanies = mycompanyService.GetAllCompanies();
             model.Products = new List<AddProductsToCreditAndDebitNoteFormModel>();
             model.PurchaseProducts = purchaseService.PurchaseProducts(model.InvoiceId);
+            model.ChoosenInvoice = await invoiceService.GetInvoiceNumber(model.InvoiceId);
             return View(model);
         }
         [HttpPost]
@@ -727,24 +726,26 @@ namespace SSMO.Controllers
             TempData["products"] = JsonConvert.SerializeObject(model.Products);
 
             return RedirectToAction("CreateDebitNote",
-                new { invoiceId = model.InvoiceId, date = model.Date, 
-                    moreQuantity = model.MoreQuantity, 
+                new { invoiceId = model.InvoiceId, date = model.Date,
                     deliveryAddress = model.DeliveryAddress,
+                    loadingAddress = model.LoadingAddress,
                     paymentTerms = model.PaymentTerms });
         }
         //sazdava se debitno
         public IActionResult CreateDebitNote
-            (int invoiceId, DateTime date, bool moreQuantity, string deliveryAddress, string paymentTerms)
+            (int invoiceId, DateTime date, string deliveryAddress,string loadingAddress, string paymentTerms)
         {
             string userId = this.User.UserId();
             var myCompanyUsersId = mycompanyService.GetCompaniesUserId();
             if (!myCompanyUsersId.Contains(userId)) { return BadRequest(); }
             if (invoiceId == 0) return BadRequest();
-
+            //productite ot izbrana CO
             List<PurchaseProductsForDebitNoteViewModel> availableProducts = JsonConvert.DeserializeObject<List<PurchaseProductsForDebitNoteViewModel>>(TempData["availableProducts"].ToString());
+            //some service products
             List<AddProductsToCreditAndDebitNoteFormModel> productsForDebit = JsonConvert.DeserializeObject<List<AddProductsToCreditAndDebitNoteFormModel>>(TempData["products"].ToString());
+            
             var debitNoteForPrint = debitNoteService.CreateDebitNote
-                (invoiceId, date, deliveryAddress,productsForDebit, availableProducts, paymentTerms);
+                (invoiceId, date, deliveryAddress, loadingAddress, productsForDebit, availableProducts, paymentTerms);
 
             return View(debitNoteForPrint);
         }

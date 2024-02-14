@@ -29,5 +29,6 @@ namespace SSMO.Models.Reports.Invoice
         public decimal DebitNoteTotalAmount { get; set; }
         public int HeaderId { get; set; }
         public int FooterId { get; set; }
+        public string CustomsExportDeclaration { get; set; }
     }
 }

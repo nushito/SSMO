@@ -13,6 +13,7 @@ namespace SSMO.Models.Reports.Products
         public int SheetsPerPallet { get; set; }
         public string Unit { get; set; }
         public decimal Quantity { get; set; }
+        public decimal AutstandingQuantity { get; set; }
         public decimal PurchasePrice { get; set; }
         public decimal CostPrice { get; set; }
         public string Currency { get; set; }

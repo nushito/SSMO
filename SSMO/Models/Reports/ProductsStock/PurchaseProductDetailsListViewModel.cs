@@ -17,5 +17,7 @@ namespace SSMO.Models.Reports.ProductsStock
         public string PurchaseCurrency { get; set; }
         public decimal CostPrice { get; set; }
         public string CostPriceCurrency { get; set; }
+        public string VehicleNumber { get; set; }
+        public string MyCompanyName { get; set; }
     }
 }

@@ -25,11 +25,14 @@ namespace SSMO.Models.Reports.Purchase
         public string ShippingLine { get; set; }
         public string Eta { get; set; }
         public string DeliveryAddress { get; set; }
+        public string LoaddingAddress { get; set; }
         public int Vat { get; set; }
         public decimal ProcentComission { get; set; }
         public decimal OtherExpenses { get; set; }
         public decimal PurchaseTransportCost { get; set; }
         public decimal BankExpenses { get; set; }
+        public string Origin { get; set; }
+        public string CustomsImportDeclaration { get; set; }
         public int SupplierOrderId { get; set; }
         public ICollection<PurchaseProductsDetailsViewModel> Products { get; set; }
 

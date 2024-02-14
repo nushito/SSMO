@@ -4,23 +4,16 @@
     var i = 0;
 }
 
-<div class="card print">
+<div id="invoice">
+    <div class="card print">
   <div class="card-body">
     <div class="container mb-5 mt-3">
       <div class="row d-flex align-items-baseline">
         <div class="col-xl-9">
           <p style="color: #7e8d9f;font-size: 20px;">@Model.Type: <strong>@Model.OrderConfirmationNumber</strong></p>
-        </div>
-        <div class="col-xl-3 float-end"> 
-          <a class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark"><i
-              class="fas fa-print text-primary"></i> Print</a>
-              <form method="post" asp-action="Pdf" asp-controller="Exports"><input type="submit" value="Convert To PDF"></form>
-          <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportCoToExcel"><i
-              class="far fa-file-pdf text-danger"></i> Export xls</a>              
-        </div>
+        </div>       
         <hr>
       </div>
-
       <div class="container">
         <div class="col-md-12">
           <div class="text-center">
@@ -49,7 +42,7 @@
                <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.MyCompany.Street </span></li>
                 <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.MyCompany.City </span></li>
                  <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.MyCompany.Country </span></li>
-                            
+
            </ul>
           </div>
         </div>
@@ -59,17 +52,17 @@
                    <li class="text-muted">Customer Po No: <span style="color:#5d9fc5 ;">@Model.CustomerPoNumber                                  
                   </span></li>
               <li class="text-muted">Delivery Terms: <span style="color:#5d9fc5 ;">@Model.DeliveryTerms</span></li>             
-              
+
             </ul>
           </div>
           <div class="col-xl-4">
-                        @if (Model.FiscalAgent != null)
-                        {
-                            @Model.FiscalAgent.Name
-         <br />
-                            @Model.FiscalAgent.Details
-                        }
-                       
+                            @if (Model.FiscalAgent != null)
+                            {
+                                @Model.FiscalAgent.Name
+             <br />
+                                @Model.FiscalAgent.Details
+                            }
+
               </div>
             </div>
             <div class="col-xl-4">
@@ -102,24 +95,24 @@
                 </thead>
                 <tbody>
                                 @foreach (var product in @Model.Products)
-                            {
-                                i += 1;                                
-                            <tr>
-                                <td>@i</td>
-                                <td>@product.Description</td>
-                                <td>@product.Grade</td>
-                                <td>@product.Size</td>
-                                <td>@product.FSCClaim</td>
-                                <td>@product.FscCertificate</td>
-                                <td>@product.HsCode</td>
-                                 <td>@product.Pallets</td>
-                                <td>@product.SheetsPerPallet</td>
-                                <td>@product.Unit</td>
-                                <td>@product.Quantity</td>                               
-                                <td>@product.SellPrice</td>                               
-                                <td>@product.Amount.ToString("N2")</td>
-                            </tr>
-                            }                           
+                                {
+                                    i += 1;                                
+                                <tr>
+                                    <td>@i</td>
+                                    <td>@product.Description</td>
+                                    <td>@product.Grade</td>
+                                    <td>@product.Size</td>
+                                    <td>@product.FSCClaim</td>
+                                    <td>@product.FscCertificate</td>
+                                    <td>@product.HsCode</td>
+                                     <td>@product.Pallets</td>
+                                    <td>@product.SheetsPerPallet</td>
+                                    <td>@product.Unit</td>
+                                    <td>@product.Quantity</td>                               
+                                    <td>@product.SellPrice</td>                               
+                                    <td>@product.Amount.ToString("N2")</td>
+                                </tr>
+                                }                           
             </tbody>
           </table>
         </div>
@@ -140,7 +133,7 @@
                 <li>Notes: @Model.Comment</li>
                 <li>Country of origin:@Model.Origin</li>
          </ul>
-             
+
             </div>
         <table class="table-borderless">            
             <tr>
@@ -155,15 +148,15 @@
             </tr>
            <tr></tr>
             <tr>
-                        @foreach (var bank in Model.BankDetails)
-                        {
-                            <td class="px-3 mr-5">
-                                    Currency:@bank.CurrencyName<br>
-                                    Bank:@bank.BankName<br>
-                                    IBAN:@bank.Iban<br>
-                                    SWIFT:@bank.Swift
-                             </td>
-                        }
+                @foreach (var bank in Model.BankDetails)
+                {
+                    <td class="px-3 mr-5">
+                            Currency:@bank.CurrencyName<br>
+                            Bank:@bank.BankName<br>
+                            IBAN:@bank.Iban<br>
+                            SWIFT:@bank.Swift
+                        </td>
+                }
             </tr>
         </table>
 
@@ -171,3 +164,18 @@
     </div>
   </div>
 </div>
+</div>
+
+ <div class="col-xl-3 float-end">            
+
+    <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportCoToExcel"><i
+        class="far fa-file-pdf text-danger"></i> Export xls</a>              
+</div>
+
+  <form method="post" asp-controller="Reports" asp-action="ExportPdf">
+                <input type="hidden" name="exportData" id="exportData" />  
+                <input type="submit" id="btnSubmit" value="Export" class="btn btn-primary" />
+ </form>
+@section Scripts{
+             <script type="text/javascript" src="~/js/documentToPdf.js"></script>
+ }

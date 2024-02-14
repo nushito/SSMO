@@ -22,5 +22,6 @@ namespace SSMO.Models.Reports.Purchase
         public string TruckNumber { get; set; }
         public string Swb { get; set; }
         public decimal TotalAmount { get; set; }
+        public string CustomsImportDeclaration { get; set; }
     }
 }

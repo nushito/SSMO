@@ -45,7 +45,7 @@ namespace SSMO.Models.Documents.Invoice
         public string LoadingAddress { get; set; }
         public string PaymentTerms { get; set; }
         public string HeaderUrl { get; set; }
-        public string FooterUrl { get; set; }
+        public string FooterUrl { get; set; }        
         public ICollection<InvoiceBankDetailsViewModel> CompanyBankDetails { get; set; }
         public IEnumerable<ProductsForInvoiceModel> Products { get; set; }
         public IEnumerable<ServiceProductForInvoiceFormModel> ServiceProducts { get; set; }

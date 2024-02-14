@@ -43,6 +43,26 @@
         <input asp-for="DeliveryCost" type="number" min="0" step="0.00001" class="form-control">
     </div>
     <div class="row col-md-4">
+        <label asp-for="BankExpenses">Bank Expenses</label>
+        <input asp-for="BankExpenses" type="number" min="0" step="0.00001" class="form-control">
+    </div>
+    <div class="row col-md-4">
+        <label asp-for="FiscalAgentExpenses">Fiscal Agent Expenses</label>
+        <input asp-for="FiscalAgentExpenses" type="number" min="0" step="0.00001" class="form-control">
+    </div>
+    <div class="row col-md-4">
+        <label asp-for="CustomsExpenses">Customs Expenses</label>
+        <input asp-for="CustomsExpenses" type="number" min="0" step="0.00001" class="form-control">
+    </div>
+    <div class="row col-md-4">
+        <label asp-for="Duty">Duty Expenses</label>
+        <input asp-for="Duty" type="number" min="0" step="0.00001" class="form-control">
+    </div>
+    <div class="row col-md-4">
+        <label asp-for="OtherExpenses">Other Expenses</label>
+        <input asp-for="OtherExpenses" type="number" min="0" step="0.00001" class="form-control">
+    </div>
+    <div class="row col-md-4">
         <label asp-for="Factoring">Factoring %</label>
         <input asp-for="Factoring" type="number" min="0.00" step="0.01" class="form-control">
     </div>
@@ -57,6 +77,27 @@
      <div class="row col-md-4">
         <label asp-for="PaymentTerms">Payment Terms</label>
         <input asp-for="PaymentTerms" type="text" class="form-control">
+    </div>
+    <div class="row">
+        <div class="form-group col-md-4">
+            <label asp-for="DealType">Deal Type Eng</label>
+            <select asp-for="DealType" class="form-control">
+            <option value="-">-</option>
+            <option value="0% VAT according to article 21, p.2 from Bulgarian VAT Law">0% VAT according to article 21, p.2 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article.69, p.2 from Bulgarian VAT Law">0% VAT according to article.69, p.2 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article 53, p.1 from Bulgarian VAT Law">0% VAT according to article 53, p.1 from Bulgarian VAT Law</option>
+           <option value="0% VAT according to article 141 2006/112/ЕО from Bulgarian VAT Law">0% VAT according to article 141 2006/112/ЕО from Bulgarian VAT Law</option>    
+         </select>
+    </div>
+        <div class="form-group col-md-4">
+            <label asp-for="DealDescription">Deal Description</label>
+            <select asp-for="DealDescription" class="form-control">
+            <option value="-">-</option>
+            <option value="Participates in a VIES declaration">Participates in a VIES declaration</option>
+           <option value=" 	Agent in Third party"> 	Agent in Third party</option>
+            <option value="Participates in a VIES declaration, but not in Intrastat Declaration">Participates in a VIES declaration, but not in Intrastat Declaration</option>
+          </select>
+        </div>
     </div>
      <div class="form-group row col-md-4">
         <label asp-for="ChosenBanks">Choose Banks</label>
@@ -77,6 +118,10 @@
         <label asp-for="Comment">Comment</label>
         <input asp-for="Comment" type="text" class="form-control">
     </div>
+      <div class="row col-md-4">
+        <label asp-for="CustomsExportDeclaration">Customs Export Declaration</label>
+        <input asp-for="CustomsExportDeclaration" type="text" class="form-control">
+    </div>
     <div class="form-group row col-md-4">
         <label >Choose Fiscal Agent</label>
         <select asp-for="FiscalAgentId" class="form-control">
@@ -84,8 +129,7 @@
             @foreach (var item in Model.FiscalAgents)
             {
                <option value="@item.Id">@item.Name</option>
-            }   
-
+            }
         </select>
     </div>
      <div class="form-group row col-md-4">
@@ -100,8 +144,7 @@
         </select>
     </div>
             <p><b>Edit Products</b></p>
- <div class="row">
-  <table >
+   <table class="table">
        <thead class="thead-light">
             <tr>                       
                 <th>Description</th>
@@ -159,44 +202,44 @@
                         </td>
                             <td class="col-sm-1">
                             <div class="editor-field">
-                             <input asp-for="@Model.Products[i].FscClaim" value="@Model.Products[i].FscClaim" type="text" class="form-control"/>
+                             <input asp-for="@Model.Products[i].FscClaim" value="@Model.Products[i].FscClaim" type="text" />
                             </div>
                         </td>
                              <td class="col-sm-1">
                             <div class="editor-field">
-                               <input asp-for="@Model.Products[i].FscSertificate" value="@Model.Products[i].FscSertificate" type="text" class="form-control"/>
+                               <input asp-for="@Model.Products[i].FscSertificate" value="@Model.Products[i].FscSertificate" type="text" />
                             </div>
                         </td>
                          <td class="col-sm-1">
                             <div class="editor-field">
-                                <input asp-for="@Model.Products[i].HsCode" value="@Model.Products[i].HsCode" type="text" class="form-control"/>
+                                <input asp-for="@Model.Products[i].HsCode" value="@Model.Products[i].HsCode" type="text" />
                             </div>
                         </td>
                            <td class="col-sm-1">
                             <div class="editor-field">
-                                <input asp-for="@Model.Products[i].Unit" value="@Model.Products[i].Unit" type="text" class="form-control"/>
+                                <input asp-for="@Model.Products[i].Unit" value="@Model.Products[i].Unit" type="text" />
                             </div>
                         </td>
                               <td class="col-sm-1">
                             <div class="editor-field" scope="col">
-                                <input asp-for="@Model.Products[i].InvoicedQuantity" value="@Model.Products[i].InvoicedQuantity" type="number" class="form-control"/>
+                                <input asp-for="@Model.Products[i].InvoicedQuantity" value="@Model.Products[i].InvoicedQuantity" type="number" />
                         </div>
                     </td>
                           <td class="col-sm-1">
                         <div class="editor-field">
-                                <input asp-for="@Model.Products[i].SellPrice" value="@Model.Products[i].SellPrice" type="number" class="form-control"/>
+                                <input asp-for="@Model.Products[i].SellPrice" value="@Model.Products[i].SellPrice" type="number"/>
                                 <span asp-validation-for="@Model.Products[i].SellPrice" class="small text-danger"></span>
                         </div>
                     </td>
                           <td class="col-sm-1">
                         <div class="editor-field">
-                                <input asp-for="@Model.Products[i].Pallets" value="@Model.Products[i].Pallets" type="number" class="form-control"/>
+                                <input asp-for="@Model.Products[i].Pallets" value="@Model.Products[i].Pallets" type="number" />
                                 <span asp-validation-for="@Model.Products[i].Pallets" class="small text-danger"></span>
                         </div>
                     </td>
                           <td class="col-sm-1">
                         <div class="editor-field">
-                            <input asp-for="@Model.Products[i].SheetsPerPallet" value="@Model.Products[i].SheetsPerPallet" type="number" class="form-control"/>
+                            <input asp-for="@Model.Products[i].SheetsPerPallet" value="@Model.Products[i].SheetsPerPallet" type="number" />
                             <span asp-validation-for="@Model.Products[i].SheetsPerPallet" class="small text-danger"></span>
                         </div>
                     </td>
@@ -204,8 +247,9 @@
                 }
           </tbody>
  </table>
- </div>     
+      
  <div class="editor-field">
+     <label>Choose different customer</label>
        <select name="CustomerId" id="CustomerId" asp-for="CustomerId" >
            <option value="">All</option>
             @foreach (var customer in invoiceService.CustomersForeEditInvoice())

@@ -97,14 +97,8 @@
                     No
                 </th>
                 <th scope="col">
-                    Description
-                </th>
-                <th scope="col">
-                   Quantity on stock
-                </th>
-                <th scope="col">
-                    Supplier Name
-                </th>               
+                  Product Description, Quantity on stock - Supplier/Order No
+                </th>     
             </tr>
         </thead>
         <tbody>
@@ -112,19 +106,13 @@
         {           
             @foreach (var product in Model.ProductsDetails)
             {
-                <tr>
+                 <tr class="table-success">
                     <td>
                         @i
                     </td>
-                    <td>
-                        @product.Description @product.Size @product.Grade
-                    </td>
-                    <td>
-                        @product.QuantityOnStock
-                    </td>
-                    <td>
-                        @product.SupplierName
-                    </td>                           
+                    <td style="font-weight:700">
+                        @product.Description @product.Size @product.Grade,<span style="color:red"> on stock: @product.QuantityOnStock @product.Unit</span>, Supplier: @product.SupplierName / Order No: @product.SupplierOrderNumber  
+                    </td>                
                 </tr>
                 <tr>                         
                     <td>
@@ -140,6 +128,7 @@
                                     <th scope="col">
                                         Date
                                     </th>
+                                    <th>Buyer</th>
                                     <th scope="col">
                                         Delivery address
                                     </th>
@@ -161,6 +150,9 @@
                                     <th scope="col">
                                         Cost Price 
                                     </th>
+                                    <th scope="col">
+                                       Vehicle Number 
+                                    </th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -173,6 +165,7 @@
                                     <td>
                                         @purchase.PurchaseDate
                                     </td>
+                                    <td>@purchase.MyCompanyName</td>
                                     <td>
                                        @purchase.DeliveryAddress
                                     </td>
@@ -194,64 +187,77 @@
                                     <td>
                                         @purchase.CostPrice @purchase.CostPriceCurrency
                                     </td>
+                                    <td>
+                                        @purchase.VehicleNumber
+                                    </td>
                                 </tr>
                                 }    
                             </tbody>
                         </table>
                     </td>
                 </tr>
-                        <tr>
-                            
-                            <td>
-                                Customer Orders
-                            </td>
-                            <td>
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th scope="col">
-                                                Customer Name
-                                            </th>
-                                            <th scope="col">
-                                                Order Confirmation No
-                                            </th>
-                                            <th scope="col">
-                                                Customer PO No
-                                            </th>
-                                            <th scope="col">
-                                                Delivery address
-                                            </th>  
-                                            <th scope="col">
-                                                Price
-                                            </th>                                           
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                @foreach (var order in product.CustomerProductsDetails)
-                                {
-                                                 <tr>
-                                                <td>
-                                            @order.CustomerName
-                                                </td>
-                                                <td>
-                                            @order.CustomerOrderNumber
-                                                </td>
-                                                <td>
-                                            @order.CustomerPoNumber
-                                                </td>
-                                                <td>
-                                            @order.DeliveryAddress
-                                                </td>  
-                                                <td>
-                                            @order.Price @order.Currency
-                                                </td>
-                                                
-                                            </tr>
-                                }    
-                                    </tbody>
-                                </table>
-                            </td>
-                        </tr>
+                 <tr>                            
+                <td>
+                    Customer Orders
+                </td>
+                <td>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th scope="col">Seller</th>
+                                <th scope="col">
+                                    Customer Name
+                                </th>
+                                <th scope="col">
+                                    Order Confirmation No
+                                </th>
+                                <th scope="col">
+                                    Customer PO No
+                                </th>
+                                <th scope="col">
+                                    Delivery address
+                                </th>  
+                                <th scope="col">
+                                    Price
+                                </th>  
+                                <th>Unit</th>
+                                <th>Quantity</th>
+                                <th>Pallets</th>
+                                <th>Sheets/Pallet</th>
+                                <th>Austanding Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                    @foreach (var order in product.CustomerProductsDetails)
+                    {
+                             <tr>
+                                 <td>@order.MyCompanyName</td>
+                                    <td>
+                                @order.CustomerName
+                                    </td>
+                                    <td>
+                                @order.CustomerOrderNumber
+                                    </td>
+                                    <td>
+                                @order.CustomerPoNumber
+                                    </td>
+                                    <td>
+                                @order.DeliveryAddress
+                                    </td>  
+                                    <td>
+                                @order.Price @order.Currency
+                                    </td>
+                                    <td>@order.Unit</td>
+                                    <td>@order.Quantity</td>
+                                    <td>@order.Pallets</td>
+                                    <td>@order.SheetsPerPallet</td>
+                                    <td>@order.AutstandingQuantity</td>
+                                </tr>
+                    }    
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
                 i++;
             }  
         }

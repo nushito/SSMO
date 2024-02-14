@@ -118,7 +118,9 @@ namespace SSMO.Repository
             var purchasedPorduct = dbContext.PurchaseProductDetails
                 .Where(i => productId.Contains(i.ProductId) && checkSupplierCompany.Contains(i.SupplierOrderId))
                 .Skip((currentpage - 1) * productsPerPage)
-                .Take(productsPerPage).ToList();
+                .Take(productsPerPage)
+                .OrderByDescending(i=>i.Id)
+                .ToList();
 
             var productDetails = new List<ProductPurchaseDetails>();
          
@@ -150,6 +152,7 @@ namespace SSMO.Repository
                     Quantity = product.Quantity,
                     Unit = product.Unit.ToString(),
                     SupplierOrderNumber = supplierOrder.Number,
+                    //AutstandingQuantity = product.qua
                     SupplierName = supplierService.SupplierNameById(supplierOrder.SupplierId)
                 };
                //all sells for this product
@@ -157,6 +160,8 @@ namespace SSMO.Repository
 
                 purchaseProduct.SellDetails = soldProduct;
                 productDetails.Add(purchaseProduct);
+
+                purchaseProduct.AutstandingQuantity = product.Quantity - soldProduct.Sum(q => q.Quantity);
             }
             var result = await Task.FromResult(productDetails);
 

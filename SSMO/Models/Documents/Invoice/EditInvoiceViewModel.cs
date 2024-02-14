@@ -21,6 +21,11 @@ namespace SSMO.Models.Documents.Invoice
         public decimal NetWeight { get; set; }
         public string TruckNumber { get; set; }
         public decimal DeliveryCost { get; set; }
+        public decimal? BankExpenses { get; set; }
+        public decimal? Duty { get; set; }
+        public decimal? CustomsExpenses { get; set; }       
+        public decimal? FiscalAgentExpenses { get; set; }      
+        public decimal? OtherExpenses { get; set; }
         public decimal CurrencyExchangeRate { get; set; }
         public string Incoterms { get; set; }
         public string Comment { get; set; }
@@ -37,6 +42,8 @@ namespace SSMO.Models.Documents.Invoice
         public List<int> ChosenBanks { get; set; }
         public ICollection<BankDetailsViewModel> CompanyBankDetails { get; set; }
         public string PaymentTerms { get; set; }
+        public string DealType { get; set; }
+        public string DealDescription { get; set; }
         public string DeliveryAddress { get; set; }
         public string LoadingAddress { get; set; }
         public int Header { get; set; }
@@ -46,5 +53,6 @@ namespace SSMO.Models.Documents.Invoice
         public decimal? Factoring { get; set; }
         public decimal? Comission { get; set; }
         public int MyCompanyId { get; set; }
+        public string CustomsExportDeclaration { get; set; }
     }
 }

@@ -23,9 +23,13 @@ namespace SSMO.Models.Documents.CreditNote
         public decimal DeliveryCost { get; set; }
         public decimal CurrencyExchangeRate { get; set; }
         public string Incoterms { get; set; }
+        public string DeliveryAddress { get; set; }
+        public string LoadingAddress { get; set; }
         public string Comment { get; set; }
         public IList<EditProductForCreditNoteViewModel> Products { get; set; }
         public string PaymentTerms { get; set; }
+        public string DealType { get; set; }
+        public string DealDescription { get; set; }
         public string HeaderUrl { get; set; }
         public string FooterUrl { get; set; }        
     }

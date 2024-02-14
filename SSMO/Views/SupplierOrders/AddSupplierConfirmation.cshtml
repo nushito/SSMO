@@ -63,7 +63,7 @@
                 </select>
     </div>
     <div class="row col-sm-4 mb-2">                  
-         <label asp-for="DeliveryTerms">Delivery Terms</label> 
+         <label asp-for="DeliveryTerms">Incoterms</label> 
          <input asp-for="DeliveryTerms"  type="text" class="form-control"/>       
     </div>
   <div class="row col-sm-4 mb-2">                  
@@ -80,6 +80,10 @@
      <label asp-for="VAT">Enter VAT %</label>
      <input asp-for="VAT"  min="0" step="1" class="form-control" />
  </div>
+  <div class="row col-sm-4 mb-2">                  
+         <label asp-for="Comment">Comment</label> 
+         <input asp-for="Comment" type="text" class="form-control"/>       
+    </div>
     <br />
 
      <div  class="table-responsive-sm">

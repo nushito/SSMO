@@ -10,7 +10,7 @@ namespace SSMO.Services.Documents.DebitNote
     public interface IDebitNoteService
     {
         public CreditAndDebitNoteViewModel CreateDebitNote
-           (int invoiceId, DateTime date,string deliveryAddress,
+           (int invoiceId, DateTime date,string deliveryAddress, string loadingAddress,
             List<AddProductsToCreditAndDebitNoteFormModel> products, 
             List<PurchaseProductsForDebitNoteViewModel> availableProducts,string paymentTerms);
 
@@ -18,7 +18,8 @@ namespace SSMO.Services.Documents.DebitNote
 
         public bool EditDebitNote
             (int id, DateTime date, string incoterms, string comment, 
-            List<EditProductForDebitNoteViewModel> products, string paymentTerms);
+            List<EditProductForDebitNoteViewModel> products, string paymentTerms,
+            string dealType, string descriptionType, string deliveryAddress, string loadingAddress);
 
         public ICollection<InvoiceNumbersForEditedDebitNoteViewModel> GetInvoiceNumbers();
 

@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using DocumentFormat.OpenXml.InkML;
 using Microsoft.EntityFrameworkCore;
 using SSMO.Data;
 using SSMO.Data.Enums;
@@ -10,8 +8,6 @@ using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.CreditNote;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Documents.Packing_List;
-using SSMO.Models.FscTexts;
-using SSMO.Models.Image;
 using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Repository;
@@ -790,12 +786,17 @@ namespace SSMO.Services.Documents.Invoice
                 GrossWeight = invoice.GrossWeight,
                 NetWeight = invoice.NetWeight,
                 DeliveryCost = invoice.DeliveryTrasnportCost,
+                BankExpenses= invoice.BankExpenses,
+                Duty = invoice.Duty,
+                FiscalAgentExpenses= invoice.FiscalAgentExpenses,
+                CustomsExpenses= invoice.CustomsExpenses,
+                OtherExpenses = invoice.OtherExpenses,
                 CurrencyId = invoice.CurrencyId,
                 TruckNumber = invoice.TruckNumber,
                 Products = new List<EditProductForCompanyInvoicesViewModel>(),
                 DocumentType = invoice.DocumentType.ToString(),
                 CompanyBankDetails = new List<BankDetailsViewModel>(),
-                PaymentTerms = invoice.PaymentTerms,
+                PaymentTerms = invoice.PaymentTerms,                
                 FiscalAgents = documentService.GetFiscalAgents(),
                 FscTexts = fscTextService.GetAllFscTexts(),
                 LoadingAddress = invoice.LoadingAddress,
@@ -803,7 +804,10 @@ namespace SSMO.Services.Documents.Invoice
                 Images = imageService.ImageCollection(myCompany.Id),
                 Factoring = invoice.Factoring,
                 Comission = invoice.ProcentComission,
-                MyCompanyId = invoice.MyCompanyId
+                MyCompanyId = invoice.MyCompanyId,
+                DealDescription = invoice.DealDescriptionEng,
+                DealType = invoice.DealTypeEng,
+                CustomsExportDeclaration = invoice.CustomsExportDeclaration
               };
 
             if(fiscalAgent != null)
@@ -891,7 +895,10 @@ namespace SSMO.Services.Documents.Invoice
             ICollection<EditProductForCompanyInvoicesViewModel> products,
             string incoterms, string comment, List<int> banks, int? fiscalAgentId, 
             int? fscText, string paymentTerms, string deliveryAddress, 
-            string loadingAddress, decimal? factoring, decimal? comission)
+            string loadingAddress, decimal? factoring, decimal? comission,
+            string dealType, string dealDescription,string customsDeclaration,
+            decimal? bankExpenses,decimal? fiscalAgentExpenses, decimal? customsExpenses, 
+            decimal? duty, decimal? otherExpenses)
         {
             if (id == 0) return false;
 
@@ -921,6 +928,14 @@ namespace SSMO.Services.Documents.Invoice
             invoice.LoadingAddress = loadingAddress;
             invoice.Factoring = (decimal)factoring;
             invoice.ProcentComission = (decimal)comission;
+            invoice.BankExpenses = (decimal)bankExpenses;
+            invoice.FiscalAgentExpenses = (decimal)fiscalAgentExpenses;
+            invoice.CustomsExpenses= (decimal)customsExpenses;
+            invoice.Duty = (decimal)duty;
+            invoice.OtherExpenses = (decimal)otherExpenses;
+            invoice.DealTypeEng = dealType;
+            invoice.DealDescriptionEng = dealDescription;
+            invoice.CustomsExportDeclaration = customsDeclaration;
 
             var oldBanks = invoice.BankDetails.ToList();
 
@@ -1022,9 +1037,9 @@ namespace SSMO.Services.Documents.Invoice
                     var expensesFactoringPerProduct = (((factoring * invoice.TotalAmount) / 100)
                    / invoice.TotalQuantity) * updatedProduct.QuantityM3ForCalc;
 
-                    var comissionExpenses = (comission / invoice.TotalQuantity) * updatedProduct.QuantityM3ForCalc;
+                    var allExpenses = ((comission + bankExpenses + fiscalAgentExpenses + customsExpenses + duty + otherExpenses) / invoice.TotalQuantity) * updatedProduct.QuantityM3ForCalc;
 
-                    updatedProduct.Profit = (decimal)((updatedProduct.Amount - (purchaseProductDetail.CostPrice * updatedProduct.InvoicedQuantity)) - updatedProduct.DeliveryCost - expensesFactoringPerProduct - comissionExpenses);
+                    updatedProduct.Profit = (decimal)((updatedProduct.Amount - (purchaseProductDetail.CostPrice * updatedProduct.InvoicedQuantity)) - updatedProduct.DeliveryCost - expensesFactoringPerProduct - allExpenses);
                 }
             }
                 invoice.VatAmount = invoice.Amount*invoice.Vat/100;
@@ -1054,6 +1069,12 @@ namespace SSMO.Services.Documents.Invoice
                 PackingListId = num.Id,
                 PackingListNumber = num.DocumentNumber
             })
-            .ToList();       
+            .ToList();
+
+        public async Task<string> GetInvoiceNumber(int id)
+        {
+            var num = await Task.FromResult(dbContext.Documents.Where(i => i.Id == id).Select(n => n.DocumentNumber).FirstOrDefault().ToString());
+            return num;
+        }
     }
 }

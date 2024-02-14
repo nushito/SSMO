@@ -8,7 +8,8 @@ namespace SSMO.Models.Reports.PaymentsModels
     {
         public string Currency { get; set; }
         public string ConvertToThatCurrency { get; set; }
-        public string Number { get; set; } 
+        public string Number { get; set; }
+        public decimal Balance { get; set; }
         public List<PurchaseNewpaymentsPerOrderFormModel> PurchasePaymentsCollection { get; set; }
         public decimal? NewPaidAmount { get; set; }
         public DateTime? NewDateOfPayment { get; set; }

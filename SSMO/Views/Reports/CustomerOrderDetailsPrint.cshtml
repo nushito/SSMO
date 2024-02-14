@@ -4,22 +4,16 @@
     var i = 0;
 }
 
-<div class="card">
+<div id="invoice">
+    <div class="card">
   <div class="card-body">
     <div class="container mb-5 mt-3">
       <div class="row d-flex align-items-baseline">
         <div class="col-xl-9">
           <p style="color: #7e8d9f;font-size: 20px;">@Model.Type <span>:</span> <strong>@Model.OrderConfirmationNumber</strong></p>
-        </div>
-        <div class="col-xl-3 float-end">
-          <a class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark"><i
-              class="fas fa-print text-primary"></i> Print</a>
-          <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportCoToExcel"><i
-              class="far fa-file-pdf text-danger"></i> Export xls</a>              
-        </div>
+        </div>        
         <hr>
       </div>
-
       <div class="container">
         <div class="col-md-12">
           <div class="text-center">
@@ -66,15 +60,17 @@
               Delivery Period: @Model.Eta <br />
           </div>          
           <div class="col-xl-4">
-                        @if (Model.FiscalAgent != null)
-                            @Model.FiscalAgent.Name
+                            @if (Model.FiscalAgent != null)
+                                @Model.FiscalAgent.Name
 
-         <br />
-                            @if(Model.FiscalAgent != null)
-                        {
-                            @Model.FiscalAgent.Details
-                        }
-                       
+
+
+                 <br />
+                                @if (Model.FiscalAgent != null)
+                            {
+                                @Model.FiscalAgent.Details
+                            }
+
                   </div>
                 </div>            
                 <div class="row my-2 mx-1 justify-content-center">
@@ -98,24 +94,24 @@
                     </thead>
                     <tbody>
                                 @foreach (var product in @Model.Products)
-                            {
-                                i += 1;                                
-                                <tr>
-                                    <td>@i</td>
-                                    <td>@product.Description</td>
-                                    <td>@product.Grade</td>
-                                    <td>@product.Size</td>
-                                    <td>@product.FSCClaim</td>
-                                    <td>@product.FscCertificate</td>
-                                    <td>@product.HsCode</td>
-                                    <td>@product.Pallets</td>  
-                                    <td>@product.SheetsPerPallet</td>   
-                                    <td>@product.Unit</td>
-                                    <td>@product.Quantity</td>                                    
-                                    <td>@product.SellPrice</td>
-                                    <td>@product.Amount.ToString("N2")</td>
-                                </tr>
-                            }
+                                {
+                                    i += 1;                                
+                                        <tr>
+                                            <td>@i</td>
+                                            <td>@product.Description</td>
+                                            <td>@product.Grade</td>
+                                            <td>@product.Size</td>
+                                            <td>@product.FSCClaim</td>
+                                            <td>@product.FscCertificate</td>
+                                            <td>@product.HsCode</td>
+                                            <td>@product.Pallets</td>  
+                                            <td>@product.SheetsPerPallet</td>   
+                                            <td>@product.Unit</td>
+                                            <td>@product.Quantity</td>                                    
+                                             <td>@product.SellPrice.ToString("N2")</td>
+                                            <td>@product.Amount.ToString("N2")</td>
+                                        </tr>
+                                }
 
             </tbody>
           </table>
@@ -137,12 +133,12 @@
              </ul>
         </div>
         <div class="row">
-                    @if(Model.FscText != null)
-                    {
-                        <span>@Model.FscText</span> 
-                        <br />
-                       <span>License code:</span> @Model.FscCertificate
-                    }
+                        @if (Model.FscText != null)
+                        {
+                                <span>@Model.FscText</span> 
+                                <br />
+                               <span>License code:</span> @Model.FscCertificate
+                        }
         </div>
         <hr />
         <table class="table-borderless">
@@ -156,17 +152,17 @@
                    Payment Terms: @Model.PaymentTerms
                 </td>
             </tr>
-           
+
             <tr>
-                @foreach (var bank in Model.BankDetails)
-                {
-                        <td class="px-3 mr-5">
-                                Currency:@bank.CurrencyName<br>
-                                Bank:@bank.BankName<br>
-                                IBAN:@bank.Iban<br>
-                                SWIFT:@bank.Swift
-                            </td>
-                }
+                            @foreach (var bank in Model.BankDetails)
+                            {
+                                <td class="px-3 mr-5">
+                                        Currency:@bank.CurrencyName<br>
+                                        Bank:@bank.BankName<br>
+                                        IBAN:@bank.Iban<br>
+                                        SWIFT:@bank.Swift
+                                    </td>
+                            }
             </tr>
         </table>
 
@@ -174,3 +170,23 @@
     </div>
   </div>
 </div>
+</div>
+<br />
+<section class="row">
+    <div class="col-2">
+           
+          <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportCoToExcel"><i
+              class="far fa-file-pdf text-danger"></i> Export xls</a>              
+    
+    </div>
+    <div class="col-2">
+<form method="post" asp-controller="Reports" asp-action="ExportPdf">
+                <input type="hidden" name="exportData" id="exportData" />  
+                <input type="submit" id="btnSubmit" value="Download Pdf" class="btn btn-primary" />
+ </form>
+    </div>
+</section>
+
+@section Scripts{
+             <script type="text/javascript" src="~/js/documentToPdf.js"></script>
+ }

@@ -21,7 +21,6 @@ namespace SSMO.Data.Models
             DebitNoteProducts = new List<InvoiceProductDetails>();
             CreditNoteProducts = new List<InvoiceProductDetails>();
         }
-
         public int Id { get; init; }      
         [Required]
         public DocumentTypes DocumentType { get; set; }
@@ -64,6 +63,9 @@ namespace SSMO.Data.Models
         public decimal ProcentComission { get; set; }
         public decimal OtherExpenses { get; set; }
         public decimal PaidAvance { get; set; }
+        public string Origin { get; set; }
+        public string CustomsImportDeclaration { get; set; }
+        public string CustomsExportDeclaration { get; set; }
         public int CurrencyId { get; set; }
         public Currency Currency { get; set; }
         public int? CostPriceCurrencyId { get; set; }

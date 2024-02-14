@@ -7,6 +7,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\js\documentToPdf.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="wwwroot\js\documentToPdf.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <COMReference Include="{bee4bfec-6683-3e67-9167-3c0cbc68f40a}">
       <WrapperTool>tlbimp</WrapperTool>
       <VersionMinor>4</VersionMinor>
@@ -22,6 +30,9 @@
     <PackageReference Include="Beiyuan.WebSystem.UI" Version="3.1.0" />
     <PackageReference Include="ClosedXML" Version="0.100.3" />
     <PackageReference Include="DevExpress.Data" Version="22.2.4" />
+    <PackageReference Include="itext7.bouncy-castle-adapter" Version="8.0.2" />
+    <PackageReference Include="itext7.pdfhtml" Version="5.0.2" />
+    <PackageReference Include="iTextSharp" Version="5.5.13.3" />
     <!--<PackageReference Include="EntityFramework" Version="6.4.4" />-->
     <!--<PackageReference Include="iTextSharp" Version="5.5.13.3" />
     <PackageReference Include="itextsharp.xmlworker" Version="5.5.13.3" />-->
@@ -42,6 +53,10 @@
   <ItemGroup>
     <Folder Include="Models\Documents\BgInvoice\" />
     <Folder Include="Services\Customer\CustomerModels\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\js\documentToPdf.js" />
   </ItemGroup>
 
   <ItemGroup>

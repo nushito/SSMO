@@ -69,7 +69,7 @@ namespace SSMO.Controllers
             this.documentService = documentService;
             this.fscTextService = fscTextService;
         }
-
+        
         [HttpGet]
         [Authorize]
         public IActionResult AddCustomerOrder()
@@ -237,7 +237,8 @@ namespace SSMO.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> AddOrderProducts(IEnumerable<ProductCustomerFormModel> model, int customerorderId)
+        public async Task<IActionResult> AddOrderProducts
+            (IEnumerable<ProductCustomerFormModel> model, int customerorderId)
         {
             // var count = int.Parse(TempData["Count"].ToString());
             string userId = this.User.UserId();

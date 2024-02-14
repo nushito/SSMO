@@ -53,6 +53,8 @@ namespace SSMO.Models.Reports.Invoice
         public string FooterUrl { get; set; }
         public string PlaceOfIssue { get; set; }
         public int CurrencyId { get; set; }
-        public string Currency { get; set; }
+        public string Currency { get; set; }        
+        public string FiscalAgentName { get; set; }
+        public string FiscalAgentDetail { get; set; }
     }
 }

@@ -34,6 +34,10 @@ namespace SSMO.Models.Documents
         public string CreditNoteDeliveryAddress { get; set; }
         public ICollection<InvoiceBankDetailsViewModel> BankDetails { get; set; }
         public string PaymentTerms { get; set; }
+        public string DealType { get; set; }
+        public string DealDescription { get; set; }
+        public string PlaceOfIssue { get; set; }
+        public string LoadingAddress { get; set; }
         public ICollection<ImageModelViewForAllDocuments> Images { get; set; }
         public string FooterUrl { get; set; }
         public string HeaderUrl { get; set; }

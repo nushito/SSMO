@@ -2,7 +2,7 @@
 @{
     ViewBag.Title = "Edit Supplier Order Payment";
 }
-
+<h5>Payments to Supplier</h5>
 <form method="get">    
     <div class="row">
         <div class="form-group col-md-4">
@@ -13,9 +13,20 @@
                 {
                     <option value="@supplierName">@supplierName</option>
                 }
-
             </select>
         </div>
+        <div class="form-group col-md-4">
+            <label asp-for="MyCompanyId">Choose Seller</label>
+            <select asp-for="MyCompanyId" class="form-control">
+            <option value="">All</option>
+                @foreach (var name in Model.MyCompanyNames)
+                {
+                      <option value="@name.Id">@name.Name</option>
+                }
+            </select>
+        </div>
+        </div>
+        <div class="row">
         <div class="form-group col-3" >
              <label asp-for="StartDate" >Start Date</label>
              <div class="input-group date" id="datepicker1">
@@ -127,7 +138,11 @@
                             <br />
                         }        
                     </th>
-                    <th><a asp-controller="Reports" asp-action="DetailsSupplierAndPurchasePayment" asp-route-id="@order.Id" class="btn btn-outline-info mr-1">Add new payment</a></th> 
+                    <th><a asp-controller="Reports" 
+                          asp-action="DetailsSupplierAndPurchasePayment" 
+                          asp-route-id="@order.Id" 
+                          asp-route-balance="@order.Balance" 
+                          class="btn btn-outline-info mr-1" target="_blank">Add new payment</a></th> 
                 </tr>               
                 <tr>
                     <th colspan="8">

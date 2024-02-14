@@ -10,6 +10,8 @@ namespace SSMO.Models.Reports
         public int CurrentPage { get; init; } = 1;
         public int TotalSupplierOrders { get; set; }
         public string SupplierName { get; set; }
+        public int MyCompanyId { get; set; }
+        public ICollection<MyCompaniesForReportViewModel> MyCompanyNames { get; set; }
         public IEnumerable<string> SupplierNames { get; set; }
         public IEnumerable<SupplierOrderDetailsModel> SupplierOrderCollection { get; set; }
         public DateTime StartDate { get; set; }

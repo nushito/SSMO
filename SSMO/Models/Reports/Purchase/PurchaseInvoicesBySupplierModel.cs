@@ -9,6 +9,8 @@ namespace SSMO.Models.Reports.Purchase
         public const int PurchaseInvoicesPerPage = 15;
         public int CurrentPage { get; init; } = 1;
         public int? TotalPurchaseInvoices { get; set; }
+        public int MyCompanyId { get; init; }
+        public IEnumerable<MyCompaniesForReportViewModel> MyCompanyNames { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public string Supplier { get; set; }

@@ -25,9 +25,7 @@ using Microsoft.EntityFrameworkCore;
 using SSMO.Repository;
 using SSMO.Services.CustomerOrder.Models;
 using SSMO.Models.Reports.ServiceOrders;
-using DocumentFormat.OpenXml.Wordprocessing;
 using SSMO.Services.Images;
-using DocumentFormat.OpenXml.InkML;
 
 namespace SSMO.Services.Reports
 {
@@ -62,7 +60,7 @@ namespace SSMO.Services.Reports
             this.imageService = imageService;
         }
         public CustomerOrdersQueryModel AllCustomerOrders
-            (string customerName, DateTime startDate, DateTime endDate,
+            (string customerName, int myCompanyId, DateTime startDate, DateTime endDate,
             int currentpage, int customerOrdersPerPage)
         {
 
@@ -77,7 +75,9 @@ namespace SSMO.Services.Reports
                                 .FirstOrDefault();
 
             var queryOrders = dbcontext.CustomerOrders
-                     .Where(a => a.CustomerId == customerId && a.Date >= startDate && a.Date <= endDate);
+                     .Where(a => a.CustomerId == customerId 
+                     && a.MyCompanyId == myCompanyId
+                     && a.Date >= startDate && a.Date <= endDate);
 
             // var totalOrders = queryOrders.Count();  
 
@@ -144,7 +144,7 @@ namespace SSMO.Services.Reports
         }
 
         public CustomerInvoicesPaymentCollectionViewModel CustomersInvoicesPaymentDetails
-            (string customerName, int currentpage, int customerInvoicePerPage)
+            (string customerName, int currentpage, int myCompanyId, int customerInvoicePerPage)
         {
             if (String.IsNullOrEmpty(customerName))
             {
@@ -156,7 +156,8 @@ namespace SSMO.Services.Reports
                                 .FirstOrDefault();
 
             var queryInvoices = dbcontext.Documents
-                    .Where(a => a.DocumentType == Data.Enums.DocumentTypes.Invoice && a.CustomerId == customerId);
+                    .Where(a => a.DocumentType == Data.Enums.DocumentTypes.Invoice 
+                    && a.CustomerId == customerId && a.MyCompanyId == myCompanyId);
 
             var invoices = queryInvoices.ProjectTo<CustomerInvoicePaymentDetailsModel>(this.mapper).ToList();
 
@@ -451,7 +452,7 @@ namespace SSMO.Services.Reports
         }
 
         public CustomerOrderPaymentCollectionViewModel CustomerOrdersPaymentDetails
-            (string customerName, int currentpage, int customerOrdersPerPage)
+            (string customerName, int currentpage, int myCompanyId, int customerOrdersPerPage)
         {
             if (String.IsNullOrEmpty(customerName))
             {
@@ -462,7 +463,9 @@ namespace SSMO.Services.Reports
                                 .Select(a => a.Id)
                                 .FirstOrDefault();
 
-            var customerOrders = dbcontext.CustomerOrders.Where(c => c.CustomerId == customerId);
+            var customerOrders = dbcontext.CustomerOrders
+                .Where(c => c.CustomerId == customerId
+                && c.MyCompanyId == myCompanyId);
 
             var incustomerOrdersCollectionvoices = customerOrders.ProjectTo<CustomerOrderDetailsPaymentModel>(this.mapper).ToList();
 
@@ -528,7 +531,7 @@ namespace SSMO.Services.Reports
         }
 
         public SupplierOrdersQueryModel AllSupplierOrders
-            (string name, DateTime startDate, DateTime endDate, int currentpage, int supplierOrdersPerPage)
+            (string name,int myCompanyId, DateTime startDate, DateTime endDate, int currentpage, int supplierOrdersPerPage)
         {
             if (String.IsNullOrEmpty(name))
             {
@@ -540,7 +543,10 @@ namespace SSMO.Services.Reports
                                 .FirstOrDefault();
 
             var queryOrders = dbcontext.SupplierOrders
-                    .Where(a => a.SupplierId == supplierId && a.Date >= startDate && a.Date <= endDate);
+                    .Where(a => a.SupplierId == supplierId 
+                    && a.MyCompanyId == myCompanyId
+                    && a.Date >= startDate 
+                    && a.Date <= endDate);
 
             var supplierOrders = queryOrders.ProjectTo<SupplierOrderDetailsModel>(this.mapper).ToList();
             
@@ -576,7 +582,7 @@ namespace SSMO.Services.Reports
                 TotalQuantity = supplierOrder.TotalQuantity,
                 MyCompanyId = supplierOrder.MyCompanyId,
                 NetWeight = supplierOrder.NetWeight,
-                VAT = supplierOrder.VAT,
+                VAT = supplierOrder.VAT,                
                 NewProducts = new List<NewProductsForSupplierOrderModel>()
             };
 
@@ -864,7 +870,6 @@ namespace SSMO.Services.Reports
                     product.InvoicedQuantity = Math.Round(product.InvoicedQuantity, 0);
                 }
             }
-
             invoiceDetails.Products = productsDetails;
 
             var seller = dbcontext.MyCompanies
@@ -923,13 +928,18 @@ namespace SSMO.Services.Reports
                 .Where(i=>i.Id == invoiceDetails.CurrencyId)
                 .Select(a=>a.Name).FirstOrDefault();
 
+            var fiscalAgent = dbcontext.FiscalAgents.Find(invoice.Select(i=>i.FiscalAgentId).FirstOrDefault());
+            invoiceDetails.FiscalAgentName = fiscalAgent.Name;
+            invoiceDetails.FiscalAgentDetail = fiscalAgent.Details;
+
             return invoiceDetails;
         }
         public PurchaseCollectionQueryModel PurchaseInvoices
-            (string supplierName, DateTime startDate, DateTime endDate, int currentpage = 1, int invoiceperPage = int.MaxValue)
+            (string supplierName, int myCompanyId, DateTime startDate, DateTime endDate, int currentpage = 1, int invoiceperPage = int.MaxValue)
         {
             var purchaseDocuments = dbcontext.Documents
-                .Where(d => d.DocumentType == Data.Enums.DocumentTypes.Purchase);
+                .Where(d => d.DocumentType == Data.Enums.DocumentTypes.Purchase 
+                && d.MyCompanyId == myCompanyId);
 
             if (supplierName != null)
             {

@@ -3,45 +3,34 @@
     ViewBag.Title = "Invoice Details";
     var i = 0;
 }
-<div>
+<div id="invoice">
+    <div>
     <img src="@Model.HeaderUrl" />
 </div>
 <div class="card">
   <div class="card-body">
     <div id="PrintPDF" class="container mb-5 mt-3">
       <div class="row d-flex align-items-baseline">
-                @if(Model.CreditToInvoiceId != 0)
-                {
-                      <div class="col-xl-9">
-                         <p style="color: #7e8d9f;font-size: 20px;">Credit Invoice No: <strong>@Model.DocumentNumber</strong></p>
-                       <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.CreditToInvoice, date: @Model.CreditToInvoiceDate.Date.ToString("dd-MM-yyyy")</p>
-                       </div>
-                }else if(Model.DebitToInvoiceId != 0)
-                {
-             <div class="col-xl-9">
-              <p style="color: #7e8d9f;font-size: 20px;">Debit Invoice No: <strong>@Model.DocumentNumber</strong></p>
-                           <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.DebitToInvoice, date: @Model.DebitToInvoiceDate.Date.ToString("dd-MM-yyyy")</p>
-            </div>
-                }
-                else
-                {
-               <div class="col-xl-9">
-              <p style="color: #7e8d9f;font-size: 20px;">Invoice No: <strong>@Model.DocumentNumber</strong></p>
-            </div>
-                }
-               
-        <div class="col-xl-3 float-end">
-          <a class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportToExcel"><i
-              class="fas fa-print text-primary"></i> Excel</a>
-          <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="GetPdf"><i
-              class="far fa-file-pdf text-danger"></i> PDF</a>  
-               <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" 
-               asp-controller="Documents" 
-               asp-action="BgInvoice"
-               asp-route-documentNumber="@Model.DocumentNumber"
-               asp-route-currencyExchangeRateUsdToBGN = "@Model.CurrencyExchangeRateUsdToBGN"><i
-              class="far fa-file-pdf text-danger"></i> BG</a>
-        </div>
+                    @if (Model.CreditToInvoiceId != 0)
+                    {
+                          <div class="col-xl-9">
+                             <p style="color: #7e8d9f;font-size: 20px;">Credit Invoice No: <strong>@Model.DocumentNumber</strong></p>
+                           <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.CreditToInvoice, date: @Model.CreditToInvoiceDate.Date.ToString("dd-MM-yyyy")</p>
+                           </div>
+                    }
+                    else if (Model.DebitToInvoiceId != 0)
+                    {
+                 <div class="col-xl-9">
+                  <p style="color: #7e8d9f;font-size: 20px;">Debit Invoice No: <strong>@Model.DocumentNumber</strong></p>
+                               <p style="color: #7e8d9f;font-size: 20px;">to Invoice No: @Model.DebitToInvoice, date: @Model.DebitToInvoiceDate.Date.ToString("dd-MM-yyyy")</p>
+                </div>
+                    }
+                    else
+                    {
+                   <div class="col-xl-9">
+                  <p style="color: #7e8d9f;font-size: 20px;">Invoice No: <strong>@Model.DocumentNumber</strong></p>
+                </div>
+                    }        
         <hr/>
       </div>
 
@@ -74,7 +63,7 @@
                <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.Seller.Street </span></li>
                 <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.Seller.City </span></li>
                  <li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="fw-bold">@Model.Seller.Country </span></li>
-              @*<li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="me-1 fw-bold">FSC:</span>
+                                @*<li class="text-muted"><i class="fas fa-circle" style="color:#84B0CA ;"></i> <span class="me-1 fw-bold">FSC:</span>
                   <span class="badge bg-warning text-black fw-bold">@Model.Seller.FSCClaim @Model.Seller.FSCSertificate</span></li>*@
             </ul>
           </div>
@@ -84,105 +73,113 @@
             <ul class="list-unstyled">
                  <li class="text-muted">O/C No: 
                      <span style="color:#5d9fc5 ;">
-                        @foreach (var num in Model.OrderConfirmationNumber)
-                        {
-                                @num; 
-                        }   
+                                        @foreach (var num in Model.OrderConfirmationNumber)
+                                        {
+                                            @num
+                                            ;
+                                        }   
                     </span> 
                  </li>   
                  <li class="text-muted">Customer PO No: 
                      <span style="color:#5d9fc5 ;">
-                        @foreach (var num in Model.CustomerPoNumbers)
-                        {
-                            @num
-                            ;
-                        }   
+                                        @foreach (var num in Model.CustomerPoNumbers)
+                                        {
+                                            @num
+                                            ;
+                                        }   
                     </span> 
                  </li>  
                   <li class="text-muted">Place of loading: <span style="color:#5d9fc5 ;">@Model.LoadingAddress</span></li>
                    <li class="text-muted">Delivery Address: <span style="color:#5d9fc5 ;">@Model.DeliveryAddress</span></li>
               <li class="text-muted">Delivery Terms: <span style="color:#5d9fc5 ;">@Model.Incoterms</span></li>
-              <li class="text-muted">Truck Number: <span style="color:#5d9fc5 ;">@Model.TruckNumber</span></li>
-             
+              <li class="text-muted">Vehicle Number: <span style="color:#5d9fc5 ;">@Model.TruckNumber</span></li>
+             <li class="text-muted">B/L No: <span style="color:#5d9fc5 ;">@Model.Swb</span></li>
             </ul>
           </div>
-        </div>       
-        <div class="row my-2 mx-1 justify-content-center">
-          <table class="table table-striped table-borderless">
-            <thead style="background-color:#84B0CA ;" class="text-white">
-              <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Grade</th>
-                                <th scope="col">Size</th>
-                                <th scope="col">FSC Claim</th>
-                                <th scope="col">FSC Certificate</th>
-                                <th scope="col">HS Code</th>
-                                <th scope="col">Unit</th>
-                                <th scope="col">Qty</th>
-                                <th scope="col">Unit Price</th>
-                                <th scope="col">Amount @Model.Currency</th>
-              </tr>
-            </thead>
-            <tbody>
-                @foreach (var product in @Model.Products)
-                            {  
-                                i += 1;                                
-                                <tr>
-                                    <td>@i</td>
-                                    <td>@product.Description</td>
-                                    <td>@product.Grade</td>
-                                    <td>@product.Size</td>
-                                    <td>@product.FscClaim</td>
-                                    <td>@product.FscCertificate</td>
-                                    <td>@product.HsCode</td>
-                                    @if (Model.CreditToInvoiceId != 0)
-                                    {
-                                        <td>@product.Unit</td>
-                                        <td>@product.CreditNoteQuantity</td>
-                                        <td>@product.CreditNotePrice</td>
-                                        <td>@product.CreditNoteProductAmount.ToString("N2")</td>       
-                                    }
-                                    else if (Model.DebitToInvoiceId != 0)
-                                    {
-                                        <td>@product.Unit</td>
-                                        <td>@product.DebitNoteQuantity</td>
-                                        <td>@product.DebitNotePrice</td>
-                                        <td>@product.DebitNoteAmount.ToString("N2")</td>  
-                                    }
-                                    else
-                                    {
-                                        <td>@product.Unit</td>
-                                        <td>@product.InvoicedQuantity</td>
-                                        <td>@product.SellPrice</td>
-                                        <td>@product.Amount.ToString("N2")</td>                                        
-                                    }                                   
-                                </tr>
-                            }
+           <div class="col-xl-4">
+                            @if (Model.FiscalAgentName != "-")
+                                @Model.FiscalAgentName
+
+                            <br />
+                                @Model.FiscalAgentDetail
+                  </div>
+            </div>       
+            <div class="row my-2 mx-1 justify-content-center">
+              <table class="table table-striped table-borderless">
+                <thead style="background-color:#84B0CA ;" class="text-white">
+                  <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Description</th>
+                                    <th scope="col">Grade</th>
+                                    <th scope="col">Size</th>
+                                    <th scope="col">FSC Claim</th>
+                                    <th scope="col">FSC Certificate</th>
+                                    <th scope="col">HS Code</th>
+                                    <th scope="col">Unit</th>
+                                    <th scope="col">Qty</th>
+                                    <th scope="col">Unit Price</th>
+                                    <th scope="col">Amount @Model.Currency</th>
+                  </tr>
+                </thead>
+                <tbody>
+                                    @foreach (var product in @Model.Products)
+                                {
+                                    i += 1;                                
+                                    <tr>
+                                        <td>@i</td>
+                                        <td>@product.Description</td>
+                                        <td>@product.Grade</td>
+                                        <td>@product.Size</td>
+                                        <td>@product.FscClaim</td>
+                                        <td>@product.FscCertificate</td>
+                                        <td>@product.HsCode</td>
+                                        @if (Model.CreditToInvoiceId != 0)
+                                        {
+                                                <td>@product.Unit</td>
+                                                <td>@product.CreditNoteQuantity</td>
+                                                <td>@product.CreditNotePrice</td>
+                                                <td>@product.CreditNoteProductAmount.ToString("N2")</td>       
+                                        }
+                                        else if (Model.DebitToInvoiceId != 0)
+                                        {
+                                                <td>@product.Unit</td>
+                                                <td>@product.DebitNoteQuantity</td>
+                                                <td>@product.DebitNotePrice</td>
+                                                <td>@product.DebitNoteAmount.ToString("N2")</td>  
+                                        }
+                                        else
+                                        {
+                                                <td>@product.Unit</td>
+                                                <td>@product.InvoicedQuantity</td>
+                                                <td>@product.SellPrice</td>
+                                                <td>@product.Amount.ToString("N2")</td>                                        
+                                        }                                   
+                                    </tr>
+                                }
              </tbody>
           </table>
         </div>
         <div class="row">
           <div class="col-xl-6">
             <ul class="list-unstyled">
-                    @if(Model.CreditToInvoiceId != 0)
-                    {
-                        <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
-                        <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
-                        <li class="text-black float-start"><span class="text-black me-3">Total Amount @Model.Currency: </span><span style="font-size: 25px;">@Model.CreditNoteTotalAmount.ToString("N2")</span></li>                                
-                    }
-                    else if(Model.DebitToInvoiceId != 0)
-                    {
-                        <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
-                        <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
-                       <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.DebitNoteTotalAmount.ToString("N2") @Model.Currency</span></li>
-                    }
-                    else
-                    {
-                        <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
-                        <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
-                             <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.TotalAmount.ToString("N2") @Model.Currency</span></li>
-                    }    
+                                @if (Model.CreditToInvoiceId != 0)
+                                {
+                            <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
+                            <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
+                            <li class="text-black float-start"><span class="text-black me-3">Total Amount @Model.Currency: </span><span style="font-size: 25px;">@Model.CreditNoteTotalAmount.ToString("N2")</span></li>                                
+                                }
+                                else if (Model.DebitToInvoiceId != 0)
+                                {
+                            <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
+                            <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
+                           <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.DebitNoteTotalAmount.ToString("N2") @Model.Currency</span></li>
+                                }
+                                else
+                                {
+                            <li class="text-muted ms-3"><span class="text-black me-4">Amount: </span>@Model.Amount.ToString("N2")</li>
+                            <li class="text-muted ms-3 mt-2"><span class="text-black me-4">VAT @Model.VAT: </span>@Model.VatAmount.ToString("N2")</li>            
+                                 <li class="text-black float-start"><span class="text-black me-3">Total Amount: </span><span style="font-size: 25px;">@Model.TotalAmount.ToString("N2") @Model.Currency</span></li>
+                                }    
             </ul>
           </div>
         </div>
@@ -195,45 +192,51 @@
         </div>
         <table class="table-borderless">
              <tr class="mb-2">
-                <td class="px-3 mr-5">
+                <td>
                     Event Date: @Model.Date.ToShortDateString() <br />
                     Deal Type: @Model.DealTypeEng <br />
                     Description of the deal: @Model.DealDescriptionEng <br />
                     Place of issue:@Model.PlaceOfIssue<br />
                     Payment Terms: @Model.PaymentTerms
-                </td>
-            </tr>  
-            <hr />
-            <tr>
-                @foreach (var bank in Model.CompanyBankDetails)
-                {
-                       <td class="px-3 mr-5">
-                        Currency:@bank.CurrencyName<br/>
-                        Bank:@bank.BankName<br>
-                        IBAN:@bank.Iban<br/>
-                        SWIFT:@bank.Swift
-                    </td>
-                }
+                </td>           
+                            @foreach (var bank in Model.CompanyBankDetails)
+                            {
+                           <td class="px-5">
+                            Currency:@bank.CurrencyName<br/>
+                            Bank:@bank.BankName<br>
+                            IBAN:@bank.Iban<br/>
+                            SWIFT:@bank.Swift
+                        </td>
+                            }
             </tr>
         </table>       
       </div>
     </div>
-     <form method="post" asp-controller="Reports" asp-action="ExportPdf2">
-                <input type="hidden" name="exportData" id="exportData" />  
-                <input type="submit" id="btnSubmit" value="Export" class="btn btn-primary" />
-         </form>
-
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-       <script type="text/javascript">  
-         $(function () {  
-           $("#btnSubmit").click(function () {  
-             $("input[name='exportData']").val($("#PrintPDF").html());  
-           });  
-         });  
-       </script>  
   </div>
 </div>
 <div>
     <img src="@Model.FooterUrl" />
 </div>
-       
+</div>
+
+<div class="col-xl-3 float-end">
+          <a class="btn btn-light text-capitalize border-0" data-mdb-ripple-color="dark" asp-controller="Reports" asp-action="ExportToExcel"><i
+              class="fas fa-print text-primary"></i> Excel
+        </a>          
+         <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" 
+               asp-controller="Documents" 
+               asp-action="BgInvoice"
+               asp-route-documentNumber="@Model.DocumentNumber"
+               asp-route-currencyExchangeRateUsdToBGN = "@Model.CurrencyExchangeRateUsdToBGN"><i
+              class="far fa-file-pdf text-danger"></i> BG
+          </a>
+</div>
+ <form method="post" asp-controller="Reports" asp-action="ExportPdf">
+                <input type="hidden" name="exportData" id="exportData" />  
+                <input type="submit" id="btnSubmit" value="Export" class="btn btn-primary" />
+ </form>
+ @section Scripts{
+         <script type="text/javascript" src="~/js/documentToPdf.js"></script>
+ }
+ 
+  

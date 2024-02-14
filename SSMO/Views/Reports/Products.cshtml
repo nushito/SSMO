@@ -69,7 +69,7 @@
     int i = 1;   
 }
 <table class="table">
-    <thead>
+    <thead style="position: sticky;top: 0" class="thead-dark">
         <tr>
             <th>#</th>
             <th>Supplier</th>  
@@ -77,9 +77,10 @@
             <th>Date</th>
             <th>SupplierOrderNumber</th>
             <th>Unit</th>
-            <th>Quantity</th>
+            <th>Purchased Quantity</th>
             <th>Pallets</th>
             <th>Sheets/pallet</th>
+            <th>Autstanding Quantity</th>
             <th>Fsc Claim</th>
             <th>Fsc Certificate</th>
             <th>Purchase Price</th>
@@ -96,7 +97,7 @@
             @foreach(var product in Model.Products.Products)
             {
                 int j = 1;
-                <tr>
+               <tr class="table-success" >
                      <td>@i</td>    
                      <td>@product.SupplierName</td>
                      <td>@product.PurchaseInvoice</td>
@@ -106,6 +107,7 @@
                      <td>@product.Quantity</td>
                      <td>@product.Pallets</td>
                      <td>@product.SheetsPerPallet</td>
+                     <td>@product.AutstandingQuantity</td>
                      <td>@product.FscClaim</td>
                      <td>@product.FscCertificate</td>
                      <td>@product.PurchasePrice</td>

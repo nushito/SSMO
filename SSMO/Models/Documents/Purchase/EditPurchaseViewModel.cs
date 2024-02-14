@@ -30,6 +30,8 @@ namespace SSMO.Models.Documents.Purchase
         public decimal FiscalAgentExpenses { get; set; }
         public decimal ProcentComission { get; set; }
         public decimal OtherExpenses { get; set; }
+        public string Origin { get; set; }
+        public string CustomsImportDeclaration { get; set; }
         public bool DelayCostCalculation { get; set; }
         public int CostPriceCurrency { get; set; }
         public ICollection<GetCurrencyModel> Currencies { get; set; }

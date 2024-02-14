@@ -104,6 +104,9 @@
              <th>
                 Debit Note to Invoice N
             </th>
+            <th>
+                Customs Export Declaration
+            </th>
         </tr>
     </thead>
     <tbody> 
@@ -141,6 +144,9 @@
                             </th>
                             <th>
                         @order.DebitToInvoiceDocumentNumber
+                            </th>
+                            <th>
+                                @order.CustomsExportDeclaration
                             </th>
                             <th><a asp-controller="Reports" 
                                 asp-action="InvoiceDetails" 

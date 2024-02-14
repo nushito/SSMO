@@ -282,7 +282,11 @@ namespace SSMO.Services.Documents
                 Products = new List<AddProductsToCreditAndDebitNoteFormModel>(),
                 CompanyBankDetails = new List<InvoiceBankDetailsViewModel>(),
                 HeaderUrl = imageService.HeaderUrl(invoice.HeaderId??0),
-                FooterUrl = imageService.FooterUrl(invoice.FooterId??0)
+                FooterUrl = imageService.FooterUrl(invoice.FooterId??0),
+                DealDescription = invoice.DealDescriptionEng,
+                DealType = invoice.DealTypeEng,
+                PlaceOfIssue = invoice.PlaceOfIssue,
+                LoadingAddress = creditOrDebitNote.LoadingAddress
             };
 
             if(creditOrDebitNote.DocumentType == Data.Enums.DocumentTypes.CreditNote) 

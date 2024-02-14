@@ -34,7 +34,6 @@ namespace SSMO.Controllers
             {
                await imageService.NewImage(file,model.Id);
             }
-
             return RedirectToAction("Index", "Home");
         }
 

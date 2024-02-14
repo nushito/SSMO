@@ -120,10 +120,15 @@
                     <td>
                       <input type="hidden" value="@Model.PurchasePaymentsCollection[i].Id" asp-for="@Model.PurchasePaymentsCollection[i].Id">
                     </td>
-                        <td class="col-md-1">
-                          <label style="color:red">Make Only Cost Calculation</label>
-                         <input type="checkbox" asp-for="@Model.PurchasePaymentsCollection[i].OnlyCalculate">
-                        </td>
+                      <td class="col-md-1">
+                         <label style="color:red">Make Only Cost Calculation</label>
+                        @if(Model.Balance > 1)
+                        {
+                          <input type="checkbox" disabled="disabled">
+                        }else{
+                          <input type="checkbox" asp-for="@Model.PurchasePaymentsCollection[i].OnlyCalculate">
+                        }
+                     </td>
                     <td class="col-md-1">
                       <label>Choose Purchase Invoice for payment</label>
                      <input type="checkbox" asp-for="@Model.PurchasePaymentsCollection[i].IsChecked">

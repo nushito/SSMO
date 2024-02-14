@@ -115,7 +115,7 @@ namespace SSMO.Controllers
                                    model.Number, model.StatusId,
                                    model.CurrencyId, model.FscClaim, model.VAT ?? 0,
                                    model.LoadingAddress, model.DeliveryAddress,
-                                   model.DeliveryTerms);
+                                   model.DeliveryTerms,model.Comment);
             ViewBag.NumberExist = 1;
           
             int loopsNum = 0;

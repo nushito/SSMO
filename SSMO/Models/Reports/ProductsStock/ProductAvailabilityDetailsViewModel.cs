@@ -11,12 +11,10 @@ namespace SSMO.Models.Reports.ProductsStock
         public string Grade { get; set; }
         public List<ProductDetailsForEachCustomerOrderViewModel> CustomerProductsDetails { get; set; }
         public List<PurchaseProductDetailsListViewModel> PurchaseProductDetails { get; set; }
-        public decimal LoadedQuantity { get; set; }
-        public decimal DeliveredQuantity { get; set; }
-        public decimal QuantityOnStock { get; set; }      
-        public decimal OrderedQuantity { get; set; }
+        public decimal LoadedQuantity { get; set; }        
+        public decimal QuantityOnStock { get; set; }
+        public string Unit { get; set; }
         public string SupplierName { get; set; }
-
-
+        public string SupplierOrderNumber { get; set; }
     }
 }

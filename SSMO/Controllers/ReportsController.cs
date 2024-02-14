@@ -41,14 +41,17 @@ using SSMO.Services.FscTextDocuments;
 using SSMO.Models.CustomerOrders;
 using SSMO.Models.Reports.ServiceOrders;
 using SSMO.Services.TransportService;
-using DocumentFormat.OpenXml.Drawing.Charts;
-using System.Net.Mime;
 using SSMO.Models.ServiceOrders;
-using SSMO.Services.FiscalAgent;
 using SSMO.Services.Images;
 using SSMO.Models.Image;
 using SSMO.Models.Reports.PaymentsModels.TransportModels;
 using SSMO.Models.Reports.Products;
+using System.Text;
+using iText.Html2pdf;
+using iText.IO.Source;
+using iText.Kernel.Geom;
+using iText.Kernel.Pdf;
+
 
 namespace SSMO.Controllers
 {
@@ -122,9 +125,11 @@ namespace SSMO.Controllers
 			}
 
 			var customerNames = customerService.GetCustomerNames(userId);
+            var myCompanies = myCompanyService.GetAllCompanies();
+            model.MyCompanyNames = myCompanies;
 
-			var customerOrderCollection = reportService.AllCustomerOrders(
-				model.CustomerName, model.StartDate, model.EndDate,
+            var customerOrderCollection = reportService.AllCustomerOrders(
+				model.CustomerName,model.MyCompanyId, model.StartDate, model.EndDate,
 				model.CurrentPage, CustomerOrderReportAll.CustomerOrdersPerPage);
 
 			model.CustomerOrderCollection = customerOrderCollection.CustomerOrders;
@@ -286,9 +291,11 @@ namespace SSMO.Controllers
 			}
 
 			model.SupplierNames = supplierService.GetSupplierNames(userId);
+            var myCompanies = myCompanyService.GetAllCompanies();
+            model.MyCompanyNames = myCompanies;
 
-			var supplierOrdersCollection = reportService.AllSupplierOrders
-				(model.SupplierName,model.StartDate,model.EndDate,
+            var supplierOrdersCollection = reportService.AllSupplierOrders
+				(model.SupplierName,model.MyCompanyId,model.StartDate,model.EndDate,
 				model.CurrentPage, SupplierOrdersReportAll.SupplierOrdersPerPage);
 
 			model.SupplierOrderCollection = supplierOrdersCollection.SupplierOrders;
@@ -444,10 +451,12 @@ namespace SSMO.Controllers
 			//TODO When All are selected page is empty
 
 			var customerNames = customerService.GetCustomerNames(userId);
+            var myCompanies = myCompanyService.GetAllCompanies();
+            model.MyCompanyNames = myCompanies;
 
-			var customerPaymentCollection = reportService.CustomersInvoicesPaymentDetails(
-				model.CustomerName,
-				model.CurrentPage, CustomerInvoicePaymentsReportsViewModel.CustomerInvoicesPerPage);
+            var customerPaymentCollection = reportService.CustomersInvoicesPaymentDetails(
+				model.CustomerName, model.CurrentPage, model.MyCompanyId,
+				CustomerInvoicePaymentsReportsViewModel.CustomerInvoicesPerPage);
 
 			model.CustomerPaymentCollection = customerPaymentCollection.CustomerInvoices;
 			model.CustomerNames = customerNames;
@@ -513,10 +522,11 @@ namespace SSMO.Controllers
 			if (!ModelState.IsValid) return View();
 			//TODO When All are selected page is empty
 			var customerNames = customerService.GetCustomerNames(userId);
-
-			var customerOrdersPaymentCollection = reportService.CustomerOrdersPaymentDetails(
-				model.CustomerName,
-				model.CurrentPage, CustomerOrderPaymentReportViewModel.CustomerOrderPerPage);
+            var myCompanies = myCompanyService.GetAllCompanies();
+            model.MyCompanyNames = myCompanies;
+            var customerOrdersPaymentCollection = reportService.CustomerOrdersPaymentDetails(
+				model.CustomerName, model.CurrentPage, model.MyCompanyId,
+				CustomerOrderPaymentReportViewModel.CustomerOrderPerPage);
 
 			model.CustomerOrdersPaymentCollection = customerOrdersPaymentCollection.CustomerPaymentCollection;
 			model.CustomerNames = customerNames;
@@ -582,8 +592,11 @@ namespace SSMO.Controllers
 			var supplierNames = supplierService.GetSupplierNames(userId);
 			model.SupplierNames = supplierNames;
 
-			var supplierOrdersPaymentCollection = supplierOrderService.GetSupplierOrders
-				(model.SupplierName,model.StartDate,model.EndDate, model.CurrentPage,
+            var myCompanies = myCompanyService.GetAllCompanies();
+            model.MyCompanyNames = myCompanies;
+
+            var supplierOrdersPaymentCollection = supplierOrderService.GetSupplierOrders
+				(model.SupplierName,model.MyCompanyId,model.StartDate,model.EndDate, model.CurrentPage,
 				SupplierInvoicePaymentReportViewModel.SupplierInvoicePerPage);
 
 			model.SupplierOrderPaymentCollection = supplierOrdersPaymentCollection.SupplierOrderPaymentCollection;
@@ -593,7 +606,7 @@ namespace SSMO.Controllers
 		}
 		[HttpGet]
 		[Authorize]
-		public IActionResult DetailsSupplierAndPurchasePayment(int id)
+		public IActionResult DetailsSupplierAndPurchasePayment(int id, decimal balance)
 		{
 			string userId = this.User.UserId();
 			var myCompanyUsersId = myCompanyService.GetCompaniesUserId();
@@ -604,6 +617,7 @@ namespace SSMO.Controllers
 				return BadRequest();
 			}
 			var supplierOrder = supplierOrderService.GetPaymentsPerOrderForEdit(id);
+			supplierOrder.Balance = balance;
 			ViewBag.Count = supplierOrder.PurchasePaymentsCollection.Count;           
             return View(supplierOrder);
 		}
@@ -860,7 +874,9 @@ namespace SSMO.Controllers
 				model.DeliveryCost, model.OrderConfirmationNumber, model.TruckNumber,
 			   model.Products, model.Incoterms, model.Comment, model.ChosenBanks, 
 			   model.FiscalAgentId, model.FscTextEng, model.PaymentTerms,model.DeliveryAddress,
-			   model.LoadingAddress,model.Factoring, model.Comission);
+			   model.LoadingAddress,model.Factoring, model.Comission,model.DealType,
+			   model.DealDescription,model.CustomsExportDeclaration,model.BankExpenses,
+			   model.FiscalAgentExpenses,model.CustomsExpenses,model.Duty,model.OtherExpenses);
 
 			if (!checkEditableInvoice) return BadRequest();
 
@@ -955,7 +971,8 @@ namespace SSMO.Controllers
 			var editcreditnote = creditNoteService.EditCreditNote
 				(id, model.Date, model.Incoterms, model.TruckNumber, model.NetWeight,
 				model.GrossWeight, model.DeliveryCost, model.CurrencyExchangeRate, model.Comment, 
-				model.Products, model.PaymentTerms, model.InvoiceNumberId);
+				model.Products, model.PaymentTerms, model.InvoiceNumberId,model.DealType,
+				model.DealDescription,model.DeliveryAddress,model.LoadingAddress);
 
 			if (editcreditnote == false)
 			{
@@ -1124,7 +1141,9 @@ namespace SSMO.Controllers
 			}
 
 			var editDebitNote = debitNoteService.EditDebitNote
-				(id, model.Date, model.Incoterms, model.Comment, model.Products, model.PaymentTerms);
+				(id, model.Date, model.Incoterms, model.Comment, model.Products,
+				model.PaymentTerms,model.DealType,model.DescriptionType,model.DeliveryAddress,
+				model.LoadingAddress);
 
 			if (editDebitNote == false)
 			{
@@ -1260,8 +1279,7 @@ namespace SSMO.Controllers
 
 			var invoiceDetails = reportService.InvoiceDetails(id, header, footer);
 			ClientService.AddClient(invoiceDetails);
-
-			// return RedirectToAction("ExportInvoiceToPdf", new { Model = invoiceDetails })
+		
 			return View(invoiceDetails);
 		}
 
@@ -1273,10 +1291,12 @@ namespace SSMO.Controllers
 
 			if (!ModelState.IsValid) { return BadRequest(); }
 
-			model.Suppliers = supplierService.GetSupplierNames(userId);
+            var myCompanies = myCompanyService.GetAllCompanies();
+            model.MyCompanyNames = myCompanies;
+            model.Suppliers = supplierService.GetSupplierNames(userId);
 
 			var purchaseCollection = reportService.PurchaseInvoices
-				(model.Supplier, model.StartDate.Date, model.EndDate.Date, model.CurrentPage,
+				(model.Supplier, model.MyCompanyId, model.StartDate.Date, model.EndDate.Date, model.CurrentPage,
 				PurchaseInvoisecBySupplierModel.PurchaseInvoicesPerPage);
 
 			model.InvoiceCollection = purchaseCollection.PurchaseInvoiceCollection;
@@ -1326,7 +1346,7 @@ namespace SSMO.Controllers
 				model.PurchaseTransportCost, model.BankExpenses, model.Duty, model.CustomsExpenses,
 				model.Factoring, model.FiscalAgentExpenses, model.ProcentComission, model.OtherExpenses,
 				model.PurchaseProducts, model.DeliveryAddress, model.ShippingLine,model.Eta,
-				model.CostPriceCurrency,model.DelayCostCalculation);
+				model.CostPriceCurrency,model.DelayCostCalculation,model.Origin,model.CustomsImportDeclaration);
 
 			if (purchaseForEdit == false) { return BadRequest(); }
 
@@ -1410,100 +1430,19 @@ namespace SSMO.Controllers
             return RedirectToAction("Index", "Home");
 		}
 		
-		[HttpGet]
-		//public async Task<IActionResult> ExportInvoiceToPdf()
-		//{
-		//	InvoiceDetailsViewModel invoice = ClientService.GetClient();
-		//	await Export();
-		//	return View(invoice);
-		//}
-		//public async Task<string> Export()
-		//{
-		//	System.Text.Encoding.RegisterProvider(System.Text.CodePagesEncodingProvider.Instance);
-		//	var pdfModel = ClientService.GetClient();
-		//	var filename = "doc" + pdfModel.DocumentNumber + "_" + DateTime.Now.ToString("ddMMyyyy");
-		//	var stringForPrint = await viewRenderService.RenderToStringAsync("~/Views/Reports/ExportInvoiceToPdf.cshtml", pdfModel);
-		//	iTextSharp.text.Document document = new iTextSharp.text.Document();
-		//	XMLWorkerFontProvider fontProvider = new XMLWorkerFontProvider(XMLWorkerFontProvider.DONTLOOKFORFONTS);
-		//	var path = Directory.GetCurrentDirectory() + filename + ".pdf";
-		//	PdfWriter writer = PdfWriter.GetInstance(document, new FileStream(path, FileMode.Create));
-		//	//foreach (var file in Directory.GetFiles(Directory.GetCurrentDirectory()+"/"+"wwwroot/fonts"))
-		//	//{
-		//	//	FontFactory.FontImp.Register(file);
-		//	//}
-
-		//	document.Open();
-		//	document.Add(new Chunk(""));
-
-		//	using (var strReader = new StringReader(stringForPrint))
-		//	{
-		//		HtmlPipelineContext htmlcontext = new HtmlPipelineContext(null);
-		//		htmlcontext.SetTagFactory(Tags.GetHtmlTagProcessorFactory());
-		//		ICSSResolver cSSResolver = XMLWorkerHelper.GetInstance().GetDefaultCssResolver(false);
-		//		//cSSResolver.AddCssFile(Directory.GetCurrentDirectory() + "/wwwroot/css/site.css", true);
-		//		IPipeline pipeline = new CssResolverPipeline(cSSResolver, new HtmlPipeline(htmlcontext, new PdfWriterPipeline(document, writer)));
-		//		var worker = new XMLWorker(pipeline, true);
-		//		var xmlParse = new XMLParser(true, worker);
-		//		xmlParse.Parse(strReader);
-		//		xmlParse.Flush();
-		//	}
-		//	document.Close();
-		//	return path;
-		//}
-
-		//public async Task<ActionResult> ExportToPdf2()
-		//      {
-		//          InvoiceDetailsViewModel invoice = ClientService.GetClient();
-		//          using (StringWriter sw = new StringWriter())
-		//          {
-		//              using (HtmlTextWriter hw = new HtmlTextWriter(sw))
-		//              {
-		//                  //To Export all pages
-		//                  GridView gridview = new GridView();
-		//                  gridview.DataSource = _empList;
-		//                  gridview.DataBind();
-
-		//                  gridview.RenderControl(hw);
-		//                  StringReader sr = new StringReader(sw.ToString());
-		//                  Document pdfDoc = new Document(PageSize.A2, 10f, 10f, 10f, 0f);
-		//                  HTMLWorker htmlparser = new HTMLWorker(pdfDoc);
-		//                  PdfWriter.GetInstance(pdfDoc, Response.OutputStream);
-		//                  pdfDoc.Open();
-		//                  htmlparser.Parse(sr);
-		//                  pdfDoc.Close();
-		//                  Response.ContentType = "application/pdf";
-		//                  Response.AddHeader("content-disposition", "attachment;filename=Export.pdf");
-		//                  Response.Cache.SetCacheability(HttpCacheability.NoCache);
-		//                  Response.Write(pdfDoc);
-		//                  Response.End();
-		//              }
-		//              return View();
-		//} 
-		[HttpGet]
-		public async Task<IActionResult> GetPdf()
+		public FileResult ExportPdf(string exportData)
 		{
-			var model = ClientService.GetClient();
-			var htmlData = await this.viewRenderService.RenderToStringAsync("~/Views/Reports/ExportInvoiceToPdf.cshtml", model);
-
-			//TODO Convert is not working						
-			byte[] fileContents = this.htmlToPdfConverter.Convert(htmlData);
-
-			return this.File(fileContents, "application/pdf");
+			using (MemoryStream stream = new MemoryStream(Encoding.ASCII.GetBytes(exportData)))
+			{
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                PdfWriter writer = new PdfWriter(byteArrayOutputStream);
+                PdfDocument pdfDocument = new PdfDocument(writer);
+                pdfDocument.SetDefaultPageSize(PageSize.A4);
+                HtmlConverter.ConvertToPdf(stream, pdfDocument);
+                pdfDocument.Close();
+                return File(byteArrayOutputStream.ToArray(), "application/pdf", "Invoice.pdf");
+			}
 		}
-		//public FileResult ExportPdf2(string exportData)
-		//{
-		//	using (MemoryStream stream = new System.IO.MemoryStream())
-		//	{
-		//		StringReader reader = new StringReader(exportData);
-		//		iTextSharp.text.Document PdfFile = new iTextSharp.text.Document(iTextSharp.text.PageSize.A4);
-		//		PdfWriter writer = PdfWriter.GetInstance(PdfFile, stream);
-		//		PdfFile.Open();
-		//		XMLWorkerHelper.GetInstance().ParseXHtml(writer, PdfFile, reader);
-		//		PdfFile.Close();
-		//		return File(stream.ToArray(), "application/pdf", "exportData.pdf");
-		//	}
-		//}
-
 		public FileResult ExportToExcel()
 		{
 			InvoiceDetailsViewModel invoice = ClientService.GetClient();
@@ -1885,7 +1824,6 @@ namespace SSMO.Controllers
 			}
 
 		}
-
 		public FileResult ExportProductDetails()
 		{
 			ICollection<ProductPurchaseDetails> productPurchaseDetails = ClientService.GetProductDetails();
@@ -1901,14 +1839,15 @@ namespace SSMO.Controllers
                 worksheet.Cell(1, 7).Value = "Quantity";
                 worksheet.Cell(1, 8).Value = "Pallets";
                 worksheet.Cell(1, 9).Value = "Sheets/pallet";
-                worksheet.Cell(1, 10).Value = "Fsc Claim";
-                worksheet.Cell(1, 11).Value = "Fsc Certificate";
-                worksheet.Cell(1, 12).Value = "Purchase Price";
-                worksheet.Cell(1, 13).Value = "Curency";
-                worksheet.Cell(1, 14).Value = "Cost Price";
-                worksheet.Cell(1, 15).Value = "Cost Price Currency";
-                worksheet.Cell(1, 16).Value = "Loading Address";
-                worksheet.Cell(1, 17).Value = "Delivery Address";
+                worksheet.Cell(1, 10).Value = "Autstanding Quantity";
+                worksheet.Cell(1, 11).Value = "Fsc Claim";
+                worksheet.Cell(1, 12).Value = "Fsc Certificate";
+                worksheet.Cell(1, 13).Value = "Purchase Price";
+                worksheet.Cell(1, 14).Value = "Curency";
+                worksheet.Cell(1, 15).Value = "Cost Price";
+                worksheet.Cell(1, 16).Value = "Cost Price Currency";
+                worksheet.Cell(1, 17).Value = "Loading Address";
+                worksheet.Cell(1, 18).Value = "Delivery Address";
 
 				int row = 2;
 
@@ -1922,14 +1861,15 @@ namespace SSMO.Controllers
 					worksheet.Cell(row, 7).Value = product.Quantity;
                     worksheet.Cell(row, 8).Value = product.Pallets;
                     worksheet.Cell(row, 9).Value = product.SheetsPerPallet;
-                    worksheet.Cell(row, 10).Value = product.FscClaim;
-                    worksheet.Cell(row, 11).Value = product.FscCertificate;
-                    worksheet.Cell(row, 12).Value = product.PurchasePrice;
-                    worksheet.Cell(row, 13).Value = product.Currency;
-                    worksheet.Cell(row, 14).Value = product.CostPrice;
-                    worksheet.Cell(row, 15).Value = product.CostPriceCurrency;
-                    worksheet.Cell(row, 16).Value = product.LoadingAddress;
-                    worksheet.Cell(row, 17).Value = product.DeliveryAddress;
+					worksheet.Cell(row, 10).Value = product.AutstandingQuantity;
+                    worksheet.Cell(row, 11).Value = product.FscClaim;
+                    worksheet.Cell(row, 12).Value = product.FscCertificate;
+                    worksheet.Cell(row, 13).Value = product.PurchasePrice;
+                    worksheet.Cell(row, 14).Value = product.Currency;
+                    worksheet.Cell(row, 15).Value = product.CostPrice;
+                    worksheet.Cell(row, 16).Value = product.CostPriceCurrency;
+                    worksheet.Cell(row, 17).Value = product.LoadingAddress;
+                    worksheet.Cell(row, 18).Value = product.DeliveryAddress;
                     row++;
                     worksheet.Cell(row, 3).Value = "Customer";
                     worksheet.Cell(row, 4).Value = "Document Type";
