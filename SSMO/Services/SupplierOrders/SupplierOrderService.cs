@@ -340,7 +340,7 @@ namespace SSMO.Services.SupplierOrders
         public ICollection<SupplierOrdersNumbersListViewModel> GetSupplierOrdersNumbersJsonList(int id)
         {
            return dbContext.SupplierOrders
-                .Where(s=>s.SupplierId == id)
+                .Where(s=>s.MyCompanyId == id)
                 .Select(l=>new SupplierOrdersNumbersListViewModel   
                 {
                     SupplierOrderId = l.Id,  

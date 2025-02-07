@@ -60,5 +60,9 @@ namespace SSMO.Data.Models
         public string PaymentTerms { get; set; }
         public string Etd { get; set; }
         public string Eta { get; set; }
+        public int? HeaderId { get; set; }
+        public Image Header { get; set; }
+        public int? FooterId { get; set; }
+        public Image Footer { get; set; }
     }
 }

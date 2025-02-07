@@ -38,5 +38,7 @@ namespace SSMO.Models.CustomerOrders
         public string PaymentTerms { get; set; }
         public string Eta { get; set; }
         public string Etd { get; set; }
+        public string HeaderUrl { get; set; }
+        public string FooterUrl { get; set; }
     }
 }

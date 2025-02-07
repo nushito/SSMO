@@ -51,7 +51,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\Documents\BgInvoice\" />
     <Folder Include="Services\Customer\CustomerModels\" />
   </ItemGroup>
 

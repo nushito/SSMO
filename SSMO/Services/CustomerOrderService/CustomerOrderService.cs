@@ -11,6 +11,7 @@ using SSMO.Models.Products;
 using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
 using SSMO.Repository;
+using SSMO.Services.Images;
 using SSMO.Services.MyCompany;
 using SSMO.Services.Products;
 using SSMO.Services.TransportService;
@@ -28,15 +29,17 @@ namespace SSMO.Services.CustomerOrderService
         private readonly IProductService productService;
         private readonly IProductRepository productRepository;
         private readonly IMycompanyService mycompanyService;
+        private readonly IImageService imageService;
         public CustomerOrderService(ApplicationDbContext dbContext, IConfigurationProvider mapper,
             IProductService productService,IProductRepository productRepository,
-            IMycompanyService mycompanyService)
+            IMycompanyService mycompanyService, IImageService imageService)
         {
             this.dbContext = dbContext;
             this.mapper = mapper;
             this.productService = productService;
             this.productRepository = productRepository;
             this.mycompanyService = mycompanyService;
+            this.imageService = imageService;
         }
 
         public bool CheckOrderNumberExist(int number)
@@ -47,12 +50,11 @@ namespace SSMO.Services.CustomerOrderService
             }
             return false;
         }
-
         public async Task<int> CreateOrder(string num, DateTime date, int customerId, int company, string deliveryTerms,
             string loadingAddress, string deliveryAddress,int currency,string origin, 
             int vat, int statusId, List<int> supplierOrders, string comment, 
             List<int> banks, string type, int? fiscalAgentId, string dealType, string dealDescription, 
-            int? fscText, string paymentTerms, string eta, string etd)
+            int? fscText, string paymentTerms, string eta, string etd, int header, int footer)
         {
            
             var fscClaim = dbContext.MyCompanies
@@ -98,7 +100,9 @@ namespace SSMO.Services.CustomerOrderService
                 DealDescription= dealDescription,
                 PaymentTerms= paymentTerms,
                 Eta = eta,
-                Etd = etd
+                Etd = etd,
+                HeaderId = header,
+                FooterId = footer
             };
 
             if (fiscalAgentId != null)
@@ -162,7 +166,7 @@ namespace SSMO.Services.CustomerOrderService
             string deliveryAddress, int currency, string origin, 
            int vat, int statusId, List<int> supplierOrders, string comment, 
            List<int> banks, string type, int? fiscalAgentId, string dealType, string dealDescription, 
-           int? fscText, string paymentTerms, string eta, string etd)
+           int? fscText, string paymentTerms, string eta, string etd, int header, int footer)
         {
             var fscClaim = dbContext.MyCompanies
                  .Where(a => a.Id == company)
@@ -201,7 +205,9 @@ namespace SSMO.Services.CustomerOrderService
                 DealDescription = dealDescription,
                 PaymentTerms= paymentTerms,
                 Eta = eta,
-                Etd = etd
+                Etd = etd,
+                HeaderId = header,
+                FooterId = footer
             };
 
             banksForOrder.ForEach(i => order.BankDetails.Add(i));
@@ -416,7 +422,9 @@ namespace SSMO.Services.CustomerOrderService
                 BankDetails = new List<BankDetailsViewModel>(),
                 PaymentTerms = order.PaymentTerms,
                 Eta = order.Eta,
-                Currency = currency
+                Currency = currency,
+                HeaderUrl = imageService.HeaderUrl(order.HeaderId ?? 0),
+                FooterUrl = imageService.FooterUrl(order.FooterId ?? 0)
             };
 
             var myCompany = dbContext.MyCompanies

@@ -28,6 +28,8 @@ using Syncfusion.Pdf;
 using DocumentFormat.OpenXml.InkML;
 using System.Text.RegularExpressions;
 using System.Text;
+using SSMO.Services.Images;
+using SSMO.Services.Documents.Invoice;
 
 
 namespace SSMO.Controllers
@@ -46,6 +48,7 @@ namespace SSMO.Controllers
         private readonly ISupplierOrderService supplierOrderService;
         private readonly IDocumentService documentService;
         private readonly IFscTextService fscTextService;
+        private readonly IImageService imageService;
         public CustomerOrdersController(ISupplierService supplierService,
            ICurrency currency,
            IMycompanyService myCompanyService,
@@ -54,7 +57,7 @@ namespace SSMO.Controllers
            ICustomerOrderService cusomerOrderService,
             IReportsService reportService, IStatusService statusService,
             ISupplierOrderService supplierOrderService, IDocumentService
-             documentService, IFscTextService fscTextService)
+             documentService, IFscTextService fscTextService, IImageService imageService)
         {
             this.supplierService = supplierService;
             this.currency = currency;
@@ -68,6 +71,7 @@ namespace SSMO.Controllers
             this.supplierOrderService = supplierOrderService;
             this.documentService = documentService;
             this.fscTextService = fscTextService;
+            this.imageService = imageService;
         }
         
         [HttpGet]
@@ -98,9 +102,9 @@ namespace SSMO.Controllers
                 BankDetails = customerOrderService.GetBanks(),
                 SupplierOrdersBySupplier = supplierOrderService.SuppliersAndOrders(),
                 FiscalAgents = documentService.GetFiscalAgents(),
-                FscTexts = fscTextService.GetAllFscTexts()
+                FscTexts = fscTextService.GetAllFscTexts(),
+               // Images = imageService.ImageCollection(myCompanyId)
             };
-
             return View(customerOrderDetails);
         }
       
@@ -159,7 +163,8 @@ namespace SSMO.Controllers
                                  customermodel.Type, customermodel.FiscalAgentId,
                                  customermodel.DealType, customermodel.DealDescription, 
                                  customermodel.FscText, customermodel.PaymentTerms,
-                                 customermodel.Eta, customermodel.Etd);
+                                 customermodel.Eta, customermodel.Etd, customermodel.Header,
+                                 customermodel.Footer);
                 ViewBag.NumberExist = 0;
             }
             else
@@ -180,7 +185,8 @@ namespace SSMO.Controllers
                                  customermodel.Type, customermodel.FiscalAgentId,
                                   customermodel.DealType, customermodel.DealDescription,
                                   customermodel.FscText, customermodel.PaymentTerms,
-                                  customermodel.Eta, customermodel.Etd);
+                                  customermodel.Eta, customermodel.Etd,customermodel.Header,
+                                 customermodel.Footer);
                 ViewBag.NumberExist = 1;
             }
             return RedirectToAction("AddOrderProducts", 
@@ -189,6 +195,17 @@ namespace SSMO.Controllers
                 }) ;
         }
 
+        public IActionResult GetImages(string id)
+        {
+            if(id == null)
+            {
+                id = "0";
+            }
+
+            var  myCompanyId = int.Parse(id.ToString());
+            var images = imageService.ImageCollection(myCompanyId);
+            return Json(images, new JsonSerializerOptions() { PropertyNameCaseInsensitive = false });
+        }
         public IActionResult AddOrderProducts
             (List<int> selectedSupplierOrders, int customerorderId)
         {
@@ -289,5 +306,15 @@ namespace SSMO.Controllers
             return View(printModel);
         }
         
+        public IActionResult GetSupplierOrders(string myCompanyId)
+        {
+            if (myCompanyId == null)
+            {
+                myCompanyId = "0";
+            }
+            var sellerId = int.Parse(myCompanyId.ToString());
+            var selectedSupplierOrders = supplierOrderService.GetSupplierOrdersNumbersJsonList(sellerId);
+            return Json(selectedSupplierOrders, new JsonSerializerOptions() { PropertyNameCaseInsensitive = false });
+        }
     }
 }

@@ -481,7 +481,7 @@ namespace SSMO.Controllers
             {
                 return View();
             }
-
+            model.MyCompanies = mycompanyService.GetAllCompanies();
             var documentNumbers = documentService.GetBgInvoices(model.MyCompanyId);
 
             if (documentNumbers == null)
@@ -490,9 +490,10 @@ namespace SSMO.Controllers
                 return View(model);
             }
             model.DocumentNumbers = documentNumbers;
+            
             return View(model);
         }
-        public IActionResult BgInvoice(int documentNumber)
+        public IActionResult BgInvoice(int bgInvoiceNumberId)
         {
             if (!User.Identity.IsAuthenticated)
             {
@@ -503,12 +504,27 @@ namespace SSMO.Controllers
                 return View();
             }
             //TODO Fix amount with currencyexchange
-            var bgInvoice = invoiceService.CreateBgInvoiceForPrint(documentNumber);
+            var bgInvoice = invoiceService.CreateBgInvoiceForPrint(bgInvoiceNumberId);
 
             if (bgInvoice == null) return View();
             ClientService.AddBgInvoice(bgInvoice);
 
             return View(bgInvoice);
+        }
+
+        public IActionResult GetBgInvoiceNumbers(string id)
+        {
+            if (id == null)
+            {
+                id = "0";
+            }
+
+            int myCompanyId = int.Parse(id.ToString());
+
+            var bgInvoices = invoiceService.BgInvoiceNumbers(myCompanyId);
+
+            return Json(bgInvoices, new JsonSerializerOptions() { PropertyNameCaseInsensitive = false });
+
         }
         public IActionResult ChoosePackingListForPrint(ChoosePackingListFromInvoicesViewModel model)
         {
@@ -535,6 +551,9 @@ namespace SSMO.Controllers
 
             model.Companies = mycompanyService.GetAllCompanies();           
             model.PackingListForPrint = documentService.PackingListForPrint(model.PackingListNumber);
+
+            ClientService.AddPackingList(model.PackingListForPrint);
+
             return View(model);
         }
         [HttpGet]

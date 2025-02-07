@@ -2,6 +2,7 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using SSMO.Models.CustomerOrders;
 using SSMO.Models.Documents.Invoice;
+using SSMO.Models.Documents.Packing_List;
 using SSMO.Models.Reports.FSC;
 using SSMO.Models.Reports.Invoice;
 using SSMO.Models.Reports.PaymentsModels;
@@ -24,6 +25,7 @@ namespace SSMO.Services
         private static CustomerOrderPrintViewModel _customerOrderPrint;
         private static ServiceOrderDetailsPrintViewModel _serviceOrder;
         private static ICollection<ProductPurchaseDetails> _products;
+        private static PackingListForPrintViewModel _packingList;
         public static void AddClient(InvoiceDetailsViewModel clientModel)
         {
             _clientModel = clientModel;
@@ -110,6 +112,16 @@ namespace SSMO.Services
         public static ICollection<ProductPurchaseDetails> GetProductDetails()
         {
             return _products;
+        }
+
+        public static void AddPackingList(PackingListForPrintViewModel packingList)
+        {
+            _packingList = packingList;
+        }
+
+        public static PackingListForPrintViewModel GetPackingList()
+        {
+            return _packingList;
         }
 
     }

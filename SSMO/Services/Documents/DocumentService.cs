@@ -94,7 +94,9 @@ namespace SSMO.Services.Documents
                 TruckNumber = packingList.TruckNumber,               
                 Products = new List<ProductsForPackingListModel>(),
                 CustomerPoNumber = new List<string>(),
-                DeliveryAddress = packingList.DeliveryAddress
+                DeliveryAddress = packingList.DeliveryAddress,
+                HeaderUrl = imageService.HeaderUrl(invoice.HeaderId ?? 0),
+                FooterUrl = imageService.FooterUrl(invoice.FooterId ?? 0),
             };
 
             var customerOrders = dbContext.CustomerOrders

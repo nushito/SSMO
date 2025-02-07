@@ -22,6 +22,8 @@ namespace SSMO.Models.Documents.Packing_List
         public ICollection<ProductsForPackingListModel> Products { get; set; }
         public CustomerForPackingListPrint Customer { get; set; }
         public decimal InvoicedQuantity { get; set; }
+        public string HeaderUrl { get; set; }
+        public string FooterUrl { get; set; }
 
     }
 }

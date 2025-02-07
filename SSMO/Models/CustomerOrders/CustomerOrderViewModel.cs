@@ -1,5 +1,6 @@
 ﻿using SSMO.Models.Customers;
 using SSMO.Models.FscTexts;
+using SSMO.Models.Image;
 using SSMO.Models.MyCompany;
 using SSMO.Models.Products;
 using SSMO.Models.Reports;
@@ -61,5 +62,8 @@ namespace SSMO.Models.CustomerOrders
         public string PaymentTerms { get; set; }
         public string Etd { get; set; }
         public string Eta { get; set; }
+        public ICollection<ImageModelViewForAllDocuments> Images { get; set; }
+        public int Footer { get; set; }
+        public int Header { get; set; }
     }
 }

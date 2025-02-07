@@ -35,20 +35,6 @@ namespace SSMO.Controllers
                await imageService.NewImage(file,model.Id);
             }
             return RedirectToAction("Index", "Home");
-        }
-
-       // [HttpPost]
-        //public IActionResult RetrieveImage()
-        //{
-        //    Image img = dbContext.Images.OrderByDescending
-        //(i => i.Id).SingleOrDefault();
-        //    string imageBase64Data = Convert.ToBase64String(img.ImageData);
-        //    string imageDataURL =
-        //string.Format("data:image/jpg;base64,{0}",
-        //imageBase64Data);
-        //    ViewBag.ImageTitle = img.ImageTitle;
-        //    ViewBag.ImageDataUrl = imageDataURL;
-        //    return View("Index");
-        //}}
+        }      
     }
 }

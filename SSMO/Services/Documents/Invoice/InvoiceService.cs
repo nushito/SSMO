@@ -5,6 +5,7 @@ using SSMO.Data.Enums;
 using SSMO.Data.Models;
 using SSMO.Infrastructure;
 using SSMO.Models.CustomerOrders;
+using SSMO.Models.Documents.BgInvoice;
 using SSMO.Models.Documents.CreditNote;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Documents.Packing_List;
@@ -595,8 +596,13 @@ namespace SSMO.Services.Documents.Invoice
                 InvoiceNumber = num.DocumentNumber
             })
             .ToList();
-        public BgInvoiceViewModel CreateBgInvoiceForPrint(int documentNumber)
+        public BgInvoiceViewModel CreateBgInvoiceForPrint(int documentNumberId)
         {
+            var documentNumber = dbContext.Documents
+                .Where(i => i.Id == documentNumberId)
+                .Select(n => n.DocumentNumber)
+                .FirstOrDefault();
+
             var invoice = dbContext.Documents
                 .Where(i => i.DocumentNumber == documentNumber && 
                 (i.DocumentType == DocumentTypes.Invoice 
@@ -697,7 +703,8 @@ namespace SSMO.Services.Documents.Invoice
             if(bgInvoiceForPrint.DocumentType == "CreditNote")
             {
                 bgInvoiceForPrint.TotalAmount = invoice.CreditNoteTotalAmount * currencyExchange;
-            }else if(bgInvoiceForPrint.DocumentType == "DebitNote")
+            }
+            else if(bgInvoiceForPrint.DocumentType == "DebitNote")
             {
                 bgInvoiceForPrint.TotalAmount = invoice.DebitNoteTotalAmount * currencyExchange;
             }
@@ -1075,6 +1082,18 @@ namespace SSMO.Services.Documents.Invoice
         {
             var num = await Task.FromResult(dbContext.Documents.Where(i => i.Id == id).Select(n => n.DocumentNumber).FirstOrDefault().ToString());
             return num;
+        }
+
+        public ICollection<BgInvoiceJsonCollection> BgInvoiceNumbers(int companyId)
+        {
+            return dbContext.Documents
+                .Where(d=>d.DocumentType == DocumentTypes.BGInvoice && d.MyCompanyId == companyId)
+                .Select(a=> new BgInvoiceJsonCollection
+                {
+                    BgInvoiceId= a.Id,
+                    BgInvoiceNumber= a.DocumentNumber
+                })
+                .ToList();
         }
     }
 }

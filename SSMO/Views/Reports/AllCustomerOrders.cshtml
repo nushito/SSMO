@@ -76,61 +76,64 @@
            >>></a>
     </div>
 </div>
-
-<div class="container">
-   <div class="row">
-        <div class="col">
-          OC Number
-        </div>
-        <div class="col">
-         Customer PO Number
-        </div>
-         <div class="col">
-          Date
-        </div>
-         <div class="col">
-          Loading Address
-        </div>
-         <div class="col">
-          Delivery Address
-        </div>
-        <div class="col">
-          Order Status
-        </div>
-        </div>
-<hr />
-<br />
-</div>
-<div class="container">
-    @if(Model.CustomerOrderCollection != null)
-    {
-        @foreach (var order in Model.CustomerOrderCollection)
+<table>
+    <thead>
+        <tr>
+            <th>
+                OC Number
+            </th>
+            <th>
+                Customer PO Number 
+            </th>
+            <th>
+                Date
+            </th>
+            <th>
+                Loading Address
+            </th>
+            <th>
+                Delivery Address
+            </th>
+            <th>
+                Order Status
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.CustomerOrderCollection != null)
         {
-            <div class="row">
-                <div class="col">
-                    @order.OrderConfirmationNumber
-                </div>
-                  <div class="col">
-                    @order.CustomerPoNumber
-                </div>
-                 <div class="col">
-                    @order.Date
-                </div>
-                 <div class="col">
-                    @order.LoadingPlace
-                </div>
-                 <div class="col">
-                    @order.DeliveryAddress
-                </div>
-             <div class="col">
-                    @order.StatusName
-            </div>
-            <a asp-controller="Reports" asp-action="CustomerOrderDetailsPrint" asp-route-id="@order.Id" class="btn btn-info mr-1" target="_blank">Details</a>
-            <a asp-controller="Reports" asp-action="CustomerOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1" target="_blank">Edit</a>
-            </div>
-            <hr />
-        }
-    }   
-</div>
+            @foreach (var order in Model.CustomerOrderCollection)
+            {
+                <tr >
+                    <td>
+                         @order.OrderConfirmationNumber
+                    </td>
+                    <td>
+                         @order.CustomerPoNumber
+                    </td>
+                    <td>
+                         @order.Date
+                    </td>
+                    <td>
+                         @order.LoadingPlace
+                    </td>
+                    <td>
+                         @order.DeliveryAddress
+                    </td>
+                    <td>
+                         @order.StatusName
+                    </td>
+                    <td>
+                        <a asp-controller="Reports" asp-action="CustomerOrderDetailsPrint" asp-route-id="@order.Id" class="btn btn-info mr-1" target="_blank">Details</a>
+                    </td>
+                    <td>
+                        <a asp-controller="Reports" asp-action="CustomerOrderEdit" asp-route-id="@order.Id" class="btn btn-outline-info mr-1" target="_blank">Edit</a>
+                    </td>
+                </tr>                   
+            }
+        }  
+    </tbody>
+</table>
+<hr />
 
 

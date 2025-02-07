@@ -5,18 +5,7 @@
 }
 
 <form class="get">
-<div class="row">
-        <div class="form-group col-md-4">
-            <label asp-for="DocumentNumber"></label>
-            <select asp-for="DocumentNumber" class="form-control">
-            <option value="">All</option>
-                @foreach (var number in Model.DocumentNumbers)
-                {
-                        <option value="@number">@number</option>
-                }
-
-            </select>
-        </div>
+<div class="row">      
         <div class="row col-md-4 mb-3">
             <label asp-for="MyCompanyId">Seller</label>
             <select name= "MyCompanyId" asp-for="MyCompanyId" class="form-control">
@@ -25,19 +14,22 @@
                 {
                        <option value="@myCompany.Id">@myCompany.Name</option>
                 }
-
             </select>
+        </div>
+          <div class="form-group col-md-4">
+            <label asp-for="BgInvoiceNumberId" class="control-label">Select BgInvoice Number</label>          
+             <select class="form-control" id="BgInvoiceNumberId" name="BgInvoiceNumberId" asp-for="BgInvoiceNumberId" asp-items="@(new SelectList(string.Empty,"BgInvoiceId", "BgInvoiceNumber"))"></select>               
         </div>
  </div>
     <hr /> 
     <input type="submit" value="BG Invoice" class="btn btn-primary mt-3" 
                asp-controller="Documents" 
                asp-action="BgInvoice"
-               asp-route-documentNumber="@Model.DocumentNumber"/>
-
-  @* <a class="btn btn-light text-capitalize" data-mdb-ripple-color="dark" 
-               asp-controller="Documents" 
-               asp-action="BgInvoice"
-               asp-route-documentNumber="@Model.DocumentNumber"
-               asp-route-currencyExchangeRateToBgn = "@Model.CurrencyExchangeRateToBgn"> Към БГ Фактура </a>*@
+               asp-route-bgInvoiceNumberId="@Model.BgInvoiceNumberId"/> 
 </form>
+
+@section Scripts {
+         <script src="/js/getBgInvoiceNumbers.js" type="text/javascript">                                       
+         </script>
+
+}

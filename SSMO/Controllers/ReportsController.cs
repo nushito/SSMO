@@ -51,7 +51,7 @@ using iText.Html2pdf;
 using iText.IO.Source;
 using iText.Kernel.Geom;
 using iText.Kernel.Pdf;
-
+using SSMO.Models.Documents.Packing_List;
 
 namespace SSMO.Controllers
 {
@@ -1727,6 +1727,102 @@ namespace SSMO.Controllers
 
                     var strDate = DateTime.Now.ToString("yyyyMMdd");
                     string filename = string.Format($"Invoice_{strDate}.xlsx");
+
+                    return File(content, contentType, filename);
+                }
+            }
+        }
+
+		public FileResult ExportPackingListExcel()
+		{
+            PackingListForPrintViewModel packingList = ClientService.GetPackingList();
+
+            using (var excelDocument = new XLWorkbook())
+            {
+                IXLWorksheet worksheet = excelDocument.Worksheets.Add("Packing List");
+                worksheet.Cell(1, 1).Value = "Packing List No:";
+                worksheet.Cell(1, 2).Value = packingList.DocumentNumber;
+                worksheet.Cell(2, 1).Value = "Date";
+                worksheet.Cell(2, 2).Value = packingList.Date;
+
+                
+                worksheet.Cell(4, 1).Value = "Customer";
+                worksheet.Cell(4, 2).Value = packingList.Customer.Name;
+                worksheet.Cell(4, 7).Value = "Supplier";
+                worksheet.Cell(4, 8).Value = packingList.MyCompanyForPl.Name;
+
+                worksheet.Cell(5, 1).Value = "EIK No";
+                worksheet.Cell(5, 2).Value = packingList.Customer.EIK;
+                worksheet.Cell(5, 7).Value = "EIK No";
+                worksheet.Cell(5, 8).Value = packingList.MyCompanyForPl.EIK;
+
+                worksheet.Cell(6, 1).Value = "VAT No";
+                worksheet.Cell(6, 2).Value = packingList.Customer.VAT;
+                worksheet.Cell(6, 7).Value = "VAT No";
+                worksheet.Cell(6, 8).Value = packingList.MyCompanyForPl.VAT;
+
+                worksheet.Cell(7, 1).Value = "Address";
+                worksheet.Cell(7, 2).Value = packingList.Customer.ClientAddress.Country;
+                worksheet.Cell(7, 3).Value = packingList.Customer.ClientAddress.City;
+                worksheet.Cell(7, 4).Value = packingList.Customer.ClientAddress.Street;
+                worksheet.Cell(7, 7).Value = "Address";
+                worksheet.Cell(7, 8).Value = packingList.MyCompanyForPl.Country;
+                worksheet.Cell(7, 9).Value = packingList.MyCompanyForPl.City;
+                worksheet.Cell(7, 10).Value = packingList.MyCompanyForPl.Street;
+
+				worksheet.Cell(8, 1).Value = "Incoterms:";
+				worksheet.Cell(8, 2).Value = packingList.Incoterms;
+
+				worksheet.Cell(8, 4).Value = "Truck No:";
+				worksheet.Cell(8, 5).Value = packingList.TruckNumber;
+
+                worksheet.Cell(9, 1).Value = "No";
+                worksheet.Cell(9, 2).Value = "Oписание";
+                worksheet.Cell(9, 3).Value = "Качество";
+                worksheet.Cell(9, 4).Value = "Размер";
+                worksheet.Cell(9, 5).Value = "FSC Claim";
+                worksheet.Cell(9, 6).Value = "FSC Certificate";
+                worksheet.Cell(9, 7).Value = "Мер.ед.";
+                worksheet.Cell(9, 8).Value = "Количество";
+                worksheet.Cell(9, 9).Value = "Цена лв.";
+                worksheet.Cell(9, 10).Value = "Сума лв.";
+
+                IXLRange range = worksheet.Range(worksheet.Cell(9, 1).Address, worksheet.Cell(9, 10).Address);
+                range.Style.Fill.SetBackgroundColor(XLColor.TurquoiseGreen);
+
+                int row = 10;
+                int i = 1;
+
+                foreach (var product in packingList.Products)
+                {
+                    worksheet.Cell(row, 1).Value = i;
+                    worksheet.Cell(row, 2).Value = product.DescriptionName;
+                    worksheet.Cell(row, 3).Value = product.GradeName;
+                    worksheet.Cell(row, 4).Value = product.SizeName;
+                    worksheet.Cell(row, 5).Value = product.FSCClaim;
+                    worksheet.Cell(row, 6).Value = product.FSCSertificate;
+                    worksheet.Cell(row, 7).Value = product.Unit.ToString();
+                    worksheet.Cell(row, 8).Value = product.Pallets;
+                    worksheet.Cell(row, 9).Value = product.SheetsPerPallet;
+                    worksheet.Cell(row, 10).Value = product.InvoicedQuantity;
+					worksheet.Cell(row, 11).Value = product.VehicleNumber;
+                    row++;
+                    i++;
+                }
+                row++;
+				worksheet.Cell(row, 1).Value = "Net Weigth";
+				worksheet.Cell(row, 2).Value = packingList.NetWeight;
+				worksheet.Cell(row, 4).Value = "Gross Weight";
+				worksheet.Cell(row, 5).Value = packingList.GrossWeight;
+               
+                using (var stream = new MemoryStream())
+                {
+                    excelDocument.SaveAs(stream);
+                    var content = stream.ToArray();
+                    string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+
+                    var strDate = DateTime.Now.ToString("yyyyMMdd");
+                    string filename = string.Format($"PackingList{strDate}.xlsx");
 
                     return File(content, contentType, filename);
                 }

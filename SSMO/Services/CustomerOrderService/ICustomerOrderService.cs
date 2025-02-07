@@ -20,7 +20,7 @@ namespace SSMO.Services.CustomerOrderService
             int vat, int statusId,List<int> supplierOrders, 
             string comment, List<int> banks, string type, int? fiscalAgentId,
             string dealType, string dealDescription, int? fscText, string paymentTerms,
-            string eta, string etd);
+            string eta, string etd, int header, int footer);
 
         public Task<int> CreateFirstOrder
             (int number, string num, DateTime date, int customer,
@@ -30,7 +30,7 @@ namespace SSMO.Services.CustomerOrderService
             int vat, int statusId, List<int> supplierOrders,
             string comment, List<int> banks, string type, int? fiscalAgentId,
             string dealType, string dealDescription, int? fscTextm, string paymentTerms,
-            string eta, string etd);
+            string eta, string etd, int header, int footer);
 
         public SSMO.Data.Models.CustomerOrder OrderPerIndex(int id);
         public SSMO.Data.Models.CustomerOrder OrderPerNumber(int number);

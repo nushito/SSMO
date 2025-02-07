@@ -51,7 +51,7 @@
         </td>
         <td class="form-group col-md-6 mb-4">           
                 <label >My Company</label>
-                <select id="mycompany" asp-for="MyCompanyId" class="form-control">
+                <select id="MyCompanyId" asp-for="MyCompanyId" class="form-control">
                 <option value="">All</option>
                     @foreach (var company in Model.MyCompanies)
                     {
@@ -173,7 +173,14 @@
             }
         </select> 
     </div>
-    
+    <div class="row col-md-4 mb-3">           
+             <label asp-for="Header" class="control-label"> Select Header</label>
+             <select class="form-control" id="Header" name="Header" asp-for="Header" asp-items="@(new SelectList(string.Empty,"Id", "ImageTitle"))"></select>               
+     </div>
+   <div class="row col-md-4 mb-3">
+       <label asp-for="Footer" class="control-label">Select Footer</label>
+       <select class="form-control" id="Footer" name="Footer" asp-for="Footer" asp-items="@(new SelectList(string.Empty,"Id","ImageTitle"))"></select>
+   </div>
     @if(Model.SupplierOrdersBySupplier.Count() > 0)
     {
            <div class="form-group row col-sm-4">
@@ -188,6 +195,10 @@
        </div>   
     }
 
+   @* <div class="row col-md-4 mb-3">           
+                 <label class="control-label"> Select SupplierOrder</label>
+                 <select multiple class="form-control" id="SupplierOrderId" name="SupplierOrderId" asp-for="SupplierOrderId" asp-items="@(new SelectList(string.Empty,"SupplierOrderId", "SupplierOrderNumber"))"></select>               
+     </div>*@
    @* <div class="row col-md-4 mb-3">
         <div class="form-group">
                 <label asp-for="SupplierId">Supplier</label>
@@ -202,10 +213,7 @@
         </div>
 
     </div>
-     <div class="row col-md-4 mb-3">           
-                 <label class="control-label"> Select SupplierOrder</label>
-                 <select class="form-control" id="SupplierOrderNumber" name="SupplierOrderId" asp-for="SupplierOrderId" asp-items="@(new SelectList(string.Empty,"SupplierOrderId", "SupplierOrderNumber"))"></select>               
-     </div>   *@
+        *@
     @* <input type="hidden" name="customerorderid" value="@model.id" />*@
         <input type="submit" value="Add Order Products" class="btn btn-primary mt-3"/>        
  </form> 
@@ -213,33 +221,33 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
-
+    <script type="text/javascript" src="~/js/getImages.js"></script>    
         <script type="text/javascript">
         $(function () {
             $("#datepicker").datepicker();
         });
     </script>
        
- @*<script type="text/javascript">
+@* <script type="text/javascript">
             $(document).ready
             (
                     function() 
                     {
                     //Dropdownlist Selectedchange event
-                    $("#SupplierId").change(function() {                        
-                        $("#SupplierOrderNumber option").remove();
-                        var supplierId = $(this).val(); 
+                    $("#MyCompanyId").change(function() {                        
+                       $("#SupplierOrderId option").remove();
+                        var myCompanyId = $(this).val(); 
                         $.ajax({
                             type: 'GET',
                             url: "/CustomerOrders/GetSupplierOrders", 
                             dataType: 'json',
-                            data: { id: supplierId },
+                            data: { id: myCompanyId },
                             success: function(selectedSuppliers) {                           
-                                $("#SupplierOrderNumber").append('<option value="' + "0" + '">' + "Select SupplierOrderNumber" + '</option>');
+                                    $("#SupplierOrderId").append('<option value="' + "0" + '">' + "Select SupplierOrderNumber" + '</option>');
                                 debugger;
                                 for (var i = 0; i < selectedSuppliers.length; i++) 
                                 {
-                                   $("#SupplierOrderNumber").append('<option value="' + selectedSuppliers[i].SupplierOrderId + '">' + selectedSuppliers[i].SupplierOrderNumber + '</option>');
+                                       $("#SupplierOrderId").append('<option value="' + selectedSuppliers[i].SupplierOrderId + '">' + selectedSuppliers[i].SupplierOrderNumber + '</option>');
                                 }      
 
                                 debugger;                          

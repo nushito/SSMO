@@ -14,13 +14,7 @@
                 for (var i = 0; i < selectedNumbers.length; i++) {
                     $("#PackingListNumber").append('<option value="' + selectedNumbers[i].PackingListId + '">' + selectedNumbers[i].PackingListNumber + '</option>');
                 }
-                debugger;
-                //var numbers = '';
-                //$(#InvoiceNumber).empty();
-                //$.each(selectedInvoiceNumbers, function(i, invoice) {
-                //    numbers += '<option value="' + invoice.InvoiceId + '">' + invoice.InvoiceNumber + '</option>';
-                //    
-                //}); $(#InvoiceNumber).html(invoice);
+               
             },
             error: function (ex) {
                 alert('Failed to retrieve packinglistNumber' + ex);

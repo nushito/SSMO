@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using SSMO.Controllers;
+using System.Collections;
 using System.Collections.Generic;
 
 namespace SSMO.Data.Models
@@ -12,5 +13,7 @@ namespace SSMO.Data.Models
             public MyCompany MyCompanyName { get; set;}
             public ICollection<Document> HeaderDocuments { get; set; } 
             public ICollection<Document> FooterDocuments { get; set; }
+            public ICollection<CustomerOrder> CustomerOrdersHeader { get; set; }
+        public ICollection<CustomerOrder> CustomerOrdersFooter { get; set; }
     }
 }

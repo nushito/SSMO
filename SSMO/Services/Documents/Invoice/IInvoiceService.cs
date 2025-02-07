@@ -1,4 +1,5 @@
-﻿using SSMO.Models.Documents.CreditNote;
+﻿using SSMO.Models.Documents.BgInvoice;
+using SSMO.Models.Documents.CreditNote;
 using SSMO.Models.Documents.Invoice;
 using SSMO.Models.Documents.Packing_List;
 using SSMO.Models.Reports.Invoice;
@@ -45,6 +46,8 @@ namespace SSMO.Services.Documents.Invoice
 
         public Task<string> GetInvoiceNumber(int id);
         public ICollection<CustomerCollectionForChoosingNewOrderForInvoiceEditViewModel> CustomersForeEditInvoice();
+
+        public ICollection<BgInvoiceJsonCollection> BgInvoiceNumbers(int companyId);
 
     }
 }

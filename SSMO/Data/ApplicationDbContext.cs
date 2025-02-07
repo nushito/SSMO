@@ -833,8 +833,21 @@ namespace SSMO.Data
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.Entity<Image>()
+                .HasMany(c => c.CustomerOrdersHeader)
+                .WithOne(i => i.Header)
+                .HasForeignKey(k => k.HeaderId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.Entity<Image>()
+                .HasMany(f => f.CustomerOrdersFooter)
+                .WithOne(c => c.Footer)
+                .HasForeignKey(f => f.FooterId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
             base.OnModelCreating(builder);
         }
-
     }
 }
